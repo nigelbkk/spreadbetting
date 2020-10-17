@@ -255,22 +255,17 @@ namespace BetfairAPI
             //            return RPCRequest<List<CompetitionResult>>("listCompetitions", p) as List<Event>;
             return RPCRequestFile<List<CompetitionResult>>("listCompetitions", p) as List<CompetitionResult>;
         }
-        public List<Market> GetMarkets(Int32 sportid, marketTypeEnum marketTypes, String[] Countries, marketProjectionEnum Projection)
+        public List<Market> GetMarkets(Int32 event_id)
         {
-            HashSet<String> marketProjection = GetHashSet<marketProjectionEnum>((uint)Projection);
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-            filter["eventTypeIds"] = new Int32[] { sportid };
-//            filter["marketCountries"] = Countries;
-            filter["marketStartTime"] = TimeRange(DateTime.UtcNow.Date.AddDays(1), 1, 0);
-            filter["marketTypeCodes"] = GetHashSet<marketTypeEnum>((uint)marketTypes);
+            filter["eventIds"] = new Int32[] { event_id };
             p["filter"] = filter;
-            p["sort"] = "FIRST_TO_START";
-            p["marketProjection"] = GetHashSet<marketProjectionEnum>((uint)Projection);
-            p["maxResults"] = 1000;
+            p["marketProjection"] = GetHashSet<marketProjectionEnum>((uint) marketProjectionEnum.EVENT);
 
-            return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
+            return RPCRequestFile<List<Market>>("listMarketCatalogue", p) as List<Market>;
+//            return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
         }
         public List<Market> GetMarkets(Int32 exchange, Int32 sportid, Int32 days, marketTypeEnum marketTypes, String[] Countries, marketProjectionEnum Projection)
         {

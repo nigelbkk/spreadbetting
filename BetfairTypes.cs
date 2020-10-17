@@ -39,6 +39,15 @@ namespace BetfairAPI
             return "Not found";
         }
     }
+    public enum MarketSortEnum
+    {
+        MINIMUM_TRADED,
+        MAXIMUM_TRADED,
+        MINIMUM_AVAILABLE,
+        MAXIMUM_AVAILABLE,
+        FIRST_TO_START,
+        LAST_TO_START
+    }
     public enum TimeZoneEnum
     {
         System,
@@ -385,7 +394,6 @@ namespace BetfairAPI
             get { return null; }
             set
             {
-                //                IvyBotNG.MainWindow.theMainWindow.OnNotify(this, value);
             }
         }
         public event PropertyChangedEventHandler PropertyChanged;

@@ -60,8 +60,9 @@ namespace SpreadTrader
 				WindowState = System.Windows.WindowState.Maximized;
 			}
 		}
-		private void FetchAllMarkets(object sender, RoutedEventArgs args)
+		private void FetchEvents(object sender, RoutedEventArgs args)
 		{
+			
 			AllEventTypes = new ObservableCollection<EventType>();
 			AllMarkets = new ObservableCollection<Market>();
 			LiveRunners = new ObservableCollection<RunnerLive>();
@@ -73,6 +74,7 @@ namespace SpreadTrader
 					{
 						_busyIndicator.BusyContent = "Loading markets...";
 						_busyIndicator.IsBusy = true;
+						EventsTreeView.Items.Clear();
 						ng.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
 						List<EventTypeResult> eventTypes = ng.GetEventTypes().OrderBy(o => o.eventType.name).ToList();
 						Favourites f = new Favourites(ng.GetEventTypes().OrderBy(o => o.eventType.name).ToList());
@@ -81,8 +83,8 @@ namespace SpreadTrader
 							if (!f.IsFavourite(ev.eventType.id))
 								continue;
 
-							var item = SportsTreeView.Items.Add(new TreeViewItem() { Header = ev.eventType.name } );
-							TreeViewItem tvi = (TreeViewItem)SportsTreeView.Items[item];
+							var item = EventsTreeView.Items.Add(new TreeViewItem() { Header = ev.eventType.name } );
+							TreeViewItem tvi = (TreeViewItem)EventsTreeView.Items[item];
 							try
 							{
 								List<CompetitionResult> competitions = ng.GetCompetitions(ev.eventType.id);
@@ -95,18 +97,13 @@ namespace SpreadTrader
 									{
 										Int32 item3 = tvi2.Items.Add(new TreeViewItem() { Header = e.details.name });
 										TreeViewItem tvi3 = (TreeViewItem)tvi2.Items[item3];
+										List<Market> markets = ng.GetMarkets(e.details.id).OrderBy(o => o.marketName).ToList();
+										foreach (Market m in markets)
+										{
+											tvi3.Items.Add(new TreeViewItem() { Header = String.Format("{0} {1}", m.details.openDate.ToString("HH:mm"), m.marketName)});
+										}
 									}
 								}
-								//foreach (Event e in events)
-								//{
-								//	Int32 item2 = tvi.Items.Add(new TreeViewItem() { Header = e.details.name });
-								//	TreeViewItem tvi2 = (TreeViewItem) tvi.Items[item2];
-								//	List<Market> markets = ng.GetMarkets(ev.eventType.id, marketTypeEnum.WIN, new String[] { "AE", "GB", "IE", "USA" }, marketProjectionEnum.EVENT);
-								//	foreach (Market m in markets)
-								//	{
-								//		tvi2.Items.Add(new TreeViewItem() { Header = m.details.Venue });
-								//	}
-								//}
 							}
 							catch (Exception xe)
 							{
@@ -218,6 +215,9 @@ namespace SpreadTrader
 			Button b = sender as Button;
 			switch (b.Tag)
 			{
+				case "Refresh":
+					FetchEvents(null, null);
+					break;
 				case "Favourites":
 					{
 						Point coords = PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(80, 24)));
