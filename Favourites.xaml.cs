@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security.Policy;
 using System.Windows;
 using BetfairAPI;
 
@@ -11,16 +12,15 @@ namespace SpreadTrader
 	{
 		Properties.Settings props = Properties.Settings.Default;
 		public ObservableCollection<EventType> AllEventTypes { get; set; }
-		public Favourites()
+		public Favourites(List<EventTypeResult> eventTypes)
 		{
 			AllEventTypes = new ObservableCollection<EventType>();
+			foreach (EventTypeResult er in eventTypes)
+			{
+				AllEventTypes.Add(er.eventType);
+			}
 			InitializeComponent();
-			AllEventTypes.Add(new EventType() { name = "American Football", id = 1});
-			AllEventTypes.Add(new EventType() { name = "Horses", id = 2 });
-			AllEventTypes.Add(new EventType() { name = "Dogs", id = 3 });
-
 			String[] ids = props.Favourites.Split(',');
-
 			foreach(EventType e in AllEventTypes)
 			{
 				e.IsChecked = ids.Contains(e.id.ToString());
@@ -37,6 +37,11 @@ namespace SpreadTrader
 				}
 			}
 			props.Save();
+		}
+		public bool IsFavourite(Int32 id)
+		{
+			String[] ids = props.Favourites.Split(',');
+			return ids.Contains(id.ToString());
 		}
 	}
 }

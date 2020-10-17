@@ -29,9 +29,9 @@ namespace BetfairAPI
             {"DSC-0037", "SubscriptionRequired"},
             {"DSC-0038", "OperationForbidden"}
         };
-        static public  String FaultCode(String code)
+        static public String FaultCode(String code)
         {
-            for (int i = 0; i < _ErrorCodes.Length; i++)
+            for (int i = 0; i < _ErrorCodes.Length / 2; i++)
             {
                 if (_ErrorCodes[i, 0] == code)
                     return _ErrorCodes[i, 1];
@@ -351,29 +351,29 @@ namespace BetfairAPI
         [JsonProperty(PropertyName = "clearedOrders")]
         private List<ClearedOrder> clearedOrders { get; set; }
         public Boolean moreAvailable { get; set; }
-        public List<ClearedOrder> Orders { get { return clearedOrders; }  }
+        public List<ClearedOrder> Orders { get { return clearedOrders; } }
     }
     public class CurrentOrderSummaryReport
     {
         public class CurrentOrderSummary
         {
-            public UInt64 betId { get ; set;  }
-            public String marketId { get ; set;  }
-            public Int32 selectionId { get ; set;  }
-            public Double handicap { get ; set;  }
-            public PriceSize priceSize { get ; set;  }
-            public Double bspLiability { get ; set;  }
-            public String side { get ; set;  }
-            public String status { get ; set;  }
-            public String persistenceType { get ; set;  }
-            public String orderType { get ; set;  }
-            public DateTime placedDate { get ; set;  }
-            public Double averagePriceMatched { get ; set;  }
-            public Double sizeMatched { get ; set;  }
+            public UInt64 betId { get; set; }
+            public String marketId { get; set; }
+            public Int32 selectionId { get; set; }
+            public Double handicap { get; set; }
+            public PriceSize priceSize { get; set; }
+            public Double bspLiability { get; set; }
+            public String side { get; set; }
+            public String status { get; set; }
+            public String persistenceType { get; set; }
+            public String orderType { get; set; }
+            public DateTime placedDate { get; set; }
+            public Double averagePriceMatched { get; set; }
+            public Double sizeMatched { get; set; }
             public Double sizeRemaining { get; set; }
-            public Double sizeLapsed { get ; set;  }
-            public Double sizeCancelled { get ; set;  }
-            public Double sizeVoided { get ; set;  }
+            public Double sizeLapsed { get; set; }
+            public Double sizeCancelled { get; set; }
+            public Double sizeVoided { get; set; }
         }
         public Boolean moreAvailable { get; set; }
         public List<CurrentOrderSummary> currentOrders { get; set; }
@@ -385,7 +385,7 @@ namespace BetfairAPI
             get { return null; }
             set
             {
-//                IvyBotNG.MainWindow.theMainWindow.OnNotify(this, value);
+                //                IvyBotNG.MainWindow.theMainWindow.OnNotify(this, value);
             }
         }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -409,7 +409,7 @@ namespace BetfairAPI
             public String rules { get; set; }
             public String wallet { get; set; }
             public marketTypeEnum marketType { get; set; }
-            public Double marketBaseRate{ get; set; }
+            public Double marketBaseRate { get; set; }
 
             public DateTime marketTime { get; set; }
             public DateTime suspendTime { get; set; }
@@ -507,10 +507,10 @@ namespace BetfairAPI
             {
                 switch (DisplayTimeZone)
                 {
-                    case TimeZoneEnum.System: return startTimeLocal; 
-                    case TimeZoneEnum.UK: return startTimeGmt; 
+                    case TimeZoneEnum.System: return startTimeLocal;
+                    case TimeZoneEnum.UK: return startTimeGmt;
                 }
-                return startTimeUtc; 
+                return startTimeUtc;
             }
         }
         public animalTypeEnum animalType
@@ -520,7 +520,7 @@ namespace BetfairAPI
                 switch (eventType.id)
                 {
                     case 4339: return animalTypeEnum.Greyhound;
-                    case 7: 
+                    case 7:
                         if (marketName.Contains(" Trot") || marketName.Contains(" Pace"))
                         {
                             return animalTypeEnum.Harness;
@@ -644,6 +644,17 @@ namespace BetfairAPI
         {
             return eventType.name;
         }
+    }
+    public class Competition
+    {
+        public Int32 id { get; set; }
+        public String name { get; set; }
+    }
+    public class CompetitionResult
+    {
+        public Competition competition { get; set; }
+        public Int32 marketCount { get; set; }
+        public String competitionRegion { get; set; }
     }
     public class Event
     {

@@ -76,42 +76,18 @@ namespace BetfairAPI
                 return reader.ReadToEnd();
             }
         }
-        private String GetURL(Dictionary<String, Object> Params)
+        private Object RPCRequestFile<T>(String Method, Dictionary<String, Object> Params)
         {
-            if (Params.ContainsKey("filter"))
+            string jsonResponse = System.IO.File.ReadAllText(String.Format(@"C:\development\data\{0}.json", Method));
+            var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
+            if (err != null)
             {
-                Dictionary<String, Object> filter = Params["filter"] as Dictionary<String, Object>;
-                if (filter.ContainsKey("exchangeIds"))
-                {
-                    Int32[] IDs = filter["exchangeIds"] as Int32[];
-
-                    if (IDs.Contains(2))
-                    {
-                        return "https://api-au.betfair.com/exchange/betting/json-rpc/v1/";    //URL(Params);
-                    }
-                }
-                if (filter.ContainsKey("marketIds"))
-                {
-                    String[] IDs = filter["marketIds"] as String[];
-
-                    if (IDs.First().Contains("2."))
-                    {
-                        return "https://api-au.betfair.com/exchange/betting/json-rpc/v1/";    //URL(Params);
-                    }
-                }
+                ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
+                throw new Exception(oo.ToString(), new Exception(oo.data.exception.errorCode));
             }
-            if (Params.ContainsKey("marketIds"))
-            {
-                String[] IDs = Params["marketIds"] as String[];
-
-                if (IDs.First().Contains("2."))
-                {
-                    return "https://api-au.betfair.com/exchange/betting/json-rpc/v1/";    //URL(Params);
-                }
-            }
-            return "https://api.betfair.com/exchange/betting/json-rpc/v1/";    //URL(Params);
+            String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
+            return JsonConvert.DeserializeObject<T>(res);
         }
-
         private Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
             String[] AccountCalls = new String[] { "getAccountFunds" };
@@ -121,7 +97,8 @@ namespace BetfairAPI
             joe["method"] = "SportsAPING/v1.0/" + Method;
             joe["params"] = Params;
 
-            String url = GetURL(Params);// "https://api.betfair.com/exchange/betting/json-rpc/v1/";    //URL(Params);
+            String url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";    //URL(Params);
+
             if (AccountCalls.Contains(Method))
             {
                 url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
@@ -195,10 +172,7 @@ namespace BetfairAPI
         }
         public void login(String CertFile, String CertPassword, String AppKey, String username, String password)
         {
-            if (PlayBackDate.Ticks != 0)
-            {
-                return;
-            }
+            return; ///NH
             this.AppKey = AppKey;   
             Token = String.Empty;
             byte[] args = Encoding.UTF8.GetBytes(String.Format("username={0}&password={1}", username, password));
@@ -258,21 +232,28 @@ namespace BetfairAPI
             //filter["eventTypeIds"] = new Int32[] { 7 };
             filter["marketCountries"] = new String[] { "GB", "USA" };
             p["filter"] = filter;
-            return RPCRequest<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
+//            return RPCRequest<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
+            return RPCRequestFile<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
         }
-        public List<Event> GetEvents(Int32 id)
+        public List<Event> GetEvents(Int32 competitionId)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
-            Dictionary<String, Object> start = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-            start["from"] = DateTime.UtcNow;
-            start["to"] = DateTime.UtcNow + new TimeSpan(24, 0, 0);
-            filter["exchangeIds"] = new Int32[] { 1 };
-            filter["eventTypeIds"] = new Int32[] { id };
-            filter["marketCountries"] = new String[] { "GB" };
+            filter["competitionIds"] = new Int32[] { competitionId };
             p["filter"] = filter;
-            return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
+//            return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
+            return RPCRequestFile<List<Event>>("listEvents", p) as List<Event>;
+        }
+        public List<CompetitionResult> GetCompetitions(Int32 event_type)
+        {
+            Dictionary<String, Object> p = new Dictionary<string, object>();
+            Dictionary<String, Object> filter = new Dictionary<string, object>();
+
+            filter["eventTypeIds"] = new Int32[] { event_type };
+            p["filter"] = filter;
+            //            return RPCRequest<List<CompetitionResult>>("listCompetitions", p) as List<Event>;
+            return RPCRequestFile<List<CompetitionResult>>("listCompetitions", p) as List<CompetitionResult>;
         }
         public List<Market> GetMarkets(Int32 sportid, marketTypeEnum marketTypes, String[] Countries, marketProjectionEnum Projection)
         {

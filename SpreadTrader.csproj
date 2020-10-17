@@ -70,7 +70,7 @@
       <DependentUpon>Favourites.xaml</DependentUpon>
     </Compile>
     <Compile Include="RunnerLive.cs" />
-    <Compile Include="Types.cs" />
+    <Compile Include="BetfairTypes.cs" />
     <Compile Include="WaitCursor.cs" />
     <Page Include="Favourites.xaml">
       <SubType>Designer</SubType>

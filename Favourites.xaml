@@ -8,7 +8,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="Favourites" Height="450" Width="234.693">
     <Grid>
-		<ListBox ItemsSource="{Binding AllEventTypes}" >
+		<ListBox ItemsSource="{Binding AllEventTypes}" FontSize="10">
 			<ListBox.ItemTemplate>
 				<HierarchicalDataTemplate>
 					<CheckBox Content="{Binding name}" IsChecked="{Binding IsChecked}"/>
