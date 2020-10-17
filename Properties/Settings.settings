@@ -6,28 +6,10 @@
       <Value Profile="(Default)">80</Value>
     </Setting>
     <Setting Name="BFUser" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">peter.oconnell444@gmail.com</Value>
     </Setting>
     <Setting Name="BFPassword" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="CtrlLCBack" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="LCBack" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="RCBack" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="LCLay" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="CtrlLCLay" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="RCLay" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">thestick871</Value>
     </Setting>
     <Setting Name="Top" Type="System.Double" Scope="User">
       <Value Profile="(Default)">100</Value>
@@ -59,14 +41,8 @@
     <Setting Name="XMLPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">http://p4-7006.uk2net.com/sangster/x.xml</Value>
     </Setting>
-    <Setting Name="RememberPasswords" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="SessionToken" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="AppKey" Type="System.String" Scope="User">
-      <Value Profile="(Default)">uCmjo7RlVUJRCc0T</Value>
+      <Value Profile="(Default)">qmYuRi9HoF3R9FR8</Value>
     </Setting>
     <Setting Name="CertFile" Type="System.String" Scope="User">
       <Value Profile="(Default)">c:\client-2048.p12</Value>
@@ -76,12 +52,6 @@
     </Setting>
     <Setting Name="Upgraded" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="WaitBF" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">500</Value>
-    </Setting>
-    <Setting Name="WaitBQ" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">500</Value>
     </Setting>
     <Setting Name="BetfairSPColour" Type="System.String" Scope="User">
       <Value Profile="(Default)">Chartreuse</Value>
@@ -97,6 +67,12 @@
     </Setting>
     <Setting Name="RowHeight2" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">40</Value>
+    </Setting>
+    <Setting Name="WaitBF" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="Favourites" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1,2,3</Value>
     </Setting>
   </Settings>
 </SettingsFile>

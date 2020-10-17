@@ -10,8 +10,35 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace APING
+namespace BetfairAPI
 {
+    public static class ErrorCodes
+    {
+        static String[,] _ErrorCodes = new string[,] {
+            {"DSC-0008", "JSONDeserialisationParseFailure"},
+            {"DSC-0009", "ClassConversionFailure"},
+            {"DSC-0015", "SecurityException"},
+            {"DSC-0018", "MandatoryNotDefined"},
+            {"DSC-0019", "Timeout"},
+            {"DSC-0021", "NoSuchOperation"},
+            {"DSC-0023", "NoSuchService"},
+            {"DSC-0024", "RescriptDeserialisationFailure"},
+            {"DSC-0034", "UnknownCaller"},
+            {"DSC-0035", "UnrecognisedCredentials"},
+            {"DSC-0036", "InvalidCredentials"},
+            {"DSC-0037", "SubscriptionRequired"},
+            {"DSC-0038", "OperationForbidden"}
+        };
+        static public  String FaultCode(String code)
+        {
+            for (int i = 0; i < _ErrorCodes.Length; i++)
+            {
+                if (_ErrorCodes[i, 0] == code)
+                    return _ErrorCodes[i, 1];
+            }
+            return "Not found";
+        }
+    }
     public enum TimeZoneEnum
     {
         System,
@@ -166,6 +193,7 @@ namespace APING
     {
         public String name { get; set; }
         public Int32 id { get; set; }
+        public bool IsChecked { get; set; }
     }
     public class PriceSize
     {
@@ -606,6 +634,15 @@ namespace APING
                 }
                 catch (Exception) { return 0; }
             }
+        }
+    }
+    public class EventTypeResult
+    {
+        public EventType eventType { get; set; }
+        public Int32 marketCount { get; set; }
+        public override string ToString()
+        {
+            return eventType.name;
         }
     }
     public class Event

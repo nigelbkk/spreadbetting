@@ -37,7 +37,7 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("peter.oconnell444@gmail.com")]
         public string BFUser {
             get {
                 return ((string)(this["BFUser"]));
@@ -49,85 +49,13 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("thestick871")]
         public string BFPassword {
             get {
                 return ((string)(this["BFPassword"]));
             }
             set {
                 this["BFPassword"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int CtrlLCBack {
-            get {
-                return ((int)(this["CtrlLCBack"]));
-            }
-            set {
-                this["CtrlLCBack"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int LCBack {
-            get {
-                return ((int)(this["LCBack"]));
-            }
-            set {
-                this["LCBack"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int RCBack {
-            get {
-                return ((int)(this["RCBack"]));
-            }
-            set {
-                this["RCBack"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int LCLay {
-            get {
-                return ((int)(this["LCLay"]));
-            }
-            set {
-                this["LCLay"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int CtrlLCLay {
-            get {
-                return ((int)(this["CtrlLCLay"]));
-            }
-            set {
-                this["CtrlLCLay"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int RCLay {
-            get {
-                return ((int)(this["RCLay"]));
-            }
-            set {
-                this["RCLay"] = value;
             }
         }
         
@@ -253,31 +181,7 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool RememberPasswords {
-            get {
-                return ((bool)(this["RememberPasswords"]));
-            }
-            set {
-                this["RememberPasswords"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string SessionToken {
-            get {
-                return ((string)(this["SessionToken"]));
-            }
-            set {
-                this["SessionToken"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("uCmjo7RlVUJRCc0T")]
+        [global::System.Configuration.DefaultSettingValueAttribute("qmYuRi9HoF3R9FR8")]
         public string AppKey {
             get {
                 return ((string)(this["AppKey"]));
@@ -320,30 +224,6 @@ namespace SpreadTrader.Properties {
             }
             set {
                 this["Upgraded"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("500")]
-        public int WaitBF {
-            get {
-                return ((int)(this["WaitBF"]));
-            }
-            set {
-                this["WaitBF"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("500")]
-        public int WaitBQ {
-            get {
-                return ((int)(this["WaitBQ"]));
-            }
-            set {
-                this["WaitBQ"] = value;
             }
         }
         
@@ -404,6 +284,30 @@ namespace SpreadTrader.Properties {
             }
             set {
                 this["RowHeight2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int WaitBF {
+            get {
+                return ((int)(this["WaitBF"]));
+            }
+            set {
+                this["WaitBF"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1,2,3")]
+        public string Favourites {
+            get {
+                return ((string)(this["Favourites"]));
+            }
+            set {
+                this["Favourites"] = value;
             }
         }
     }

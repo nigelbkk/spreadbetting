@@ -65,13 +65,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Bet.cs" />
+    <Compile Include="Favourites.xaml.cs">
+      <DependentUpon>Favourites.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RunnerLive.cs" />
     <Compile Include="Types.cs" />
+    <Compile Include="WaitCursor.cs" />
+    <Page Include="Favourites.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="aping.cs" />
+    <Compile Include="BetfairAPI.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -106,6 +115,33 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\arrow_down.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\arrow_up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\bullet_toggle_minus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\bullet_toggle_plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\cog.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\horse32x32.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\page_gear.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\tab.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\tab_go.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

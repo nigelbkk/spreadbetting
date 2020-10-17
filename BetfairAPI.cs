@@ -10,16 +10,16 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace APING
+namespace BetfairAPI
 {
-    public class APING
+    public class BetfairAPI
     {
         public DateTime PlayBackDate {get;set;}
         private const String AppName = "Ivy";
         private String AppKey { get; set; }  //"uCmjo7RlVUJRCc0T";
         private String Token { get; set; }
         public String SessionToken { get { return Token; } }
-        public APING()
+        public BetfairAPI()
         {
         }
         public DateTime sysTime = DateTime.UtcNow;
@@ -111,6 +111,7 @@ namespace APING
             }
             return "https://api.betfair.com/exchange/betting/json-rpc/v1/";    //URL(Params);
         }
+
         private Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
             String[] AccountCalls = new String[] { "getAccountFunds" };
@@ -151,7 +152,7 @@ namespace APING
                if (err != null)
                 {
                     ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
-                    throw new Exception(oo.ToString(), new Exception(oo.data.exception.errorCode));
+                    throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
                 }
                 String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
                 return JsonConvert.DeserializeObject<T>(res);
@@ -198,7 +199,7 @@ namespace APING
             {
                 return;
             }
-            this.AppKey = AppKey;   //B3VuvRc0Zva07aoa
+            this.AppKey = AppKey;   
             Token = String.Empty;
             byte[] args = Encoding.UTF8.GetBytes(String.Format("username={0}&password={1}", username, password));
 
@@ -208,7 +209,7 @@ namespace APING
             wr.ContentType = "application/x-www-form-urlencoded";
             wr.ContentLength = args.Length;
 
-            var cert = new X509Certificate2(CertFile, CertPassword); //@"\client-2048.p12", "zzzz2222");
+            var cert = new X509Certificate2(CertFile, CertPassword); 
             wr.ClientCertificates.Add(cert);
 
             using (Stream newStream = wr.GetRequestStream())
@@ -245,7 +246,7 @@ namespace APING
             p["filter"] = filter;
             return RPCRequest <List<VenueResult>>("listVenues", p) as List<VenueResult>;
         }
-        public List<Event> GetEventTypes()
+        public List<EventTypeResult> GetEventTypes() 
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> start = new Dictionary<string, object>();
@@ -254,31 +255,35 @@ namespace APING
             start["from"] = DateTime.UtcNow;
             start["to"] = DateTime.UtcNow + new TimeSpan(24, 0, 0);
             filter["exchangeIds"] = new Int32[] { 1 };
-            filter["eventTypeIds"] = new Int32[] { 7 };
+            //filter["eventTypeIds"] = new Int32[] { 7 };
+            filter["marketCountries"] = new String[] { "GB", "USA" };
+            p["filter"] = filter;
+            return RPCRequest<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
+        }
+        public List<Event> GetEvents(Int32 id)
+        {
+            Dictionary<String, Object> p = new Dictionary<string, object>();
+            Dictionary<String, Object> start = new Dictionary<string, object>();
+            Dictionary<String, Object> filter = new Dictionary<string, object>();
+
+            start["from"] = DateTime.UtcNow;
+            start["to"] = DateTime.UtcNow + new TimeSpan(24, 0, 0);
+            filter["exchangeIds"] = new Int32[] { 1 };
+            filter["eventTypeIds"] = new Int32[] { id };
             filter["marketCountries"] = new String[] { "GB" };
-            //            filter["marketStartTime"] = start;
-            //           filter["venues"] = new String[] { "Bath" };
-            //            filter["marketTypeCodes"] = new String[] { "ODDS", "LINE", "RANGE" };
             p["filter"] = filter;
             return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
         }
-        public List<Market> GetMarkets(Int32 exchange, Int32 sportid, marketTypeEnum marketTypes, String[] Countries, Int32 Days, marketProjectionEnum Projection)
+        public List<Market> GetMarkets(Int32 sportid, marketTypeEnum marketTypes, String[] Countries, marketProjectionEnum Projection)
         {
             HashSet<String> marketProjection = GetHashSet<marketProjectionEnum>((uint)Projection);
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-            filter["exchangeIds"] = new Int32[] { exchange };
             filter["eventTypeIds"] = new Int32[] { sportid };
-            filter["marketCountries"] = Countries;
-            filter["marketStartTime"] = TimeRange(DateTime.UtcNow.Date, Days, 0);
+//            filter["marketCountries"] = Countries;
+            filter["marketStartTime"] = TimeRange(DateTime.UtcNow.Date.AddDays(1), 1, 0);
             filter["marketTypeCodes"] = GetHashSet<marketTypeEnum>((uint)marketTypes);
-
-            if (PlayBackDate.Ticks != 0)
-            {
-                filter["marketStartTime"] = TimeRange(new DateTime(PlayBackDate.Ticks, DateTimeKind.Utc), 1, 0);
-            }
-
             p["filter"] = filter;
             p["sort"] = "FIRST_TO_START";
             p["marketProjection"] = GetHashSet<marketProjectionEnum>((uint)Projection);
