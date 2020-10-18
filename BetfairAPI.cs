@@ -367,7 +367,7 @@ namespace BetfairAPI
             {
                 priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.SP_AVAILABLE | priceDataEnum.EX_BEST_OFFERS))
             };
-            List<MarketBook> books = RPCRequest<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
+            List<MarketBook> books = RPCRequestFile<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
             //CalculateProfitAndLoss(books.First());
             MarketBook book = books.First();
 

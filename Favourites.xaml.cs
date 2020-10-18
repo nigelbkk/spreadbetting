@@ -38,10 +38,11 @@ namespace SpreadTrader
 			}
 			props.Save();
 		}
-		public bool IsFavourite(Int32 id)
+		static public bool IsFavourite(Int32 id)
 		{
+			Properties.Settings props = Properties.Settings.Default;
 			String[] ids = props.Favourites.Split(',');
-			return ids.Contains(id.ToString());
+			return ids.Count() == 0 || ids.Contains(id.ToString());
 		}
 	}
 }

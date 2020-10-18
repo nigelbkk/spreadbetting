@@ -12,7 +12,7 @@ using BetfairAPI;
 
 namespace SpreadTrader
 {
-	public partial class MainWindow : Window
+	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
 		private Properties.Settings props = Properties.Settings.Default;
 		private String _Status = "Ready";
@@ -20,10 +20,11 @@ namespace SpreadTrader
 		public String UKBalance { get; set; }
 		public ObservableCollection<EventType> AllEventTypes { get; set; }
 		public ObservableCollection<Market> AllMarkets { get; set; }
+		public ObservableCollection<Bet> AllBets { get; set; }
 		private BackgroundWorker bw = new BackgroundWorker();
 		private BetfairAPI.BetfairAPI ng = null;
 		public Market SelectedMarket { get; set; }
-		public ObservableCollection<RunnerLive> LiveRunners { get; set; }
+		public ObservableCollection<LiveRunner> LiveRunners { get; set; }
 		public ObservableCollection<Bet> LiveBets { get; set; }
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
@@ -59,13 +60,28 @@ namespace SpreadTrader
 			{
 				WindowState = System.Windows.WindowState.Maximized;
 			}
+			PopulateBetsGrid();
+			NotifyPropertyChanged("");
 		}
-		private void FetchEvents(object sender, RoutedEventArgs args)
+		public void PopulateBetsGrid()
 		{
-			
+			AllBets = new ObservableCollection<Bet>();
 			AllEventTypes = new ObservableCollection<EventType>();
 			AllMarkets = new ObservableCollection<Market>();
-			LiveRunners = new ObservableCollection<RunnerLive>();
+			LiveRunners = new ObservableCollection<LiveRunner>();
+
+			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
+			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
+			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
+			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
+			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
+		}
+		private void PopulateEvents(object sender, RoutedEventArgs args)
+		{
+//			AllBets = new ObservableCollection<Bet>();
+			AllEventTypes = new ObservableCollection<EventType>();
+			AllMarkets = new ObservableCollection<Market>();
+			LiveRunners = new ObservableCollection<LiveRunner>();
 			try
 			{
 				Dispatcher.BeginInvoke(new Action(() =>
@@ -77,10 +93,9 @@ namespace SpreadTrader
 						EventsTreeView.Items.Clear();
 						ng.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
 						List<EventTypeResult> eventTypes = ng.GetEventTypes().OrderBy(o => o.eventType.name).ToList();
-						Favourites f = new Favourites(ng.GetEventTypes().OrderBy(o => o.eventType.name).ToList());
 						foreach (EventTypeResult ev in eventTypes)
 						{
-							if (!f.IsFavourite(ev.eventType.id))
+							if (!Favourites.IsFavourite(ev.eventType.id))
 								continue;
 
 							var item = EventsTreeView.Items.Add(new TreeViewItem() { Header = ev.eventType.name } );
@@ -100,7 +115,9 @@ namespace SpreadTrader
 										List<Market> markets = ng.GetMarkets(e.details.id).OrderBy(o => o.marketName).ToList();
 										foreach (Market m in markets)
 										{
-											tvi3.Items.Add(new TreeViewItem() { Header = String.Format("{0} {1}", m.details.openDate.ToString("HH:mm"), m.marketName)});
+											Int32 item4 = tvi3.Items.Add(new TreeViewItem() { Header = String.Format("{0} {1}", m.details.openDate.ToString("HH:mm"), m.marketName)});
+											TreeViewItem tvi4 = (TreeViewItem)tvi3.Items[item4];
+											tvi4.Tag = m;
 										}
 									}
 								}
@@ -137,14 +154,14 @@ namespace SpreadTrader
 						MarketBook book = ng.GetMarketBook(SelectedMarket);
 						foreach (Runner rr in book.Runners)
 						{
-							foreach (Market.RunnerCatalog cat in SelectedMarket.runners)
-							{
-								if (rr.selectionId == cat.selectionId)
-								{
-									rr.Catalog = cat;
-								}
-							}
-							foreach (RunnerLive r in LiveRunners)
+							//foreach (Market.RunnerCatalog cat in SelectedMarket.runners)
+							//{
+							//	if (rr.selectionId == cat.selectionId)
+							//	{
+							//		rr.Catalog = cat;
+							//	}
+							//}
+							foreach (LiveRunner r in LiveRunners)
 							{
 								if (r.selectionId == rr.selectionId)
 								{
@@ -152,7 +169,7 @@ namespace SpreadTrader
 								}
 							}
 						}
-						CalculateProfitAndLoss(SelectedMarket.marketId, LiveRunners.ToList());
+//						CalculateProfitAndLoss(SelectedMarket.marketId, LiveRunners.ToList());
 						System.Threading.Thread.Sleep(props.WaitBF);
 					}
 					catch (Exception xe)
@@ -164,12 +181,12 @@ namespace SpreadTrader
 				System.Threading.Thread.Sleep(props.WaitBF);
 			}
 		}
-		public void CalculateProfitAndLoss(String marketId, List<RunnerLive> runners)
+		public void CalculateProfitAndLoss(String marketId, List<LiveRunner> runners)
 		{
 			List<MarketProfitAndLoss> pl = ng.listMarketProfitAndLoss(marketId);
 			if (pl.Count > 0)
 			{
-				foreach (RunnerLive v in runners)
+				foreach (LiveRunner v in runners)
 				{
 					foreach (var o in pl[0].profitAndLosses)
 					{
@@ -210,13 +227,43 @@ namespace SpreadTrader
 		{
 			ng = new BetfairAPI.BetfairAPI();
 		}
+		private void SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+			TreeViewItem selectedItem = (TreeViewItem)EventsTreeView.SelectedItem;
+			SelectedMarket = selectedItem.Tag as Market;
+
+			using (new WaitCursor())
+			{
+				try
+				{
+					Market m = SelectedMarket;
+					LiveRunners.Clear();
+					MarketBook book = ng.GetMarketBook(m);
+					foreach (Runner r in book.Runners)
+					{
+						if (r.removalDate == new DateTime())
+						{
+							LiveRunner rl = new LiveRunner(r);
+							LiveRunners.Add(rl);
+						}
+					}
+					book.Runners[0].Catalog.name = "Auburn";
+					book.Runners[1].Catalog.name = "South Carolina";
+					NotifyPropertyChanged("");
+					Status = "Ready";
+				}
+				catch (Exception xe) { Status = "Markets_SelectionChanged: " + String.Format(xe.Message.ToString()); }
+			}
+		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			Button b = sender as Button;
 			switch (b.Tag)
 			{
 				case "Refresh":
-					FetchEvents(null, null);
+					PopulateEvents(null, null);
+					if (!bw.IsBusy)
+						bw.RunWorkerAsync();
 					break;
 				case "Favourites":
 					{

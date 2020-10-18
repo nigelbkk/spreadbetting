@@ -69,7 +69,7 @@
     <Compile Include="Favourites.xaml.cs">
       <DependentUpon>Favourites.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RunnerLive.cs" />
+    <Compile Include="LiveRunner.cs" />
     <Compile Include="BetfairTypes.cs" />
     <Compile Include="WaitCursor.cs" />
     <Page Include="Favourites.xaml">

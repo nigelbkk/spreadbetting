@@ -10,21 +10,9 @@ using System.Windows.Media;
 
 namespace SpreadTrader
 {
-    public class RunnerLive : INotifyPropertyChanged
+    public class LiveRunner : INotifyPropertyChanged
     {
-        public static Int32 tabindex { get; set; }
-        public String SPColour
-        {
-            get
-            {
-                switch (tabindex)
-                {
-                    case 0: return Properties.Settings.Default.BetfairSPColour;
-                    case 2: return Properties.Settings.Default.MultiSPColour;
-                }
-                return "magenta";
-            }
-        }
+        public String SPColour { get { return Properties.Settings.Default.BetfairSPColour; } }
         public Runner ngrunner { get; set; }
         private BitmapImage _colors = null;
         public BitmapImage Colors { get { return _colors; } set { _colors = value; NotifyPropertyChanged("Colors"); } }
@@ -45,10 +33,9 @@ namespace SpreadTrader
             }
         }
         public Double actualSP { get { return _prices[0][6].price; } }
-        public Double ifWin { get { return tabindex == 2 ? _prices[0][6].size + _prices[1][6].size : _prices[tabindex][6].size; } }
+        public Double ifWin { get { return _prices[0][6].size; } }
         public List<PriceSize[]> _prices = new List<PriceSize[]>();
-        public PriceSize[] prices { get { return tabindex == 2 ? _prices[0] : _prices[tabindex]; } }
-
+        public PriceSize[] prices { get { return _prices[0]; } }
         public double BackLayRatio
         {
             get
@@ -71,7 +58,7 @@ namespace SpreadTrader
                 PropertyChanged(this, new PropertyChangedEventArgs(propName));
             }
         }
-        private RunnerLive()
+        private LiveRunner()
         {
             _prices.Clear();
             _prices.Add(new PriceSize[7]);
@@ -82,7 +69,7 @@ namespace SpreadTrader
                 _prices[1][i] = new PriceSize();
             }
         }
-        public RunnerLive(Runner r) : this()
+        public LiveRunner(Runner r) : this()
         {
             ngrunner = r;
             SetPrices(ngrunner);
@@ -90,11 +77,6 @@ namespace SpreadTrader
         public void SetPrices(Runner r)
         {
             int i = 0;
-            //          for (i = 0; i < 7; i++)
-            //          {
-            /////              _prices[0][i] = new PriceSize();
-            //          }
-            i = 0;
             foreach (var p in r.ex.availableToBack)
             {
                 _prices[0][i++] = p;

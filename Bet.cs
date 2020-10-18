@@ -1,9 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using BetfairAPI;
 
 namespace SpreadTrader
 {
-	public class Bet
+	public class Bet : INotifyPropertyChanged
 	{
 		public String Date { get; set; }
 		public String Venue { get; set; }
@@ -22,6 +23,14 @@ namespace SpreadTrader
 		public Double AmtMatched { get; set; }
 		public Double AvgPriceMatched { get; set; }
 		public bool Resubmitted { get; set; }
+		public event PropertyChangedEventHandler PropertyChanged;
+		public void NotifyPropertyChanged(string propName)
+		{
+			if (this.PropertyChanged != null)
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(propName));
+			}
+		}
 		public Bet(Exception xe)
 		{
 			Status = xe.Message;

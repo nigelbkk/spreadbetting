@@ -11,7 +11,8 @@
 			<Setter Property="Background" Value="ivory"/>
 			<Setter Property="BorderBrush" Value="DarkGray"/>
 			<Setter Property="VerticalContentAlignment" Value="Center"/>
-			<Setter Property="Padding" Value="0,0"/>
+			<!--<Setter Property="Margin" Value="10,0,10,0"/>-->
+			<Setter Property="Padding" Value="10,0,10,0"/>
 			<Setter Property="Button.Effect">
 				<Setter.Value>
 					<DropShadowEffect Color="Black" Direction="320" ShadowDepth="3" BlurRadius="5" Opacity="0.5" />
@@ -99,59 +100,28 @@
 							<TextBlock FontSize="9"  TextAlignment="Center"  Text="{Binding prices[1].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
 						</StackPanel>
 					</Button>
-
 					<Button Tag="back1" VerticalContentAlignment="Center" BorderThickness="0.5" BorderBrush="DarkGray"  Background="ivory" Padding="0,0" Width="40"     Visibility="{Binding Source={x:Static p:Settings.Default}, Path=ShowLive, Converter={StaticResource BoolToVisibilityConverter}}">
 						<StackPanel Orientation="Vertical">
 							<TextBlock FontSize="11" TextAlignment="Center"  Text="{Binding prices[0].price, UpdateSourceTrigger=PropertyChanged}"/>
 							<TextBlock FontSize="9"  TextAlignment="Center"  Text="{Binding prices[0].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
 						</StackPanel>
 					</Button>
-					<Button Tag="SP2" VerticalContentAlignment="Center" BorderThickness="0.5" BorderBrush="DarkGray"  Background="{Binding SPColour, Mode=OneWay }" Padding="0,0" Width="40"   >
+					<Button Tag="lay1" VerticalContentAlignment="Center" BorderThickness="0.5" BorderBrush="DarkGray"  Background="ivory" Padding="0,0" Width="40"   Visibility="{Binding Source={x:Static p:Settings.Default}, Path=ShowLive, Converter={StaticResource BoolToVisibilityConverter}}">
 						<StackPanel Orientation="Vertical">
-							<TextBlock FontSize="11" TextAlignment="Center"  Text="{Binding actualSP, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
+							<TextBlock FontSize="11" TextAlignment="Center"  Text="{Binding prices[3].price, UpdateSourceTrigger=PropertyChanged}"/>
+							<TextBlock FontSize="9"  TextAlignment="Center"  Text="{Binding prices[3].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
 						</StackPanel>
 					</Button>
-				</StackPanel>
-			</Border>
-		</DataTemplate>
-		<DataTemplate x:Key="DataTemplate_Bet">
-			<Border BorderThickness="0 0 0 0.25" BorderBrush="Black">
-				<StackPanel Orientation="Horizontal" Tag="{Binding selectionId}">
-					<Image Width="32" Source="{Binding Colors}"/>
-					<StackPanel Orientation="Vertical">
-						<StackPanel Orientation="Horizontal">
-							<TextBlock FontSize="11" Background="#FFFFFCFC"  Padding="0,0,0,0" Text="{Binding saddle_number}"  TextAlignment="Left" VerticalAlignment="Top" Width="14" Margin="2" />
-							<TextBlock FontSize="11" Background="#FFFFFCFC"  Padding="0,0,0,0" Text="{Binding name}" TextAlignment="Left" VerticalAlignment="Top" Width="130" Margin="2" />
-						</StackPanel>
-						<TextBlock FontSize="10" Foreground="{Binding OutComeColor}" Background="#FFFFFCFC"  Padding="16,-2,0,0" Text="{Binding ifWin, StringFormat=\{0:C\}}"  TextAlignment="Left" VerticalAlignment="Top" Width="140" Margin="2" />
-					</StackPanel>
-					<Button Tag="fixed3" VerticalContentAlignment="Center" BorderThickness="0.5" BorderBrush="DarkGray"  Background="#FFC8D0E5" Padding="0,0" Width="40"   >
+					<Button Tag="lay2" VerticalContentAlignment="Center" BorderThickness="0.5" BorderBrush="DarkGray"  Background="ivory" Padding="0,0" Width="40"     Visibility="{Binding Source={x:Static p:Settings.Default}, Path=ShowLive, Converter={StaticResource BoolToVisibilityConverter}}">
 						<StackPanel Orientation="Vertical">
-							<TextBlock FontSize="11" TextAlignment="Center"  Text="{Binding Source={x:Static p:Settings.Default}, Path=back3, Mode=OneWay}"/>
+							<TextBlock FontSize="11" TextAlignment="Center"  Text="{Binding prices[4].price, UpdateSourceTrigger=PropertyChanged}"/>
+							<TextBlock FontSize="9"  TextAlignment="Center"  Text="{Binding prices[4].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
 						</StackPanel>
 					</Button>
-					<Button Tag="fixed2" VerticalContentAlignment="Center" BorderThickness="0.5" BorderBrush="DarkGray"  Background="#FFC8D0E5" Padding="0,0" Width="40"   >
+					<Button Tag="lay31" VerticalContentAlignment="Center" BorderThickness="0.5" BorderBrush="DarkGray"  Background="ivory" Padding="0,0" Width="40"     Visibility="{Binding Source={x:Static p:Settings.Default}, Path=ShowLive, Converter={StaticResource BoolToVisibilityConverter}}">
 						<StackPanel Orientation="Vertical">
-							<TextBlock FontSize="11" TextAlignment="Center"  Text="{Binding Source={x:Static p:Settings.Default}, Path=back2, Mode=OneWay}"/>
-						</StackPanel>
-					</Button>
-					<Button Tag="back3" VerticalContentAlignment="Center" BorderThickness="0.5" BorderBrush="DarkGray"  Background="ivory" Padding="0,0" Width="40"   Visibility="{Binding Source={x:Static p:Settings.Default}, Path=ShowLive, Converter={StaticResource BoolToVisibilityConverter}}">
-						<StackPanel Orientation="Vertical">
-							<TextBlock FontSize="11" TextAlignment="Center"  Text="{Binding prices[2].price, UpdateSourceTrigger=PropertyChanged}"/>
-							<TextBlock FontSize="9"  TextAlignment="Center"  Text="{Binding prices[2].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
-						</StackPanel>
-					</Button>
-					<Button Tag="back2" VerticalContentAlignment="Center" BorderThickness="0.5" BorderBrush="DarkGray"  Background="ivory" Padding="0,0" Width="40"     Visibility="{Binding Source={x:Static p:Settings.Default}, Path=ShowLive, Converter={StaticResource BoolToVisibilityConverter}}">
-						<StackPanel Orientation="Vertical">
-							<TextBlock FontSize="11" TextAlignment="Center"  Text="{Binding prices[1].price, UpdateSourceTrigger=PropertyChanged}"/>
-							<TextBlock FontSize="9"  TextAlignment="Center"  Text="{Binding prices[1].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
-						</StackPanel>
-					</Button>
-
-					<Button Tag="back1" VerticalContentAlignment="Center" BorderThickness="0.5" BorderBrush="DarkGray"  Background="ivory" Padding="0,0" Width="40"     Visibility="{Binding Source={x:Static p:Settings.Default}, Path=ShowLive, Converter={StaticResource BoolToVisibilityConverter}}">
-						<StackPanel Orientation="Vertical">
-							<TextBlock FontSize="11" TextAlignment="Center"  Text="{Binding prices[0].price, UpdateSourceTrigger=PropertyChanged}"/>
-							<TextBlock FontSize="9"  TextAlignment="Center"  Text="{Binding prices[0].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
+							<TextBlock FontSize="11" TextAlignment="Center"  Text="{Binding prices[5].price, UpdateSourceTrigger=PropertyChanged}"/>
+							<TextBlock FontSize="9"  TextAlignment="Center"  Text="{Binding prices[5].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
 						</StackPanel>
 					</Button>
 					<Button Tag="SP2" VerticalContentAlignment="Center" BorderThickness="0.5" BorderBrush="DarkGray"  Background="{Binding SPColour, Mode=OneWay }" Padding="0,0" Width="40"   >
@@ -174,19 +144,7 @@
 					</Button.ToolTip>
 					<Image Source="/SpreadTrader;component/Images/cog.png" />
 				</Button>
-				<Button Click="FetchEvents" Height="23" Margin="5,0,0,0">
-					<Button.ToolTip>
-						<ToolTip>
-							<TextBlock Text="Load Markets"></TextBlock>
-						</ToolTip>
-					</Button.ToolTip>
-					<Image Source="/SpreadTrader;component/Images/horse32x32.ico" Width="23" />
-				</Button>
-				<TextBlock Foreground="#FF8D6969" FontWeight="Bold" FontStyle="Italic" FontSize="12" Width="329" Padding="5,6,5,0" Margin="5,0">
-                    <InlineUIContainer>
-                        <CheckBox Content="Lay the Field" IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=LayTheField, Mode=TwoWay}" />
-                    </InlineUIContainer>
-				</TextBlock>
+				<TextBlock Foreground="#FF8D6969" FontWeight="Bold" FontStyle="Italic" FontSize="12" Width="329" Padding="5,6,5,0" Margin="5,0"/>
 				<Button  Height="23" Width="125">Exposure
 					<Button.ToolTip>
 						<ToolTip>
@@ -210,7 +168,7 @@
 					<ColumnDefinition Width="1*"></ColumnDefinition>
 					<ColumnDefinition Width="2*"></ColumnDefinition>
 				</Grid.ColumnDefinitions>
-				<Grid Name="MarketsGrid">
+				<Grid Name="LeftGrid">
 					<xctk:BusyIndicator Grid.Row="0" IsBusy="False" IsEnabled="True" Name="_busyIndicator" >
 						<Grid>
 							<Grid.RowDefinitions>
@@ -219,15 +177,15 @@
 							</Grid.RowDefinitions>
 							<Grid HorizontalAlignment="Stretch">
 								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="48*" />
-									<ColumnDefinition Width="73*"/>
+									<ColumnDefinition Width="80*" />
+									<ColumnDefinition Width="80*"/>
 									<ColumnDefinition Width="120*" />
 								</Grid.ColumnDefinitions>
 								<Button Content="Refresh" Tag="Refresh" Grid.Column="0" Style="{ StaticResource OurButton}" Click="Button_Click"/>
 								<Button Content="Favourites"  Tag="Favourites" Name="FavouritesButton" Grid.Column="1" Style="{ StaticResource OurButton}" Click="Button_Click"/>
 								<Button Content="Search"  Grid.Column="2" Style="{ StaticResource OurButton}"/>
 							</Grid>
-							<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10"/>
+							<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10" SelectedItemChanged="SelectedItemChanged"/>
 							<!--<ListView Name="MarketsListView" Grid.Row="1" FontSize="10" ItemsSource="{Binding AllSports}" ItemTemplate="{DynamicResource DataTemplate_Market}" Foreground="Black" />-->
 						</Grid>
 					</xctk:BusyIndicator>
@@ -275,15 +233,17 @@
 							</StackPanel>
 						</Grid>
 						<Grid Name="BetsManagerGrid"  Grid.Row="2">
-							<ItemsControl FontFamily="Verdana" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Bet}" ItemsSource="{Binding LiveBets}" FontWeight="Medium" >
-								<ItemsControl.Template>
-									<ControlTemplate>
-										<ScrollViewer Name="ScrollViewer" Padding="{TemplateBinding Control.Padding}">
-											<ItemsPresenter />
-										</ScrollViewer>
-									</ControlTemplate>
-								</ItemsControl.Template>
-							</ItemsControl>
+							<StackPanel Orientation="Vertical"  VerticalAlignment="Top">
+								<StackPanel Orientation="Horizontal" Height="32" VerticalAlignment="Top">
+									<Label Content="Bets last updated:" VerticalContentAlignment="Center" Margin="4,0,0,0"/>
+									<TextBlock Text="18/10/202 10:27" VerticalAlignment="Center"  Margin="14,0,10,0"/>
+									<Button Content="Refresh Bets" Tag="Refresh Bets" Style="{ StaticResource OurButton}" Margin="10,0,10,0"/>
+									<Button Content="Cancel All Bets" Tag="Refresh Bets" Style="{ StaticResource OurButton}" Margin="10,0,10,0"/>
+									<CheckBox Content="Display Unmatched Only" Tag="Unmatched Only" VerticalContentAlignment="Center" Padding="10,0,10,0"/>
+								</StackPanel>
+
+								<DataGrid Name="BetsGrid"  ItemsSource="{Binding AllBets}"  />
+							</StackPanel>
 						</Grid>
 						<GridSplitter Height="5" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="Gray" ResizeDirection="Rows" />
 						<GridSplitter Height="5" Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="Gray" ResizeDirection="Rows" />

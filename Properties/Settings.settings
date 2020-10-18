@@ -36,7 +36,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ShowLive" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="XMLPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">http://p4-7006.uk2net.com/sangster/x.xml</Value>
@@ -69,7 +69,7 @@
       <Value Profile="(Default)">40</Value>
     </Setting>
     <Setting Name="WaitBF" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">100</Value>
+      <Value Profile="(Default)">1000</Value>
     </Setting>
     <Setting Name="Favourites" Type="System.String" Scope="User">
       <Value Profile="(Default)">1,2,3</Value>
