@@ -74,5 +74,8 @@
     <Setting Name="Favourites" Type="System.String" Scope="User">
       <Value Profile="(Default)">1,2,3</Value>
     </Setting>
+    <Setting Name="Proxy" Type="System.String" Scope="User">
+      <Value Profile="(Default)">127.0.0.1:5055</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace BetfairAPI
 {
@@ -76,18 +77,6 @@ namespace BetfairAPI
                 return reader.ReadToEnd();
             }
         }
-        private Object RPCRequestFile<T>(String Method, Dictionary<String, Object> Params)
-        {
-            string jsonResponse = System.IO.File.ReadAllText(String.Format(@"C:\development\data\{0}.json", Method));
-            var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
-            if (err != null)
-            {
-                ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
-                throw new Exception(oo.ToString(), new Exception(oo.data.exception.errorCode));
-            }
-            String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
-            return JsonConvert.DeserializeObject<T>(res);
-        }
         private Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
             String[] AccountCalls = new String[] { "getAccountFunds" };
@@ -97,7 +86,10 @@ namespace BetfairAPI
             joe["method"] = "SportsAPING/v1.0/" + Method;
             joe["params"] = Params;
 
-            String url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";    //URL(Params);
+//            String url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";    //URL(Params);
+            String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy; // "http://127.0.0.1:5055"; 
+
+            Debug.WriteLine(Method);
 
             if (AccountCalls.Contains(Method))
             {
@@ -170,45 +162,44 @@ namespace BetfairAPI
         {
             this.Token = Token;
         }
-        public void login(String CertFile, String CertPassword, String AppKey, String username, String password)
-        {
-            return; ///NH
-            this.AppKey = AppKey;   
-            Token = String.Empty;
-            byte[] args = Encoding.UTF8.GetBytes(String.Format("username={0}&password={1}", username, password));
+   //     public void login(String CertFile, String CertPassword, String AppKey, String username, String password)
+   //     {
+   //         this.AppKey = AppKey;   
+   //         Token = String.Empty;
+   //         byte[] args = Encoding.UTF8.GetBytes(String.Format("username={0}&password={1}", username, password));
 
-            HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(" https://identitysso-cert.betfair.com/api/certlogin");
-			wr.Method = WebRequestMethods.Http.Post;
-            wr.Headers.Add("X-Application", AppKey);
-            wr.ContentType = "application/x-www-form-urlencoded";
-            wr.ContentLength = args.Length;
+   //         HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(" https://identitysso-cert.betfair.com/api/certlogin");
+			//wr.Method = WebRequestMethods.Http.Post;
+   //         wr.Headers.Add("X-Application", AppKey);
+   //         wr.ContentType = "application/x-www-form-urlencoded";
+   //         wr.ContentLength = args.Length;
 
-            var cert = new X509Certificate2(CertFile, CertPassword); 
-            wr.ClientCertificates.Add(cert);
+   //         var cert = new X509Certificate2(CertFile, CertPassword); 
+   //         wr.ClientCertificates.Add(cert);
 
-            using (Stream newStream = wr.GetRequestStream())
-            {
-                newStream.Write(args, 0, args.Length);
-                newStream.Close();
-            }
-            using (WebResponse response = wr.GetResponse())
-            {
-                sysTime = DateTime.Parse(response.Headers["Date"]).ToUniversalTime();
-                using (Stream ds = response.GetResponseStream())
-                {
-                    StreamReader reader = new StreamReader(ds);
-                    String rs = reader.ReadToEnd();
+   //         using (Stream newStream = wr.GetRequestStream())
+   //         {
+   //             newStream.Write(args, 0, args.Length);
+   //             newStream.Close();
+   //         }
+   //         using (WebResponse response = wr.GetResponse())
+   //         {
+   //             sysTime = DateTime.Parse(response.Headers["Date"]).ToUniversalTime();
+   //             using (Stream ds = response.GetResponseStream())
+   //             {
+   //                 StreamReader reader = new StreamReader(ds);
+   //                 String rs = reader.ReadToEnd();
 
-                    LoginResponse o = JsonConvert.DeserializeObject<LoginResponse>(rs);
-                    if (!o.Status)
-                    {
-                        Console.WriteLine("Login failed. Are you running Fiddler?");
-                        throw new Exception(o.ToString());
-                    }
-                    Token = o.sessionToken;
-                }
-            }
-        }
+   //                 LoginResponse o = JsonConvert.DeserializeObject<LoginResponse>(rs);
+   //                 if (!o.Status)
+   //                 {
+   //                     Console.WriteLine("Login failed. Are you running Fiddler?");
+   //                     throw new Exception(o.ToString());
+   //                 }
+   //                 Token = o.sessionToken;
+   //             }
+   //         }
+   //     }
         public List<VenueResult> ListVenues()
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
@@ -223,17 +214,15 @@ namespace BetfairAPI
         public List<EventTypeResult> GetEventTypes() 
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
-            Dictionary<String, Object> start = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-            start["from"] = DateTime.UtcNow;
-            start["to"] = DateTime.UtcNow + new TimeSpan(24, 0, 0);
-            filter["exchangeIds"] = new Int32[] { 1 };
-            //filter["eventTypeIds"] = new Int32[] { 7 };
-            filter["marketCountries"] = new String[] { "GB", "USA" };
+            //start["from"] = DateTime.UtcNow;
+            //start["to"] = DateTime.UtcNow + new TimeSpan(24, 0, 0);
+			filter["marketStartTime"] = TimeRange(DateTime.UtcNow.Date - new TimeSpan(1, 0, 0, 0), 0, 24);
+			filter["marketCountries"] = new String[] { "GB", "USA" };
             p["filter"] = filter;
-//            return RPCRequest<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
-            return RPCRequestFile<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
+            return RPCRequest<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
+//            return RPCRequestFile<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
         }
         public List<Event> GetEvents(Int32 competitionId)
         {
@@ -242,8 +231,8 @@ namespace BetfairAPI
 
             filter["competitionIds"] = new Int32[] { competitionId };
             p["filter"] = filter;
-//            return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
-            return RPCRequestFile<List<Event>>("listEvents", p) as List<Event>;
+            return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
+//            return RPCRequestFile<List<Event>>("listEvents", p) as List<Event>;
         }
         public List<CompetitionResult> GetCompetitions(Int32 event_type)
         {
@@ -252,9 +241,9 @@ namespace BetfairAPI
 
             filter["eventTypeIds"] = new Int32[] { event_type };
             p["filter"] = filter;
-            //            return RPCRequest<List<CompetitionResult>>("listCompetitions", p) as List<Event>;
-            return RPCRequestFile<List<CompetitionResult>>("listCompetitions", p) as List<CompetitionResult>;
-        }
+			return RPCRequest<List<CompetitionResult>>("listCompetitions", p) as List<CompetitionResult>;
+			//            return RPCRequestFile<List<CompetitionResult>>("listCompetitions", p) as List<CompetitionResult>;
+		}
         public List<Market> GetMarkets(Int32 event_id)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
@@ -264,8 +253,8 @@ namespace BetfairAPI
             p["filter"] = filter;
             p["marketProjection"] = GetHashSet<marketProjectionEnum>((uint) marketProjectionEnum.EVENT);
 
-            return RPCRequestFile<List<Market>>("listMarketCatalogue", p) as List<Market>;
-//            return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
+//            return RPCRequestFile<List<Market>>("listMarketCatalogue", p) as List<Market>;
+            return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
         }
         public List<Market> GetMarkets(Int32 exchange, Int32 sportid, Int32 days, marketTypeEnum marketTypes, String[] Countries, marketProjectionEnum Projection)
         {
@@ -367,7 +356,7 @@ namespace BetfairAPI
             {
                 priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.SP_AVAILABLE | priceDataEnum.EX_BEST_OFFERS))
             };
-            List<MarketBook> books = RPCRequestFile<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
+            List<MarketBook> books = RPCRequest<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
             //CalculateProfitAndLoss(books.First());
             MarketBook book = books.First();
 

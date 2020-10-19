@@ -71,6 +71,9 @@
     </Compile>
     <Compile Include="LiveRunner.cs" />
     <Compile Include="BetfairTypes.cs" />
+    <Compile Include="Settings.xaml.cs">
+      <DependentUpon>Settings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WaitCursor.cs" />
     <Page Include="Favourites.xaml">
       <SubType>Designer</SubType>
@@ -89,6 +92,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Settings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

@@ -310,5 +310,17 @@ namespace SpreadTrader.Properties {
                 this["Favourites"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1:5055")]
+        public string Proxy {
+            get {
+                return ((string)(this["Proxy"]));
+            }
+            set {
+                this["Proxy"] = value;
+            }
+        }
     }
 }
