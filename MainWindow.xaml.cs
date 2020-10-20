@@ -16,6 +16,8 @@ namespace SpreadTrader
 {
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
+		public EventsModel EventsModel { get; set; }
+
 		private Properties.Settings props = Properties.Settings.Default;
 		private String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged("Status"); } }
@@ -80,71 +82,33 @@ namespace SpreadTrader
 		}
 		private void PopulateEvents(object sender, DoWorkEventArgs e)
 		{
-//			AllBets = new ObservableCollection<Bet>();
+			this.Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(delegate () { _busyIndicator.IsBusy = true; }));
+			//			AllBets = new ObservableCollection<Bet>();
 			AllEventTypes = new ObservableCollection<EventType>();
 			AllMarkets = new ObservableCollection<Market>();
 			LiveRunners = new ObservableCollection<LiveRunner>();
+
+			//TreeModel = new TreeViewModel();
+
+			//TreeModel.Items = new ObservableCollection<NodeViewModel>();
+			//TreeModel.Items.Add(new NodeViewModel() { Name = "American Football", Children = new ObservableCollection<NodeViewModel>() });
+			//TreeModel.Items.Add(new NodeViewModel() { Name = "Gaelic Football", Children = new ObservableCollection<NodeViewModel>() });
+
+			//TreeModel.Items[0].Children.Add(new NodeViewModel() { Name = "NFL", Children = new ObservableCollection<NodeViewModel>() });
+			//TreeModel.Items[1].Children.Add(new NodeViewModel() { Name = "GAA", Children = new ObservableCollection<NodeViewModel>() });
+
 			try
 			{
-				//Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
-				//{
-					try
-					{
-						_busyIndicator.IsBusy = true;
-						EventsTreeView.Items.Clear();
-						//ng.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
-						List<EventTypeResult> eventTypes = ng.GetEventTypes().OrderBy(o => o.eventType.name).ToList();
-						foreach (EventTypeResult ev in eventTypes)
-						{
-							if (!Favourites.IsFavourite(ev.eventType.id))
-								continue;
-
-							var item = EventsTreeView.Items.Add(new TreeViewItem() { Header = ev.eventType.name });
-							TreeViewItem tvi = (TreeViewItem)EventsTreeView.Items[item];
-							try
-							{
-								List<CompetitionResult> competitions = ng.GetCompetitions(ev.eventType.id);
-								foreach (CompetitionResult cr in competitions)
-								{
-									Int32 item2 = tvi.Items.Add(new TreeViewItem() { Header = cr.competition.name });
-									TreeViewItem tvi2 = (TreeViewItem)tvi.Items[item2];
-									List<Event> events = ng.GetEvents(ev.eventType.id).OrderBy(o => o.details.name).ToList();
-									foreach (Event e2 in events)
-									{
-										Int32 item3 = tvi2.Items.Add(new TreeViewItem() { Header = e2.details.name });
-										TreeViewItem tvi3 = (TreeViewItem)tvi2.Items[item3];
-										List<Market> markets = ng.GetMarkets(e2.details.id).OrderBy(o => o.marketName).ToList();
-										foreach (Market m in markets)
-										{
-											Int32 item4 = tvi3.Items.Add(new TreeViewItem() { Header = String.Format("{0} {1}", m.details.openDate.ToString("HH:mm"), m.marketName) });
-											TreeViewItem tvi4 = (TreeViewItem)tvi3.Items[item4];
-											tvi4.Tag = m;
-										}
-									}
-								}
-							}
-							catch (Exception xe)
-							{
-								Status = xe.Message;
-								//								MessageBox.Show(xe.Message);
-							}
-					}
-					}
-					catch (Exception xe)
-					{
-						Status = xe.Message;
-//						MessageBox.Show(xe.Message);
-					}
-					finally
-					{
-//						_busyIndicator.IsBusy = false;
-					}
-//				}));
+				EventsModel = new EventsModel(ng);
+				NotifyPropertyChanged("");
 			}
 			catch (Exception xe)
 			{
 				Status = xe.Message;
-				//MessageBox.Show(xe.Message);
+			}
+			finally
+			{
+				this.Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(delegate () { _busyIndicator.IsBusy = false; }));
 			}
 		}
 		private void RefreshSelectedMarket(object sender, DoWorkEventArgs e)
@@ -234,8 +198,8 @@ namespace SpreadTrader
 		}
 		private void SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
-			TreeViewItem selectedItem = (TreeViewItem)EventsTreeView.SelectedItem;
-			SelectedMarket = selectedItem.Tag as Market;
+			NodeViewModel selectedItem = (NodeViewModel)EventsTreeView.SelectedItem;
+//			SelectedMarket = selectedItem.Tag as Market;
 
 			using (new WaitCursor())
 			{
@@ -275,34 +239,7 @@ namespace SpreadTrader
 						}
 						break;
 					case "Refresh":
-						Application.Current.Dispatcher.BeginInvoke(
-						DispatcherPriority.Background,
-						new Action(() =>
-						{
-							_busyIndicator.IsBusy = true;
-							Thread.Sleep(200); // this is important ...
-						}));
-
-						Thread thread = new Thread(new ThreadStart(delegate ()
-						{
-							Thread.Sleep(200); // this is important ...
-							try
-							{
-								this.Dispatcher.BeginInvoke(DispatcherPriority.Send,
-									new Action(delegate ()
-									{
-										PopulateEvents(null, null);
-									}));
-							}
-							catch { }
-						}));
-//						thread.Start();
-
-
-						//PopulateEvents(null, null);
-						//bw.DoWork += PopulateEvents;
-						//////if (!bw.IsBusy)
-						//bw.RunWorkerAsync();
+						new Thread(new ThreadStart(delegate () { PopulateEvents(null, null); })).Start();
 						break;
 					case "Favourites":
 						{

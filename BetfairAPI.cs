@@ -216,13 +216,10 @@ namespace BetfairAPI
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-            //start["from"] = DateTime.UtcNow;
-            //start["to"] = DateTime.UtcNow + new TimeSpan(24, 0, 0);
 			filter["marketStartTime"] = TimeRange(DateTime.UtcNow.Date - new TimeSpan(1, 0, 0, 0), 0, 24);
 			filter["marketCountries"] = new String[] { "GB", "USA" };
             p["filter"] = filter;
             return RPCRequest<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
-//            return RPCRequestFile<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
         }
         public List<Event> GetEvents(Int32 competitionId)
         {
@@ -232,7 +229,6 @@ namespace BetfairAPI
             filter["competitionIds"] = new Int32[] { competitionId };
             p["filter"] = filter;
             return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
-//            return RPCRequestFile<List<Event>>("listEvents", p) as List<Event>;
         }
         public List<CompetitionResult> GetCompetitions(Int32 event_type)
         {
@@ -242,7 +238,6 @@ namespace BetfairAPI
             filter["eventTypeIds"] = new Int32[] { event_type };
             p["filter"] = filter;
 			return RPCRequest<List<CompetitionResult>>("listCompetitions", p) as List<CompetitionResult>;
-			//            return RPCRequestFile<List<CompetitionResult>>("listCompetitions", p) as List<CompetitionResult>;
 		}
         public List<Market> GetMarkets(Int32 event_id)
         {
@@ -253,7 +248,6 @@ namespace BetfairAPI
             p["filter"] = filter;
             p["marketProjection"] = GetHashSet<marketProjectionEnum>((uint) marketProjectionEnum.EVENT);
 
-//            return RPCRequestFile<List<Market>>("listMarketCatalogue", p) as List<Market>;
             return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
         }
         public List<Market> GetMarkets(Int32 exchange, Int32 sportid, Int32 days, marketTypeEnum marketTypes, String[] Countries, marketProjectionEnum Projection)
@@ -266,8 +260,6 @@ namespace BetfairAPI
             filter["eventTypeIds"] = new Int32[] { sportid };
             filter["marketCountries"] = Countries;
             filter["marketStartTime"] = TimeRange(DateTime.UtcNow.Date, days, 0);
-            //            filter["marketStartTime"] = TimeRange(DateTime.UtcNow.Date - new TimeSpan(1,0,0,0), 0, 24);
-            //          filter["venues"] = new String[] { "Bath" };
             filter["marketTypeCodes"] = GetHashSet<marketTypeEnum>((uint)marketTypes);
 
             p["filter"] = filter;

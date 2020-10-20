@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
 		xmlns:p="clr-namespace:SpreadTrader.Properties"
+        xmlns:local="clr-namespace:SpreadTrader"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="SpreadTrader" Height="598" Width="1089" WindowStartupLocation="CenterScreen" Closing="Window_Closing" Loaded="Window_Loaded" >
+        Title="SpreadTrader" Height="598" Width="1089" x:Name="UI"  WindowStartupLocation="CenterScreen" Closing="Window_Closing" Loaded="Window_Loaded" >
 	<Window.Resources>
 		<BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 		<Style x:Key="OurButton" TargetType="Button">
@@ -176,7 +177,13 @@
 								<Button Content="Favourites"  Tag="Favourites" Name="FavouritesButton" Grid.Column="1" Style="{ StaticResource OurButton}" Click="Button_Click" />
 								<Button Content="Settings"  Tag="Settings" Grid.Column="2" Style="{ StaticResource OurButton}" Click="Button_Click" />
 							</Grid>
-							<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10" SelectedItemChanged="SelectedItemChanged"/>
+							<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10" SelectedItemChanged="SelectedItemChanged" DataContext="{Binding ElementName=UI, Path=EventsModel.TreeModel}" ItemsSource="{Binding Items}">
+								<TreeView.Resources>
+									<HierarchicalDataTemplate DataType="{x:Type local:NodeViewModel}" ItemsSource="{Binding Children}">
+										<TextBlock Text="{Binding Name}"></TextBlock>
+									</HierarchicalDataTemplate>
+								</TreeView.Resources>
+							</TreeView>
 							<!--<ListView Name="MarketsListView" Grid.Row="1" FontSize="10" ItemsSource="{Binding AllSports}" ItemTemplate="{DynamicResource DataTemplate_Market}" Foreground="Black" />-->
 						</Grid>
 					</xctk:BusyIndicator>
