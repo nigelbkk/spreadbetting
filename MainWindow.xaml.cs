@@ -199,7 +199,7 @@ namespace SpreadTrader
 		private void SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			NodeViewModel selectedItem = (NodeViewModel)EventsTreeView.SelectedItem;
-//			SelectedMarket = selectedItem.Tag as Market;
+			SelectedMarket = selectedItem.item as Market;
 
 			using (new WaitCursor())
 			{

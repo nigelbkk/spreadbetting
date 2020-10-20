@@ -16,6 +16,7 @@ namespace SpreadTrader
 	}
 	public class NodeViewModel
 	{
+		public Object item { get; set; }
 		public string Id { get; set; }
 		public string Name { get; set; }
 		public ObservableCollection<NodeViewModel> Children { get; set; }
@@ -58,7 +59,7 @@ namespace SpreadTrader
 						List<Market> markets = ng.GetMarkets(e2.details.id).OrderBy(o => o.marketName).ToList();
 						foreach (Market m in markets)
 						{
-							NodeViewModel node4 = new NodeViewModel() { Name = m.details.name, Id = m.marketId, Children = new ObservableCollection<NodeViewModel>() };
+							NodeViewModel node4 = new NodeViewModel() { Name = m.details.name, item=m, Id = m.marketId, Children = new ObservableCollection<NodeViewModel>() };
 							node3.Children.Add(node4);
 						}
 					}
