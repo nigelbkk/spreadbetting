@@ -4,8 +4,10 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
 		xmlns:p="clr-namespace:SpreadTrader.Properties"
         xmlns:local="clr-namespace:SpreadTrader"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="SpreadTrader" Height="598" Width="1089" x:Name="UI"  WindowStartupLocation="CenterScreen" Closing="Window_Closing" Loaded="Window_Loaded" >
+	<!--<Window.DataContext>
+		<local:MainWindow/>
+	</Window.DataContext>-->
 	<Window.Resources>
 		<BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 		<Style x:Key="OurButton" TargetType="Button">
@@ -177,13 +179,55 @@
 								<Button Content="Favourites"  Tag="Favourites" Name="FavouritesButton" Grid.Column="1" Style="{ StaticResource OurButton}" Click="Button_Click" />
 								<Button Content="Settings"  Tag="Settings" Grid.Column="2" Style="{ StaticResource OurButton}" Click="Button_Click" />
 							</Grid>
-							<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10" SelectedItemChanged="SelectedItemChanged" DataContext="{Binding ElementName=UI, Path=EventsModel.TreeModel}" ItemsSource="{Binding Items}">
+
+							<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10" ItemsSource="{Binding Path=Cat, Mode=TwoWay}" Focusable="True" >
+								<TreeView.DataContext>
+									<local:MainWindowViewModel />
+								</TreeView.DataContext>
+								<TreeView.ItemContainerStyle>
+									<Style TargetType="{x:Type TreeViewItem}">
+										<Setter Property="IsExpanded" Value="{Binding IsExtended, Mode=TwoWay}" />
+										<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+										<Setter Property="local:Behaviours.ExpandingBehaviour" Value="{Binding DataContext.ExpandingCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+									</Style>
+								</TreeView.ItemContainerStyle>
+								<TreeView.Resources>
+									<HierarchicalDataTemplate DataType="{x:Type local:ScenarioCategory}" ItemsSource="{Binding Path=ScenarioList}" >
+										<TextBlock  Text="{Binding Path=Name}" Foreground="Black" IsEnabled="True" Focusable="True"/>
+									</HierarchicalDataTemplate>
+
+									<DataTemplate DataType="{x:Type local:Scenario}" >
+										<TextBlock  Text="{Binding Path=Name, Mode=TwoWay}" />
+									</DataTemplate>
+								</TreeView.Resources>
+							</TreeView>
+
+
+
+
+							<!--<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10" SelectedItemChanged="SelectedItemChanged" DataContext="{Binding ElementName=UI, Path=EventsModel.TreeModel}" ItemsSource="{Binding Items}" PreviewMouseDown="EventsTreeView_PreviewMouseDown">
+								<TreeView.ItemContainerStyle>
+									<Style TargetType="{x:Type TreeViewItem}">
+										<Setter Property="IsExpanded" Value="{Binding DataContext.OnItemExpanding, RelativeSource={RelativeSource AncestorType=TreeView}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, TargetNullValue=False}" />
+									</Style>
+								</TreeView.ItemContainerStyle>
 								<TreeView.Resources>
 									<HierarchicalDataTemplate DataType="{x:Type local:NodeViewModel}" ItemsSource="{Binding Children}">
 										<TextBlock Text="{Binding Name}"></TextBlock>
 									</HierarchicalDataTemplate>
+									<Style TargetType="TreeViewItem">
+										<Style.Triggers>
+											<Trigger Property="IsExpanded" Value="True">
+												<Setter Property="FontWeight" Value="Bold"/>
+												<Setter Property="FontStyle" Value="Italic"/>
+												<Setter Property="Foreground" Value="Red"/>
+												<Setter Property="Background" Value="Green"/>
+												--><!--<Setter Property="Template" Value="{StaticResource selectedTemplate}"/>--><!--
+											</Trigger>
+										</Style.Triggers>
+									</Style>
 								</TreeView.Resources>
-							</TreeView>
+							</TreeView>-->
 							<!--<ListView Name="MarketsListView" Grid.Row="1" FontSize="10" ItemsSource="{Binding AllSports}" ItemTemplate="{DynamicResource DataTemplate_Market}" Foreground="Black" />-->
 						</Grid>
 					</xctk:BusyIndicator>

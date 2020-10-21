@@ -79,23 +79,13 @@ namespace BetfairAPI
         }
         private Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
-            String[] AccountCalls = new String[] { "getAccountFunds" };
             Dictionary<String, Object> joe = new Dictionary<string, object>();
             joe["jsonrpc"] = "2.0";
             joe["id"] = "1";
             joe["method"] = "SportsAPING/v1.0/" + Method;
             joe["params"] = Params;
 
-//            String url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";    //URL(Params);
             String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy; // "http://127.0.0.1:5055"; 
-
-            Debug.WriteLine(Method);
-
-            if (AccountCalls.Contains(Method))
-            {
-                url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
-                joe["method"] = "AccountAPING/v1.0/" + Method;
-            }
             String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
             HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
             wr.Method = WebRequestMethods.Http.Post;
@@ -143,6 +133,13 @@ namespace BetfairAPI
             Dictionary<String, Object> start = new Dictionary<string, object>();
             start["from"] = from;
             start["to"] = from + new TimeSpan(days, hours, 0, 0);
+            return start;
+        }
+        public Dictionary<String, Object> Today()
+        {
+            Dictionary<String, Object> start = new Dictionary<string, object>();
+            start["from"] = DateTime.UtcNow;
+            start["to"] = DateTime.UtcNow.Date.AddDays(1);
             return start;
         }
         private HashSet<String> GetHashSet<T>(UInt32 arg)
@@ -208,6 +205,7 @@ namespace BetfairAPI
             filter["exchangeIds"] = new Int32[] { 1 };
             filter["eventTypeIds"] = new Int32[] { 7 };
             filter["marketCountries"] = new String[] { "GB", "IE" };
+            filter["marketStartTime"] = Today();
             p["filter"] = filter;
             return RPCRequest <List<VenueResult>>("listVenues", p) as List<VenueResult>;
         }
@@ -216,19 +214,10 @@ namespace BetfairAPI
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-			filter["marketStartTime"] = TimeRange(DateTime.UtcNow.Date - new TimeSpan(1, 0, 0, 0), 0, 24);
-			filter["marketCountries"] = new String[] { "GB", "USA" };
-            p["filter"] = filter;
+			filter["marketStartTime"] = Today();
+			filter["marketCountries"] = new String[] { "GB" };
+			p["filter"] = filter;
             return RPCRequest<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
-        }
-        public List<Event> GetEvents(Int32 competitionId)
-        {
-            Dictionary<String, Object> p = new Dictionary<string, object>();
-            Dictionary<String, Object> filter = new Dictionary<string, object>();
-
-            filter["competitionIds"] = new Int32[] { competitionId };
-            p["filter"] = filter;
-            return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
         }
         public List<CompetitionResult> GetCompetitions(Int32 event_type)
         {
@@ -237,69 +226,76 @@ namespace BetfairAPI
 
             filter["eventTypeIds"] = new Int32[] { event_type };
             p["filter"] = filter;
-			return RPCRequest<List<CompetitionResult>>("listCompetitions", p) as List<CompetitionResult>;
-		}
-        public List<Market> GetMarkets(Int32 event_id)
+            return RPCRequest<List<CompetitionResult>>("listCompetitions", p) as List<CompetitionResult>;
+        }
+        public List<VenueResult> GetVenues(Int32 event_type, String country)
+        {
+            Dictionary<String, Object> p = new Dictionary<string, object>();
+            Dictionary<String, Object> filter = new Dictionary<string, object>();
+
+            filter["eventTypeIds"] = new Int32[] { event_type };
+            filter["marketStartTime"] = Today();
+            filter["marketCountries"] = new String[] { country };
+            p["filter"] = filter;
+            return RPCRequest<List<VenueResult>>("listVenues", p) as List<VenueResult>;
+        }
+        public List<Event> GetEvents(Int32 competitionId)
+        {
+            Dictionary<String, Object> p = new Dictionary<string, object>();
+            Dictionary<String, Object> filter = new Dictionary<string, object>();
+
+            filter["competitionIds"] = new Int32[] { competitionId };
+            filter["marketStartTime"] = Today();
+            p["filter"] = filter;
+            return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
+        }
+        public List<Event> GetEvents(Int32 event_type, String country_code)
+        {
+            Dictionary<String, Object> p = new Dictionary<string, object>();
+            Dictionary<String, Object> filter = new Dictionary<string, object>();
+
+            filter["eventTypeIds"] = new Int32[] { event_type };
+            filter["marketCountries"] = new String[] { country_code };
+            filter["marketStartTime"] = Today();
+            p["filter"] = filter;
+            return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
+        }
+        public List<Market> GetMarkets(Int32 event_id, String country_code)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
             filter["eventIds"] = new Int32[] { event_id };
+            filter["marketCountries"] = new String[] { country_code };
+            filter["marketStartTime"] = Today();
             p["filter"] = filter;
-            p["marketProjection"] = GetHashSet<marketProjectionEnum>((uint) marketProjectionEnum.EVENT);
+            p["maxResults"] = 18;
 
             return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
         }
-        public List<Market> GetMarkets(Int32 exchange, Int32 sportid, Int32 days, marketTypeEnum marketTypes, String[] Countries, marketProjectionEnum Projection)
+        public List<Market> GetMarkets(Int32 event_type_id)
         {
-            HashSet<String> marketProjection = GetHashSet<marketProjectionEnum>((uint)Projection);
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-            filter["exchangeIds"] = new Int32[] { exchange };
-            filter["eventTypeIds"] = new Int32[] { sportid };
-            filter["marketCountries"] = Countries;
-            filter["marketStartTime"] = TimeRange(DateTime.UtcNow.Date, days, 0);
-            filter["marketTypeCodes"] = GetHashSet<marketTypeEnum>((uint)marketTypes);
-
+            filter["eventTypeIds"] = new Int32[] { event_type_id };
+            filter["marketStartTime"] = Today();
             p["filter"] = filter;
-            p["sort"] = "FIRST_TO_START";
-            p["marketProjection"] = GetHashSet<marketProjectionEnum>((uint)Projection);
-            p["maxResults"] = 200;
+            p["maxResults"] = 19;
 
             return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
         }
-        public List<Market> GetMarkets(Dictionary<String, Object> filter, marketProjectionEnum Projection)
+        public List<CountryCodeResult> GetCountries(Int32 event_type_id)
         {
-            HashSet<String> marketProjection = GetHashSet<marketProjectionEnum>((uint)Projection);
-            Dictionary<String, Object> p = new Dictionary<string, object>();
-            //Dictionary<String, Object> filter = new Dictionary<string, object>();
-
-            //filter["exchangeIds"] = new Int32[] { exchange };
-            //filter["eventTypeIds"] = new Int32[] { sportid };
-            //filter["marketCountries"] = new String[] { "GB" };
-            //filter["marketStartTime"] = TimeRange(DateTime.UtcNow.Date, 0, 24);
-            ////          filter["venues"] = new String[] { "Bath" };
-            //filter["marketTypeCodes"] = GetHashSet<marketTypeEnum>((uint)marketTypes);
-
-            p["filter"] = filter;
-            p["marketProjection"] = GetHashSet<marketProjectionEnum>((uint)Projection);
-            p["maxResults"] = 1000;
-
-            return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
-        }
-        public List<Market> GetMarket(String marketId, marketProjectionEnum Projection)
-        {
-            HashSet<String> marketProjection = GetHashSet<marketProjectionEnum>((uint)Projection);
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-            filter["marketIds"] = new String[] { marketId };
+            filter["eventTypeIds"] = new Int32[] { event_type_id };
+            filter["marketStartTime"] = Today();
             p["filter"] = filter;
-//            p["exchangeIds"] = new Int32[] { Int32.Parse(marketId.Split('.')[0]) };
-            p["marketProjection"] = GetHashSet<marketProjectionEnum>((uint)Projection);   
-            p["maxResults"] = 100;
-            return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
+            p["maxResults"] = 17;
+
+            return RPCRequest<List<CountryCodeResult>>("listCountries", p) as List<CountryCodeResult>;
         }
         private void CalculateProfitAndLoss(MarketBook book)
         {
@@ -332,13 +328,6 @@ namespace BetfairAPI
                     }
                 }
             }
-        }
-        public MarketBook GetMarketBookNoPrices(Market m)
-        {
-            Dictionary<String, Object> p = new Dictionary<string, object>();
-            p["marketIds"] = new String[] { m.marketId };
-            List<MarketBook> books = RPCRequest<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
-            return books.First();
         }
         public MarketBook GetMarketBook(Market m)
         {
@@ -374,17 +363,6 @@ namespace BetfairAPI
                 }
             }
             return book;
-        }
-        public List<MarketBook> GetMarketBooks(String[] mid)
-        {
-            Dictionary<String, Object> p = new Dictionary<string, object>();
-            p["priceProjection"] = new priceProjection()
-            {
-                priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.SP_AVAILABLE | priceDataEnum.EX_BEST_OFFERS))
-            };
-            p["marketIds"] = mid;
-//            p["exchangeIds"] = new Int32[] { Int32.Parse(mid[0].Split('.')[0]) };
-            return RPCRequest<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
         }
         public List<ClearedOrder> GetClearedOrders(Int32 ExchangeId, String mid, betStatusEnum status)
         {
@@ -423,15 +401,6 @@ namespace BetfairAPI
                 }
             }
             return os2;
-        }
-        public String GetClearedOrdersRaw(Int32 ExchangeId, DateTime from, TimeSpan to, betStatusEnum status)
-        {
-            List<ClearedOrder> os2 = new List<ClearedOrder>();
-            Dictionary<String, Object> p = new Dictionary<string, object>();
-            p["betStatus"] = status.ToString();
-            p["settledDateRange"] = TimeRange(from, to.Days, to.Hours);
-            p["recordCount"] = 0;
-            return RPCRequestRaw("listClearedOrders", p);
         }
         public List<ClearedOrder> GetClearedOrders(Int32 ExchangeId, HashSet<UInt64> betIds, betStatusEnum status)
         {

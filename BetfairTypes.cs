@@ -56,14 +56,25 @@ namespace BetfairAPI
     }
     public enum marketProjectionEnum
     {
-        RUNNER_DESCRIPTION = 0x01,
-        RUNNER_METADATA = 0x02,
-        MARKET_START_TIME = 0x04,
-        EVENT_TYPE = 0x08,
+        COMPETITION = 0x01,
+        EVENT = 0x02,
+        EVENT_TYPE = 0x04,
+        MARKET_START_TIME = 0x08,
         MARKET_DESCRIPTION = 0x10,
-        EVENT = 0x20,
-        DETAILS = 0x20,
-        ALL = RUNNER_DESCRIPTION | RUNNER_METADATA | MARKET_START_TIME | EVENT_TYPE | MARKET_DESCRIPTION | DETAILS,
+        RUNNER_DESCRIPTION = 0x20,
+        RUNNER_METADATA = 0x40,
+        ALL = COMPETITION | EVENT | EVENT_TYPE | MARKET_START_TIME | MARKET_DESCRIPTION | RUNNER_DESCRIPTION | RUNNER_METADATA,
+
+
+
+        //RUNNER_DESCRIPTION = 0x01,
+        //RUNNER_METADATA = 0x02,
+        //MARKET_START_TIME = 0x04,
+        //EVENT_TYPE = 0x08,
+        //MARKET_DESCRIPTION = 0x10,
+        //EVENT = 0x20,
+        //DETAILS = 0x20,
+        //ALL = RUNNER_DESCRIPTION | RUNNER_METADATA | MARKET_START_TIME | EVENT_TYPE | MARKET_DESCRIPTION | DETAILS,
     }
     public enum marketTypeEnum
     {
@@ -387,6 +398,12 @@ namespace BetfairAPI
         public Boolean moreAvailable { get; set; }
         public List<CurrentOrderSummary> currentOrders { get; set; }
     }
+    public class CountryCodeResult
+	{
+        public String countryCode { get; set; }
+        public Int32 marketCount { get; set; }
+
+    }
     public class Market : INotifyPropertyChanged
     {
         public String Notify
@@ -416,7 +433,8 @@ namespace BetfairAPI
             public String clarifications { get; set; }
             public String rules { get; set; }
             public String wallet { get; set; }
-            public marketTypeEnum marketType { get; set; }
+            public String marketType { get; set; }
+//            public marketTypeEnum marketType { get; set; }
             public Double marketBaseRate { get; set; }
 
             public DateTime marketTime { get; set; }
@@ -542,7 +560,7 @@ namespace BetfairAPI
         {
             get
             {
-                if (marketName == "To Be Placed" || description.marketType != marketTypeEnum.WIN)
+                if (marketName == "To Be Placed" || description.marketType != "WIN") //marketTypeEnum.WIN)
                 {
                     return "";
                 }
@@ -566,7 +584,7 @@ namespace BetfairAPI
         {
             get
             {
-                if (marketName == "To Be Placed" || description.marketType != marketTypeEnum.WIN)
+                if (marketName == "To Be Placed" || description.marketType != "WIN") //)
                 {
                     return 0;
                 }

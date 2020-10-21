@@ -196,32 +196,38 @@ namespace SpreadTrader
 		{
 			ng = new BetfairAPI.BetfairAPI();
 		}
+		private void NodeExpanded(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+		}
 		private void SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			NodeViewModel selectedItem = (NodeViewModel)EventsTreeView.SelectedItem;
-			SelectedMarket = selectedItem.item as Market;
-
-			using (new WaitCursor())
+			SelectedMarket = selectedItem.Tag as Market;
+			if (SelectedMarket != null)
 			{
-				try
+				using (new WaitCursor())
 				{
-					Market m = SelectedMarket;
-					LiveRunners.Clear();
-					MarketBook book = ng.GetMarketBook(m);
-					foreach (Runner r in book.Runners)
+					try
 					{
-						if (r.removalDate == new DateTime())
+						Market m = SelectedMarket;
+						LiveRunners.Clear();
+						MarketBook book = ng.GetMarketBook(m);
+						foreach (Runner r in book.Runners)
 						{
-							LiveRunner rl = new LiveRunner(r);
-							LiveRunners.Add(rl);
+							if (r.removalDate == new DateTime())
+							{
+								LiveRunner rl = new LiveRunner(r);
+								LiveRunners.Add(rl);
+								if (r.ex.availableToBack.Count > 0)
+								{
+								}
+							}
 						}
+						NotifyPropertyChanged("");
+						Status = "Ready";
 					}
-					book.Runners[0].Catalog.name = "Auburn";
-					book.Runners[1].Catalog.name = "South Carolina";
-					NotifyPropertyChanged("");
-					Status = "Ready";
+					catch (Exception xe) { Status = "Markets_SelectionChanged: " + String.Format(xe.Message.ToString()); }
 				}
-				catch (Exception xe) { Status = "Markets_SelectionChanged: " + String.Format(xe.Message.ToString()); }
 			}
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
@@ -239,7 +245,12 @@ namespace SpreadTrader
 						}
 						break;
 					case "Refresh":
-						new Thread(new ThreadStart(delegate () { PopulateEvents(null, null); })).Start();
+						TreeViewTest sd2 = new TreeViewTest();
+						if (sd2.ShowDialog() == true)
+						{
+							NotifyPropertyChanged("");
+						}
+						//new Thread(new ThreadStart(delegate () { PopulateEvents(null, null); })).Start();
 						break;
 					case "Favourites":
 						{
@@ -256,6 +267,25 @@ namespace SpreadTrader
 			catch (Exception xe)
 			{
 				Status = xe.Message.ToString();
+			}
+		}
+
+		public void OnItemExpanding(object sender, MouseButtonEventArgs e)
+		{
+
+		}
+
+		private void EventsTreeView_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			TreeView tv = sender as TreeView;
+			foreach (var item in tv.Items)
+			{
+				TreeViewItem tvi = tv.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
+				if (!tvi.IsExpanded)
+				{
+					EventsModel.ExpandNode(tvi);
+				}
+				tvi.UpdateLayout();
 			}
 		}
 	}
