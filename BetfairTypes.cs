@@ -27,7 +27,8 @@ namespace BetfairAPI
             {"DSC-0035", "UnrecognisedCredentials"},
             {"DSC-0036", "InvalidCredentials"},
             {"DSC-0037", "SubscriptionRequired"},
-            {"DSC-0038", "OperationForbidden"}
+            {"DSC-0038", "OperationForbidden"},
+            {"ANGX-0003", "Invalid Session Information"}
         };
         static public String FaultCode(String code)
         {
@@ -36,7 +37,7 @@ namespace BetfairAPI
                 if (_ErrorCodes[i, 0] == code)
                     return _ErrorCodes[i, 1];
             }
-            return "Not found";
+            return "Error code not found " +code;
         }
     }
     public enum MarketSortEnum
@@ -490,7 +491,7 @@ namespace BetfairAPI
         public Description description { get; set; }
         public override string ToString()
         {
-            return String.Format("{0} {1:HH:mm} {2}", details == null ? "##" : details.Venue, startTimeGmt, marketName);
+            return String.Format("{0:HH:mm} {1}", description.marketTime, marketName);
         }
         public MarketBook MarketBook { get; set; }
         public string ToString(TimeZoneEnum Zone)

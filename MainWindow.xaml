@@ -178,7 +178,7 @@
 								<Button Content="Settings"  Tag="Settings" Grid.Column="2" Style="{ StaticResource OurButton}" Click="Button_Click" />
 							</Grid>
 
-							<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10" SelectedItemChanged="SelectedItemChanged" DataContext="{Binding ElementName=UI, Path=EventsModel}" ItemsSource="{Binding Children}">
+							<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10" DataContext="{Binding ElementName=UI, Path=EventsModel}" ItemsSource="{Binding Path=Root}">
 								<TreeView.ItemContainerStyle>
 									<Style TargetType="{x:Type TreeViewItem}">
 										<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
@@ -196,7 +196,6 @@
 												<Setter Property="FontStyle" Value="Italic"/>
 												<Setter Property="Foreground" Value="Red"/>
 												<Setter Property="Background" Value="Green"/>
-												<!--<Setter Property="Template" Value="{StaticResource selectedTemplate}"/>-->
 											</Trigger>
 										</Style.Triggers>
 									</Style>

@@ -255,21 +255,31 @@ namespace BetfairAPI
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
             filter["eventTypeIds"] = new Int32[] { event_type };
-            filter["marketCountries"] = new String[] { country_code };
+            //filter["marketCountries"] = new String[] { country_code };
+            filter["venues"] = new String[] { country_code };
             filter["marketStartTime"] = Today();
             p["filter"] = filter;
             return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
         }
-        public List<Market> GetMarkets(Int32 event_id, String country_code)
+        public List<Market> GetMarkets(Int32 event_type_id, String venue)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-            filter["eventIds"] = new Int32[] { event_id };
-            filter["marketCountries"] = new String[] { country_code };
+            HashSet<String> projection = new HashSet<String>();
+            projection.Add("HALF_TIME_SCORE");
+            projection.Add("MATCH_ODDS");
+            projection.Add("WIN");
+
+
+            filter["eventTypeIds"] = new Int32[] { event_type_id };
+            filter["venues"] = new String[] { venue };
             filter["marketStartTime"] = Today();
+            filter["marketBettingTypes"] = new String[] { "ODDS" };
+            filter["marketTypeCodes"] = projection;
+            p["marketProjection"] = new String[] { "MARKET_DESCRIPTION" };
             p["filter"] = filter;
-            p["maxResults"] = 18;
+            p["maxResults"] = 20;
 
             return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
         }
