@@ -22,11 +22,11 @@ namespace SpreadTrader
 		public EventsModel(BetfairAPI.BetfairAPI Betfair)
 		{
 			Children = new ObservableCollection<NodeViewModel>(new NodeViewModel[]
-						{
+			{
 				new NodeViewModel("C1x"),
 				new NodeViewModel("C2x"),
 				new NodeViewModel("C3x"),
-						});
+			});
 			Children[0].Add(new NodeViewModel("X1"));
 			Children[0].Children[0].Add(new NodeViewModel("X2"));
 			EventsModel.Betfair = Betfair;
@@ -43,18 +43,16 @@ namespace SpreadTrader
 			//Children[0].Add(new NodeViewModel("X1"));
 			//Children[0].Children[0].Add(new NodeViewModel("X2")); 
 			
-			//EventsModel.Betfair = Betfair;
+			EventsModel.Betfair = Betfair;
 
-			//Root = new NodeViewModel("root");
-			//Root.Populate = Root.PopulateEventTYpes;
-			//Root.Add(new NodeViewModel("root"));
-			//Children.Add(Root);
-			//Children.Add(new NodeViewModel("American Football") { Name = "American Football" });
+			Root = new NodeViewModel("root");
+			Root.Populate = Root.PopulateEventTYpes;
+			Root.Add(new NodeViewModel("root"));
+			Children.Add(Root);
+			Children.Add(new NodeViewModel("American Football") { Name = "American Football" });
 			//TreeModel.Items.Add(new NodeViewModel() { Name = "Gaelic Football" });
 			//TreeModel.Items[0].Children.Add(new NodeViewModel() { Name = "NFL" });
 			//TreeModel.Items[1].Children.Add(new NodeViewModel() { Name = "GAA" });
-
-			NotifyPropertyChanged("");
 
 			return;
 

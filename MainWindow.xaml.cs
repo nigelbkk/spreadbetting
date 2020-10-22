@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Threading;
 using BetfairAPI;
 
 namespace SpreadTrader
@@ -75,97 +79,67 @@ namespace SpreadTrader
 			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
 			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
 		}
-		//		private void RefreshSelectedMarket(object sender, DoWorkEventArgs e)
-		//		{
-		//			BackgroundWorker worker = sender as BackgroundWorker;
-		//			while (!bw.CancellationPending)
-		//			{
-		//				if (SelectedMarket != null)
-		//				{
-		//					try
-		//					{
-		//						MarketBook book = Betfair.GetMarketBook(SelectedMarket);
-		//						foreach (Runner rr in book.Runners)
-		//						{
-		//							foreach (Market.RunnerCatalog cat in SelectedMarket.runners)
-		//							{
-		//								if (rr.selectionId == cat.selectionId)
-		//								{
-		//									rr.Catalog = cat;
-		//								}
-		//							}
-		//							foreach (LiveRunner r in LiveRunners)
-		//							{
-		//								if (r.selectionId == rr.selectionId)
-		//								{
-		//									r.SetPrices(rr);
-		//								}
-		//							}
-		//						}
-		////						CalculateProfitAndLoss(SelectedMarket.marketId, LiveRunners.ToList());
-		//						System.Threading.Thread.Sleep(props.WaitBF);
-		//					}
-		//					catch (Exception xe)
-		//					{
-		//						Status = xe.Message.ToString();
-		//						System.Threading.Thread.Sleep(props.WaitBF);
-		//					}
-		//				}
-		//				System.Threading.Thread.Sleep(props.WaitBF);
-		//			}
-		//		}
-		//public void CalculateProfitAndLoss(String marketId, List<LiveRunner> runners)
-		//{
-		//	List<MarketProfitAndLoss> pl = Betfair.listMarketProfitAndLoss(marketId);
-		//	if (pl.Count > 0)
-		//	{
-		//		foreach (LiveRunner v in runners)
-		//		{
-		//			foreach (var o in pl[0].profitAndLosses)
-		//			{
-		//				if (v.ngrunner.selectionId == o.selectionId)
-		//				{
-		//					v._prices[0][6].size = o.ifWin;
-		//				}
-		//			}
-		//		}
-		//	}
-		//}
-		//private void SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-		//{
-		//	NodeViewModel selectedItem = (NodeViewModel)EventsTreeView.SelectedItem;
-		//	SelectedMarket = selectedItem.Tag as Market;
-		//	if (SelectedMarket != null)
-		//	{
-		//		using (new WaitCursor())
-		//		{
-		//			try
-		//			{
-		//				Market m = SelectedMarket;
-		//				LiveRunners.Clear();
-		//				MarketBook book = Betfair.GetMarketBook(m);
-		//				foreach (Runner r in book.Runners)
-		//				{
-		//					if (r.removalDate == new DateTime())
-		//					{
-		//						LiveRunner rl = new LiveRunner(r);
-		//						LiveRunners.Add(rl);
-		//						if (r.ex.availableToBack.Count > 0)
-		//						{
-		//						}
-		//					}
-		//				}
-		//				NotifyPropertyChanged("");
-		//				Status = "Ready";
-		//			}
-		//			catch (Exception xe) { Status = "Markets_SelectionChanged: " + String.Format(xe.Message.ToString()); }
-		//		}
-		//	}
-		//}
+		private void RefreshSelectedMarket(object sender, DoWorkEventArgs e)
+		{
+			BackgroundWorker worker = sender as BackgroundWorker;
+			while (!bw.CancellationPending)
+			{
+				if (SelectedMarket != null)
+				{
+					try
+					{
+						MarketBook book = Betfair.GetMarketBook(SelectedMarket);
+						foreach (Runner rr in book.Runners)
+						{
+							foreach (Market.RunnerCatalog cat in SelectedMarket.runners)
+							{
+								if (rr.selectionId == cat.selectionId)
+								{
+									rr.Catalog = cat;
+								}
+							}
+							foreach (LiveRunner r in LiveRunners)
+							{
+								if (r.selectionId == rr.selectionId)
+								{
+									r.SetPrices(rr);
+								}
+							}
+						}
+//						CalculateProfitAndLoss(SelectedMarket.marketId, LiveRunners.ToList());
+						System.Threading.Thread.Sleep(props.WaitBF);
+					}
+					catch (Exception xe)
+					{
+						Status = xe.Message.ToString();
+						System.Threading.Thread.Sleep(props.WaitBF);
+					}
+				}
+				System.Threading.Thread.Sleep(props.WaitBF);
+			}
+		}
+		public void CalculateProfitAndLoss(String marketId, List<LiveRunner> runners)
+		{
+			List<MarketProfitAndLoss> pl = Betfair.listMarketProfitAndLoss(marketId);
+			if (pl.Count > 0)
+			{
+				foreach (LiveRunner v in runners)
+				{
+					foreach (var o in pl[0].profitAndLosses)
+					{
+						if (v.ngrunner.selectionId == o.selectionId)
+						{
+							v._prices[0][6].size = o.ifWin;
+						}
+					}
+				}
+			}
+		}
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
 			if (WindowState == System.Windows.WindowState.Maximized)
 			{
+				// Use the RestoreBounds as the current values will be 0, 0 and the size of the screen
 				props.Top = RestoreBounds.Top;
 				props.Left = RestoreBounds.Left;
 				props.Height = RestoreBounds.Height;
@@ -190,6 +164,38 @@ namespace SpreadTrader
 		{
 			Betfair = new BetfairAPI.BetfairAPI();
 			EventsModel = new EventsModel(Betfair);
+			NotifyPropertyChanged("");
+		}
+		private void SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+			NodeViewModel selectedItem = (NodeViewModel)EventsTreeView.SelectedItem;
+			SelectedMarket = selectedItem.Tag as Market;
+			if (SelectedMarket != null)
+			{
+				using (new WaitCursor())
+				{
+					try
+					{
+						Market m = SelectedMarket;
+						LiveRunners.Clear();
+						MarketBook book = Betfair.GetMarketBook(m);
+						foreach (Runner r in book.Runners)
+						{
+							if (r.removalDate == new DateTime())
+							{
+								LiveRunner rl = new LiveRunner(r);
+								LiveRunners.Add(rl);
+								if (r.ex.availableToBack.Count > 0)
+								{
+								}
+							}
+						}
+						NotifyPropertyChanged("");
+						Status = "Ready";
+					}
+					catch (Exception xe) { Status = "Markets_SelectionChanged: " + String.Format(xe.Message.ToString()); }
+				}
+			}
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -206,7 +212,8 @@ namespace SpreadTrader
 						}
 						break;
 					case "Refresh":
-//						new Thread(new ThreadStart(delegate () { PopulateEvents(null, null); })).Start();
+						EventsModel = new EventsModel(Betfair);
+						NotifyPropertyChanged("");
 						break;
 					case "Favourites":
 						{
