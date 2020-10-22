@@ -9,6 +9,8 @@ namespace SpreadTrader
 {
     public class ViewModelBase : INotifyPropertyChanged
     {
+        //public delegate void NotificationDelegate(String s);
+        //public NotificationDelegate NotificationCallback = null;
         public void OnPropertyChanged(string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

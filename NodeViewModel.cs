@@ -11,6 +11,9 @@ namespace SpreadTrader
 {
 	public class NodeViewModel : ViewModelBase, INotifyPropertyChanged
 	{
+		public NotificationDelegate NotificationCallback = null;
+		public ObservableCollection<LiveRunner> LiveRunners { get; set; }
+		public static BetfairAPI.BetfairAPI Betfair { get; set; }
 		private bool _isSelected;
 		private bool _IsExpanded;
 		public bool IsExpanded { get { return _IsExpanded; } set { _IsExpanded = value; OnItemExpanding(); } }
@@ -32,27 +35,28 @@ namespace SpreadTrader
 			Market m = Tag as Market;
 			if (m != null)
 			{
+				NotificationCallback("Markets_SelectionChanged: " + String.Format(m.ToString()));
 				try
 				{
-					//MainWindow.LiveRunners.Clear();
-					//MarketBook book = EventsModel.Betfair.GetMarketBook(m);
-					//foreach (Runner r in book.Runners)
-					//{
-					//	if (r.removalDate == new DateTime())
-					//	{
-					//		LiveRunner rl = new LiveRunner(r);
-					//		MainWindow.LiveRunners.Add(rl);
-					//		if (r.ex.availableToBack.Count > 0)
-					//		{
-					//		}
-					//	}
-					//}
-					//OnPropertyChanged("");
-					//MainWindow.Status = "Ready";
+					LiveRunners = new ObservableCollection<LiveRunner>();
+					MarketBook book = Betfair.GetMarketBook(m);
+					foreach (Runner r in book.Runners)
+					{
+						if (r.removalDate == new DateTime())
+						{
+							LiveRunner rl = new LiveRunner(r);
+							LiveRunners.Add(rl);
+							if (r.ex.availableToBack.Count > 0)
+							{
+							}
+						}
+					}
+					OnPropertyChanged("");
+					NotificationCallback("Ready");
 				}
 				catch (Exception xe)
 				{
-					//	MainWindow.Status = "Markets_SelectionChanged: " + String.Format(xe.Message.ToString()); 
+					NotificationCallback("Markets_SelectionChanged: " + String.Format(xe.Message.ToString())); 
 				}
 			}
 		}
@@ -71,6 +75,15 @@ namespace SpreadTrader
 		public Int32 Id { get; set; }
 		public string Name { get; set; }
 		public ObservableCollection<NodeViewModel> Children { get; set; }
+		public NodeViewModel(BetfairAPI.BetfairAPI Betfair, NotificationDelegate Callback)
+		{
+			NodeViewModel.Betfair = Betfair;
+			Children = new ObservableCollection<NodeViewModel>();
+			NotificationCallback = Callback;
+			PopulateEventTYpes();
+			Populate = PopulateCompetitionsOrCountries;
+			NotificationCallback("Ready");
+		}
 		public NodeViewModel(String name)
 		{
 			Name = name;
@@ -79,37 +92,27 @@ namespace SpreadTrader
 		public void Add(NodeViewModel child, bool leaf = false)
 		{
 			child.Parent = this;
+			child.NotificationCallback = NotificationCallback;
 			Children.Add(child);
 			if (child.Populate != null) child.Children.Add(new NodeViewModel("x"));
 			OnPropertyChanged("");
 		}
 		public void PopulateEventTYpes()
 		{
-			List<EventTypeResult> eventTypes = EventsModel.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList();
+			List<EventTypeResult> eventTypes = Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList();
 			foreach (EventTypeResult ev in eventTypes)
 			{
 				if (Favourites.IsFavourite(ev.eventType.id))
 				{
 					NodeViewModel nvm = new NodeViewModel(ev.eventType.name) { Id = ev.eventType.id };
-					nvm.Populate = nvm.PopulateCompetitions;
-//					nvm.Populate = nvm.PopulateCountries;
+					nvm.Populate = nvm.PopulateCompetitionsOrCountries;
 					Add(nvm);
 				}
 			}
 		}
-		public void PopulateCompetitions()
-		{
-			List<CompetitionResult> competitions = EventsModel.Betfair.GetCompetitions(Id).OrderBy(o => o.competition.name).ToList();
-			foreach (CompetitionResult cr in competitions)
-			{
-				NodeViewModel nvm = new NodeViewModel(cr.competition.name) { Id = cr.competition.id };
-				nvm.Populate = nvm.PopulateEvents;
-				Add(nvm);
-			}
-		}
 		public void PopulateEvents()
 		{
-			List<Event> events = EventsModel.Betfair.GetEvents(Id).OrderBy(o => o.details.name).ToList();
+			List<Event> events = Betfair.GetEvents(Id).OrderBy(o => o.details.name).ToList();
 			foreach (Event ev in events)
 			{
 				NodeViewModel nvm = new NodeViewModel(ev.details.name) { Id = this.Id, Country = this.Country };
@@ -117,19 +120,40 @@ namespace SpreadTrader
 				Add(nvm);
 			}
 		}
-		public void PopulateCountries()
+		public void PopulateEventsForCompetition()
 		{
-			List<CountryCodeResult> countries = EventsModel.Betfair.GetCountries(Id);
-			foreach (CountryCodeResult cr in countries)
+			List<Event> events = Betfair.GetEventsForCompetition(Id).OrderBy(o => o.details.name).ToList();
+			foreach (Event ev in events)
 			{
-				NodeViewModel nvm = new NodeViewModel(cr.countryCode) { Id = Id, Country = cr.countryCode };
-				nvm.Populate = nvm.PopulateVenues;
+				NodeViewModel nvm = new NodeViewModel(ev.details.name) { Id = ev.details.id };
+				nvm.Populate = nvm.PopulateMarkets;
+				Add(nvm);
+			}
+		}
+		public void PopulateCompetitionsOrCountries()
+		{
+			List<CountryCodeResult> countries = Betfair.GetCountries(Id);
+			if (countries.Count > 0)
+			{
+				foreach (CountryCodeResult cr in countries)
+				{
+					NodeViewModel nvm = new NodeViewModel(cr.countryCode) { Id = Id, Country = cr.countryCode };
+					nvm.Populate = nvm.PopulateVenues;
+					Add(nvm);
+				}
+				return;
+			}
+			List<CompetitionResult> competitions = Betfair.GetCompetitions(Id).OrderBy(o => o.competition.name).ToList();
+			foreach (CompetitionResult cr in competitions)
+			{
+				NodeViewModel nvm = new NodeViewModel(cr.competition.name) { Id = cr.competition.id };
+				nvm.Populate = nvm.PopulateEventsForCompetition;
 				Add(nvm);
 			}
 		}
 		public void PopulateVenues()
 		{
-			List<VenueResult> venues = EventsModel.Betfair.GetVenues(Id, Country).OrderBy(o => o.venue).ToList();
+			List<VenueResult> venues = Betfair.GetVenues(Id, Country).OrderBy(o => o.venue).ToList();
 			foreach (VenueResult v in venues)
 			{
 				NodeViewModel nvm = new NodeViewModel(v.venue) { Id = this.Id, Country = v.venue };
@@ -139,7 +163,7 @@ namespace SpreadTrader
 		}
 		public void PopulateMarkets()
 		{
-			List<Market> markets = EventsModel.Betfair.GetMarkets(Id).OrderBy(o => o.marketStartTime).ToList();
+			List<Market> markets = Betfair.GetMarkets(Id).OrderBy(o => o.marketStartTime).ToList();
 			foreach (Market m in markets)
 			{
 				NodeViewModel nvm = new NodeViewModel(m.ToString()) { Tag = m };

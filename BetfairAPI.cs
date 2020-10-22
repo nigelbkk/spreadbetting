@@ -214,7 +214,7 @@ namespace BetfairAPI
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-			filter["marketStartTime"] = Today();
+			//filter["marketStartTime"] = Today();
 			//filter["marketCountries"] = new String[] { "GB" };
 			p["filter"] = filter;
             return RPCRequest<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
@@ -239,13 +239,21 @@ namespace BetfairAPI
             p["filter"] = filter;
             return RPCRequest<List<VenueResult>>("listVenues", p) as List<VenueResult>;
         }
-        public List<Event> GetEvents(Int32 competitionId)
+        public List<Event> GetEventsForCompetition(Int32 competition_id)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-            filter["competitionIds"] = new Int32[] { competitionId };
-            //filter["marketStartTime"] = Today();
+			filter["competitionIds"] = new Int32[] { competition_id };
+			p["filter"] = filter;
+            return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
+        }
+        public List<Event> GetEvents(Int32 eventType_id)
+        {
+            Dictionary<String, Object> p = new Dictionary<string, object>();
+            Dictionary<String, Object> filter = new Dictionary<string, object>();
+
+            filter["eventTypeIds"] = new Int32[] { eventType_id };
             p["filter"] = filter;
             return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
         }
@@ -278,14 +286,15 @@ namespace BetfairAPI
 
             return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
         }
-        public List<Market> GetMarkets(Int32 event_type_id)
+        public List<Market> GetMarkets(Int32 event_id)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-            filter["eventIds"] = new Int32[] { event_type_id };
+            filter["eventIds"] = new Int32[] { event_id };
             //filter["eventTypeIds"] = new Int32[] { event_type_id };
             //filter["marketStartTime"] = Today();
+            p["marketProjection"] = new String[] { "MARKET_DESCRIPTION" };
             p["filter"] = filter;
             p["maxResults"] = 200;
 
