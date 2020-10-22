@@ -23,13 +23,7 @@ namespace SpreadTrader
 			EventsModel.Betfair = Betfair;
 			Children = new ObservableCollection<NodeViewModel>(new NodeViewModel[]
 			{
-				//new NodeViewModel("C1x"),
-				//new NodeViewModel("C2x"),
-				//new NodeViewModel("C3x"),
 			});
-			//Children[0].Add(new NodeViewModel("X1"));
-			//Children[0].Children[0].Add(new NodeViewModel("X2"));
-		
 			EventsModel.Betfair = Betfair;
 
 			Root = new NodeViewModel("root");

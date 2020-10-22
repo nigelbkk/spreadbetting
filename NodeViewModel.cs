@@ -91,7 +91,8 @@ namespace SpreadTrader
 				if (Favourites.IsFavourite(ev.eventType.id))
 				{
 					NodeViewModel nvm = new NodeViewModel(ev.eventType.name) { Id = ev.eventType.id };
-					nvm.Populate = nvm.PopulateCountries;
+					nvm.Populate = nvm.PopulateCompetitions;
+//					nvm.Populate = nvm.PopulateCountries;
 					Add(nvm);
 				}
 			}
@@ -101,14 +102,14 @@ namespace SpreadTrader
 			List<CompetitionResult> competitions = EventsModel.Betfair.GetCompetitions(Id).OrderBy(o => o.competition.name).ToList();
 			foreach (CompetitionResult cr in competitions)
 			{
-				NodeViewModel nvm = new NodeViewModel(cr.competition.name) { Id = this.Id, Country = this.Country };
+				NodeViewModel nvm = new NodeViewModel(cr.competition.name) { Id = cr.competition.id };
 				nvm.Populate = nvm.PopulateEvents;
 				Add(nvm);
 			}
 		}
 		public void PopulateEvents()
 		{
-			List<Event> events = EventsModel.Betfair.GetEvents(Id, Country).OrderBy(o => o.details.name).ToList();
+			List<Event> events = EventsModel.Betfair.GetEvents(Id).OrderBy(o => o.details.name).ToList();
 			foreach (Event ev in events)
 			{
 				NodeViewModel nvm = new NodeViewModel(ev.details.name) { Id = this.Id, Country = this.Country };
@@ -138,7 +139,7 @@ namespace SpreadTrader
 		}
 		public void PopulateMarkets()
 		{
-			List<Market> markets = EventsModel.Betfair.GetMarkets(Id, Country).OrderBy(o => o.marketStartTime).ToList();
+			List<Market> markets = EventsModel.Betfair.GetMarkets(Id).OrderBy(o => o.marketStartTime).ToList();
 			foreach (Market m in markets)
 			{
 				NodeViewModel nvm = new NodeViewModel(m.ToString()) { Tag = m };

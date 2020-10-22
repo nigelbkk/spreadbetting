@@ -215,7 +215,7 @@ namespace BetfairAPI
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
 			filter["marketStartTime"] = Today();
-			filter["marketCountries"] = new String[] { "GB" };
+			//filter["marketCountries"] = new String[] { "GB" };
 			p["filter"] = filter;
             return RPCRequest<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
         }
@@ -235,7 +235,7 @@ namespace BetfairAPI
 
             filter["eventTypeIds"] = new Int32[] { event_type };
         //    filter["marketStartTime"] = Today();
-            filter["marketCountries"] = new String[] { country };
+        //    filter["marketCountries"] = new String[] { country };
             p["filter"] = filter;
             return RPCRequest<List<VenueResult>>("listVenues", p) as List<VenueResult>;
         }
@@ -245,7 +245,7 @@ namespace BetfairAPI
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
             filter["competitionIds"] = new Int32[] { competitionId };
-            filter["marketStartTime"] = Today();
+            //filter["marketStartTime"] = Today();
             p["filter"] = filter;
             return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
         }
@@ -256,7 +256,7 @@ namespace BetfairAPI
 
             filter["eventTypeIds"] = new Int32[] { event_type };
             //filter["marketCountries"] = new String[] { country_code };
-            filter["venues"] = new String[] { country_or_venue };
+            //filter["venues"] = new String[] { country_or_venue };
             filter["marketStartTime"] = Today();
             p["filter"] = filter;
             return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
@@ -266,14 +266,15 @@ namespace BetfairAPI
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-            filter["eventTypeIds"] = new Int32[] { event_type_id };
-            filter["venues"] = new String[] { venue };
-            filter["marketStartTime"] = Today();
+            filter["eventIds"] = new Int32[] { event_type_id };
+            //filter["eventTypeIds"] = new Int32[] { event_type_id };
+            //filter["venues"] = new String[] { venue };
+            //filter["marketStartTime"] = Today();
             filter["marketBettingTypes"] = new String[] { "ODDS" };
             filter["marketTypeCodes"] = new String[] { "HALF_TIME_SCORE", "MATCH_ODDS", "WIN", };
             p["marketProjection"] = new String[] { "MARKET_DESCRIPTION" };
             p["filter"] = filter;
-            p["maxResults"] = 20;
+            p["maxResults"] = 200;
 
             return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
         }
@@ -282,10 +283,11 @@ namespace BetfairAPI
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-            filter["eventTypeIds"] = new Int32[] { event_type_id };
-            filter["marketStartTime"] = Today();
+            filter["eventIds"] = new Int32[] { event_type_id };
+            //filter["eventTypeIds"] = new Int32[] { event_type_id };
+            //filter["marketStartTime"] = Today();
             p["filter"] = filter;
-            p["maxResults"] = 19;
+            p["maxResults"] = 200;
 
             return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
         }

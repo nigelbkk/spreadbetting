@@ -4,6 +4,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
 		xmlns:p="clr-namespace:SpreadTrader.Properties"
         xmlns:local="clr-namespace:SpreadTrader"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="SpreadTrader" Height="598" Width="1089" x:Name="UI"  WindowStartupLocation="CenterScreen" Closing="Window_Closing" Loaded="Window_Loaded" >
 	
 	<Window.Resources>
