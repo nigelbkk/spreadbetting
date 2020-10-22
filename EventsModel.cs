@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using BetfairAPI;
@@ -11,58 +10,11 @@ using OurTuple = System.Tuple<string, int>;
 
 namespace SpreadTrader
 {
-	public class TreeViewModel
-	{
-		public ObservableCollection<NodeViewModel> Items { get; set; }
-		public TreeViewModel()
-		{
-			Items = new ObservableCollection<NodeViewModel>();
-		}
-	}
-	public class NodeViewModel
-	{
-		public delegate void CallBackDelegate();
-		public CallBackDelegate CallBack = null;
-		public bool Empty { get { return Children.Count == 0;  } }
-		public Object Tag { get; set; }
-		public NodeViewModel Parent { get; set; }
-		public string Id { get; set; }
-		public string Name { get; set; }
-		public ObservableCollection<NodeViewModel> Children { get; set; }
-		public NodeViewModel(String name)
-		{
-			Name = name;
-			Children = new ObservableCollection<NodeViewModel>();
-		}
-		public void Add(NodeViewModel child)
-		{
-			child.Parent = this;
-			Children.Add(child);
-			child.Children.Add(new NodeViewModel("x"));
-		}
-		public void PopulateCountries()
-		{
-			List<CountryCodeResult> countries = EventsModel.Betfair.GetCountries(7);
-			foreach (CountryCodeResult cr in countries)
-			{
-				Add(new NodeViewModel(cr.countryCode));
-				CallBack = PopulateVenues;
-			}
-		}
-		public void PopulateVenues()
-		{
-			List<VenueResult> venues = EventsModel.Betfair.GetVenues(7, this.Name).OrderBy(o => o.venue).ToList();
-			foreach (VenueResult v in venues)
-			{
-				Add(new NodeViewModel(v.venue));
-			}
-		}
-	}
 	public class EventsModel : INotifyPropertyChanged
 	{
 		public ICommand ExpandingCommand { get; set; }
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }
-		public TreeViewModel TreeModel { get; set; }
+		public ObservableCollection<NodeViewModel> Children { get; set; }
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
 		{
@@ -88,15 +40,17 @@ namespace SpreadTrader
 				//}
 			}
 		}
-		public void OnItemExpanding(object sender, MouseButtonEventArgs e)
-		{
-
-		}
 		public EventsModel(BetfairAPI.BetfairAPI Betfair)
 		{
+			Children = new ObservableCollection<NodeViewModel>(new NodeViewModel[]
+			{
+				new NodeViewModel("C1x"),
+				new NodeViewModel("C2x"),
+				new NodeViewModel("C3x"),
+			});
+			Children[0].Add(new NodeViewModel("X1"));
+			Children[0].Children[0].Add(new NodeViewModel("X2"));
 			EventsModel.Betfair = Betfair;
-			TreeModel = new TreeViewModel();
-
 			List<EventTypeResult> eventTypes = Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList();
 			foreach (EventTypeResult ev in eventTypes)
 			{
@@ -104,7 +58,7 @@ namespace SpreadTrader
 				{
 					NodeViewModel root = new NodeViewModel(ev.eventType.name);
 					root.CallBack = root.PopulateCountries;
-					TreeModel.Items.Add(root);
+					Children.Add(root);
 					root.Add(new NodeViewModel("x"));
 					List<CompetitionResult> competitions = Betfair.GetCompetitions(ev.eventType.id);
 

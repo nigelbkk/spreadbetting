@@ -89,7 +89,6 @@ namespace SpreadTrader
 			LiveRunners = new ObservableCollection<LiveRunner>();
 
 			//TreeModel = new TreeViewModel();
-
 			//TreeModel.Items = new ObservableCollection<NodeViewModel>();
 			//TreeModel.Items.Add(new NodeViewModel() { Name = "American Football", Children = new ObservableCollection<NodeViewModel>() });
 			//TreeModel.Items.Add(new NodeViewModel() { Name = "Gaelic Football", Children = new ObservableCollection<NodeViewModel>() });
@@ -196,9 +195,6 @@ namespace SpreadTrader
 		{
 			ng = new BetfairAPI.BetfairAPI();
 		}
-		private void NodeExpanded(object sender, RoutedPropertyChangedEventArgs<object> e)
-		{
-		}
 		private void SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			NodeViewModel selectedItem = (NodeViewModel)EventsTreeView.SelectedItem;
@@ -245,12 +241,7 @@ namespace SpreadTrader
 						}
 						break;
 					case "Refresh":
-						TreeViewTest sd2 = new TreeViewTest();
-						if (sd2.ShowDialog() == true)
-						{
-							NotifyPropertyChanged("");
-						}
-						//new Thread(new ThreadStart(delegate () { PopulateEvents(null, null); })).Start();
+						new Thread(new ThreadStart(delegate () { PopulateEvents(null, null); })).Start();
 						break;
 					case "Favourites":
 						{
@@ -267,25 +258,6 @@ namespace SpreadTrader
 			catch (Exception xe)
 			{
 				Status = xe.Message.ToString();
-			}
-		}
-
-		public void OnItemExpanding(object sender, MouseButtonEventArgs e)
-		{
-
-		}
-
-		private void EventsTreeView_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-		{
-			TreeView tv = sender as TreeView;
-			foreach (var item in tv.Items)
-			{
-				TreeViewItem tvi = tv.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
-				if (!tvi.IsExpanded)
-				{
-					EventsModel.ExpandNode(tvi);
-				}
-				tvi.UpdateLayout();
 			}
 		}
 	}

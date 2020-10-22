@@ -72,11 +72,9 @@
     </Compile>
     <Compile Include="LiveRunner.cs" />
     <Compile Include="BetfairTypes.cs" />
+    <Compile Include="NodeViewModel.cs" />
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="TreeViewTest.xaml.cs">
-      <DependentUpon>TreeViewTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel.cs" />
     <Compile Include="WaitCursor.cs" />
@@ -98,10 +96,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Settings.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="TreeViewTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

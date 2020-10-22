@@ -214,7 +214,7 @@ namespace BetfairAPI
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
-			filter["marketStartTime"] = Today();
+		//	filter["marketStartTime"] = Today();
 			filter["marketCountries"] = new String[] { "GB" };
 			p["filter"] = filter;
             return RPCRequest<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
