@@ -11,15 +11,57 @@ namespace SpreadTrader
 {
 	public class NodeViewModel : ViewModelBase, INotifyPropertyChanged
 	{
+		private bool _isSelected;
 		private bool _IsExpanded;
 		public bool IsExpanded { get { return _IsExpanded; } set { _IsExpanded = value; OnItemExpanding(); } }
+		public bool IsSelected
+		{
+			get { return _isSelected; }
+			set
+			{
+				_isSelected = value;
+				Console.WriteLine(@"IsSelected set");
+				OnItemSelected();
+				OnPropertyChanged();
+			}
+		}
 		public delegate void CallBackDelegate();
 		public CallBackDelegate Populate = null;
+		private void OnItemSelected()
+		{
+			Market m = Tag as Market;
+			if (m != null)
+			{
+				try
+				{
+					//MainWindow.LiveRunners.Clear();
+					//MarketBook book = EventsModel.Betfair.GetMarketBook(m);
+					//foreach (Runner r in book.Runners)
+					//{
+					//	if (r.removalDate == new DateTime())
+					//	{
+					//		LiveRunner rl = new LiveRunner(r);
+					//		MainWindow.LiveRunners.Add(rl);
+					//		if (r.ex.availableToBack.Count > 0)
+					//		{
+					//		}
+					//	}
+					//}
+					//OnPropertyChanged("");
+					//MainWindow.Status = "Ready";
+				}
+				catch (Exception xe)
+				{
+					//	MainWindow.Status = "Markets_SelectionChanged: " + String.Format(xe.Message.ToString()); 
+				}
+			}
+		}
 		private void OnItemExpanding()
 		{
 			Console.WriteLine(this.Name + (IsExpanded ? @" Expanded" : @" Collapsed"));
 			if (IsExpanded && Populate != null)
 			{
+				Children.Clear();
 				Populate();
 			}
 		}
@@ -29,25 +71,17 @@ namespace SpreadTrader
 		public Int32 Id { get; set; }
 		public string Name { get; set; }
 		public ObservableCollection<NodeViewModel> Children { get; set; }
-		public event PropertyChangedEventHandler PropertyChanged;
-		private void NotifyPropertyChanged(String info)
-		{
-			if (PropertyChanged != null)
-			{
-				PropertyChanged(this, new PropertyChangedEventArgs(info));
-			}
-		}
 		public NodeViewModel(String name)
 		{
 			Name = name;
 			Children = new ObservableCollection<NodeViewModel>();
 		}
-		public void Add(NodeViewModel child)
+		public void Add(NodeViewModel child, bool leaf = false)
 		{
 			child.Parent = this;
 			Children.Add(child);
-			child.Children.Add(new NodeViewModel("x"));
-			NotifyPropertyChanged("");
+			if (child.Populate != null) child.Children.Add(new NodeViewModel("x"));
+			OnPropertyChanged("");
 		}
 		public void PopulateEventTYpes()
 		{
@@ -62,22 +96,32 @@ namespace SpreadTrader
 				}
 			}
 		}
+		public void PopulateCompetitions()
+		{
+			List<CompetitionResult> competitions = EventsModel.Betfair.GetCompetitions(Id).OrderBy(o => o.competition.name).ToList();
+			foreach (CompetitionResult cr in competitions)
+			{
+				NodeViewModel nvm = new NodeViewModel(cr.competition.name) { Id = this.Id, Country = this.Country };
+				nvm.Populate = nvm.PopulateEvents;
+				Add(nvm);
+			}
+		}
 		public void PopulateEvents()
 		{
 			List<Event> events = EventsModel.Betfair.GetEvents(Id, Country).OrderBy(o => o.details.name).ToList();
 			foreach (Event ev in events)
 			{
 				NodeViewModel nvm = new NodeViewModel(ev.details.name) { Id = this.Id, Country = this.Country };
-				nvm.Populate = null;// nvm.PopulateEvents;
+				nvm.Populate = nvm.PopulateMarkets;
 				Add(nvm);
 			}
 		}
 		public void PopulateCountries()
 		{
-			List<CountryCodeResult> countries = EventsModel.Betfair.GetCountries(7);
+			List<CountryCodeResult> countries = EventsModel.Betfair.GetCountries(Id);
 			foreach (CountryCodeResult cr in countries)
 			{
-				NodeViewModel nvm = new NodeViewModel(cr.countryCode) { Id = 7, Country = cr.countryCode };
+				NodeViewModel nvm = new NodeViewModel(cr.countryCode) { Id = Id, Country = cr.countryCode };
 				nvm.Populate = nvm.PopulateVenues;
 				Add(nvm);
 			}
@@ -98,7 +142,7 @@ namespace SpreadTrader
 			foreach (Market m in markets)
 			{
 				NodeViewModel nvm = new NodeViewModel(m.ToString()) { Tag = m };
-				nvm.Populate = null;// nvm.PopulateEvents;
+				//nvm.Populate = nvm.PopulateMarketBook;
 				Add(nvm);
 			}
 		}

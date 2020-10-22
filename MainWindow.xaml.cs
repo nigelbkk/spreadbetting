@@ -18,7 +18,7 @@ namespace SpreadTrader
 	{
 		public EventsModel EventsModel { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
-		private String _Status = "Ready";
+		public static String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged("Status"); } }
 		public String UKBalance { get; set; }
 		public ObservableCollection<EventType> AllEventTypes { get; set; }
@@ -118,23 +118,6 @@ namespace SpreadTrader
 				System.Threading.Thread.Sleep(props.WaitBF);
 			}
 		}
-		public void CalculateProfitAndLoss(String marketId, List<LiveRunner> runners)
-		{
-			List<MarketProfitAndLoss> pl = Betfair.listMarketProfitAndLoss(marketId);
-			if (pl.Count > 0)
-			{
-				foreach (LiveRunner v in runners)
-				{
-					foreach (var o in pl[0].profitAndLosses)
-					{
-						if (v.ngrunner.selectionId == o.selectionId)
-						{
-							v._prices[0][6].size = o.ifWin;
-						}
-					}
-				}
-			}
-		}
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
 			if (WindowState == System.Windows.WindowState.Maximized)
@@ -197,6 +180,36 @@ namespace SpreadTrader
 				}
 			}
 		}
+		private void OnItemSelected()
+		{
+			Market m = new Market();
+			m.marketId = "1.174552719";
+			if (m != null)
+			{
+				try
+				{
+					LiveRunners.Clear();
+					MarketBook book = EventsModel.Betfair.GetMarketBook(m);
+					foreach (Runner r in book.Runners)
+					{
+						if (r.removalDate == new DateTime())
+						{
+							LiveRunner rl = new LiveRunner(r);
+							LiveRunners.Add(rl);
+							if (r.ex.availableToBack.Count > 0)
+							{
+							}
+						}
+					}
+					NotifyPropertyChanged("");
+					Status = "Ready";
+				}
+				catch (Exception xe)
+				{
+					Status = "Markets_SelectionChanged: " + String.Format(xe.Message.ToString());
+				}
+			}
+		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			Button b = sender as Button;
@@ -205,6 +218,8 @@ namespace SpreadTrader
 				switch (b.Tag)
 				{
 					case "Settings":
+						OnItemSelected();
+						break;
 						Settings sd = new Settings();
 						if (sd.ShowDialog() == true)
 						{

@@ -183,6 +183,8 @@
 									<Style TargetType="{x:Type TreeViewItem}">
 										<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
 										<Setter Property="local:Behaviours.ExpandingBehaviour" Value="{Binding DataContext.ExpandingCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+										<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+										<Setter Property="local:Behaviours.ExpandingBehaviour" Value="{Binding DataContext.ExpandingCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
 									</Style>
 								</TreeView.ItemContainerStyle>
 								<TreeView.Resources>
@@ -191,14 +193,13 @@
 									</HierarchicalDataTemplate>
 									<Style TargetType="TreeViewItem">
 										<Style.Triggers>
-											<Trigger Property="IsExpanded" Value="True">
-												<Setter Property="FontWeight" Value="Bold"/>
-												<Setter Property="FontStyle" Value="Italic"/>
-												<Setter Property="Foreground" Value="Red"/>
-												<Setter Property="Background" Value="Green"/>
-												<!--<Setter Property="Template" Value="{StaticResource selectedTemplate}"/>-->
-											</Trigger>
+											<Trigger Property="IsExpanded" Value="True"/>
+											<Trigger Property="IsSelected" Value="True"/>
 										</Style.Triggers>
+										<Setter Property="FontWeight" Value="Bold"/>
+										<Setter Property="FontStyle" Value="Italic"/>
+										<Setter Property="Foreground" Value="Red"/>
+										<Setter Property="Background" Value="Green"/>
 									</Style>
 								</TreeView.Resources>
 							</TreeView>
