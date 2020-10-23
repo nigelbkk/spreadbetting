@@ -194,7 +194,11 @@ namespace BetfairAPI
     {
         public string venue { get; set; }
         public Int32 marketCount { get; set; }
-    }
+		public override string ToString()
+		{
+			return venue;
+		}
+	}
     public class priceProjection
     {
         public class ExBestOffersOverrides
@@ -682,6 +686,10 @@ namespace BetfairAPI
         public Competition competition { get; set; }
         public Int32 marketCount { get; set; }
         public String competitionRegion { get; set; }
+        public override string ToString()
+        {
+            return competition.name;
+        }
     }
     public class Event
     {

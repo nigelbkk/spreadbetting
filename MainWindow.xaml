@@ -178,7 +178,7 @@
 							<Button Content="Settings"  Tag="Settings" Grid.Column="2" Style="{ StaticResource OurButton}" Click="Button_Click" />
 						</Grid>
 
-						<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10" DataContext="{Binding ElementName=UI, Path=RootNode}" ItemsSource="{Binding Children}">
+						<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10" DataContext="{Binding ElementName=UI, Path=RootNode}" ItemsSource="{Binding Nodes}">
 							<TreeView.ItemContainerStyle>
 								<Style TargetType="{x:Type TreeViewItem}">
 									<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
@@ -188,7 +188,7 @@
 								</Style>
 							</TreeView.ItemContainerStyle>
 							<TreeView.Resources>
-								<HierarchicalDataTemplate DataType="{x:Type local:NodeViewModel}" ItemsSource="{Binding Children}">
+								<HierarchicalDataTemplate DataType="{x:Type local:NodeViewModel}" ItemsSource="{Binding Nodes}">
 									<TextBlock Text="{Binding Name}"></TextBlock>
 								</HierarchicalDataTemplate>
 								<Style TargetType="TreeViewItem">

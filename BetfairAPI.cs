@@ -159,44 +159,6 @@ namespace BetfairAPI
         {
             this.Token = Token;
         }
-   //     public void login(String CertFile, String CertPassword, String AppKey, String username, String password)
-   //     {
-   //         this.AppKey = AppKey;   
-   //         Token = String.Empty;
-   //         byte[] args = Encoding.UTF8.GetBytes(String.Format("username={0}&password={1}", username, password));
-
-   //         HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(" https://identitysso-cert.betfair.com/api/certlogin");
-			//wr.Method = WebRequestMethods.Http.Post;
-   //         wr.Headers.Add("X-Application", AppKey);
-   //         wr.ContentType = "application/x-www-form-urlencoded";
-   //         wr.ContentLength = args.Length;
-
-   //         var cert = new X509Certificate2(CertFile, CertPassword); 
-   //         wr.ClientCertificates.Add(cert);
-
-   //         using (Stream newStream = wr.GetRequestStream())
-   //         {
-   //             newStream.Write(args, 0, args.Length);
-   //             newStream.Close();
-   //         }
-   //         using (WebResponse response = wr.GetResponse())
-   //         {
-   //             sysTime = DateTime.Parse(response.Headers["Date"]).ToUniversalTime();
-   //             using (Stream ds = response.GetResponseStream())
-   //             {
-   //                 StreamReader reader = new StreamReader(ds);
-   //                 String rs = reader.ReadToEnd();
-
-   //                 LoginResponse o = JsonConvert.DeserializeObject<LoginResponse>(rs);
-   //                 if (!o.Status)
-   //                 {
-   //                     Console.WriteLine("Login failed. Are you running Fiddler?");
-   //                     throw new Exception(o.ToString());
-   //                 }
-   //                 Token = o.sessionToken;
-   //             }
-   //         }
-   //     }
         public List<VenueResult> ListVenues()
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
@@ -234,8 +196,8 @@ namespace BetfairAPI
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
             filter["eventTypeIds"] = new Int32[] { event_type };
-        //    filter["marketStartTime"] = Today();
-        //    filter["marketCountries"] = new String[] { country };
+            filter["marketStartTime"] = Today();
+            filter["marketCountries"] = new String[] { country };
             p["filter"] = filter;
             return RPCRequest<List<VenueResult>>("listVenues", p) as List<VenueResult>;
         }
@@ -264,7 +226,7 @@ namespace BetfairAPI
 
             filter["eventTypeIds"] = new Int32[] { event_type };
             //filter["marketCountries"] = new String[] { country_code };
-            //filter["venues"] = new String[] { country_or_venue };
+            filter["venues"] = new String[] { country_or_venue };
             filter["marketStartTime"] = Today();
             p["filter"] = filter;
             return RPCRequest<List<Event>>("listEvents", p) as List<Event>;
@@ -280,7 +242,7 @@ namespace BetfairAPI
             //filter["marketStartTime"] = Today();
             filter["marketBettingTypes"] = new String[] { "ODDS" };
             filter["marketTypeCodes"] = new String[] { "HALF_TIME_SCORE", "MATCH_ODDS", "WIN", };
-            p["marketProjection"] = new String[] { "MARKET_DESCRIPTION" };
+            p["marketProjection"] = new String[] { "MARKET_DESCRIPTION", "RUNNER_DESCRIPTION" };
             p["filter"] = filter;
             p["maxResults"] = 200;
 
@@ -294,7 +256,9 @@ namespace BetfairAPI
             filter["eventIds"] = new Int32[] { event_id };
             //filter["eventTypeIds"] = new Int32[] { event_type_id };
             //filter["marketStartTime"] = Today();
-            p["marketProjection"] = new String[] { "MARKET_DESCRIPTION" };
+            filter["marketBettingTypes"] = new String[] { "ODDS" };
+            filter["marketTypeCodes"] = new String[] { "HALF_TIME_SCORE", "MATCH_ODDS", "WIN", };
+            p["marketProjection"] = new String[] { "MARKET_DESCRIPTION", "RUNNER_DESCRIPTION" };
             p["filter"] = filter;
             p["maxResults"] = 200;
 

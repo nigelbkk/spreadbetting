@@ -100,7 +100,6 @@ namespace SpreadTrader
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
 			RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged);
-//			SelectedNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification);
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
