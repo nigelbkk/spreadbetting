@@ -10,9 +10,11 @@ using System.Windows.Controls;
 namespace SpreadTrader
 {
 	public delegate void NotificationDelegate(String s);
+	public delegate void SelectedNodeDelegate(NodeViewModel node);
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
-		private  NodeViewModel RootModel { get; set; }
+		public NodeViewModel RootNode { get; set; }
+		public NodeViewModel SelectedNode { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged(""); } }
@@ -27,8 +29,6 @@ namespace SpreadTrader
 		}
 		public MainWindow()
 		{
-			//bw.DoWork += RefreshSelectedMarket;
-
 			System.Net.ServicePointManager.Expect100Continue = false;
 			InitializeComponent();
 			if (!props.Upgraded)
@@ -90,11 +90,17 @@ namespace SpreadTrader
 		}
 		private void OnNotification(String cs)
 		{
-			Dispatcher.BeginInvoke(new Action(() => { Status = cs; NotifyPropertyChanged("");  }));
+			Dispatcher.BeginInvoke(new Action(() => { Status = cs; NotifyPropertyChanged(""); }));
+		}
+		private void OnSelectionChanged(NodeViewModel node)
+		{
+			SelectedNode = node;
+			Dispatcher.BeginInvoke(new Action(() => { NotifyPropertyChanged(""); }));
 		}
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			RootModel = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification);
+			RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged);
+//			SelectedNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification);
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -111,7 +117,7 @@ namespace SpreadTrader
 						}
 						break;
 					case "Refresh":
-						RootModel = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification);
+						RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged);
 						break;
 					case "Favourites":
 						{

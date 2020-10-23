@@ -162,50 +162,48 @@
 					<ColumnDefinition Width="2*"></ColumnDefinition>
 				</Grid.ColumnDefinitions>
 				<Grid Name="LeftGrid">
-					<xctk:BusyIndicator Grid.Row="0" IsBusy="False" IsEnabled="True" Name="_busyIndicator" BusyContent="Loading markets..." >
-						<Grid>
-							<Grid.RowDefinitions>
-								<RowDefinition Height ="24"></RowDefinition>
-								<RowDefinition Height ="2*"></RowDefinition>
-							</Grid.RowDefinitions>
-							<Grid HorizontalAlignment="Stretch">
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="80*" />
-									<ColumnDefinition Width="80*"/>
-									<ColumnDefinition Width="120*"/>
-								</Grid.ColumnDefinitions>
-								<Button Content="Refresh" Tag="Refresh" Grid.Column="0" Style="{ StaticResource OurButton}" Click="Button_Click" />
-								<Button Content="Favourites"  Tag="Favourites" Name="FavouritesButton" Grid.Column="1" Style="{ StaticResource OurButton}" Click="Button_Click" />
-								<Button Content="Settings"  Tag="Settings" Grid.Column="2" Style="{ StaticResource OurButton}" Click="Button_Click" />
-							</Grid>
-
-							<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10" DataContext="{Binding ElementName=UI, Path=RootModel}" ItemsSource="{Binding Children}">
-								<TreeView.ItemContainerStyle>
-									<Style TargetType="{x:Type TreeViewItem}">
-										<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
-										<Setter Property="local:Behaviours.ExpandingBehaviour" Value="{Binding DataContext.ExpandingCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
-										<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-										<Setter Property="local:Behaviours.ExpandingBehaviour" Value="{Binding DataContext.ExpandingCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
-									</Style>
-								</TreeView.ItemContainerStyle>
-								<TreeView.Resources>
-									<HierarchicalDataTemplate DataType="{x:Type local:NodeViewModel}" ItemsSource="{Binding Children}">
-										<TextBlock Text="{Binding Name}"></TextBlock>
-									</HierarchicalDataTemplate>
-									<Style TargetType="TreeViewItem">
-										<Style.Triggers>
-											<Trigger Property="IsExpanded" Value="True"/>
-											<Trigger Property="IsSelected" Value="True"/>
-										</Style.Triggers>
-										<Setter Property="FontWeight" Value="Bold"/>
-										<Setter Property="FontStyle" Value="Italic"/>
-										<Setter Property="Foreground" Value="Red"/>
-										<Setter Property="Background" Value="Green"/>
-									</Style>
-								</TreeView.Resources>
-							</TreeView>
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height ="24"></RowDefinition>
+							<RowDefinition Height ="2*"></RowDefinition>
+						</Grid.RowDefinitions>
+						<Grid HorizontalAlignment="Stretch">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="80*" />
+								<ColumnDefinition Width="80*"/>
+								<ColumnDefinition Width="120*"/>
+							</Grid.ColumnDefinitions>
+							<Button Content="Refresh" Tag="Refresh" Grid.Column="0" Style="{ StaticResource OurButton}" Click="Button_Click" />
+							<Button Content="Favourites"  Tag="Favourites" Name="FavouritesButton" Grid.Column="1" Style="{ StaticResource OurButton}" Click="Button_Click" />
+							<Button Content="Settings"  Tag="Settings" Grid.Column="2" Style="{ StaticResource OurButton}" Click="Button_Click" />
 						</Grid>
-					</xctk:BusyIndicator>
+
+						<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10" DataContext="{Binding ElementName=UI, Path=RootNode}" ItemsSource="{Binding Children}">
+							<TreeView.ItemContainerStyle>
+								<Style TargetType="{x:Type TreeViewItem}">
+									<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+									<Setter Property="local:Behaviours.ExpandingBehaviour" Value="{Binding DataContext.ExpandingCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+									<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+									<Setter Property="local:Behaviours.ExpandingBehaviour" Value="{Binding DataContext.ExpandingCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+								</Style>
+							</TreeView.ItemContainerStyle>
+							<TreeView.Resources>
+								<HierarchicalDataTemplate DataType="{x:Type local:NodeViewModel}" ItemsSource="{Binding Children}">
+									<TextBlock Text="{Binding Name}"></TextBlock>
+								</HierarchicalDataTemplate>
+								<Style TargetType="TreeViewItem">
+									<Style.Triggers>
+										<Trigger Property="IsExpanded" Value="True"/>
+										<Trigger Property="IsSelected" Value="True"/>
+									</Style.Triggers>
+									<Setter Property="FontWeight" Value="Bold"/>
+									<Setter Property="FontStyle" Value="Italic"/>
+									<Setter Property="Foreground" Value="Red"/>
+									<Setter Property="Background" Value="Green"/>
+								</Style>
+							</TreeView.Resources>
+						</TreeView>
+					</Grid>
 				</Grid>
 				<Border  Grid.Column="1" DockPanel.Dock="Right" BorderBrush="Silver" BorderThickness="1" >
 					<Grid Name="RightGrid">
@@ -215,7 +213,7 @@
 							<RowDefinition Height ="3*"></RowDefinition>
 						</Grid.RowDefinitions>
 						<Grid Name="MarketGrid" Grid.Row="0">
-							<ItemsControl FontFamily="Verdana" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding LiveRunners}" FontWeight="Medium" >
+							<ItemsControl FontFamily="Verdana" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding SelectedNode.LiveRunners}" FontWeight="Medium" >
 								<ItemsControl.Template>
 									<ControlTemplate>
 										<ScrollViewer Name="ScrollViewer" Padding="{TemplateBinding Control.Padding}">

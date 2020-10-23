@@ -16,9 +16,12 @@ namespace SpreadTrader
         public Runner ngrunner { get; set; }
         private BitmapImage _colors = null;
         public BitmapImage Colors { get { return _colors; } set { _colors = value; NotifyPropertyChanged("Colors"); } }
-        public String name { get { return String.Format("{0} {1}",  ngrunner.Catalog.name, ngrunner.handicap == 0 ? "" : ngrunner.handicap.ToString()); } }
-        public int selectionId { get { return ngrunner.selectionId; } }
-        public String saddle_number { get { return ngrunner.Catalog.MetaData("CLOTH_NUMBER"); } }
+        public String name { get { return "George Baker"; } }
+        //        public String name { get { return String.Format("{0} {1}",  ngrunner.Catalog.name, ngrunner.handicap == 0 ? "" : ngrunner.handicap.ToString()); } }
+//        public int selectionId { get { return ngrunner.selectionId; } }
+        public int selectionId { get { return 1011; } }
+//        public String saddle_number { get { return ngrunner.Catalog.MetaData("CLOTH_NUMBER"); } }
+        public String saddle_number { get { return "5"; } }
         public int barrier { get { return Convert.ToInt32(ngrunner.Catalog.MetaData("STALL_DRAW")); } }
         public Brush OutComeColor
         {
@@ -58,7 +61,7 @@ namespace SpreadTrader
                 PropertyChanged(this, new PropertyChangedEventArgs(propName));
             }
         }
-        private LiveRunner()
+        public LiveRunner()
         {
             _prices.Clear();
             _prices.Add(new PriceSize[7]);

@@ -12,7 +12,9 @@ namespace SpreadTrader
 	public class NodeViewModel : ViewModelBase, INotifyPropertyChanged
 	{
 		public NotificationDelegate NotificationCallback = null;
+		public SelectedNodeDelegate SelectedCallback = null;
 		public ObservableCollection<LiveRunner> LiveRunners { get; set; }
+		public NodeViewModel SelectedNode { get; set; }
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }
 		private bool _isSelected;
 		private bool _IsExpanded;
@@ -30,12 +32,37 @@ namespace SpreadTrader
 		}
 		public delegate void CallBackDelegate();
 		public CallBackDelegate Populate = null;
+		public Object Tag { get; set; }
+		public NodeViewModel Parent { get; set; }
+		public string Country { get; set; }
+		public Int32 Id { get; set; }
+		public string Name { get; set; }
+		public ObservableCollection<NodeViewModel> Children { get; set; }
+		public NodeViewModel(BetfairAPI.BetfairAPI Betfair, NotificationDelegate Callback, SelectedNodeDelegate SelectedCallback)
+		{
+			NodeViewModel.Betfair = Betfair;
+			Children = new ObservableCollection<NodeViewModel>();
+			this.NotificationCallback = Callback;
+			this.SelectedCallback = SelectedCallback;
+			PopulateEventTYpes();
+			Populate = PopulateCompetitionsOrCountries;
+			NotificationCallback("Ready");
+
+			LiveRunners = new ObservableCollection<LiveRunner>();
+			LiveRunners.Add(new LiveRunner() { });
+
+			SelectedCallback(this);
+		}
+		public NodeViewModel(String name)
+		{
+			Name = name;
+			Children = new ObservableCollection<NodeViewModel>();
+		}
 		private void OnItemSelected()
 		{
 			Market m = Tag as Market;
 			if (m != null)
 			{
-				NotificationCallback("Markets_SelectionChanged: " + String.Format(m.ToString()));
 				try
 				{
 					LiveRunners = new ObservableCollection<LiveRunner>();
@@ -51,12 +78,12 @@ namespace SpreadTrader
 							}
 						}
 					}
-					OnPropertyChanged("");
-					NotificationCallback("Ready");
+					//MainWindow.SelectedNode = this;
+					NotificationCallback("Selection Changed: " + String.Format(m.ToString()));
 				}
 				catch (Exception xe)
 				{
-					NotificationCallback("Markets_SelectionChanged: " + String.Format(xe.Message.ToString())); 
+					NotificationCallback("Markets_SelectionChanged: " + String.Format(xe.Message.ToString()));
 				}
 			}
 		}
@@ -69,30 +96,11 @@ namespace SpreadTrader
 				Populate();
 			}
 		}
-		public Object Tag { get; set; }
-		public NodeViewModel Parent { get; set; }
-		public string Country { get; set; }
-		public Int32 Id { get; set; }
-		public string Name { get; set; }
-		public ObservableCollection<NodeViewModel> Children { get; set; }
-		public NodeViewModel(BetfairAPI.BetfairAPI Betfair, NotificationDelegate Callback)
-		{
-			NodeViewModel.Betfair = Betfair;
-			Children = new ObservableCollection<NodeViewModel>();
-			NotificationCallback = Callback;
-			PopulateEventTYpes();
-			Populate = PopulateCompetitionsOrCountries;
-			NotificationCallback("Ready");
-		}
-		public NodeViewModel(String name)
-		{
-			Name = name;
-			Children = new ObservableCollection<NodeViewModel>();
-		}
 		public void Add(NodeViewModel child, bool leaf = false)
 		{
 			child.Parent = this;
 			child.NotificationCallback = NotificationCallback;
+			child.SelectedCallback = SelectedCallback;
 			Children.Add(child);
 			if (child.Populate != null) child.Children.Add(new NodeViewModel("x"));
 			OnPropertyChanged("");
