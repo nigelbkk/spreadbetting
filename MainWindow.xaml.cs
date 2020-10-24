@@ -47,6 +47,12 @@ namespace SpreadTrader
 			if (props.ColumnWidth > 0)
 				OuterGrid.ColumnDefinitions[0].Width = new GridLength(props.ColumnWidth, GridUnitType.Pixel);
 
+			if (props.RowHeight1 > 0)
+				RightGrid.RowDefinitions[0].Height = new GridLength(props.RowHeight1, GridUnitType.Pixel);
+
+			if (props.RowHeight2 > 0)
+				RightGrid.RowDefinitions[1].Height = new GridLength(props.RowHeight2, GridUnitType.Pixel);
+
 			if (props.Maximised)
 			{
 				WindowState = System.Windows.WindowState.Maximized;

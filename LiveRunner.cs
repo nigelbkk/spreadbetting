@@ -81,6 +81,7 @@ namespace SpreadTrader
             {
                 _prices[0][i++] = p;
             }
+            i = 3;      // bug in scbng
             foreach (var p in r.ex.availableToLay)
             {
                 _prices[0][i++] = p;

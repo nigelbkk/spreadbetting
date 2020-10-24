@@ -44,6 +44,11 @@ namespace SpreadTrader
 			PopulateEventTYpes();
 			Populate = PopulateCompetitionsOrCountries;
 			NotificationCallback("Ready");
+
+			Market m = new Market();
+			m.marketId = "1.174361561";
+			Tag = m;
+			OnItemSelected();
 		}
 		public NodeViewModel(String name)
 		{
@@ -59,6 +64,8 @@ namespace SpreadTrader
 				{
 					LiveRunners = new ObservableCollection<LiveRunner>();
 					MarketBook book = Betfair.GetMarketBook(m);
+					book.Runners[0].Catalog.name = "Barcelona";
+					book.Runners[1].Catalog.name = "Andorra";
 					foreach (Runner r in book.Runners)
 					{
 						if (r.removalDate == new DateTime())
