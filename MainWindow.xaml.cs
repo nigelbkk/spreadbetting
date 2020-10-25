@@ -16,12 +16,10 @@ namespace SpreadTrader
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
 		public NodeViewModel RootNode { get; set; }
-		public NodeViewModel SelectedNode { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged(""); } }
 		public Decimal UKBalance { get; set; }
-		public ObservableCollection<Bet> AllBets { get; set; }
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
 		{
@@ -50,11 +48,11 @@ namespace SpreadTrader
 			if (props.ColumnWidth > 0)
 				OuterGrid.ColumnDefinitions[0].Width = new GridLength(props.ColumnWidth, GridUnitType.Pixel);
 
-			if (props.RowHeight1 > 0)
-				RightGrid.RowDefinitions[0].Height = new GridLength(props.RowHeight1, GridUnitType.Pixel);
+			//if (props.RowHeight1 > 0)
+			//	RightGrid.RowDefinitions[0].Height = new GridLength(props.RowHeight1, GridUnitType.Pixel);
 
-			if (props.RowHeight2 > 0)
-				RightGrid.RowDefinitions[1].Height = new GridLength(props.RowHeight2, GridUnitType.Pixel);
+			//if (props.RowHeight2 > 0)
+			//	RightGrid.RowDefinitions[1].Height = new GridLength(props.RowHeight2, GridUnitType.Pixel);
 
 //			TabControl.Items[0].SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
 
@@ -62,17 +60,8 @@ namespace SpreadTrader
 			{
 				WindowState = System.Windows.WindowState.Maximized;
 			}
-			PopulateBetsGrid();
+//			PopulateBetsGrid();
 			NotifyPropertyChanged("");
-		}
-		private void PopulateBetsGrid()
-		{
-			AllBets = new ObservableCollection<Bet>();
-			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
-			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
-			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
-			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
-			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
 		}
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
@@ -94,23 +83,10 @@ namespace SpreadTrader
 				props.Maximised = false;
 			}
 			props.ColumnWidth = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
-			props.RowHeight1 = Convert.ToInt32(RightGrid.RowDefinitions[0].Height.Value);
-			props.RowHeight2 = Convert.ToInt32(RightGrid.RowDefinitions[1].Height.Value);
+			//props.RowHeight1 = Convert.ToInt32(RightGrid.RowDefinitions[0].Height.Value);
+			//props.RowHeight2 = Convert.ToInt32(RightGrid.RowDefinitions[1].Height.Value);
 
 			props.Save();
-		}
-		private void OnNotification(String cs)
-		{
-			Dispatcher.BeginInvoke(new Action(() => { Status = cs; NotifyPropertyChanged(""); }));
-		}
-		private void OnSelectionChanged(NodeViewModel node)
-		{
-			SelectedNode = node;
-			Dispatcher.BeginInvoke(new Action(() => { NotifyPropertyChanged(""); }));
-		}
-		private void Window_Loaded(object sender, RoutedEventArgs e)
-		{
-			RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged);
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -120,11 +96,11 @@ namespace SpreadTrader
 				switch (b.Tag)
 				{
 					case "Market Description":
-						new MarketDescription(this, b, SelectedNode).ShowDialog(); break;
+	//					new MarketDescription(this, b, SelectedNode).ShowDialog(); break;
 					case "Settings":
 						new Settings().ShowDialog(); break;
 					case "Refresh":
-						RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged);	break;
+//						RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged); break;
 					case "Favourites":
 						new Favourites(this, b, NodeViewModel.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList()); break;
 				}
@@ -134,49 +110,12 @@ namespace SpreadTrader
 				Status = xe.Message.ToString();
 			}
 		}
-		private void GridSplitter_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
+		private void OnNotification(String cs)
 		{
-			//SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
+			Dispatcher.BeginInvoke(new Action(() => { Status = cs; NotifyPropertyChanged(""); }));
 		}
-		private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			TextBox textbox = sender as TextBox;
-			if (e.Key == Key.Return || e.Key == Key.Escape)
-			{
-				Grid grid = textbox.Parent as Grid;
-				Label label = grid.Children[0] as Label;
-				label.Visibility = Visibility.Visible;
-				textbox.Visibility = Visibility.Hidden;
-				if (textbox.Text.All(char.IsNumber))
-				{
-					props.BackStake = Convert.ToDecimal(textbox.Text);
-					props.Save();
-				}
-			}
-		}
-		private void label_MouseDown(object sender, MouseButtonEventArgs e)
-		{
-			Label label = sender as Label;
-			Grid grid = label.Parent as Grid;
-			TextBox textbox = grid.Children[1] as TextBox;
-			Application.Current.Dispatcher.Invoke(new Action(() =>
-			{
-				textbox.Focus();
-				Keyboard.Focus(textbox);
-			}));
-			label.Visibility = Visibility.Hidden;
-			textbox.Visibility = Visibility.Visible;
-			NotifyPropertyChanged("");
-		}
-
-		private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-		{
-			TextBox textbox = sender as TextBox;
-			Grid grid = textbox.Parent as Grid;
-			Label label = grid.Children[0] as Label;
-			label.Visibility = Visibility.Visible;
-			textbox.Visibility = Visibility.Hidden;
-			NotifyPropertyChanged("");
 		}
 	}
 }

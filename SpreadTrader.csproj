@@ -77,6 +77,9 @@
     </Compile>
     <Compile Include="LiveRunner.cs" />
     <Compile Include="BetfairTypes.cs" />
+    <Compile Include="MarketControl.xaml.cs">
+      <DependentUpon>MarketControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MarketDescription.xaml.cs">
       <DependentUpon>MarketDescription.xaml</DependentUpon>
     </Compile>
@@ -103,6 +106,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="MarketControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MarketDescription.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
