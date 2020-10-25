@@ -258,7 +258,7 @@ namespace BetfairAPI
             //filter["marketStartTime"] = Today();
 //            filter["marketBettingTypes"] = new String[] { "ODDS" };
 //            filter["marketTypeCodes"] = new String[] { "HALF_TIME_SCORE", "MATCH_ODDS", "WIN" };
-            p["marketProjection"] = new String[] { "MARKET_DESCRIPTION", "RUNNER_DESCRIPTION" };
+            p["marketProjection"] = new String[] { "MARKET_DESCRIPTION", "RUNNER_DESCRIPTION", "EVENT" };
             p["filter"] = filter;
             p["maxResults"] = 200;
 

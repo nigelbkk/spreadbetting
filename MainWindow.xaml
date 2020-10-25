@@ -1,19 +1,19 @@
 ﻿<Window x:Class="SpreadTrader.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:props="clr-namespace:SpreadTrader.Properties"
+		xmlns:properties="clr-namespace:SpreadTrader.Properties"
         xmlns:local="clr-namespace:SpreadTrader"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="SpreadTrader" Height="598" Width="1089" x:Name="UI"  WindowStartupLocation="CenterScreen" Closing="Window_Closing" Loaded="Window_Loaded" >
-	
 	<Window.Resources>
 		<BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-		<Style x:Key="OurTextBlock" TargetType="Label">
+		<Style x:Key="OurLabel" TargetType="Label">
 			<Setter Property="VerticalContentAlignment" Value="Center"/>
 			<Setter Property="BorderBrush" Value="DarkGray"/>
 			<Setter Property="BorderThickness" Value="0.5"/>
 			<Setter Property="Background" Value="ivory"/>
 			<Setter Property="FontSize" Value="8"/>
-			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="FontWeight" Value="Normal"/>
 			<Setter Property="Width" Value="50"/>
 			<Setter Property="HorizontalContentAlignment" Value="Center"/>
 		</Style>
@@ -27,21 +27,23 @@
 			<Setter Property="Width" Value="50"/>
 			<Setter Property="Height" Value="40"/>
 			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<EventSetter Event="Click" Handler="Button_Click"/>
 		</Style>
-		<Style x:Key="BetLabel" TargetType="Label">
+		<Style x:Key="OurTextBox" TargetType="TextBox">
 			<Setter Property="VerticalContentAlignment" Value="Center"/>
 			<Setter Property="BorderBrush" Value="DarkGray"/>
-			<Setter Property="BorderThickness" Value="0.5"/>
-			<Setter Property="Background" Value="#DFE1EE"/>
+			<Setter Property="BorderThickness" Value="1.5"/>
+			<Setter Property="Background" Value="White"/>
 			<Setter Property="FontSize" Value="11"/>
-			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="FontWeight" Value="Normal"/>
 			<Setter Property="Width" Value="50"/>
-			<Setter Property="Height" Value="40"/>
 			<Setter Property="HorizontalContentAlignment" Value="Center"/>
 		</Style>
 		<Style x:Key="OurButton" TargetType="Button">
+			<EventSetter Event="Click" Handler="Button_Click"/>
 			<Setter Property="Background" Value="ivory"/>
 			<Setter Property="BorderBrush" Value="DarkGray"/>
+			<Setter Property="BorderThickness" Value="0.5"/>
 			<Setter Property="VerticalContentAlignment" Value="Center"/>
 			<Setter Property="Padding" Value="10,0,10,0"/>
 			<Setter Property="Button.Effect">
@@ -100,7 +102,7 @@
 							<TextBlock FontSize="9"  FontWeight="Normal"  TextAlignment="Center"  Text="{Binding prices[0].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
 						</StackPanel>
 					</Button>
-					<Button Tag="lay1" Style="{ StaticResource BetButton}" Background="#DDBAD0" Margin="9,0,0,0">
+					<Button Tag="lay1" Style="{ StaticResource BetButton}" Background="#DDBAD0" Margin="10,0,0,0">
 						<StackPanel Orientation="Vertical">
 							<TextBlock TextAlignment="Center"  Text="{Binding prices[3].price, UpdateSourceTrigger=PropertyChanged}"/>
 							<TextBlock FontSize="9"  FontWeight="Normal"  TextAlignment="Center"  Text="{Binding prices[3].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
@@ -118,28 +120,27 @@
 							<TextBlock FontSize="9"  FontWeight="Normal"  TextAlignment="Center"  Text="{Binding prices[5].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
 						</StackPanel>
 					</Button>
-					<Button Tag="BackStake" Style="{ StaticResource BetButton}" FontWeight="Normal" Content="100"/>
-					<!--{Binding Path=BackStake, StringFormat=\{0:#.#\}}"/>-->
-					<!--<StackPanel Orientation="Vertical">
-							<TextBlock FontSize="11" TextAlignment="Center"  Text="{Binding Path=BackStake, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
-				</StackPanel>
-				</Button> -->
-				<Button Tag="LayStake" Style="{ StaticResource BetButton}" >
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding Path=LayStake, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
-						</StackPanel>
-					</Button>
-					<Label Tag="Profit" Style="{ StaticResource BetLabel}"  >
+
+					<Grid>
+						<Label Style="{ StaticResource OurLabel}" FontSize="11" Content="{Binding Path=BackStake2, Mode=TwoWay, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}" Visibility="Visible" MouseDown="label_MouseDown"/>
+						<TextBox Style="{ StaticResource OurTextBox}" Visibility="Hidden" Text="{Binding Path=BackStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" KeyDown="TextBox_KeyDown" MouseDoubleClick="TextBox_MouseDoubleClick" />
+					</Grid>
+					<Grid>
+						<Label Style="{ StaticResource OurLabel}" FontSize="11" Content="{Binding Path=LayStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" Visibility="Visible" MouseDown="label_MouseDown"/>
+						<TextBox  Tag="{Binding current_index}" Style="{ StaticResource OurTextBox}" Visibility="Hidden" Text="{Binding Path=LayStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" KeyDown="TextBox_KeyDown" MouseDoubleClick="TextBox_MouseDoubleClick" />
+					</Grid>
+
+					<Label Tag="Profit" Style="{ StaticResource OurLabel}"  >
 						<StackPanel Orientation="Vertical">
 							<TextBlock Text="{Binding Path=Profit, Mode=OneWay,StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
 						</StackPanel>
 					</Label>
-					<Label Tag="Level Profit" Style="{ StaticResource BetLabel}" >
+					<Label Tag="Level Profit" Style="{ StaticResource OurLabel}" >
 						<StackPanel Orientation="Vertical">
 							<TextBlock Text="{Binding Path=LevelProfit , Mode=OneWay, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
 						</StackPanel>
 					</Label>
-					<Label Tag="Last Price" Style="{ StaticResource BetLabel}"  >
+					<Label Tag="Last Price" Style="{ StaticResource OurLabel}"  >
 						<StackPanel Orientation="Vertical">
 							<TextBlock Text="{Binding Path=LastPrice, Mode=OneWay, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
 						</StackPanel>
@@ -242,28 +243,28 @@
 											</Button.ToolTip>
 											<Image Source="/SpreadTrader;component/Images/info.png" />
 										</Button>
-										<Button Grid.Column="1" Content="Barcelona @ Andorra" Padding="6,0,0,0" HorizontalContentAlignment="Left" Background="LightCyan"/>
+										<Label Grid.Column="1" Content="{Binding SelectedNode.FullName}" Padding="6,0,0,0" HorizontalContentAlignment="Left" Background="LightCyan"/>
 									</Grid>
 									<StackPanel Name="SV1_Header" Orientation="Horizontal" Height="36">
-										<Label Style="{ StaticResource OurTextBlock}" Width ="130">Selection Name</Label>
-										<Label Style="{ StaticResource OurTextBlock}"></Label>
-										<Label Style="{ StaticResource OurTextBlock}"></Label>
-										<Label Style="{ StaticResource OurTextBlock}">100.71%</Label>
-										<Label Style="{ StaticResource OurTextBlock}" Width="8"></Label>
-										<Label Style="{ StaticResource OurTextBlock}">99.37%</Label>
-										<Label Style="{ StaticResource OurTextBlock}"></Label>
-										<Label Style="{ StaticResource OurTextBlock}"></Label>
-										<Label Style="{ StaticResource OurTextBlock}">
+										<Label Style="{ StaticResource OurLabel}" Width ="130">Selection Name</Label>
+										<Label Style="{ StaticResource OurLabel}"></Label>
+										<Label Style="{ StaticResource OurLabel}"></Label>
+										<Label Style="{ StaticResource OurLabel}">100.71%</Label>
+										<Label Style="{ StaticResource OurLabel}" Width="10"></Label>
+										<Label Style="{ StaticResource OurLabel}">99.37%</Label>
+										<Label Style="{ StaticResource OurLabel}"></Label>
+										<Label Style="{ StaticResource OurLabel}"></Label>
+										<Label Style="{ StaticResource OurLabel}">
 											<TextBlock TextAlignment="Center">Back<LineBreak/>Stake</TextBlock>
 										</Label>
-										<Label Style="{ StaticResource OurTextBlock}">
+										<Label Style="{ StaticResource OurLabel}">
 											<TextBlock TextAlignment="Center">Lay<LineBreak/>Stake</TextBlock>
 										</Label>
-										<Label Style="{ StaticResource OurTextBlock}">Profit</Label>
-										<Label Style="{ StaticResource OurTextBlock}">
+										<Label Style="{ StaticResource OurLabel}">Profit</Label>
+										<Label Style="{ StaticResource OurLabel}">
 											<TextBlock TextAlignment="Center">Level<LineBreak/>Profit</TextBlock>
 										</Label>
-										<Label Style="{ StaticResource OurTextBlock}">
+										<Label Style="{ StaticResource OurLabel}">
 											<TextBlock TextAlignment="Center">Last<LineBreak/>Price</TextBlock>
 										</Label>
 									</StackPanel>

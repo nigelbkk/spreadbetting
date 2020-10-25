@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BetfairAPI;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -6,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace SpreadTrader
 {
@@ -18,6 +20,7 @@ namespace SpreadTrader
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged(""); } }
+		public Decimal UKBalance { get; set; }
 		public ObservableCollection<Bet> AllBets { get; set; }
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
@@ -134,6 +137,46 @@ namespace SpreadTrader
 		private void GridSplitter_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
 		{
 			SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
+		}
+		private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+		{
+			TextBox textbox = sender as TextBox;
+			if (e.Key == Key.Return || e.Key == Key.Escape)
+			{
+				Grid grid = textbox.Parent as Grid;
+				Label label = grid.Children[0] as Label;
+				label.Visibility = Visibility.Visible;
+				textbox.Visibility = Visibility.Hidden;
+				if (textbox.Text.All(char.IsNumber))
+				{
+					props.BackStake = Convert.ToDecimal(textbox.Text);
+					props.Save();
+				}
+			}
+		}
+		private void label_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			Label label = sender as Label;
+			Grid grid = label.Parent as Grid;
+			TextBox textbox = grid.Children[1] as TextBox;
+			Application.Current.Dispatcher.Invoke(new Action(() =>
+			{
+				textbox.Focus();
+				Keyboard.Focus(textbox);
+			}));
+			label.Visibility = Visibility.Hidden;
+			textbox.Visibility = Visibility.Visible;
+			NotifyPropertyChanged("");
+		}
+
+		private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			TextBox textbox = sender as TextBox;
+			Grid grid = textbox.Parent as Grid;
+			Label label = grid.Children[0] as Label;
+			label.Visibility = Visibility.Visible;
+			textbox.Visibility = Visibility.Hidden;
+			NotifyPropertyChanged("");
 		}
 	}
 }

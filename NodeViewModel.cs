@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using BetfairAPI;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel;
 
 namespace SpreadTrader
@@ -14,6 +12,7 @@ namespace SpreadTrader
 		public NotificationDelegate NotificationCallback = null;
 		public SelectedNodeDelegate SelectedCallback = null;
 		public ObservableCollection<LiveRunner> LiveRunners { get; set; }
+		public String FullName { get; set; }
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }
 		private bool _isSelected;
 		private bool _IsExpanded;
@@ -47,7 +46,7 @@ namespace SpreadTrader
 
 			Market m = new Market();
 			m.marketId = "1.174361561";
-			m.marketId = "1.174361562";
+//			m.marketId = "1.174361562";
 			Tag = m;
 			OnItemSelected();
 		}
@@ -77,6 +76,10 @@ namespace SpreadTrader
 							{
 							}
 						}
+					}
+					if (Parent != null)
+					{
+						FullName = String.Format("{0} - {1}", Parent.Name, Name);
 					}
 					SelectedCallback(this);
 					NotificationCallback("Selection Changed: " + String.Format(m.ToString()));
@@ -181,6 +184,14 @@ namespace SpreadTrader
 		public override string ToString()
 		{
 			return String.Format("{0}", Name);
+		}
+		public void SetStakes(Decimal stake, sideEnum side, Int32 runner_index)
+		{
+			if (side == sideEnum.BACK)
+				LiveRunners[runner_index].BackStake = stake;
+			else
+				LiveRunners[runner_index].LayStake = stake;
+			//NotificationCallback("");
 		}
 	}
 }

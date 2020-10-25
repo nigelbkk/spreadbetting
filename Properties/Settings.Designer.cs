@@ -25,18 +25,6 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("80")]
-        public double ColumnWidth {
-            get {
-                return ((double)(this["ColumnWidth"]));
-            }
-            set {
-                this["ColumnWidth"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("peter.oconnell444@gmail.com")]
         public string BFUser {
             get {
@@ -121,61 +109,25 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.29")]
-        public double back3 {
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public decimal BackStake {
             get {
-                return ((double)(this["back3"]));
+                return ((decimal)(this["BackStake"]));
             }
             set {
-                this["back3"] = value;
+                this["BackStake"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.89")]
-        public double back2 {
+        [global::System.Configuration.DefaultSettingValueAttribute("150")]
+        public decimal LayStake {
             get {
-                return ((double)(this["back2"]));
+                return ((decimal)(this["LayStake"]));
             }
             set {
-                this["back2"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool LiveBets {
-            get {
-                return ((bool)(this["LiveBets"]));
-            }
-            set {
-                this["LiveBets"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool ShowLive {
-            get {
-                return ((bool)(this["ShowLive"]));
-            }
-            set {
-                this["ShowLive"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://p4-7006.uk2net.com/sangster/x.xml")]
-        public string XMLPath {
-            get {
-                return ((string)(this["XMLPath"]));
-            }
-            set {
-                this["XMLPath"] = value;
+                this["LayStake"] = value;
             }
         }
         
@@ -224,42 +176,6 @@ namespace SpreadTrader.Properties {
             }
             set {
                 this["Upgraded"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Chartreuse")]
-        public string BetfairSPColour {
-            get {
-                return ((string)(this["BetfairSPColour"]));
-            }
-            set {
-                this["BetfairSPColour"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Magenta")]
-        public string MultiSPColour {
-            get {
-                return ((string)(this["MultiSPColour"]));
-            }
-            set {
-                this["MultiSPColour"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool LayTheField {
-            get {
-                return ((bool)(this["LayTheField"]));
-            }
-            set {
-                this["LayTheField"] = value;
             }
         }
         
@@ -320,6 +236,18 @@ namespace SpreadTrader.Properties {
             }
             set {
                 this["Proxy"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("80")]
+        public double ColumnWidth {
+            get {
+                return ((double)(this["ColumnWidth"]));
+            }
+            set {
+                this["ColumnWidth"] = value;
             }
         }
     }
