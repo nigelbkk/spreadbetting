@@ -56,7 +56,7 @@ namespace SpreadTrader
 			if (props.RowHeight2 > 0)
 				RightGrid.RowDefinitions[1].Height = new GridLength(props.RowHeight2, GridUnitType.Pixel);
 
-			SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
+//			TabControl.Items[0].SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
 
 			if (props.Maximised)
 			{
@@ -136,7 +136,7 @@ namespace SpreadTrader
 		}
 		private void GridSplitter_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
 		{
-			SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
+			//SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
 		}
 		private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
 		{
