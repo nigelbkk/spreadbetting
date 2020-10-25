@@ -148,9 +148,8 @@
 				</StackPanel>
 			</Border>
 		</DataTemplate>
-
 	</UserControl.Resources>
-	<Grid>
+	<Grid Name="RightGrid">
 		<Grid.RowDefinitions>
 			<RowDefinition Height ="1*"></RowDefinition>
 			<RowDefinition Height ="2*"></RowDefinition>
@@ -161,7 +160,7 @@
 				<Grid Height="24">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="34"/>
-						<ColumnDefinition />
+						<ColumnDefinition Width="34"/>
 					</Grid.ColumnDefinitions>
 					<Button Grid.Column="0" Click="Button_Click" Tag="Market Description" Background="LightCyan">
 						<Button.ToolTip>

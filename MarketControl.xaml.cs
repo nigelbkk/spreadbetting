@@ -63,7 +63,7 @@ namespace SpreadTrader
 		}
 		private void GridSplitter_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
 		{
-			//SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
+			SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
 		}
 		private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
 		{
@@ -113,10 +113,9 @@ namespace SpreadTrader
 			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
 			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
 		}
-
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
-			RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged);
+			//RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged);
 		}
 	}
 }
