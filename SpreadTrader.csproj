@@ -168,7 +168,7 @@
     <Resource Include="Images\cog.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\horse32x32.ico" />
+    <Resource Include="Images\horse.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\page_gear.png" />
@@ -186,6 +186,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\info.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\close.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

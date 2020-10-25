@@ -103,13 +103,6 @@ namespace SpreadTrader
 //						RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged); break;
 					case "Favourites":
 						new Favourites(this, b, NodeViewModel.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList()); break;
-					case "New Tab":
-						{
-							ClosableTab theTabItem = new ClosableTab();
-							theTabItem.Title = "Small title";
-							TabControl.Items.Add(theTabItem);
-							theTabItem.Focus();
-						}
 						break;
 				}
 			}
@@ -125,8 +118,14 @@ namespace SpreadTrader
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
 		}
-		private void TabItem_GotFocus(object sender, RoutedEventArgs e)
+
+		private void TabItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
 		{
+			ClosableTab theTabItem = new ClosableTab();
+			theTabItem.Title = "Small title";
+			TabControl.Items.Add(theTabItem);
+			theTabItem.Focus();
+			e.Handled = true;
 		}
 	}
 }

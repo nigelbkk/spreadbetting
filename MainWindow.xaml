@@ -78,17 +78,19 @@
 									<ColumnDefinition Width="120*"/>
 									<ColumnDefinition Width="120*"/>
 								</Grid.ColumnDefinitions>
-								<Button Content="Refresh" Tag="Refresh" Grid.Column="0" Style="{ StaticResource OurButton}" Click="Button_Click" />
-								<Button Content="Favourites"  Tag="Favourites" Name="FavouritesButton" Grid.Column="1" Style="{ StaticResource OurButton}" Click="Button_Click" />
-								<Button Content="Settings"  Tag="Settings" Grid.Column="2" Style="{ StaticResource OurButton}" Click="Button_Click" />
-								<Button Grid.Column="3" Style="{ StaticResource OurButton}" Click="Button_Click" Tag="New Tab" Background="LightCyan">
-									<Button.ToolTip>
-										<ToolTip>
-											<TextBlock Text="Market Description"></TextBlock>
-										</ToolTip>
-									</Button.ToolTip>
+								<Button Tag="Refresh" Grid.Column="0" Style="{ StaticResource OurButton}" Click="Button_Click" ToolTip="Refresh Markets">
+									<Image Source="/SpreadTrader;component/Images/refresh.jpg" />
+								</Button>
+								<Button Tag="Favourites" Name="FavouritesButton" Grid.Column="1" Style="{ StaticResource OurButton}" Click="Button_Click" ToolTip="Favourites">
+									<Image Source="/SpreadTrader;component/Images/horse.ico" />
+								</Button>
+								<Button Tag="Settings" Grid.Column="2" Style="{ StaticResource OurButton}" Click="Button_Click" ToolTip="Settings">
 									<Image Source="/SpreadTrader;component/Images/cog.png" />
 								</Button>
+
+								<!--<Button Grid.Column="3" Style="{ StaticResource OurButton}" Click="Button_Click" Tag="New Tab" Background="LightCyan" ToolTip="Market Description">
+									<Image Source="/SpreadTrader;component/Images/cog.png" />
+								</Button>-->
 							</Grid>
 
 							<TreeView Name="EventsTreeView" Grid.Row="1" FontSize="10" DataContext="{Binding ElementName=UI, Path=RootNode}" ItemsSource="{Binding Nodes}">
@@ -121,7 +123,7 @@
 					<Border  Grid.Column="1" DockPanel.Dock="Right" BorderBrush="Silver" BorderThickness="1" >
 						<Grid Name="RightGrid">
 							<TabControl Name ="TabControl">
-								<TabItem Header="+">
+								<TabItem Header="+" PreviewMouseDown="TabItem_PreviewMouseDown">
 									<!--<local:MarketControl/>-->
 								</TabItem>
 							</TabControl>
