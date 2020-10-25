@@ -91,5 +91,9 @@ namespace SpreadTrader
             ngrunner.sp = r.sp;
             NotifyPropertyChanged("");
         }
-    }
+		public override string ToString()
+		{
+			return String.Format("{0}", name);
+		}
+	}
 }

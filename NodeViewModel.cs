@@ -47,6 +47,7 @@ namespace SpreadTrader
 
 			Market m = new Market();
 			m.marketId = "1.174361561";
+			m.marketId = "1.174361562";
 			Tag = m;
 			OnItemSelected();
 		}

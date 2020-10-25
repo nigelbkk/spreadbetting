@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Policy;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using BetfairAPI;
 
 namespace SpreadTrader
@@ -12,8 +14,12 @@ namespace SpreadTrader
 	{
 		Properties.Settings props = Properties.Settings.Default;
 		public ObservableCollection<EventType> AllEventTypes { get; set; }
-		public Favourites(List<EventTypeResult> eventTypes)
+		public Favourites(Visual visual, Button b, List<EventTypeResult> eventTypes)
 		{
+			Point coords = PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(80, 24)));
+			Top = coords.Y;
+			Left = coords.X;
+
 			AllEventTypes = new ObservableCollection<EventType>();
 			foreach (EventTypeResult er in eventTypes)
 			{

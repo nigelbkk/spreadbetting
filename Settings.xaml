@@ -5,7 +5,7 @@
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:p="clr-namespace:SpreadTrader.Properties"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Settings" WindowStartupLocation="CenterScreen" Height="223.043" Width="500" ResizeMode="NoResize" ShowInTaskbar="False">
+        Title="Settings" WindowStartupLocation="CenterScreen" Height="223.043" Width="500" ResizeMode="NoResize" ShowInTaskbar="False" Closing="Window_Closing">
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="280*" />

@@ -53,6 +53,8 @@ namespace SpreadTrader
 			if (props.RowHeight2 > 0)
 				RightGrid.RowDefinitions[1].Height = new GridLength(props.RowHeight2, GridUnitType.Pixel);
 
+			SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
+
 			if (props.Maximised)
 			{
 				WindowState = System.Windows.WindowState.Maximized;
@@ -114,32 +116,24 @@ namespace SpreadTrader
 			{
 				switch (b.Tag)
 				{
+					case "Market Description":
+						new MarketDescription(this, b, SelectedNode).ShowDialog(); break;
 					case "Settings":
-						Settings sd = new Settings();
-						if (sd.ShowDialog() == true)
-						{
-							NotifyPropertyChanged("");
-						}
-						break;
+						new Settings().ShowDialog(); break;
 					case "Refresh":
-						RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged);
-						break;
+						RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged);	break;
 					case "Favourites":
-						{
-							Point coords = PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(80, 24)));
-							Favourites f = new Favourites(NodeViewModel.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList());
-							f.Top = coords.Y;
-							f.Left = coords.X;
-							f.ShowDialog();
-							f.Save();
-						}
-						break;
+						new Favourites(this, b, NodeViewModel.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList()); break;
 				}
 			}
 			catch (Exception xe)
 			{
 				Status = xe.Message.ToString();
 			}
+		}
+		private void GridSplitter_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
+		{
+			SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
 		}
 	}
 }
