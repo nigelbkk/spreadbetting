@@ -14,7 +14,7 @@ namespace SpreadTrader
 			{
 				Market market = node.Tag as Market;
 				if (market != null && market.description.rules != null)
-					WebView.NavigateToString(market.description.rules);
+					WebView.NavigateToString(string.Format("<body style = \"font-family:Arial\" >{0}</body>", market.description.rules));
 				Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(b.ActualWidth, b.ActualHeight)));
 				Top = coords.Y;
 				Left = coords.X;

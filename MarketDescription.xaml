@@ -6,6 +6,7 @@
         xmlns:WPF="clr-namespace:Microsoft.Toolkit.Wpf.UI.Controls;assembly=Microsoft.Toolkit.Wpf.UI.Controls.WebView"
 		xmlns:local="clr-namespace:SpreadTrader"
         mc:Ignorable="d"
+		FontFamily="Sego UI"
         Title="MarketDescription" Height="481.042" Width="571.128">
 	<Grid>
 		<WPF:WebView Name ="WebView"/>

@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using BetfairAPI;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Windows.Threading;
+using BetfairAPI;
 
 namespace SpreadTrader
 {
 	public class NodeViewModel : ViewModelBase, INotifyPropertyChanged
 	{
-		public NotificationDelegate NotificationCallback = null;
-		public SelectedNodeDelegate SelectedCallback = null;
+		public NodeSelectionDelegate NodeCallback = null;
 		public ObservableCollection<LiveRunner> LiveRunners { get; set; }
 		public String FullName { get; set; }
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }
@@ -23,8 +24,7 @@ namespace SpreadTrader
 			set
 			{
 				_isSelected = value;
-				Console.WriteLine(@"IsSelected set");
-				OnItemSelected();
+				if (IsSelected) OnItemSelected();
 			}
 		}
 		public delegate void CallBackDelegate();
@@ -34,21 +34,14 @@ namespace SpreadTrader
 		public Int32 ID { get; set; }
 		public string Name { get; set; }
 		public ObservableCollection<NodeViewModel> Nodes { get; set; }
-		public NodeViewModel(BetfairAPI.BetfairAPI Betfair, NotificationDelegate Callback, SelectedNodeDelegate SelectedCallback)
+		public NodeViewModel(BetfairAPI.BetfairAPI Betfair)
 		{
 			NodeViewModel.Betfair = Betfair;
 			Nodes = new ObservableCollection<NodeViewModel>();
-			this.NotificationCallback = Callback;
-			this.SelectedCallback = SelectedCallback;
-			PopulateEventTYpes();
-			Populate = PopulateCompetitionsOrCountries;
-			NotificationCallback("Ready");
-
-			Market m = new Market();
-			m.marketId = "1.174361561";
-//			m.marketId = "1.174361562";
-			Tag = m;
-			OnItemSelected();
+			//Market m = new Market();
+			//m.marketId = "1.174690007";
+			//Tag = m;
+			//OnItemSelected();
 		}
 		public NodeViewModel(String name)
 		{
@@ -64,29 +57,27 @@ namespace SpreadTrader
 				{
 					LiveRunners = new ObservableCollection<LiveRunner>();
 					MarketBook book = Betfair.GetMarketBook(m);
-					book.Runners[0].Catalog.name = "Barcelona";
-					book.Runners[1].Catalog.name = "Andorra";
 					foreach (Runner r in book.Runners)
 					{
 						if (r.removalDate == new DateTime())
 						{
 							LiveRunner rl = new LiveRunner(r);
 							LiveRunners.Add(rl);
-							if (r.ex.availableToBack.Count > 0)
-							{
-							}
+							if (r.ex.availableToBack.Count > 0){}
 						}
 					}
 					if (Parent != null)
 					{
 						FullName = String.Format("{0} - {1}", Parent.Name, Name);
 					}
-					SelectedCallback(this);
-					NotificationCallback("Selection Changed: " + String.Format(m.ToString()));
+					if (NodeCallback != null)
+					{
+						NodeCallback(this);
+					}
 				}
 				catch (Exception xe)
 				{
-					NotificationCallback("Markets_SelectionChanged: " + String.Format(xe.Message.ToString()));
+					Debug.WriteLine(xe.Message); //					NotificationCallback("Markets_SelectionChanged: " + String.Format(xe.Message.ToString()));
 				}
 			}
 		}
@@ -102,8 +93,7 @@ namespace SpreadTrader
 		public void Add(NodeViewModel node, bool leaf = false)
 		{
 			node.Parent = this;
-			node.NotificationCallback = NotificationCallback;
-			node.SelectedCallback = SelectedCallback;
+			node.NodeCallback = NodeCallback;
 			Nodes.Add(node);
 			if (node.Populate != null) node.Nodes.Add(new NodeViewModel("x"));
 		}
@@ -119,6 +109,7 @@ namespace SpreadTrader
 					Add(nvm);
 				}
 			}
+			Populate = PopulateCompetitionsOrCountries;
 		}
 		public void PopulateEvents()
 		{

@@ -72,8 +72,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bet.cs" />
-    <Compile Include="CloseableHeader.xaml.cs">
-      <DependentUpon>CloseableHeader.xaml</DependentUpon>
+    <Compile Include="ClosableHeader.xaml.cs">
+      <DependentUpon>ClosableHeader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EventsTree.xaml.cs">
+      <DependentUpon>EventsTree.xaml</DependentUpon>
     </Compile>
     <Compile Include="Favourites.xaml.cs">
       <DependentUpon>Favourites.xaml</DependentUpon>
@@ -92,7 +95,11 @@
     </Compile>
     <Compile Include="ViewModel.cs" />
     <Compile Include="WaitCursor.cs" />
-    <Page Include="CloseableHeader.xaml">
+    <Page Include="ClosableHeader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EventsTree.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

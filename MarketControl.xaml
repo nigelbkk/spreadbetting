@@ -127,7 +127,7 @@
 					</Grid>
 					<Grid>
 						<Label Style="{ StaticResource OurLabel}" FontSize="11" Content="{Binding Path=LayStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" Visibility="Visible" MouseDown="label_MouseDown"/>
-						<TextBox  Tag="{Binding current_index}" Style="{ StaticResource OurTextBox}" Visibility="Hidden" Text="{Binding Path=LayStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" KeyDown="TextBox_KeyDown" MouseDoubleClick="TextBox_MouseDoubleClick" />
+						<TextBox Style="{ StaticResource OurTextBox}" Visibility="Hidden" Text="{Binding Path=LayStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" KeyDown="TextBox_KeyDown" MouseDoubleClick="TextBox_MouseDoubleClick" />
 					</Grid>
 
 					<Label Tag="Profit" Style="{ StaticResource OurLabel}"  >
@@ -149,7 +149,7 @@
 			</Border>
 		</DataTemplate>
 	</UserControl.Resources>
-	<Grid Name="RightGrid">
+	<Grid Name="RightGrid" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
 		<Grid.RowDefinitions>
 			<RowDefinition Height ="1*"></RowDefinition>
 			<RowDefinition Height ="2*"></RowDefinition>
@@ -160,7 +160,7 @@
 				<Grid Height="24">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="34"/>
-						<ColumnDefinition Width="34"/>
+						<ColumnDefinition Width="34*"/>
 					</Grid.ColumnDefinitions>
 					<Button Grid.Column="0" Click="Button_Click" Tag="Market Description" Background="LightCyan">
 						<Button.ToolTip>
@@ -170,7 +170,7 @@
 						</Button.ToolTip>
 						<Image Source="/SpreadTrader;component/Images/info.png" />
 					</Button>
-					<Label Grid.Column="1" Content="{Binding SelectedNode.FullName}" Padding="6,0,0,0" HorizontalContentAlignment="Left" Background="LightCyan"/>
+					<Label Grid.Column="1" Content="{Binding MarketNode.FullName}" Padding="6,0,0,0" HorizontalContentAlignment="Left" Background="LightCyan"/>
 				</Grid>
 				<StackPanel Name="SV1_Header" Orientation="Horizontal" Height="36">
 					<Label Style="{ StaticResource OurLabel}" Width ="130">Selection Name</Label>
@@ -195,7 +195,7 @@
 						<TextBlock TextAlignment="Center">Last<LineBreak/>Price</TextBlock>
 					</Label>
 				</StackPanel>
-				<ItemsControl Name="SV1" FontFamily="Verdana" Height="200" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding SelectedNode.LiveRunners}" FontWeight="Medium" >
+				<ItemsControl Name="SV1" FontFamily="Verdana" Height="200" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding MarketNode.LiveRunners}" FontWeight="Medium" >
 					<ItemsControl.Template>
 						<ControlTemplate>
 							<ScrollViewer Padding="{TemplateBinding Control.Padding}">
@@ -240,7 +240,7 @@
 					<CheckBox Content="Display Unmatched Only" Tag="Unmatched Only" VerticalContentAlignment="Center" Padding="10,0,10,0"/>
 				</StackPanel>
 
-				<DataGrid Name="BetsGrid"  ItemsSource="{Binding AllBets}"  />
+				<DataGrid Name="BetsGrid"   />
 			</StackPanel>
 		</Grid>
 		<GridSplitter Height="5" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="Gray" ResizeDirection="Rows" DragDelta="GridSplitter_DragDelta" />

@@ -1,21 +1,17 @@
-﻿using BetfairAPI;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace SpreadTrader
 {
-	public delegate void NotificationDelegate(String s);
-	public delegate void SelectedNodeDelegate(NodeViewModel node);
+	public delegate void NodeSelectionDelegate(NodeViewModel node);
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
-		public NodeViewModel RootNode { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged(""); } }
@@ -25,7 +21,7 @@ namespace SpreadTrader
 		{
 			if (PropertyChanged != null)
 			{
-				PropertyChanged(this, new PropertyChangedEventArgs(info));
+				Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
 			}
 		}
 		public MainWindow()
@@ -48,26 +44,16 @@ namespace SpreadTrader
 			if (props.ColumnWidth > 0)
 				OuterGrid.ColumnDefinitions[0].Width = new GridLength(props.ColumnWidth, GridUnitType.Pixel);
 
-			//if (props.RowHeight1 > 0)
-			//	RightGrid.RowDefinitions[0].Height = new GridLength(props.RowHeight1, GridUnitType.Pixel);
-
-			//if (props.RowHeight2 > 0)
-			//	RightGrid.RowDefinitions[1].Height = new GridLength(props.RowHeight2, GridUnitType.Pixel);
-
-//			TabControl.Items[0].SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
-
 			if (props.Maximised)
 			{
 				WindowState = System.Windows.WindowState.Maximized;
 			}
-//			PopulateBetsGrid();
 			NotifyPropertyChanged("");
 		}
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
 			if (WindowState == System.Windows.WindowState.Maximized)
 			{
-				// Use the RestoreBounds as the current values will be 0, 0 and the size of the screen
 				props.Top = RestoreBounds.Top;
 				props.Left = RestoreBounds.Left;
 				props.Height = RestoreBounds.Height;
@@ -83,9 +69,6 @@ namespace SpreadTrader
 				props.Maximised = false;
 			}
 			props.ColumnWidth = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
-			//props.RowHeight1 = Convert.ToInt32(RightGrid.RowDefinitions[0].Height.Value);
-			//props.RowHeight2 = Convert.ToInt32(RightGrid.RowDefinitions[1].Height.Value);
-
 			props.Save();
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
@@ -95,15 +78,16 @@ namespace SpreadTrader
 			{
 				switch (b.Tag)
 				{
-					case "Market Description":
-	//					new MarketDescription(this, b, SelectedNode).ShowDialog(); break;
 					case "Settings":
-						new Settings().ShowDialog(); break;
-					case "Refresh":
-//						RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged); break;
-					case "Favourites":
-						new Favourites(this, b, NodeViewModel.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList()); break;
+						new Settings().ShowDialog(); 
 						break;
+					case "Refresh":
+						TabItem tab = TabControl.Items[TabControl.SelectedIndex] as TabItem;
+						tab.Content = new NodeViewModel(new BetfairAPI.BetfairAPI());
+						break;
+					case "Favourites":
+						if (NodeViewModel.Betfair == null) break;
+						new Favourites(this, b, NodeViewModel.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList()); break;
 				}
 			}
 			catch (Exception xe)
@@ -111,20 +95,32 @@ namespace SpreadTrader
 				Status = xe.Message.ToString();
 			}
 		}
-		private void OnNotification(String cs)
-		{
-			Dispatcher.BeginInvoke(new Action(() => { Status = cs; NotifyPropertyChanged(""); }));
-		}
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
+			EventsTree tree = new EventsTree();
+			EventsTreeGrid.Content = tree;
+			tree.NodeCallback += (node) =>
+			{
+				ClosableTab tab = TabControl.Items[TabControl.SelectedIndex] as ClosableTab;
+				if (tab != null)
+				{
+					MarketControl mc = tab.Content as MarketControl;
+					if (mc != null)
+					{
+						tab.Title = node.FullName;
+						mc.NotificationSink(node);
+					}
+				}
+			};
+			tree.Populate();
 		}
-
 		private void TabItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
 		{
-			ClosableTab theTabItem = new ClosableTab();
-			theTabItem.Title = "Small title";
-			TabControl.Items.Add(theTabItem);
-			theTabItem.Focus();
+			ClosableTab tab = new ClosableTab();
+			tab.Content = new MarketControl();
+			tab.Title = "Small title";
+			TabControl.Items.Insert(0, tab);
+			tab.Focus();
 			e.Handled = true;
 		}
 	}

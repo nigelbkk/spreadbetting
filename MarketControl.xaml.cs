@@ -1,43 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace SpreadTrader
 {
 	public partial class MarketControl : UserControl, INotifyPropertyChanged
 	{
-		public NodeViewModel RootNode { get; set; }
-		public NodeViewModel SelectedNode { get; set; }
-		public ObservableCollection<Bet> AllBets { get; set; }
+		public NodeViewModel MarketNode { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
-		private void NotifyPropertyChanged(String info)
+		public void NotifyPropertyChanged(String info)
 		{
 			if (PropertyChanged != null)
 			{
-				PropertyChanged(this, new PropertyChangedEventArgs(info));
+				Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
 			}
 		}
 		public MarketControl()
 		{
 			InitializeComponent();
+			if (props.RowHeight1 > 0)
+				RightGrid.RowDefinitions[0].Height = new GridLength(props.RowHeight1, GridUnitType.Pixel);
+
+			if (props.RowHeight2 > 0)
+				RightGrid.RowDefinitions[1].Height = new GridLength(props.RowHeight2, GridUnitType.Pixel);
+
+			SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
 		}
-		private void OnNotification(String cs)
+		public void NotificationSink(NodeViewModel node)
 		{
-			Dispatcher.BeginInvoke(new Action(() => { /*Status = cs;*/ NotifyPropertyChanged(""); }));
+			MarketNode = node;
+			NotifyPropertyChanged("");
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -46,24 +42,20 @@ namespace SpreadTrader
 			{
 				switch (b.Tag)
 				{
-					case "Market Description":
-						new MarketDescription(this, b, SelectedNode).ShowDialog(); break;
-					case "Settings":
-						new Settings().ShowDialog(); break;
-					case "Refresh":
-						RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged); break;
-					case "Favourites":
-						new Favourites(this, b, NodeViewModel.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList()); break;
+					case "Market Description": new MarketDescription(this, b, MarketNode).ShowDialog(); break;
 				}
 			}
 			catch (Exception xe)
 			{
-//				Status = xe.Message.ToString();
+				Debug.WriteLine(xe.Message);
 			}
 		}
 		private void GridSplitter_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
 		{
 			SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
+			props.RowHeight1 = Convert.ToInt32(RightGrid.RowDefinitions[0].Height.Value);
+			props.RowHeight2 = Convert.ToInt32(RightGrid.RowDefinitions[1].Height.Value);
+			props.Save();
 		}
 		private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
 		{
@@ -99,23 +91,18 @@ namespace SpreadTrader
 			textbox.Visibility = Visibility.Hidden;
 			NotifyPropertyChanged("");
 		}
-		private void OnSelectionChanged(NodeViewModel node)
-		{
-			SelectedNode = node;
-			Dispatcher.BeginInvoke(new Action(() => { NotifyPropertyChanged(""); }));
-		}
-		private void PopulateBetsGrid()
-		{
-			AllBets = new ObservableCollection<Bet>();
-			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
-			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
-			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
-			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
-			AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
-		}
+		//private void PopulateBetsGrid()
+		//{
+		//	AllBets = new ObservableCollection<Bet>();
+		//	AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
+		//	AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
+		//	AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
+		//	AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
+		//	AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
+		//}
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
-			//RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI(), OnNotification, OnSelectionChanged);
+			MarketNode = new NodeViewModel(new BetfairAPI.BetfairAPI());
 		}
 	}
 }
