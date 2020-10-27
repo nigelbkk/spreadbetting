@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SpreadTrader"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Favourites" Height="450" Width="234.693">
+        Title="Favourites" Height="450" Width="234.693" Closing="Window_Closing">
     <Grid>
 		<ListBox ItemsSource="{Binding AllEventTypes}" FontSize="10">
 			<ListBox.ItemTemplate>

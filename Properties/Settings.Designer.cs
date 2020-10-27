@@ -181,7 +181,7 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("40")]
+        [global::System.Configuration.DefaultSettingValueAttribute("140")]
         public int RowHeight1 {
             get {
                 return ((int)(this["RowHeight1"]));
@@ -193,7 +193,7 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("40")]
+        [global::System.Configuration.DefaultSettingValueAttribute("140")]
         public int RowHeight2 {
             get {
                 return ((int)(this["RowHeight2"]));

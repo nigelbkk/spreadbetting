@@ -90,6 +90,10 @@ namespace SpreadTrader
 				Populate();
 			}
 		}
+		public void Clear()
+		{
+			Nodes.Clear();
+		}
 		public void Add(NodeViewModel node, bool leaf = false)
 		{
 			node.Parent = this;

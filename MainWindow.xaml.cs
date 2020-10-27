@@ -16,6 +16,7 @@ namespace SpreadTrader
 		private static String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged(""); } }
 		public Decimal UKBalance { get; set; }
+		EventsTree EventsTree = null;
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
 		{
@@ -82,13 +83,15 @@ namespace SpreadTrader
 						new Settings().ShowDialog(); 
 						break;
 					case "Refresh":
-						TabItem tab = TabControl.Items[TabControl.SelectedIndex] as TabItem;
-						tab.Content = new NodeViewModel(new BetfairAPI.BetfairAPI());
+						EventsTree.Refresh();
+						//TabItem tab = TabControl.Items[TabControl.SelectedIndex] as TabItem;
+						//tab.Content = new NodeViewModel(new BetfairAPI.BetfairAPI());
 						break;
 					case "Favourites":
 						if (NodeViewModel.Betfair == null) break;
-						new Favourites(this, b, NodeViewModel.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList()); break;
+						new Favourites(this, b, NodeViewModel.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList()).ShowDialog(); break;
 				}
+				e.Handled = true;
 			}
 			catch (Exception xe)
 			{
@@ -97,28 +100,25 @@ namespace SpreadTrader
 		}
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			EventsTree tree = new EventsTree();
-			EventsTreeGrid.Content = tree;
-			tree.NodeCallback += (node) =>
+			try
 			{
-				ClosableTab tab = TabControl.Items[TabControl.SelectedIndex] as ClosableTab;
-				if (tab != null)
-				{
-					MarketControl mc = tab.Content as MarketControl;
-					if (mc != null)
-					{
-						tab.Title = node.FullName;
-						mc.NotificationSink(node);
-					}
-				}
-			};
-			tree.Populate();
+				EventsTree = new EventsTree();
+				EventsTreeGrid.Content = EventsTree;
+				EventsTree.Populate();
+			}
+			catch (Exception xe)
+			{
+				Status = xe.Message.ToString();
+			}
 		}
 		private void TabItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
 		{
 			ClosableTab tab = new ClosableTab();
-			tab.Content = new MarketControl();
-			tab.Title = "Small title";
+			MarketControl mc = new MarketControl();
+			tab.Content = mc;
+			// hook the new tab up to receive tree control events 
+			EventsTree.NodeCallback += mc.NodeChangeEventSink;
+			tab.Title = "New Tab";
 			TabControl.Items.Insert(0, tab);
 			tab.Focus();
 			e.Handled = true;

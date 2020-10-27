@@ -16,7 +16,7 @@ namespace SpreadTrader
 		public ObservableCollection<EventType> AllEventTypes { get; set; }
 		public Favourites(Visual visual, Button b, List<EventTypeResult> eventTypes)
 		{
-			Point coords = PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(80, 24)));
+			Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(80, 24)));
 			Top = coords.Y;
 			Left = coords.X;
 
@@ -49,6 +49,10 @@ namespace SpreadTrader
 			Properties.Settings props = Properties.Settings.Default;
 			String[] ids = props.Favourites.Split(',');
 			return ids.Count() == 0 || ids.Contains(id.ToString());
+		}
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			Save();
 		}
 	}
 }

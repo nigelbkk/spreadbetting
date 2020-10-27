@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
@@ -9,6 +10,7 @@ namespace SpreadTrader
 {
 	public partial class MarketControl : UserControl, INotifyPropertyChanged
 	{
+		public NodeSelectionDelegate NodeChangeEventSink = null;
 		public NodeViewModel MarketNode { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -19,9 +21,19 @@ namespace SpreadTrader
 				Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
 			}
 		}
+		private void UserControl_Loaded(object sender, RoutedEventArgs e)
+		{
+			MarketNode = new NodeViewModel(new BetfairAPI.BetfairAPI());
+		}
 		public MarketControl()
 		{
 			InitializeComponent();
+			NodeChangeEventSink += (node) =>
+			{
+				MarketNode = node;
+				NotifyPropertyChanged("");
+			};
+
 			if (props.RowHeight1 > 0)
 				RightGrid.RowDefinitions[0].Height = new GridLength(props.RowHeight1, GridUnitType.Pixel);
 
@@ -29,11 +41,6 @@ namespace SpreadTrader
 				RightGrid.RowDefinitions[1].Height = new GridLength(props.RowHeight2, GridUnitType.Pixel);
 
 			SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
-		}
-		public void NotificationSink(NodeViewModel node)
-		{
-			MarketNode = node;
-			NotifyPropertyChanged("");
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -100,9 +107,5 @@ namespace SpreadTrader
 		//	AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
 		//	AllBets.Add(new Bet("06/10/2017,Hexham,17:20,1.135047544,1545454,Final Fling,WIN,LAY,BF,40,1.7,LIMIT_ON_CLOSE,LAPSE") { });
 		//}
-		private void UserControl_Loaded(object sender, RoutedEventArgs e)
-		{
-			MarketNode = new NodeViewModel(new BetfairAPI.BetfairAPI());
-		}
 	}
 }
