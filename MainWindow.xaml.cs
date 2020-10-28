@@ -5,7 +5,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace SpreadTrader
 {
@@ -69,7 +68,7 @@ namespace SpreadTrader
 				props.Width = this.Width;
 				props.Maximised = false;
 			}
-			props.ColumnWidth = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
+//			props.ColumnWidth = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
 			props.Save();
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
@@ -79,13 +78,20 @@ namespace SpreadTrader
 			{
 				switch (b.Tag)
 				{
+					case "Hide":
+						Int32 w = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
+						bool hidden = w == 0;
+						OuterGrid.ColumnDefinitions[0].Width = new GridLength(hidden ? props.ColumnWidth : 0, GridUnitType.Pixel);
+						EventsTree.Visibility = EventsTree.Visibility==Visibility.Collapsed ? EventsTree.Visibility = Visibility.Visible : EventsTree.Visibility = Visibility.Collapsed;
+						RightArrow.Visibility = hidden ? Visibility.Collapsed : Visibility.Visible;
+						LeftArrow.Visibility = hidden ? Visibility.Visible : Visibility.Collapsed;
+						VerticalSplitter.Visibility = LeftArrow.Visibility;
+						break;
 					case "Settings":
-						new Settings().ShowDialog(); 
+						new Settings().ShowDialog();
 						break;
 					case "Refresh":
 						EventsTree.Refresh();
-						//TabItem tab = TabControl.Items[TabControl.SelectedIndex] as TabItem;
-						//tab.Content = new NodeViewModel(new BetfairAPI.BetfairAPI());
 						break;
 					case "Favourites":
 						if (NodeViewModel.Betfair == null) break;
@@ -122,6 +128,10 @@ namespace SpreadTrader
 			TabControl.Items.Insert(0, tab);
 			tab.Focus();
 			e.Handled = true;
+		}
+		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+		{
+			props.ColumnWidth = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
 		}
 	}
 }

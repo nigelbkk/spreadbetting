@@ -178,6 +178,7 @@
     <Resource Include="Images\horse.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\left_arrow.png" />
     <Resource Include="Images\page_gear.png" />
   </ItemGroup>
   <ItemGroup>
@@ -196,6 +197,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\right_arrow.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
