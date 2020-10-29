@@ -68,7 +68,6 @@ namespace SpreadTrader
 				props.Width = this.Width;
 				props.Maximised = false;
 			}
-//			props.ColumnWidth = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
 			props.Save();
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
@@ -78,14 +77,16 @@ namespace SpreadTrader
 			{
 				switch (b.Tag)
 				{
-					case "Hide":
-						Int32 w = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
-						bool hidden = w == 0;
-						OuterGrid.ColumnDefinitions[0].Width = new GridLength(hidden ? props.ColumnWidth : 0, GridUnitType.Pixel);
-						EventsTree.Visibility = EventsTree.Visibility==Visibility.Collapsed ? EventsTree.Visibility = Visibility.Visible : EventsTree.Visibility = Visibility.Collapsed;
-						RightArrow.Visibility = hidden ? Visibility.Collapsed : Visibility.Visible;
-						LeftArrow.Visibility = hidden ? Visibility.Visible : Visibility.Collapsed;
-						VerticalSplitter.Visibility = LeftArrow.Visibility;
+					case "Hide Tree":
+						{
+							Int32 w = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
+							bool hidden = w == 0;
+							OuterGrid.ColumnDefinitions[0].Width = new GridLength(hidden ? props.ColumnWidth : 0, GridUnitType.Pixel);
+							EventsTree.Visibility = EventsTree.Visibility == Visibility.Collapsed ? EventsTree.Visibility = Visibility.Visible : EventsTree.Visibility = Visibility.Collapsed;
+							RightArrow.Visibility = hidden ? Visibility.Collapsed : Visibility.Visible;
+							LeftArrow.Visibility = hidden ? Visibility.Visible : Visibility.Collapsed;
+							VerticalSplitter.Visibility = LeftArrow.Visibility;
+						}
 						break;
 					case "Settings":
 						new Settings().ShowDialog();

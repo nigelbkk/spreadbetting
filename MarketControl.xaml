@@ -4,246 +4,59 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded">
+             mc:Ignorable="d" d:DesignWidth="400" >
 	<UserControl.Resources>
-		<BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-		<Style x:Key="OurLabel" TargetType="Label">
-			<Setter Property="VerticalContentAlignment" Value="Center"/>
-			<Setter Property="BorderBrush" Value="DarkGray"/>
-			<Setter Property="BorderThickness" Value="0.5"/>
-			<Setter Property="Background" Value="ivory"/>
-			<Setter Property="FontSize" Value="8"/>
-			<Setter Property="FontWeight" Value="Normal"/>
-			<Setter Property="Width" Value="50"/>
-			<Setter Property="HorizontalContentAlignment" Value="Center"/>
-		</Style>
-		<Style x:Key="BetButton" TargetType="Button">
-			<Setter Property="VerticalContentAlignment" Value="Center"/>
-			<Setter Property="BorderBrush" Value="DarkGray"/>
-			<Setter Property="BorderThickness" Value="0.5"/>
-			<Setter Property="Background" Value="#DFE1EE"/>
-			<Setter Property="FontSize" Value="11"/>
-			<Setter Property="FontWeight" Value="Bold"/>
-			<Setter Property="Width" Value="50"/>
-			<Setter Property="Height" Value="40"/>
-			<Setter Property="HorizontalContentAlignment" Value="Center"/>
-			<EventSetter Event="Click" Handler="Button_Click"/>
-		</Style>
-		<Style x:Key="OurTextBox" TargetType="TextBox">
-			<Setter Property="VerticalContentAlignment" Value="Center"/>
-			<Setter Property="BorderBrush" Value="DarkGray"/>
-			<Setter Property="BorderThickness" Value="1.5"/>
-			<Setter Property="Background" Value="White"/>
-			<Setter Property="FontSize" Value="11"/>
-			<Setter Property="FontWeight" Value="Normal"/>
-			<Setter Property="Width" Value="50"/>
-			<Setter Property="HorizontalContentAlignment" Value="Center"/>
-		</Style>
-		<Style x:Key="OurButton" TargetType="Button">
-			<EventSetter Event="Click" Handler="Button_Click"/>
-			<Setter Property="Background" Value="ivory"/>
-			<Setter Property="BorderBrush" Value="DarkGray"/>
-			<Setter Property="BorderThickness" Value="0.5"/>
-			<Setter Property="VerticalContentAlignment" Value="Center"/>
-			<Setter Property="Padding" Value="10,0,10,0"/>
-			<Setter Property="Button.Effect">
-				<Setter.Value>
-					<DropShadowEffect Color="Black" Direction="320" ShadowDepth="3" BlurRadius="5" Opacity="0.5" />
-				</Setter.Value>
-			</Setter>
-			<Style.Triggers>
-				<MultiTrigger>
-					<MultiTrigger.Conditions>
-						<Condition Property="IsPressed" Value="False" />
-						<Condition Property="IsMouseOver" Value="True" />
-					</MultiTrigger.Conditions>
-					<Setter Property="Background" Value="Green" />
-				</MultiTrigger>
-				<Trigger Property="IsPressed" Value="True">
-					<Setter Property="Button.Background" Value="Purple" />
-					<Setter Property="Button.Effect">
-						<Setter.Value>
-							<DropShadowEffect Color="Black" Direction="320" ShadowDepth="0" BlurRadius="0" Opacity="0" />
-						</Setter.Value>
-					</Setter>
-				</Trigger>
-			</Style.Triggers>
-		</Style>
-		<Style x:Key="styleOutcome" TargetType="TextBlock">
-			<Style.Triggers>
-				<DataTrigger Binding="{Binding Path=ProfitIfWin}" Value="True">
-					<Setter Property="Foreground" Value="green"/>
-				</DataTrigger>
-				<DataTrigger Binding="{Binding Path=ProfitIfWin}" Value="False">
-					<Setter Property="Foreground" Value="red"/>
-				</DataTrigger>
-			</Style.Triggers>
-		</Style>
-		<DataTemplate x:Key="DataTemplate_Runner">
-			<Border BorderThickness="0 0 0 0.25" BorderBrush="Black" >
-				<StackPanel Orientation="Horizontal" Tag="{Binding selectionId}" >
-					<TextBlock Background="LightCyan"  Text="{Binding name}" FontSize="11" Width="130" Padding="6"/>
-					<Button Tag="back3" Style="{ StaticResource BetButton}" Background="#E8ECF5">
-						<StackPanel Orientation="Vertical">
-							<TextBlock TextAlignment="Center"  Text="{Binding prices[2].price, UpdateSourceTrigger=PropertyChanged}"/>
-							<TextBlock FontSize="9"  FontWeight="Normal" TextAlignment="Center"  Text="{Binding prices[2].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
-						</StackPanel>
-					</Button>
-					<Button Tag="back2" Style="{ StaticResource BetButton}" Background="#DFE1EE">
-						<StackPanel Orientation="Vertical">
-							<TextBlock TextAlignment="Center"  Text="{Binding prices[1].price, UpdateSourceTrigger=PropertyChanged}"/>
-							<TextBlock FontSize="9"  FontWeight="Normal"  TextAlignment="Center"  Text="{Binding prices[1].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
-						</StackPanel>
-					</Button>
-					<Button Tag="back1" Style="{ StaticResource BetButton}" Background="#CBCEE1">
-						<StackPanel Orientation="Vertical">
-							<TextBlock TextAlignment="Center"  Text="{Binding prices[0].price, UpdateSourceTrigger=PropertyChanged}"/>
-							<TextBlock FontSize="9"  FontWeight="Normal"  TextAlignment="Center"  Text="{Binding prices[0].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
-						</StackPanel>
-					</Button>
-					<Button Tag="lay1" Style="{ StaticResource BetButton}" Background="#DDBAD0" Margin="10,0,0,0">
-						<StackPanel Orientation="Vertical">
-							<TextBlock TextAlignment="Center"  Text="{Binding prices[3].price, UpdateSourceTrigger=PropertyChanged}"/>
-							<TextBlock FontSize="9"  FontWeight="Normal"  TextAlignment="Center"  Text="{Binding prices[3].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
-						</StackPanel>
-					</Button>
-					<Button Tag="lay2" Style="{ StaticResource BetButton}" Background="#E6CFE1">
-						<StackPanel Orientation="Vertical">
-							<TextBlock TextAlignment="Center"  Text="{Binding prices[4].price, UpdateSourceTrigger=PropertyChanged}"/>
-							<TextBlock FontSize="9"  FontWeight="Normal"  TextAlignment="Center"  Text="{Binding prices[4].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
-						</StackPanel>
-					</Button>
-					<Button Tag="lay0" Style="{ StaticResource BetButton}" Background="#F5E4F6">
-						<StackPanel Orientation="Vertical">
-							<TextBlock TextAlignment="Center"  Text="{Binding prices[5].price, UpdateSourceTrigger=PropertyChanged}"/>
-							<TextBlock FontSize="9"  FontWeight="Normal"  TextAlignment="Center"  Text="{Binding prices[5].size, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
-						</StackPanel>
-					</Button>
-
-					<Grid>
-						<Label Style="{ StaticResource OurLabel}" FontSize="11" Content="{Binding Path=BackStake2, Mode=TwoWay, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}" Visibility="Visible" MouseDown="label_MouseDown"/>
-						<TextBox Style="{ StaticResource OurTextBox}" Visibility="Hidden" Text="{Binding Path=BackStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" KeyDown="TextBox_KeyDown" MouseDoubleClick="TextBox_MouseDoubleClick" />
-					</Grid>
-					<Grid>
-						<Label Style="{ StaticResource OurLabel}" FontSize="11" Content="{Binding Path=LayStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" Visibility="Visible" MouseDown="label_MouseDown"/>
-						<TextBox Style="{ StaticResource OurTextBox}" Visibility="Hidden" Text="{Binding Path=LayStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" KeyDown="TextBox_KeyDown" MouseDoubleClick="TextBox_MouseDoubleClick" />
-					</Grid>
-
-					<Label Tag="Profit" Style="{ StaticResource OurLabel}"  >
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding Path=Profit, Mode=OneWay,StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
-						</StackPanel>
-					</Label>
-					<Label Tag="Level Profit" Style="{ StaticResource OurLabel}" >
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding Path=LevelProfit , Mode=OneWay, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
-						</StackPanel>
-					</Label>
-					<Label Tag="Last Price" Style="{ StaticResource OurLabel}"  >
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding Path=LastPrice, Mode=OneWay, StringFormat=\{0:#.#\}, UpdateSourceTrigger=PropertyChanged}"/>
-						</StackPanel>
-					</Label>
-				</StackPanel>
-			</Border>
-		</DataTemplate>
 	</UserControl.Resources>
-	<Grid Name="RightGrid" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
+	<Grid Name="MarketControlGrid" Background="Gray"  DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" >
 		<Grid.RowDefinitions>
-			<RowDefinition Height ="1*"></RowDefinition>
-			<RowDefinition Height ="2*"></RowDefinition>
-			<RowDefinition Height ="3*"></RowDefinition>
+			<RowDefinition Height="auto"/>
+			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
-		<Grid Name="MarketGrid" Grid.Row="0">
-			<StackPanel Orientation="Vertical">
-				<Grid Height="24">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="34"/>
-						<ColumnDefinition Width="34*"/>
-					</Grid.ColumnDefinitions>
-					<Button Grid.Column="0" Click="Button_Click" Tag="Market Description" Background="LightCyan">
-						<Button.ToolTip>
-							<ToolTip>
-								<TextBlock Text="Market Description"></TextBlock>
-							</ToolTip>
-						</Button.ToolTip>
-						<Image Source="/SpreadTrader;component/Images/info.png" />
-					</Button>
-					<Label Grid.Column="1" Content="{Binding MarketNode.FullName}" Padding="6,0,0,0" HorizontalContentAlignment="Left" Background="LightCyan"/>
+		<Grid Name ="MarketHeader" Grid.Row="0" Height="28" VerticalAlignment="Top" Background="LightBlue">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="34"/>
+				<ColumnDefinition Width="34"/>
+				<ColumnDefinition Width="3*"/>
+			</Grid.ColumnDefinitions>
+			<Button Grid.Column="0" Click="Button_Click" Tag="Market Description" Background="LightCyan" ToolTip="Market Description" HorizontalAlignment="Left" Width="34">
+				<Image Source="/SpreadTrader;component/Images/info.png" />
+			</Button>
+			<Button Tag="Hide Grid" Grid.Column="1" Background="LightCyan"  HorizontalContentAlignment="Left" ToolTip="Hide The Grid" Width="24" Click="Button_Click" >
+				<StackPanel Orientation="Vertical">
+					<Image Name="UpArrow" Source="/SpreadTrader;component/Images/up_arrow.png"  Visibility="Visible" Height="15" Width="17"/>
+					<Image Name="DownArrow" Source="/SpreadTrader;component/Images/down_arrow.png" Visibility="Collapsed"/>
+				</StackPanel>
+			</Button>
+			<Label Grid.Column="2" Content="{Binding MarketNode.FullName}" Padding="6,0,0,0" HorizontalContentAlignment="Left" Background="LightCyan"/>
+		</Grid>
+		<Grid Grid.Row="1" Background="Ivory">
+			<DockPanel>
+				<Grid Name="UpperGrid" Loaded="UpperGrid_Loaded">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="140"/>
+						<RowDefinition Height="*"/>
+					</Grid.RowDefinitions>
+					<Grid Grid.Row="0" Name="RunnersGrid" Background="LightBlue">
+						<local:RunnersControl x:Name="RunnersControl" />
+					</Grid>
+					<Grid Grid.Row="1" Background="Yellow">
+						<DockPanel>
+							<Grid Name ="LowerGrid" Loaded="LowerGrid_Loaded">
+								<Grid.RowDefinitions>
+									<RowDefinition Height="3*"/>
+									<RowDefinition Height="*"/>
+								</Grid.RowDefinitions>
+								<Grid Name="BettingGrid" Grid.Row="0" Background="Cyan" >
+									<!--<local:BettingGrid/>-->
+								</Grid>
+								<Grid Grid.Row="1" Background="LightPink" Loaded="LowerGrid_Loaded" />
+								<GridSplitter Grid.Row="1" Height="4" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="Gray" ResizeDirection="Rows" DragCompleted="GridSplitter_DragCompleted_1"  />
+							</Grid>
+						</DockPanel>
+					</Grid>
+					<GridSplitter Grid.Row="1" Height="4" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="Gray" ResizeDirection="Rows" DragCompleted="GridSplitter_DragCompleted"/>
 				</Grid>
-				<StackPanel Name="SV1_Header" Orientation="Horizontal" Height="36">
-					<Label Style="{ StaticResource OurLabel}" Width ="130">Selection Name</Label>
-					<Label Style="{ StaticResource OurLabel}"></Label>
-					<Label Style="{ StaticResource OurLabel}"></Label>
-					<Label Style="{ StaticResource OurLabel}">100.71%</Label>
-					<Label Style="{ StaticResource OurLabel}" Width="10"></Label>
-					<Label Style="{ StaticResource OurLabel}">99.37%</Label>
-					<Label Style="{ StaticResource OurLabel}"></Label>
-					<Label Style="{ StaticResource OurLabel}"></Label>
-					<Label Style="{ StaticResource OurLabel}">
-						<TextBlock TextAlignment="Center">Back<LineBreak/>Stake</TextBlock>
-					</Label>
-					<Label Style="{ StaticResource OurLabel}">
-						<TextBlock TextAlignment="Center">Lay<LineBreak/>Stake</TextBlock>
-					</Label>
-					<Label Style="{ StaticResource OurLabel}">Profit</Label>
-					<Label Style="{ StaticResource OurLabel}">
-						<TextBlock TextAlignment="Center">Level<LineBreak/>Profit</TextBlock>
-					</Label>
-					<Label Style="{ StaticResource OurLabel}">
-						<TextBlock TextAlignment="Center">Last<LineBreak/>Price</TextBlock>
-					</Label>
-				</StackPanel>
-				<ItemsControl Name="SV1" FontFamily="Verdana" Height="200" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding MarketNode.LiveRunners}" FontWeight="Medium" >
-					<ItemsControl.Template>
-						<ControlTemplate>
-							<ScrollViewer Padding="{TemplateBinding Control.Padding}">
-								<ItemsPresenter />
-							</ScrollViewer>
-						</ControlTemplate>
-					</ItemsControl.Template>
-				</ItemsControl>
-			</StackPanel>
+			</DockPanel>
 		</Grid>
-		<Grid Name="BettingGrid" Grid.Row="1">
-			<StackPanel Orientation="Vertical">
-				<StackPanel Orientation="Horizontal" Height="24" VerticalAlignment="Top">
-					<Label Content="Cut Stakes By %" Width="140"/>
-					<Button Content="25" Tag="cut25" Style="{ StaticResource OurButton}" Width="140"/>
-					<Button Content="35" Tag="cut35" Style="{ StaticResource OurButton}" Width="140"/>
-					<Button Content="50" Tag="cut50" Style="{ StaticResource OurButton}" Width="140"/>
-					<Button Content="60" Tag="cut60" Style="{ StaticResource OurButton}" Width="140"/>
-					<Button Content="75" Tag="cut75" Style="{ StaticResource OurButton}" Width="140"/>
-				</StackPanel>
-				<StackPanel Orientation="Horizontal" Height="24" VerticalAlignment="Top">
-					<Label Content="Execute Bets" Width="140"/>
-					<Button Content="25" Tag="Execute" Width ="120" Style="{ StaticResource OurButton}"/>
-				</StackPanel>
-				<StackPanel Orientation="Horizontal" Height="24" VerticalAlignment="Top">
-					<Label Content="Move Bets Out by Ticks" Width="140"/>
-					<Button Content="1" Tag="move1" Style="{ StaticResource OurButton}" Width="80"/>
-					<Button Content="2" Tag="move2" Style="{ StaticResource OurButton}" Width="80"/>
-					<Button Content="3" Tag="move3" Style="{ StaticResource OurButton}" Width="80"/>
-					<Button Content="4" Tag="move4" Style="{ StaticResource OurButton}" Width="80"/>
-					<Button Content="5" Tag="move5" Style="{ StaticResource OurButton}" Width="80"/>
-				</StackPanel>
-			</StackPanel>
-		</Grid>
-		<Grid Name="BetsManagerGrid"  Grid.Row="2">
-			<StackPanel Orientation="Vertical"  VerticalAlignment="Top">
-				<StackPanel Orientation="Horizontal" Height="32" VerticalAlignment="Top">
-					<Label Content="Bets last updated:" VerticalContentAlignment="Center" Margin="4,0,0,0"/>
-					<TextBlock Text="18/10/202 10:27" VerticalAlignment="Center"  Margin="14,0,10,0"/>
-					<Button Content="Refresh Bets" Tag="Refresh Bets" Style="{ StaticResource OurButton}" Margin="10,0,10,0"/>
-					<Button Content="Cancel All Bets" Tag="Refresh Bets" Style="{ StaticResource OurButton}" Margin="10,0,10,0"/>
-					<CheckBox Content="Display Unmatched Only" Tag="Unmatched Only" VerticalContentAlignment="Center" Padding="10,0,10,0"/>
-				</StackPanel>
-
-				<DataGrid Name="BetsGrid"   />
-			</StackPanel>
-		</Grid>
-		<GridSplitter Height="5" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="Gray" ResizeDirection="Rows" DragDelta="GridSplitter_DragDelta" />
-		<GridSplitter Height="5" Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="Gray" ResizeDirection="Rows" />
 	</Grid>
 </UserControl>

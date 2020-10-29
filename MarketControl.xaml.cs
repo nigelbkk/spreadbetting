@@ -21,26 +21,27 @@ namespace SpreadTrader
 				Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
 			}
 		}
-		private void UserControl_Loaded(object sender, RoutedEventArgs e)
-		{
-			MarketNode = new NodeViewModel(new BetfairAPI.BetfairAPI());
-		}
 		public MarketControl()
 		{
 			InitializeComponent();
+			NodeChangeEventSink = RunnersControl.NodeChangeEventSink;
 			NodeChangeEventSink += (node) =>
 			{
 				MarketNode = node;
 				NotifyPropertyChanged("");
 			};
-
-			if (props.RowHeight1 > 0)
-				RightGrid.RowDefinitions[0].Height = new GridLength(props.RowHeight1, GridUnitType.Pixel);
-
-			if (props.RowHeight2 > 0)
-				RightGrid.RowDefinitions[1].Height = new GridLength(props.RowHeight2, GridUnitType.Pixel);
-
-			SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
+		}
+		private void LowerGrid_Loaded(object sender, RoutedEventArgs e)
+		{
+			Grid grid = sender as Grid;
+			if (props.LowerSplitter > 0 && grid.RowDefinitions.Count > 0)
+				grid.RowDefinitions[0].Height = new GridLength(props.LowerSplitter = props.UpperSplitter, GridUnitType.Pixel);
+		}
+		private void UpperGrid_Loaded(object sender, RoutedEventArgs e)
+		{
+			Grid grid = sender as Grid;
+			if (props.UpperSplitter > 0 && grid.RowDefinitions.Count > 0)
+				grid.RowDefinitions[0].Height = new GridLength(props.UpperSplitter  = props.UpperSplitter, GridUnitType.Pixel);
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -50,6 +51,12 @@ namespace SpreadTrader
 				switch (b.Tag)
 				{
 					case "Market Description": new MarketDescription(this, b, MarketNode).ShowDialog(); break;
+					case "Hide Grid":
+						if (LowerGrid.RowDefinitions[0].ActualHeight == 0)
+							LowerGrid.RowDefinitions[0].Height = new GridLength(1, GridUnitType.Star); 
+						else
+							LowerGrid.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Pixel);
+						break;
 				}
 			}
 			catch (Exception xe)
@@ -57,47 +64,57 @@ namespace SpreadTrader
 				Debug.WriteLine(xe.Message);
 			}
 		}
-		private void GridSplitter_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
+		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
 		{
-			SV1.Height = Convert.ToDouble(RightGrid.RowDefinitions[0].Height.Value) - SV1_Header.Height - 20;
-			props.RowHeight1 = Convert.ToInt32(RightGrid.RowDefinitions[0].Height.Value);
-			props.RowHeight2 = Convert.ToInt32(RightGrid.RowDefinitions[1].Height.Value);
-			props.Save();
+			GridSplitter gs = sender as GridSplitter;
+			props.UpperSplitter = RunnersGrid.ActualHeight;
 		}
-		private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+		private void GridSplitter_DragCompleted_1(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
 		{
-			TextBox textbox = sender as TextBox;
-			if (e.Key == Key.Return || e.Key == Key.Escape)
-			{
-				Grid grid = textbox.Parent as Grid;
-				Label label = grid.Children[0] as Label;
-				label.Visibility = Visibility.Visible;
-				textbox.Visibility = Visibility.Hidden;
-			}
+			GridSplitter gs = sender as GridSplitter;
+			props.LowerSplitter = BettingGrid.ActualHeight;
 		}
-		private void label_MouseDown(object sender, MouseButtonEventArgs e)
-		{
-			Label label = sender as Label;
-			Grid grid = label.Parent as Grid;
-			TextBox textbox = grid.Children[1] as TextBox;
-			Application.Current.Dispatcher.Invoke(new Action(() =>
-			{
-				textbox.Focus();
-				Keyboard.Focus(textbox);
-			}));
-			label.Visibility = Visibility.Hidden;
-			textbox.Visibility = Visibility.Visible;
-			NotifyPropertyChanged("");
-		}
-		private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-		{
-			TextBox textbox = sender as TextBox;
-			Grid grid = textbox.Parent as Grid;
-			Label label = grid.Children[0] as Label;
-			label.Visibility = Visibility.Visible;
-			textbox.Visibility = Visibility.Hidden;
-			NotifyPropertyChanged("");
-		}
+		//		private void Button_Click(object sender, RoutedEventArgs e)
+		//		{
+		//			Button b = sender as Button;
+		//			try
+		//			{
+		//				switch (b.Tag)
+		//				{
+		//					case "Market Description": new MarketDescription(this, b, MarketNode).ShowDialog(); break;
+		//					case "Hide Grid":
+		//						//Int32 w = Convert.ToInt32(RightGrid.RowDefinitions[2].Height.Value);
+
+		////						double h0 = RightGrid.RowDefinitions[0].Height.Value;
+		////						double h1 = RightGrid.RowDefinitions[1].Height.Value;
+		////						double h2 = RightGrid.RowDefinitions[2].Height.Value;
+		////						bool hidden = h1 == 0;
+
+		//////						BettingGrid.Visibility = BettingGrid.Visibility == Visibility.Collapsed ? BettingGrid.Visibility = Visibility.Visible : BettingGrid.Visibility = Visibility.Collapsed;
+
+		////						RightGrid.RowDefinitions[0].Height = new GridLength(hidden ? props.RowHeight1 : h0 + h1, GridUnitType.Pixel);
+		////						RightGrid.RowDefinitions[1].Height = new GridLength(hidden ? props.RowHeight2 : 0, GridUnitType.Pixel);
+		////						//UpArrow.Visibility = hidden ? Visibility.Collapsed : Visibility.Visible;
+		////						//DownArrow.Visibility = hidden ? Visibility.Visible : Visibility.Collapsed;
+		////						//HorizontalSplitter2.Visibility = hidden ? Visibility.Visible : Visibility.Collapsed;
+		//						break;
+		//				}
+		//			}
+		//			catch (Exception xe)
+		//			{
+		//				Debug.WriteLine(xe.Message);
+		//			}
+		//		}
+		//public void GridVisibility()
+		//{
+		//	Int32 w = Convert.ToInt32(BettingGrid.RowDefinitions[1].Height.Value);
+		//	bool hidden = w == 0;
+		//	BettingGrid.RowDefinitions[0].Height = new GridLength(hidden ? props.ColumnWidth : 0, GridUnitType.Pixel);
+		//	BettingGrid.Visibility = BettingGrid.Visibility == Visibility.Collapsed ? BettingGrid.Visibility = Visibility.Visible : BettingGrid.Visibility = Visibility.Collapsed;
+		//	UpArrow.Visibility = hidden ? Visibility.Collapsed : Visibility.Visible;
+		//	DownArrow.Visibility = hidden ? Visibility.Visible : Visibility.Collapsed;
+		//	HorizontalSplitter2.Visibility = UpArrow.Visibility;
+		//}
 		//private void PopulateBetsGrid()
 		//{
 		//	AllBets = new ObservableCollection<Bet>();

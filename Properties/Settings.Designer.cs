@@ -25,7 +25,7 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("peter.oconnell444@gmail.com")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string BFUser {
             get {
                 return ((string)(this["BFUser"]));
@@ -37,7 +37,7 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("thestick871")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string BFPassword {
             get {
                 return ((string)(this["BFPassword"]));
@@ -133,7 +133,7 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("qmYuRi9HoF3R9FR8")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string AppKey {
             get {
                 return ((string)(this["AppKey"]));
@@ -176,30 +176,6 @@ namespace SpreadTrader.Properties {
             }
             set {
                 this["Upgraded"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("140")]
-        public int RowHeight1 {
-            get {
-                return ((int)(this["RowHeight1"]));
-            }
-            set {
-                this["RowHeight1"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("140")]
-        public int RowHeight2 {
-            get {
-                return ((int)(this["RowHeight2"]));
-            }
-            set {
-                this["RowHeight2"] = value;
             }
         }
         
@@ -248,6 +224,30 @@ namespace SpreadTrader.Properties {
             }
             set {
                 this["ColumnWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("120")]
+        public double LowerSplitter {
+            get {
+                return ((double)(this["LowerSplitter"]));
+            }
+            set {
+                this["LowerSplitter"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("120")]
+        public double UpperSplitter {
+            get {
+                return ((double)(this["UpperSplitter"]));
+            }
+            set {
+                this["UpperSplitter"] = value;
             }
         }
     }

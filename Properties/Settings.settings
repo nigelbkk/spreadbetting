@@ -3,10 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="BFUser" Type="System.String" Scope="User">
-      <Value Profile="(Default)">peter.oconnell444@gmail.com</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="BFPassword" Type="System.String" Scope="User">
-      <Value Profile="(Default)">thestick871</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Top" Type="System.Double" Scope="User">
       <Value Profile="(Default)">100</Value>
@@ -30,7 +30,7 @@
       <Value Profile="(Default)">150</Value>
     </Setting>
     <Setting Name="AppKey" Type="System.String" Scope="User">
-      <Value Profile="(Default)">qmYuRi9HoF3R9FR8</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="CertFile" Type="System.String" Scope="User">
       <Value Profile="(Default)">c:\client-2048.p12</Value>
@@ -40,12 +40,6 @@
     </Setting>
     <Setting Name="Upgraded" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="RowHeight1" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">140</Value>
-    </Setting>
-    <Setting Name="RowHeight2" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">140</Value>
     </Setting>
     <Setting Name="WaitBF" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1000</Value>
@@ -58,6 +52,12 @@
     </Setting>
     <Setting Name="ColumnWidth" Type="System.Double" Scope="User">
       <Value Profile="(Default)">80</Value>
+    </Setting>
+    <Setting Name="LowerSplitter" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">120</Value>
+    </Setting>
+    <Setting Name="UpperSplitter" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">120</Value>
     </Setting>
   </Settings>
 </SettingsFile>

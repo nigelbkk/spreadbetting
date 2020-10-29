@@ -38,10 +38,10 @@ namespace SpreadTrader
 		{
 			NodeViewModel.Betfair = Betfair;
 			Nodes = new ObservableCollection<NodeViewModel>();
-			//Market m = new Market();
-			//m.marketId = "1.174690007";
-			//Tag = m;
-			//OnItemSelected();
+			Market m = new Market();
+			m.marketId = "1.174865333";
+			Tag = m;
+			OnItemSelected();
 		}
 		public NodeViewModel(String name)
 		{
