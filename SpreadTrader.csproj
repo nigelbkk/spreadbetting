@@ -84,9 +84,6 @@
     <Compile Include="Favourites.xaml.cs">
       <DependentUpon>Favourites.xaml</DependentUpon>
     </Compile>
-    <Compile Include="GridTest.xaml.cs">
-      <DependentUpon>GridTest.xaml</DependentUpon>
-    </Compile>
     <Compile Include="LiveRunner.cs" />
     <Compile Include="BetfairTypes.cs" />
     <Compile Include="MarketControl.xaml.cs">
@@ -117,10 +114,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Favourites.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="GridTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -185,12 +178,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\arrow_down.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\arrow_up.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\bullet_toggle_minus.png" />
   </ItemGroup>
   <ItemGroup>
@@ -230,8 +217,7 @@
     <Resource Include="Images\down_arrow.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="down_arrow.png" />
-    <Resource Include="up_arrow.png" />
+    <Resource Include="Images\up_arrow.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

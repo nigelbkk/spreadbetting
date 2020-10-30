@@ -4,60 +4,51 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
-             mc:Ignorable="d" d:DesignWidth="800" Height="261.317" Loaded="UserControl_Loaded">
+             mc:Ignorable="d" d:DesignWidth="400" >
 	<UserControl.Resources>
-		<ResourceDictionary >
-			<ResourceDictionary.MergedDictionaries >
-				<ResourceDictionary Source="Styles.xaml"/>
-			</ResourceDictionary.MergedDictionaries>
-		</ResourceDictionary>
+		<Style BasedOn="{StaticResource {x:Type Button}}" 
+            TargetType="{x:Type Button}">
+			<Setter Property="FontSize" Value="12"/>
+			<EventSetter Event="Click" Handler="Button_Click"/>
+		</Style>
+		<Style BasedOn="{StaticResource {x:Type Label}}" 
+            TargetType="{x:Type Label}">
+			<Setter Property="FontSize" Value="12"/>
+		</Style>
 	</UserControl.Resources>
 	<Grid>
-		<Grid Name="Grid">
+		<Grid Name="Grid" Margin="0,8,0,8">
 			<StackPanel Orientation="Vertical">
 				<Grid HorizontalAlignment="Stretch">
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="160" />
-						<ColumnDefinition Width="10*"/>
-						<ColumnDefinition Width="10*"/>
-						<ColumnDefinition Width="10*"/>
-						<ColumnDefinition Width="10*"/>
-						<ColumnDefinition Width="10*"/>
+						<ColumnDefinition Width="160" /><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/>
 					</Grid.ColumnDefinitions>
-					<Label Grid.Column="0" Content="Cut Stakes By %" Style="{ StaticResource OurLabel}" Width="160"/>
-					<Button Grid.Column="1" Content="25" Tag="cut25" Style="{ StaticResource OurButton}" Width="auto"/>
-					<Button Grid.Column="2" Content="35" Tag="cut35" Style="{ StaticResource OurButton}" Width="auto"/>
-					<Button Grid.Column="3" Content="50" Tag="cut50" Style="{ StaticResource OurButton}" Width="auto"/>
-					<Button Grid.Column="4" Content="60" Tag="cut60" Style="{ StaticResource OurButton}" Width="auto"/>
-					<Button Grid.Column="5" Content="75" Tag="cut75" Style="{ StaticResource OurButton}" Width="auto"/>
+					<Label Grid.Column="0" Content="Cut Stakes By %" Width="auto"/>
+					<Button Grid.Column="1" Content="25" Tag="cut25" />
+					<Button Grid.Column="2" Content="35" Tag="cut35" />
+					<Button Grid.Column="3" Content="50" Tag="cut50" />
+					<Button Grid.Column="4" Content="60" Tag="cut60" />
+					<Button Grid.Column="5" Content="75" Tag="cut75" />
 				</Grid>
 				<Grid HorizontalAlignment="Stretch">
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="160" />
-						<ColumnDefinition Width="10*"/>
 					</Grid.ColumnDefinitions>
-					<Label Grid.Column="0" Content="Execute Bets" Style="{ StaticResource OurLabel}" Width="160"/>
-					<Button Grid.Column="1" Content="25" Tag="cut25" Style="{ StaticResource OurButton}" Width="auto"/>
+					<Button Grid.Column="0" Content="Execute Bets" Background="OrangeRed"/>
 				</Grid>
 				<Grid HorizontalAlignment="Stretch">
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="160" />
-						<ColumnDefinition Width="10*"/>
-						<ColumnDefinition Width="10*"/>
-						<ColumnDefinition Width="10*"/>
-						<ColumnDefinition Width="10*"/>
-						<ColumnDefinition Width="10*"/>
-					</Grid.ColumnDefinitions>
-					<Label Grid.Column="0" Content="Move Bets Out by Ticks" Style="{ StaticResource OurLabel}" Width="160"/>
-					<Button Grid.Column="1" Content="1" Tag="move1" Style="{ StaticResource OurButton}" Width="auto"/>
-					<Button Grid.Column="2" Content="2" Tag="move2" Style="{ StaticResource OurButton}" Width="auto"/>
-					<Button Grid.Column="3" Content="3" Tag="move3" Style="{ StaticResource OurButton}" Width="auto"/>
+						<ColumnDefinition Width="160" /><ColumnDefinition Width="10*"/><ColumnDefinition Width="10*"/><ColumnDefinition Width="10*"/>
+						<ColumnDefinition Width="10*"/><ColumnDefinition Width="10*"/></Grid.ColumnDefinitions>
+					<Label Grid.Column="0" Content="Move Bets Out by Ticks" Width="auto"/>
+					<Button Grid.Column="1" Content="1" Tag="move1" />
+					<Button Grid.Column="2" Content="2" Tag="move2" />
+					<Button Grid.Column="3" Content="3" Tag="move3" />
 
-					<Button Grid.Column="1" Content="25" Tag="cut25" Style="{ StaticResource OurButton}" Width="auto"/>
-					<Button Grid.Column="2" Content="35" Tag="cut35" Style="{ StaticResource OurButton}" Width="auto"/>
-					<Button Grid.Column="3" Content="50" Tag="cut50" Style="{ StaticResource OurButton}" Width="auto"/>
-					<Button Grid.Column="4" Content="60" Tag="cut60" Style="{ StaticResource OurButton}" Width="auto"/>
-					<Button Grid.Column="5" Content="75" Tag="cut75" Style="{ StaticResource OurButton}" Width="auto"/>
+					<Button Grid.Column="1" Content="25" Tag="cut25" />
+					<Button Grid.Column="2" Content="35" Tag="cut35" />
+					<Button Grid.Column="3" Content="50" Tag="cut50" />
+					<Button Grid.Column="4" Content="60" Tag="cut60" />
+					<Button Grid.Column="5" Content="75" Tag="cut75" />
 				</Grid>
 			</StackPanel>
 		</Grid>

@@ -112,22 +112,29 @@ namespace SpreadTrader
 				EventsTree = new EventsTree();
 				EventsTreeGrid.Content = EventsTree;
 				EventsTree.Populate();
+				AppendNewTab();
 			}
 			catch (Exception xe)
 			{
 				Status = xe.Message.ToString();
 			}
 		}
-		private void TabItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		private void AppendNewTab()
 		{
+			// hook the new tab up to receive tree control events 
 			ClosableTab tab = new ClosableTab();
 			MarketControl mc = new MarketControl();
 			tab.Content = mc;
-			// hook the new tab up to receive tree control events 
 			EventsTree.NodeCallback += mc.NodeChangeEventSink;
-			tab.Title = "New Tab";
+			EventsTree.NodeCallback += tab.NodeChangeEventSink;
+
+			tab.Title = "";
 			TabControl.Items.Insert(0, tab);
 			tab.Focus();
+		}
+		private void TabItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			AppendNewTab();
 			e.Handled = true;
 		}
 		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)

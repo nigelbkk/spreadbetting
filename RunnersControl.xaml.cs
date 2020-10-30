@@ -80,7 +80,7 @@ namespace SpreadTrader
 		}
 		private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			SV1.Height = Math.Max(25, e.NewSize.Height - SV1_Header.Height - 20);
+			SV1.Height = Math.Max(25, e.NewSize.Height - SV1_Header.Height);
 		}
 	}
 }

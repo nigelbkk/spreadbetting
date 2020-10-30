@@ -14,6 +14,8 @@ namespace SpreadTrader
 		public NodeSelectionDelegate NodeCallback = null;
 		public ObservableCollection<LiveRunner> LiveRunners { get; set; }
 		public String FullName { get; set; }
+		public String MarketName { get; set; }
+		List<EventTypeResult> EventTypes { get; set; }
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }
 		private bool _isSelected;
 		private bool _IsExpanded;
@@ -38,10 +40,10 @@ namespace SpreadTrader
 		{
 			NodeViewModel.Betfair = Betfair;
 			Nodes = new ObservableCollection<NodeViewModel>();
-			Market m = new Market();
-			m.marketId = "1.174865333";
-			Tag = m;
-			OnItemSelected();
+			//Market m = new Market();
+			//m.marketId = "1.174749670";
+			//Tag = m;
+			//OnItemSelected();
 		}
 		public NodeViewModel(String name)
 		{
@@ -69,6 +71,7 @@ namespace SpreadTrader
 					if (Parent != null)
 					{
 						FullName = String.Format("{0} - {1}", Parent.Name, Name);
+						MarketName = Parent.Name;
 					}
 					if (NodeCallback != null)
 					{
@@ -103,8 +106,8 @@ namespace SpreadTrader
 		}
 		public void PopulateEventTYpes()
 		{
-			List<EventTypeResult> eventTypes = Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList();
-			foreach (EventTypeResult ev in eventTypes)
+			EventTypes = Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList();
+			foreach (EventTypeResult ev in EventTypes)
 			{
 				if (Favourites.IsFavourite(ev.eventType.id))
 				{

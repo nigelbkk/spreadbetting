@@ -4,8 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
-             mc:Ignorable="d" d:DesignWidth="400" >
+             mc:Ignorable="d" d:DesignWidth="600" >
 	<UserControl.Resources>
+		<Style BasedOn="{StaticResource {x:Type Button}}" 
+            TargetType="{x:Type Button}">
+			<Setter Property="FontSize" Value="12"/>
+		</Style>
 	</UserControl.Resources>
 	<Grid Name="MarketControlGrid" Background="Gray"  DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" >
 		<Grid.RowDefinitions>
@@ -14,30 +18,34 @@
 		</Grid.RowDefinitions>
 		<Grid Name ="MarketHeader" Grid.Row="0" Height="28" VerticalAlignment="Top" Background="LightBlue">
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="34"/>
-				<ColumnDefinition Width="34"/>
-				<ColumnDefinition Width="3*"/>
+				<ColumnDefinition Width="38"/>
+				<ColumnDefinition Width="38"/>
+				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<Button Grid.Column="0" Click="Button_Click" Tag="Market Description" Background="LightCyan" ToolTip="Market Description" HorizontalAlignment="Left" Width="34">
+			<Button Grid.Column="0" Click="Button_Click" Tag="Market Description" ToolTip="Market Description" HorizontalAlignment="Left">
 				<Image Source="/SpreadTrader;component/Images/info.png" />
 			</Button>
-			<Button Tag="Hide Grid" Grid.Column="1" Background="LightCyan"  HorizontalContentAlignment="Left" ToolTip="Hide The Grid" Width="24" Click="Button_Click" >
+			<Button Tag="Hide Grid" Grid.Column="1"  HorizontalContentAlignment="Left" ToolTip="Hide The Grid" Click="Button_Click" >
 				<StackPanel Orientation="Vertical">
-					<Image Name="UpArrow" Source="/SpreadTrader;component/Images/up_arrow.png"  Visibility="Visible" Height="15" Width="17"/>
-					<Image Name="DownArrow" Source="/SpreadTrader;component/Images/down_arrow.png" Visibility="Collapsed"/>
+					<Image Source="/SpreadTrader;component/Images/up_arrow.png"  Visibility="Visible" Margin="0,2,0,3"/>
+					<Image Source="/SpreadTrader;component/Images/down_arrow.png" Visibility="Collapsed" Margin="0,2,0,3"/>
 				</StackPanel>
 			</Button>
-			<Label Grid.Column="2" Content="{Binding MarketNode.FullName}" Padding="6,0,0,0" HorizontalContentAlignment="Left" Background="LightCyan"/>
+			<Label Grid.Column="2" Content="{Binding MarketNode.FullName}" Padding="6,0,0,0" Width="auto" HorizontalContentAlignment="Left" FontSize="12"/>
 		</Grid>
 		<Grid Grid.Row="1" Background="Ivory">
 			<DockPanel>
 				<Grid Name="UpperGrid" Loaded="UpperGrid_Loaded">
 					<Grid.RowDefinitions>
-						<RowDefinition Height="140"/>
+						<RowDefinition Height="160"/>
 						<RowDefinition Height="*"/>
 					</Grid.RowDefinitions>
 					<Grid Grid.Row="0" Name="RunnersGrid" Background="LightBlue">
-						<local:RunnersControl x:Name="RunnersControl" />
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="83*"/>
+							<ColumnDefinition Width="67*"/>
+						</Grid.ColumnDefinitions>
+						<local:RunnersControl x:Name="RunnersControl" Grid.ColumnSpan="2" />
 					</Grid>
 					<Grid Grid.Row="1" Background="Yellow">
 						<DockPanel>
@@ -46,10 +54,12 @@
 									<RowDefinition Height="3*"/>
 									<RowDefinition Height="*"/>
 								</Grid.RowDefinitions>
-								<Grid Name="BettingGrid" Grid.Row="0" Background="Cyan" >
-									<!--<local:BettingGrid/>-->
+								<Grid Name="BettingGrid" Grid.Row="0" Background="Ivory">
+									<local:BettingGrid/>
 								</Grid>
-								<Grid Grid.Row="1" Background="LightPink" Loaded="LowerGrid_Loaded" />
+								<Grid Grid.Row="1" Background="Ivory" Loaded="LowerGrid_Loaded">
+									<Label Content= "Bets Manager" HorizontalAlignment="Left" FontSize="18" FontWeight="Bold" Foreground ="LightGray" Margin="20,20" Width="auto" Height="32" VerticalAlignment="Top"/>
+								</Grid>
 								<GridSplitter Grid.Row="1" Height="4" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="Gray" ResizeDirection="Rows" DragCompleted="GridSplitter_DragCompleted_1"  />
 							</Grid>
 						</DockPanel>

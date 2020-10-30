@@ -6,37 +6,36 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="SpreadTrader" Height="598" Width="1089" WindowStartupLocation="CenterScreen" Closing="Window_Closing" Loaded="Window_Loaded" >
 	<Window.Resources>
-		<ResourceDictionary >
-			<ResourceDictionary.MergedDictionaries >
-				<ResourceDictionary Source="Styles.xaml"/>
+		<ResourceDictionary Source="styles.xaml"/>
+		<!--<ResourceDictionary>
+			<Style BasedOn="{StaticResource {x:Type Label}}" 
+            TargetType="{x:Type Label}">
+				<Setter Property="Width" Value="auto"/>
+			</Style>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="styles.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
-		</ResourceDictionary>
+		</ResourceDictionary>-->
 	</Window.Resources>
 	<Grid>
 		<DockPanel>
-			<ToolBarPanel Orientation="Horizontal" VerticalAlignment="Top" DockPanel.Dock="Top" Height="20">
-				<Button Tag="Hide Tree" Grid.Column="0" Padding="0" HorizontalContentAlignment="Left" Style="{ StaticResource OurButton}" ToolTip="Hide The Events Tree" Width="18">
+			<StackPanel Orientation="Horizontal" VerticalAlignment="Top" DockPanel.Dock="Top" Height="28">
+				<Button Tag="Hide Tree" Grid.Column="0" Padding="0" HorizontalContentAlignment="Left" ToolTip="Hide The Events Tree" Width="18">
 					<StackPanel Orientation="Vertical" Margin="2,0,2,0">
 						<Image Name="LeftArrow" Source="/SpreadTrader;component/Images/left_arrow.png"  Visibility="Visible"/>
 						<Image Name="RightArrow" Source="/SpreadTrader;component/Images/right_arrow.png" Visibility="Collapsed"/>
 					</StackPanel>
 				</Button>
-				<Button Content ="Refresh" Tag="Refresh" Grid.Column="1" Style="{ StaticResource OurButton}" ToolTip="Refresh Markets"/>
-				<Button Content ="Favourites" Tag="Favourites" Name="FavouritesButton" Grid.Column="2" Style="{ StaticResource OurButton}" ToolTip="Favourites"/>
-				<Button Content ="Settings" Tag="Settings" Grid.Column="3" Style="{ StaticResource OurButton}" ToolTip="Settings"/>
-				<Label Style="{ StaticResource OurLabel}"  Width="58" />
-				<Button Style="{ StaticResource OurButton}" Width="125">Exposure
-					<Button.ToolTip>
-						<ToolTip>
-							<TextBlock Text="Sort runners into betting order"></TextBlock>
-						</ToolTip>
-					</Button.ToolTip>
-				</Button>
-				<Button Style="{ StaticResource OurButton}" Content="{Binding UKBalance}" Width="109"  />
-				<Label Style="{ StaticResource OurLabel}" Content="Balance: 000.00" />
-				<Label Style="{ StaticResource OurLabel}" Content="Exposure: 000.00"/>
-				<Label Style="{ StaticResource OurLabel}" Content="Commission: 000.00" />
-			</ToolBarPanel>
+				<Button Content ="Refresh" Tag="Refresh" Grid.Column="1" ToolTip="Refresh Markets" Click="Button_Click"/>
+				<Button Content ="Favourites" Tag="Favourites" Name="FavouritesButton" Grid.Column="2" ToolTip="Favourites" Click="Button_Click"/>
+				<Button Content ="Settings" Tag="Settings" Grid.Column="3" ToolTip="Settings" Click="Button_Click"/>
+				<Label   Width="58" />
+				<Button Width="125">Exposure: 0.00</Button>
+				<Button Content="{Binding UKBalance}" Width="109"  />
+				<Label  Content="Balance: 000.00" Width="109" />
+				<Label  Content="Exposure: 000.00"/>
+				<Label  Content="Commission: 000.00" />
+			</StackPanel>
 			<StatusBar DockPanel.Dock="Bottom" Height="23" VerticalAlignment="Bottom" >
 				<TextBlock Text="{Binding Path=Status}"></TextBlock>
 			</StatusBar>
@@ -51,9 +50,6 @@
 				<Border  Grid.Column="1" DockPanel.Dock="Right" BorderBrush="Silver" BorderThickness="1" >
 					<Grid >
 						<TabControl Name ="TabControl">
-							<TabItem Header="Market"  >
-								<local:MarketControl/>
-							</TabItem>
 							<TabItem Header="+" PreviewMouseDown="TabItem_PreviewMouseDown"/>
 						</TabControl>
 					</Grid>
