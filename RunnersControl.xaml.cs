@@ -26,8 +26,11 @@ namespace SpreadTrader
 			MarketNode = new NodeViewModel(new BetfairAPI.BetfairAPI());
 			NodeChangeEventSink += (node) =>
 			{
-				MarketNode = node;
-				NotifyPropertyChanged("");
+				if (IsLoaded)
+				{
+					MarketNode = node;
+					NotifyPropertyChanged("");
+				}
 			};
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)

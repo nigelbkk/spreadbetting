@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Threading;
 using BetfairAPI;
 
 namespace SpreadTrader
 {
-	public class NodeViewModel : ViewModelBase, INotifyPropertyChanged
+	public class NodeViewModel : ViewModelBase
 	{
 		public NodeSelectionDelegate NodeCallback = null;
 		public ObservableCollection<LiveRunner> LiveRunners { get; set; }
@@ -181,7 +179,7 @@ namespace SpreadTrader
 		}
 		public override string ToString()
 		{
-			return String.Format("{0}", Name);
+			return String.Format("{0}", FullName);
 		}
 		public void SetStakes(Decimal stake, sideEnum side, Int32 runner_index)
 		{

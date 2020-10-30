@@ -50,7 +50,7 @@
 				<Border  Grid.Column="1" DockPanel.Dock="Right" BorderBrush="Silver" BorderThickness="1" >
 					<Grid >
 						<TabControl Name ="TabControl">
-							<TabItem Header="+" PreviewMouseDown="TabItem_PreviewMouseDown"/>
+							<TabItem Header="+" PreviewMouseDown="TabItem_PreviewMouseDown" />
 						</TabControl>
 					</Grid>
 				</Border>

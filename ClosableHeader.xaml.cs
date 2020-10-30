@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace SpreadTrader
@@ -13,9 +15,10 @@ namespace SpreadTrader
 			this.Header = OurHeader;
 			NodeChangeEventSink += (node) =>
 			{
-				NodeViewModel MarketNode = node;
-				OurHeader.Label.Content = node.MarketName;
-				OurHeader.Width = OurHeader.Label.ActualWidth + 40;
+				if (IsSelected)
+				{
+					OurHeader.Label.Content = node.MarketName.Trim();
+				}
 			};
 		}
 	}
@@ -30,6 +33,12 @@ namespace SpreadTrader
 			ClosableTab parent = this.Parent as ClosableTab;
 			TabControl tabcontrol = parent.Parent as TabControl;
 			tabcontrol.Items.Remove(parent);
+		}
+		private void Label_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			ClosableTab parent = this.Parent as ClosableTab;
+			ClosableHeader header = parent.Header as ClosableHeader;
+			parent.Width = e.NewSize.Width + header.Image.Width;
 		}
 	}
 }

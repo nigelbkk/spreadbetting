@@ -39,7 +39,6 @@ namespace SpreadTrader
                         if (ic.CanExecute(a))
                         {
                             ic.Execute(a);
-
                         }
                         a.Handled = true;
                     };

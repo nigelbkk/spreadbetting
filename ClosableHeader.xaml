@@ -6,11 +6,22 @@
              mc:Ignorable="d" 
              d:DesignHeight="23" d:DesignWidth="81" Margin="0">
 	<UserControl.Resources>
+		<Style BasedOn="{StaticResource {x:Type Label}}" 
+            TargetType="{x:Type Label}">
+			<Setter Property="FontSize" Value="9"/>
+			<Setter Property="BorderThickness" Value="0.0"/>
+			<Setter Property="Width" Value="auto"/>
+			<Setter Property="HorizontalContentAlignment" Value="Left"/>
+			<!--<Setter Property="Foreground"  Value="DarkGray"/>-->
+			<Setter Property="Background"  Value="#00000000"/>
+			<Setter Property="Margin"  Value="0"/>
+			<Setter Property="Padding"  Value="0"/>
+		</Style>
 	</UserControl.Resources>
 	<Grid>
-		<StackPanel Orientation="Horizontal" Height="20">
-			<Label Name="Label" Content="TabItem" Margin="1,-3,0,0" FontSize="12" Width="auto"/>
-			<Image Name="Image" Margin="4,0,4,0" Source="/SpreadTrader;component/Images/close.png" PreviewMouseDown="Image_PreviewMouseDown" />
+		<StackPanel Orientation="Horizontal" Height="16">
+			<Label Name="Label" Content="TabItem" SizeChanged="Label_SizeChanged" />
+			<Image Name="Image" Margin="4,2,4,0" Source="/SpreadTrader;component/Images/close.png" PreviewMouseDown="Image_PreviewMouseDown" />
 		</StackPanel>
 	</Grid>
 </UserControl>

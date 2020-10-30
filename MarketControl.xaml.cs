@@ -12,7 +12,7 @@ namespace SpreadTrader
 	{
 		public NodeSelectionDelegate NodeChangeEventSink = null;
 		public NodeViewModel MarketNode { get; set; }
-		public String MarketName { get { return MarketNode == null ? "Barcelona vs Andorra" : MarketNode.Name;  } }
+		public String MarketName { get { return MarketNode == null ? "No market selected" : MarketNode.Name;  } }
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
 		public void NotifyPropertyChanged(String info)
@@ -28,8 +28,11 @@ namespace SpreadTrader
 			NodeChangeEventSink = RunnersControl.NodeChangeEventSink;
 			NodeChangeEventSink += (node) =>
 			{
-				MarketNode = node;
-				NotifyPropertyChanged("");
+				if (IsLoaded)
+				{
+					MarketNode = node;
+					NotifyPropertyChanged("");
+				}
 			};
 		}
 		private void LowerGrid_Loaded(object sender, RoutedEventArgs e)
