@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
-             mc:Ignorable="d" d:DesignWidth="400" >
+	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
+             mc:Ignorable="d" d:DesignWidth="600" >
 	<UserControl.Resources>
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
             TargetType="{x:Type Button}">
@@ -15,13 +16,36 @@
             TargetType="{x:Type Label}">
 			<Setter Property="FontSize" Value="12"/>
 		</Style>
+		<DataTemplate x:Key="DataTemplate_Row">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="160" />
+					<ColumnDefinition Width="10*"/>
+					<ColumnDefinition Width="10*"/>
+					<ColumnDefinition Width="10*"/>
+					<ColumnDefinition Width="10*"/>
+					<ColumnDefinition Width="10*"/>
+				</Grid.ColumnDefinitions>
+				<Button Grid.Column="0" Content="{Binding Path=Name }" HorizontalContentAlignment="Left"/>
+				<Button Grid.Column="1" Content="{Binding Path=Values[0] }" />
+				<Button Grid.Column="2" Content="{Binding Path=Values[1] }" />
+				<Button Grid.Column="3" Content="{Binding Path=Values[2] }" />
+				<Button Grid.Column="4" Content="{Binding Path=Values[3] }" />
+				<Button Grid.Column="5" Content="{Binding Path=Values[4] }" />
+			</Grid>
+		</DataTemplate>
 	</UserControl.Resources>
 	<Grid>
 		<Grid Name="Grid" Margin="0,8,0,8">
 			<StackPanel Orientation="Vertical">
 				<Grid HorizontalAlignment="Stretch">
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="160" /><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/>
+						<ColumnDefinition Width="160" />
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Cut Stakes By %" Width="auto"/>
 					<Button Grid.Column="1" Content="25" Tag="cut25" />
@@ -37,8 +61,13 @@
 				</Grid>
 				<Grid HorizontalAlignment="Stretch">
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="160" /><ColumnDefinition Width="10*"/><ColumnDefinition Width="10*"/><ColumnDefinition Width="10*"/>
-						<ColumnDefinition Width="10*"/><ColumnDefinition Width="10*"/></Grid.ColumnDefinitions>
+						<ColumnDefinition Width="160" />
+						<ColumnDefinition Width="10*"/>
+						<ColumnDefinition Width="10*"/>
+						<ColumnDefinition Width="10*"/>
+						<ColumnDefinition Width="10*"/>
+						<ColumnDefinition Width="10*"/>
+					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Move Bets Out by Ticks" Width="auto"/>
 					<Button Grid.Column="1" Content="1" Tag="move1" />
 					<Button Grid.Column="2" Content="2" Tag="move2" />
@@ -49,6 +78,19 @@
 					<Button Grid.Column="3" Content="50" Tag="cut50" />
 					<Button Grid.Column="4" Content="60" Tag="cut60" />
 					<Button Grid.Column="5" Content="75" Tag="cut75" />
+				</Grid>
+				<Grid Name="DataGrid" HorizontalAlignment="Stretch">
+					<StackPanel Orientation="Vertical">
+						<ItemsControl ItemTemplate="{DynamicResource DataTemplate_Row}" ItemsSource="{Binding Items}">
+							<ItemsControl.Template>
+								<ControlTemplate>
+									<ItemsPresenter/>
+								</ControlTemplate>
+							</ItemsControl.Template>
+						</ItemsControl>
+						<Slider Tag="0" Orientation="Horizontal" Margin="10" ValueChanged="Slider_ValueChanged"/>
+						<Slider Tag="1" Orientation="Horizontal" Margin="10" ValueChanged="Slider_ValueChanged"/>
+					</StackPanel>
 				</Grid>
 			</StackPanel>
 		</Grid>

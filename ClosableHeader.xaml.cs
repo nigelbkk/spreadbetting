@@ -38,7 +38,7 @@ namespace SpreadTrader
 		{
 			ClosableTab parent = this.Parent as ClosableTab;
 			ClosableHeader header = parent.Header as ClosableHeader;
-			parent.Width = e.NewSize.Width + header.Image.Width;
+			parent.Width = Math.Max(e.NewSize.Width + header.Image.Width, 20);
 		}
 	}
 }
