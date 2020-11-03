@@ -54,4 +54,10 @@
 		<Setter Property="Width" Value="auto"/>
 		<Setter Property="HorizontalContentAlignment" Value="Center"/>
 	</Style>
+	<SolidColorBrush x:Key="Back1Color" Color="#CACEE7"/>
+	<SolidColorBrush x:Key="Back2Color" Color="#DFE1EE"/>
+	<SolidColorBrush x:Key="Back3Color" Color="#F5F8FF"/>
+	<SolidColorBrush x:Key="Lay1Color" Color="#DBBBD2"/>
+	<SolidColorBrush x:Key="Lay2Color" Color="#EBD6E5"/>
+	<SolidColorBrush x:Key="Lay3Color" Color="#F6E5E6"/>
 </ResourceDictionary>
