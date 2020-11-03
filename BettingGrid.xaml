@@ -7,6 +7,10 @@
 	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
              mc:Ignorable="d" d:DesignWidth="600" >
 	<UserControl.Resources>
+		<Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+		</Style>
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
             TargetType="{x:Type Button}">
 			<Setter Property="FontSize" Value="12"/>
@@ -15,82 +19,133 @@
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
 			<Setter Property="FontSize" Value="12"/>
+			<Setter Property="Width" Value="auto"/>
 		</Style>
-		<DataTemplate x:Key="DataTemplate_Row">
-			<Grid>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="160" />
-					<ColumnDefinition Width="10*"/>
-					<ColumnDefinition Width="10*"/>
-					<ColumnDefinition Width="10*"/>
-					<ColumnDefinition Width="10*"/>
-					<ColumnDefinition Width="10*"/>
-				</Grid.ColumnDefinitions>
-				<Button Grid.Column="0" Content="{Binding Path=Name }" HorizontalContentAlignment="Left"/>
-				<Button Grid.Column="1" Content="{Binding Path=Values[0] }" />
-				<Button Grid.Column="2" Content="{Binding Path=Values[1] }" />
-				<Button Grid.Column="3" Content="{Binding Path=Values[2] }" />
-				<Button Grid.Column="4" Content="{Binding Path=Values[3] }" />
-				<Button Grid.Column="5" Content="{Binding Path=Values[4] }" />
-			</Grid>
-		</DataTemplate>
+		<Style BasedOn="{StaticResource {x:Type Slider}}" 
+            TargetType="{x:Type Slider}">
+			<Setter Property="Orientation" Value="Horizontal"/>
+			<Setter Property="Maximum" Value="100"/>
+			<Setter Property="Value" Value="50"/>
+			<EventSetter Event="ValueChanged" Handler="Slider_ValueChanged"/>
+		</Style>
+
+		<Style x:Key="GridItemsStyle"
+           TargetType="ItemsControl">
+			<Setter Property="ItemsPanel">
+				<Setter.Value>
+					<ItemsPanelTemplate>
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition />
+							</Grid.RowDefinitions>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="160"/>
+								<ColumnDefinition Width="10*"/>
+								<ColumnDefinition Width="10*"/>
+								<ColumnDefinition Width="10*"/>
+								<ColumnDefinition Width="10*"/>
+								<ColumnDefinition Width="10*"/>
+							</Grid.ColumnDefinitions>
+						</Grid>
+					</ItemsPanelTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
 	</UserControl.Resources>
 	<Grid>
 		<Grid Name="Grid" Margin="0,8,0,8">
 			<StackPanel Orientation="Vertical">
-				<Grid HorizontalAlignment="Stretch">
+				<Grid>
+					<Grid.ColumnDefinitions>
+					</Grid.ColumnDefinitions>
+					<Button Grid.Column="0" Content="Execute Bets" Background="OrangeRed" Foreground="White"/>
+				</Grid>
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="160" />
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" Content="Cut All Stakes By %" HorizontalContentAlignment="Left" />
+					<Slider Grid.Column="1" Tag="0"/>
+				</Grid>
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="160" />
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" Content="Move Back Bets Out" HorizontalContentAlignment="Left" />
+					<Slider Grid.Column="1" Tag="1"/>
+				</Grid>
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="160" />
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" Content="Move Lay Bets In" HorizontalContentAlignment="Left" />
+					<Slider Grid.Column="1" Tag="3"/>
+				</Grid>
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="160" />
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" Content="Back Prices Up/Down" HorizontalContentAlignment="Left" />
+					<Slider Grid.Column="1" Tag="4"/>
+				</Grid>
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="160" />
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" Content="Lay Prices Up/Down" HorizontalContentAlignment="Left" />
+					<Slider Grid.Column="1" Tag="5"/>
+				</Grid>
+				<Grid>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="160" />
 						<ColumnDefinition/>
-						<ColumnDefinition/>
-						<ColumnDefinition/>
-						<ColumnDefinition/>
-						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
-					<Label Grid.Column="0" Content="Cut Stakes By %" Width="auto"/>
-					<Button Grid.Column="1" Content="25" Tag="cut25" />
-					<Button Grid.Column="2" Content="35" Tag="cut35" />
-					<Button Grid.Column="3" Content="50" Tag="cut50" />
-					<Button Grid.Column="4" Content="60" Tag="cut60" />
-					<Button Grid.Column="5" Content="75" Tag="cut75" />
+					<Label Grid.Column="0" Content="Price" HorizontalContentAlignment="Left" />
+					<Grid Grid.Column = "1" >
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="1*"/>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+						</Grid.ColumnDefinitions>
+						<Button Grid.Column="0" Tag="-"  Content="-" FontWeight="Bold"></Button>
+						<Label Grid.Column="1" Content="{Binding Path=Price}" Background="LightCyan"></Label>
+						<Button Grid.Column="2" Tag="+" Content="+" FontWeight="Bold"></Button>
+					</Grid>
 				</Grid>
-				<Grid HorizontalAlignment="Stretch">
-					<Grid.ColumnDefinitions>
-					</Grid.ColumnDefinitions>
-					<Button Grid.Column="0" Content="Execute Bets" Background="OrangeRed"/>
+				<Grid>
+					<ItemsControl Style="{StaticResource GridItemsStyle}">
+						<Label Grid.Column="0" Content="Active" HorizontalContentAlignment="Left"/>
+						<CheckBox Grid.Column="1"></CheckBox>
+						<CheckBox Grid.Column="2"></CheckBox>
+						<CheckBox Grid.Column="3"></CheckBox>
+						<CheckBox Grid.Column="4"></CheckBox>
+						<CheckBox Grid.Column="5"></CheckBox>
+					</ItemsControl>
 				</Grid>
-				<Grid HorizontalAlignment="Stretch">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="160" />
-						<ColumnDefinition Width="10*"/>
-						<ColumnDefinition Width="10*"/>
-						<ColumnDefinition Width="10*"/>
-						<ColumnDefinition Width="10*"/>
-						<ColumnDefinition Width="10*"/>
-					</Grid.ColumnDefinitions>
-					<Label Grid.Column="0" Content="Move Bets Out by Ticks" Width="auto"/>
-					<Button Grid.Column="1" Content="1" Tag="move1" />
-					<Button Grid.Column="2" Content="2" Tag="move2" />
-					<Button Grid.Column="3" Content="3" Tag="move3" />
-
-					<Button Grid.Column="1" Content="25" Tag="cut25" />
-					<Button Grid.Column="2" Content="35" Tag="cut35" />
-					<Button Grid.Column="3" Content="50" Tag="cut50" />
-					<Button Grid.Column="4" Content="60" Tag="cut60" />
-					<Button Grid.Column="5" Content="75" Tag="cut75" />
+				<Grid>
+					<ItemsControl Style="{StaticResource GridItemsStyle}" >
+						<Label Grid.Column="0" Content="Stakes" HorizontalContentAlignment="Left"/>
+						<Label Grid.Column="1" Content="{Binding Path=Stakes[0]}"/>
+						<Label Grid.Column="2" Content="{Binding Path=Stakes[1]}"/>
+						<Label Grid.Column="3" Content="{Binding Path=Stakes[2]}"/>
+						<Label Grid.Column="4" Content="{Binding Path=Stakes[3]}"/>
+						<Label Grid.Column="5" Content="{Binding Path=Stakes[4]}"/>
+					</ItemsControl>
 				</Grid>
-				<Grid Name="DataGrid" HorizontalAlignment="Stretch">
-					<StackPanel Orientation="Vertical">
-						<ItemsControl ItemTemplate="{DynamicResource DataTemplate_Row}" ItemsSource="{Binding Items}">
-							<ItemsControl.Template>
-								<ControlTemplate>
-									<ItemsPresenter/>
-								</ControlTemplate>
-							</ItemsControl.Template>
-						</ItemsControl>
-						<Slider Tag="0" Orientation="Horizontal" Margin="10" ValueChanged="Slider_ValueChanged"/>
-						<Slider Tag="1" Orientation="Horizontal" Margin="10" ValueChanged="Slider_ValueChanged"/>
-					</StackPanel>
+				<Grid>
+					<ItemsControl Style="{StaticResource GridItemsStyle}" >
+						<Label Grid.Column="0" Content="Prices" HorizontalContentAlignment="Left"/>
+						<Label Grid.Column="1" Content="{Binding Path=Prices[0]}"/>
+						<Label Grid.Column="2" Content="{Binding Path=Prices[1]}"/>
+						<Label Grid.Column="3" Content="{Binding Path=Prices[2]}"/>
+						<Label Grid.Column="4" Content="{Binding Path=Prices[3]}"/>
+						<Label Grid.Column="5" Content="{Binding Path=Prices[4]}"/>
+					</ItemsControl>
 				</Grid>
 			</StackPanel>
 		</Grid>

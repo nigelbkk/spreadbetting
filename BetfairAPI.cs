@@ -24,59 +24,6 @@ namespace BetfairAPI
         {
         }
         public DateTime sysTime = DateTime.UtcNow;
-        public static double ticksize(double odds)
-        {
-            if (odds < 2) return 0.01;
-            if (odds < 3) return 0.02;
-            if (odds < 4) return 0.05;
-            if (odds < 6) return 0.1;
-            if (odds < 10) return 0.2;
-            if (odds < 20) return 0.5;
-            if (odds < 30) return 1;
-            if (odds < 50) return 2;
-            if (odds < 100) return 5;
-            return 10;
-        }
-        public static double snapTo(double _odds)
-        {
-            Double odds = Convert.ToDouble(_odds);
-            Double tx = Convert.ToDouble(ticksize(_odds)) * 100;
-
-            odds -= ((odds * 100) % tx) / 100;
-            return Convert.ToDouble(odds.ToString("F"));
-        }
-        private String RPCRequestRaw(String Method, Dictionary<String, Object> Params)
-        {
-            Dictionary<String, Object> joe = new Dictionary<string, object>();
-            joe["jsonrpc"] = "2.0";
-            joe["id"] = "1";
-            joe["method"] = "SportsAPING/v1.0/" + Method;
-            joe["params"] = Params;
-
-            String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
-
-            HttpWebRequest wr = (HttpWebRequest)WebRequest.Create("https://api.betfair.com/exchange/betting/json-rpc/v1/");
-            wr.Method = WebRequestMethods.Http.Post;
-            wr.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            wr.Headers.Add("X-Application", AppKey);
-            wr.Headers.Add("X-Authentication", Token);
-            wr.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); wr.Accept = "*/*";
-
-            var bytes = Encoding.GetEncoding("UTF-8").GetBytes(postData);
-            wr.ContentType = "application/json";
-            wr.ContentLength = bytes.Length;
-
-            using (Stream stream = wr.GetRequestStream())
-            {
-                stream.Write(bytes, 0, bytes.Length);
-            }
-            using (WebResponse response = wr.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
-            {
-                return reader.ReadToEnd();
-            }
-        }
         private Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
             Dictionary<String, Object> joe = new Dictionary<string, object>();
@@ -474,6 +421,78 @@ namespace BetfairAPI
             p["includeBspBets"] = false;
             p["netOfCommission"] = true;
             return RPCRequest<List<MarketProfitAndLoss>>("listMarketProfitAndLoss", p) as List<MarketProfitAndLoss>;
+        }
+        public static Decimal PreviousPrice(Decimal v)
+        {
+            Decimal[] MinValue = { 1.01M, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
+            Decimal[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
+            Decimal[] Increment = { 0.01M, 0.02M, 0.05M, 0.1M, 0.2M, 0.5M, 1, 2, 5, 10 };
+
+            if (v > 1000)
+                return 1000;
+
+            for (Int32 idx = 0; idx < MaxValue.Length; idx++)
+            {
+                if (v <= MaxValue[idx] && v > MinValue[idx])
+                {
+                    Decimal lo = (v / Increment[idx]) * Increment[idx];
+                    lo = Math.Round(lo, 2);
+                    lo -= Increment[idx];
+                    return BetfairPrice(lo);
+                }
+            }
+            return v;
+        }
+        public static Decimal NextPrice(Decimal v)
+        {
+            Decimal[] MinValue = { 1.01M, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
+            Decimal[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
+            Decimal[] Increment = { 0.01M, 0.02M, 0.05M, 0.1M, 0.2M, 0.5M, 1, 2, 5, 10 };
+
+            if (v < MinValue[0])
+                return MinValue[0];
+
+            Int32 idx = 0;
+            for (; idx < MinValue.Length; idx++)
+            {
+                if (v >= MinValue[idx] && v <= MaxValue[idx])
+                {
+                    break;
+                }
+            }
+            Decimal lo = (v / Increment[idx]) * Increment[idx];
+            lo = Math.Round(lo, 2);
+            lo += Increment[idx];
+            return BetfairPrice(lo);
+        }
+        public static Decimal BetfairPrice(Decimal v)
+        {
+            Decimal OriginalPrice = v;
+            v = Math.Round(v, 2);
+            if (v <= 1.01M) return 1.01M;
+            if (v >= 1000) return 1000;
+
+            Decimal[] MinValue = { 1.01M, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
+            Decimal[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
+            Decimal[] Increment = { 0.01M, 0.02M, 0.05M, 0.1M, 0.2M, 0.5M, 1, 2, 5, 10 };
+
+            Int32 idx = 0;
+            for (; idx < MinValue.Length; idx++)
+            {
+                if (v >= MinValue[idx] && v <= MaxValue[idx])
+                {
+                    break;
+                }
+            }
+            Decimal lo = (Int32)(v / Increment[idx]) * Increment[idx];
+            lo = Math.Round(lo, 2);
+
+            if (lo == v)
+            {
+                return Convert.ToDecimal(v);
+            }
+            Decimal hi = lo + Increment[idx];
+            return Math.Abs(lo - OriginalPrice) < Math.Abs(hi - OriginalPrice) ? lo : hi;
         }
     }
 }
