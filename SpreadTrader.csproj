@@ -99,6 +99,9 @@
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SliderControl.xaml.cs">
+      <DependentUpon>SliderControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModel.cs" />
     <Compile Include="WaitCursor.cs" />
     <Page Include="BettingGrid.xaml">
@@ -143,6 +146,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Settings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SliderControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

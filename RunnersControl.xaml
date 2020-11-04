@@ -19,11 +19,15 @@
 			<Setter Property="Height" Value="40"/>
 			<Setter Property="HorizontalContentAlignment" Value="Center"/>
 		</Style>
-
 		<Style TargetType="{x:Type TextBlock}">
 			<Setter Property="FontSize" Value="9"/>
 			<Setter Property="FontWeight" Value="Normal"/>
-			<Setter Property="Width" Value="auto"/>
+			<Setter Property="Width" Value="50"/>
+			<!--<Setter Property="Width" Value="auto"/>-->
+		</Style>
+		<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+			<Setter Property="FontSize" Value="11"/>
+			<Setter Property="Padding" Value="0"/>
 		</Style>
 		<Style x:Key="styleOutcome" TargetType="TextBlock">
 			<Style.Triggers>
@@ -38,7 +42,7 @@
 		<DataTemplate x:Key="DataTemplate_Runner">
 			<DataTemplate.Resources>
 				<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
-					<Setter Property="FontSize" Value="10"/>
+					<Setter Property="FontSize" Value="11"/>
 				</Style>
 				<Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
 					<Setter Property="TextAlignment" Value="Center"/>
@@ -54,9 +58,9 @@
 					</Style.Triggers>
 				</Style>
 			</DataTemplate.Resources>
-			<Border BorderThickness="0 0 0 0.25" BorderBrush="DarkGray" >
+			<Grid>
 				<StackPanel Orientation="Horizontal" Tag="{Binding selectionId}" >
-					<Label Background="LightCyan"  Content="{Binding name}" FontSize="11" Width="135" Padding="6" HorizontalContentAlignment="Left" VerticalContentAlignment="Top"/>
+					<Label Background="LightCyan"  Content="{Binding name}" Width="135" Padding="6" HorizontalContentAlignment="Left"/>
 					<Button Tag="back3" Background = "{StaticResource Back3Color}">
 						<StackPanel Orientation="Vertical">
 							<TextBlock Text="{Binding prices[2].price, StringFormat={}{0:N2}}"/>
@@ -105,14 +109,14 @@
 					<Label Content="{Binding Path=LastPrice, Mode=OneWay, StringFormat=\{0:#.#\}}" Tag="Level Profit" />
 					<Label Content="{Binding Path=LastPrice, Mode=OneWay, StringFormat=\{0:#.#\}}" Tag="Last Price" />
 				</StackPanel>
-			</Border>
+			</Grid>
 		</DataTemplate>
 	</UserControl.Resources>
     <Grid SizeChanged="Grid_SizeChanged" >
 		<Grid Name="UpperGrid" Grid.Row="0" VerticalAlignment="Stretch" Background="Azure"  DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
 			<StackPanel Orientation="Vertical" >
 				<StackPanel Name="SV1_Header" Orientation="Horizontal" Height="36">
-					<Label Width ="135">Selection Name</Label><Label/><Label/>
+					<Label Width ="135" Padding="8,0,0,0" HorizontalContentAlignment ="Left">Selection Name</Label><Label/><Label/>
 					<Label>100.71%</Label><Label Width="10"></Label><Label>99.37%</Label><Label/><Label/>
 					<Label><TextBlock TextAlignment="Center">Back<LineBreak/>Stake</TextBlock></Label>
 					<Label><TextBlock TextAlignment="Center">Lay<LineBreak/>Stake</TextBlock></Label>

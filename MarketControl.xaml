@@ -37,17 +37,27 @@
 			<DockPanel>
 				<Grid Name="UpperGrid" Loaded="UpperGrid_Loaded">
 					<Grid.RowDefinitions>
-						<RowDefinition Height="160"/>
+						<RowDefinition Height="auto"/>
 						<RowDefinition Height="*"/>
 					</Grid.RowDefinitions>
-					<Grid Grid.Row="0" Name="RunnersGrid" Background="LightBlue">
+					<Grid Name="RunersAndSlidersGrid" Grid.Row="0" Grid.ColumnSpan="2">
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="83*"/>
-							<ColumnDefinition Width="67*"/>
+							<ColumnDefinition Width="500"/>
+							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
-						<local:RunnersControl x:Name="RunnersControl" Grid.ColumnSpan="2" />
+						<Grid Name="RunnersGrid" Background="LightBlue">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="83*"/>
+								<ColumnDefinition Width="67*"/>
+							</Grid.ColumnDefinitions>
+							<local:RunnersControl x:Name="RunnersControl" Grid.ColumnSpan="2" />
+						</Grid>
+						<Grid Name="SlidersGrid" Grid.Column="1">
+							<local:SliderControl/>
+						</Grid>
+						<GridSplitter Name="VerticalSplitter" Width="4" Grid.Column="1" Grid.RowSpan="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Background="Gray" ResizeDirection="Columns" DragCompleted="GridSplitter_DragCompleted" />
 					</Grid>
-					<Grid Grid.Row="1" Background="Yellow">
+					<Grid Grid.Row="1">
 						<DockPanel>
 							<Grid Name ="LowerGrid" Loaded="LowerGrid_Loaded">
 								<Grid.RowDefinitions>

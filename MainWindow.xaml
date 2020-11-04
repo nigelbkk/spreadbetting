@@ -6,16 +6,17 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="SpreadTrader" Height="598" Width="1089" WindowStartupLocation="CenterScreen" Closing="Window_Closing" Loaded="Window_Loaded" >
 	<Window.Resources>
-		<ResourceDictionary Source="styles.xaml"/>
-		<!--<ResourceDictionary>
-			<Style BasedOn="{StaticResource {x:Type Label}}" 
-            TargetType="{x:Type Label}">
+		<ResourceDictionary>
+			<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+				<Setter Property="BorderBrush" Value="DarkGray"/>
+				<Setter Property="BorderThickness" Value="0.5"/>
 				<Setter Property="Width" Value="auto"/>
+				<Setter Property="Background" Value="Ivory"/>
 			</Style>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="styles.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
-		</ResourceDictionary>-->
+		</ResourceDictionary>
 	</Window.Resources>
 	<Grid>
 		<DockPanel>
@@ -29,26 +30,25 @@
 				<Button Content ="Refresh" Tag="Refresh" Grid.Column="1" ToolTip="Refresh Markets" Click="Button_Click"/>
 				<Button Content ="Favourites" Tag="Favourites" Name="FavouritesButton" Grid.Column="2" ToolTip="Favourites" Click="Button_Click"/>
 				<Button Content ="Settings" Tag="Settings" Grid.Column="3" ToolTip="Settings" Click="Button_Click"/>
-				<Label   Width="58" />
-				<Button Width="125">Exposure: 0.00</Button>
-				<Button Content="{Binding UKBalance}" Width="109"  />
-				<Label  Content="Balance: 000.00" Width="109" />
-				<Label  Content="Exposure: 000.00"/>
-				<Label  Content="Commission: 000.00" />
+				<Label Width="58" />
+				<Label>Exposure: $0.00</Label>
+				<Label>Balance: $0.00</Label>
+				<Label>Exposure: $0.00</Label>
+				<Label>Commission: $0.00</Label>
 			</StackPanel>
 			<StatusBar DockPanel.Dock="Bottom" Height="23" VerticalAlignment="Bottom" >
 				<TextBlock Text="{Binding Path=Status}"></TextBlock>
 			</StatusBar>
 			<Grid  Name="OuterGrid" DockPanel.Dock="Top" >
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*"></ColumnDefinition>
+					<ColumnDefinition Width="auto"></ColumnDefinition>
 					<ColumnDefinition Width="*"></ColumnDefinition>
 				</Grid.ColumnDefinitions>
 				<Grid>
 					<ContentControl Name="EventsTreeGrid"/>
 				</Grid>
-				<Border  Grid.Column="1" DockPanel.Dock="Right" BorderBrush="Silver" BorderThickness="1" >
-					<Grid >
+				<Border Grid.Column="1" DockPanel.Dock="Right" BorderBrush="Silver" BorderThickness="1" >
+					<Grid>
 						<TabControl Name ="TabControl">
 							<TabItem Header="+" PreviewMouseDown="TabItem_PreviewMouseDown" />
 						</TabControl>
