@@ -6,20 +6,22 @@
              xmlns:local="clr-namespace:SpreadTrader"
 	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
              mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="400">
+             d:DesignHeight="200" d:DesignWidth="400" Loaded="UserControl_Loaded">
 	<UserControl.Resources>
 		<Style BasedOn="{StaticResource {x:Type Slider}}" 
             TargetType="{x:Type Slider}">
 			<Setter Property="Orientation" Value="Horizontal"/>
-			<Setter Property="Maximum" Value="100"/>
-			<Setter Property="Value" Value="50"/>
+			<Setter Property="Minimum" Value="-50"/>
+			<Setter Property="Maximum" Value="50"/>
+			<Setter Property="Value" Value="0"/>
 			<Setter Property="VerticalAlignment" Value="Center"/>
 			<EventSetter Event="ValueChanged" Handler="Slider_ValueChanged"/>
 		</Style>
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
             TargetType="{x:Type Button}">
 			<Setter Property="Height" Value="28"/>
-			<Setter Property="FontSize" Value="12"/>
+			<Setter Property="FontSize" Value="28"/>
+			<Setter Property="Padding" Value="0,-8,0,0"/>
 			<EventSetter Event="Click" Handler="Button_Click"/>
 		</Style>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
@@ -30,7 +32,7 @@
 		</Style>
 	</UserControl.Resources>
 	<Grid>
-		<Grid Name="Grid" Margin="0,8,0,8">
+		<Grid Name="SliderControlGrid" Margin="0,8,0,8">
 			<StackPanel Orientation="Vertical">
 				<Grid>
 					<Grid.ColumnDefinitions>
@@ -44,23 +46,23 @@
 							<ColumnDefinition/>
 							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
-						<Button Grid.Column="0" Tag="-"  Content="-" FontWeight="Bold"></Button>
+						<Button Grid.Column="0" Tag="-"  Content="-" ></Button>
 						<Label Grid.Column="1" Content="{Binding Path=Price}" Background="LightCyan"></Label>
-						<Button Grid.Column="2" Tag="+" Content="+" FontWeight="Bold"></Button>
+						<Button Grid.Column="2" Tag="+" Content="+" ></Button>
 					</Grid>
 				</Grid>
-				<Grid>
+				<!--<Grid>
 					<Grid.ColumnDefinitions>
 					</Grid.ColumnDefinitions>
 					<Button Grid.Column="0" Content="Execute Bets" Background="OrangeRed" Foreground="White"/>
-				</Grid>
+				</Grid>-->
 				<Grid>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="110" />
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Cut Stakes By %" HorizontalContentAlignment="Left" />
-					<Slider Grid.Column="1" Tag="0"/>
+					<Slider Grid.Column="1" Tag="CutStakes"/>
 				</Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>
@@ -68,7 +70,7 @@
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Move Back Bets" HorizontalContentAlignment="Left" />
-					<Slider Grid.Column="1" Tag="1"/>
+					<Slider Grid.Column="1" Name="MoveBack" Tag="MoveBack"/>
 				</Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>
@@ -76,7 +78,7 @@
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Move Lay Bets" HorizontalContentAlignment="Left" />
-					<Slider Grid.Column="1" Tag="2"/>
+					<Slider Grid.Column="1" Name="MoveLay" Tag="MoveLay"/>
 				</Grid>
 			</StackPanel>
 		</Grid>

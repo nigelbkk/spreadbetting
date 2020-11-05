@@ -34,6 +34,12 @@ namespace SpreadTrader
 					NotifyPropertyChanged("");
 				}
 			};
+			SliderControl.OnSliderChanged += BettingGridControl.OnSliderChanged;
+			{
+				//Stakes = slider.Stakes;
+				//Prices = slider.Prices;
+				NotifyPropertyChanged("");
+			};
 		}
 		private void LowerGrid_Loaded(object sender, RoutedEventArgs e)
 		{
