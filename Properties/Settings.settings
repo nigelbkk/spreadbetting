@@ -53,11 +53,14 @@
     <Setting Name="ColumnWidth" Type="System.Double" Scope="User">
       <Value Profile="(Default)">80</Value>
     </Setting>
-    <Setting Name="LowerSplitter" Type="System.Double" Scope="User">
+    <Setting Name="Splitter1" Type="System.Double" Scope="User">
       <Value Profile="(Default)">120</Value>
     </Setting>
-    <Setting Name="UpperSplitter" Type="System.Double" Scope="User">
+    <Setting Name="Splitter2" Type="System.Double" Scope="User">
       <Value Profile="(Default)">120</Value>
+    </Setting>
+    <Setting Name="BasePrice" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

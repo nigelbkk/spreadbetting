@@ -4,19 +4,13 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Net;
-using System.Web;
-using System.Security.Cryptography.X509Certificates;
-using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Diagnostics;
 
 namespace BetfairAPI
 {
     public class BetfairAPI
     {
-        public DateTime PlayBackDate {get;set;}
-        private const String AppName = "Ivy";
         private String AppKey { get; set; }  //"uCmjo7RlVUJRCc0T";
         private String Token { get; set; }
         public String SessionToken { get { return Token; } }
@@ -398,10 +392,6 @@ namespace BetfairAPI
             p["betIds"] = new HashSet<UInt64>();
             p["orderProjection"] = orderProjectionEnum.ALL.ToString();
             p["dateRange"] = TimeRange(DateTime.UtcNow.Date, 0, 24);
-            if (PlayBackDate.Ticks != 0)
-            {
-                p["dateRange"] = TimeRange(new DateTime(PlayBackDate.Ticks, DateTimeKind.Utc), 0, 24);
-            }
             return RPCRequest<CurrentOrderSummaryReport>("listCurrentOrders", p) as CurrentOrderSummaryReport;
         }
         public AccountFundsResponse getAccountFunds(Int32 ExchangeId)
@@ -421,49 +411,6 @@ namespace BetfairAPI
             p["includeBspBets"] = false;
             p["netOfCommission"] = true;
             return RPCRequest<List<MarketProfitAndLoss>>("listMarketProfitAndLoss", p) as List<MarketProfitAndLoss>;
-        }
-        public static Decimal PreviousPrice(Decimal v)
-        {
-            Decimal[] MinValue = { 1.01M, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
-            Decimal[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
-            Decimal[] Increment = { 0.01M, 0.02M, 0.05M, 0.1M, 0.2M, 0.5M, 1, 2, 5, 10 };
-
-            if (v > 1000)
-                return 1000;
-
-            for (Int32 idx = 0; idx < MaxValue.Length; idx++)
-            {
-                if (v <= MaxValue[idx] && v > MinValue[idx])
-                {
-                    Decimal lo = (v / Increment[idx]) * Increment[idx];
-                    lo = Math.Round(lo, 2);
-                    lo -= Increment[idx];
-                    return BetfairPrice(lo);
-                }
-            }
-            return v;
-        }
-        public static Decimal NextPrice(Decimal v)
-        {
-            Decimal[] MinValue = { 1.01M, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
-            Decimal[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
-            Decimal[] Increment = { 0.01M, 0.02M, 0.05M, 0.1M, 0.2M, 0.5M, 1, 2, 5, 10 };
-
-            if (v < MinValue[0])
-                return MinValue[0];
-
-            Int32 idx = 0;
-            for (; idx < MinValue.Length; idx++)
-            {
-                if (v >= MinValue[idx] && v <= MaxValue[idx])
-                {
-                    break;
-                }
-            }
-            Decimal lo = (v / Increment[idx]) * Increment[idx];
-            lo = Math.Round(lo, 2);
-            lo += Increment[idx];
-            return BetfairPrice(lo);
         }
         public static Decimal BetfairPrice(Decimal v)
         {

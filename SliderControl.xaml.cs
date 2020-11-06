@@ -9,36 +9,49 @@ namespace SpreadTrader
 	public partial class SliderControl : UserControl, INotifyPropertyChanged
 	{
 		private const Int32 BACKPRICES = 0;
-		private const Int32 BACKSTAKES = 1;
-		private const Int32 LAYPRICES = 2;
+		private const Int32 LAYPRICES = 1;
+		private const Int32 BACKSTAKES = 2;
 		private const Int32 LAYSTAKES = 3;
 		public SliderChangedDelegate OnSliderChanged = null;
 		private List<List<Decimal>> Values { get; set; }
+		private List<Decimal> AllPrices = null;
 		public SliderControl()
 		{
+			BasePrice = props.BasePrice;// 1.52M;
 			Values = new List<List<decimal>>();
 			Values.Add(new List<Decimal>());
 			Values.Add(new List<Decimal>());
 			Values.Add(new List<Decimal>());
 			Values.Add(new List<Decimal>());
 
-			Price = 1.52M;
-			Decimal p = BetfairAPI.BetfairAPI.PreviousPrice(Price);
+			Decimal[] MinValue = { 1.01M, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
+			Decimal[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
+			Decimal[] Increment = { 0.01M, 0.02M, 0.05M, 0.1M, 0.2M, 0.5M, 1, 2, 5, 10 };
+
+			AllPrices = new List<decimal>();
+			Decimal m = 1.0M;
+			for (Int32 idx = 0; idx < MinValue.Length; idx++)
+			{
+				while (m < MaxValue[idx])
+				{
+					m += Increment[idx];
+					AllPrices.Add(m);
+				}
+			}
 			for (Int32 i = 0; i < 9; i++)
 			{
-				Values[BACKPRICES].Add(p);
-				Values[LAYPRICES].Add(p);
-				p = BetfairAPI.BetfairAPI.PreviousPrice(p);
+				Values[BACKPRICES].Add(AllPrices[i]);
+				Values[LAYPRICES].Add(AllPrices[i]);
 			}
 			for (Int32 i = 0; i < 10; i++)
 			{
 				Values[BACKSTAKES].Add(i + 9);
 				Values[LAYSTAKES].Add(i + 9);
 			}
+			Int32 index = PriceIndex(BasePrice);
 			InitializeComponent();
-			NotifyPropertyChanged("");
 		}
-		public Decimal Price { get; set; }
+		public Decimal BasePrice { get; set; }
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
 		{
@@ -51,33 +64,45 @@ namespace SpreadTrader
 				PropertyChanged(this, new PropertyChangedEventArgs(info));
 			}
 		}
-		public void CutStakes(Int32 value)
+		private Int32 PriceIndex(Decimal v)
 		{
+			for (int i = 1; i < AllPrices.Count; i++)
+			{
+				if (AllPrices[i] == v)
+				{
+					return i;
+				}
+			}
+			return 1;
+		}
+		private Decimal PreviousPrice(Decimal v)
+		{
+			return AllPrices[PriceIndex(v) - 1];
+		}
+		private Decimal NextPrice(Decimal v)
+		{
+			return AllPrices[PriceIndex(v) + 1];
+		}
+		public void SyncStakes()
+		{
+			Int32 offset = Convert.ToInt32(CutStakes.Value);
 			for (Int32 i = 0; i < 10; i++)
 			{
-				Values[BACKSTAKES][i] = 10 * (value + i);
-				Values[LAYSTAKES][i] = 10 * (value + i);
+				Values[BACKSTAKES][i] = 10 * (offset + i);
+				Values[LAYSTAKES][i] = 10 * (offset + i);
 			}
 			NotifyPropertyChanged("");
 		}
-		public void MovePrices(Int32 side, Int32 value)	
+		public void SyncPrices()
 		{
-			Decimal p = Price;
-			for (int i = 0; i < Math.Abs(value); i++)
+			for (Int32 side = BACKPRICES; side <= LAYPRICES; side++)
 			{
-				if (value > 0)
-					p = BetfairAPI.BetfairAPI.NextPrice(p);
-				else
-					p = BetfairAPI.BetfairAPI.PreviousPrice(p);
-			}
-			for (int i = 0; i < Math.Abs(9); i++)
-			{
-				p = BetfairAPI.BetfairAPI.PreviousPrice(p);
-			}
-			for (int i = 0; i < 9; i++)
-			{
-				Values[side][i] = p;
-				p = BetfairAPI.BetfairAPI.NextPrice(p);
+				Int32 base_index = PriceIndex(BasePrice)-9;
+				Int32 offset = Convert.ToInt32(side == 0 ? MoveBack.Value : MoveLay.Value);
+				for (int i = 0; i < 9; i++)
+				{
+					Values[side][i] = AllPrices[base_index + offset + i];// + BasePrice - 1.01M;
+				}
 			}
 			NotifyPropertyChanged("");
 		}
@@ -86,31 +111,40 @@ namespace SpreadTrader
 		{
 			Slider slider = sender as Slider;
 			String tag = slider.Tag as String;
-			Int32 value = Convert.ToInt32(e.NewValue);
 			switch (tag)
 			{
-				case "CutStakes": CutStakes(value+50); break;
-				case "MoveBack": MovePrices(BACKPRICES, value); break;
-				case "MoveLay": MovePrices(LAYPRICES, value); break;
+				case "CutStakes": SyncStakes(); break;
+				case "MoveBack": SyncPrices(); break;
+				case "MoveLay": SyncPrices(); break;
 			}
-			NotifyPropertyChanged("");
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			Button b = sender as Button;
 			switch (b.Tag)
 			{
-				case "-": Price = BetfairAPI.BetfairAPI.PreviousPrice(Price); break;
-				case "+": Price = BetfairAPI.BetfairAPI.NextPrice(Price); break;
+				case "-": BasePrice = PreviousPrice(BasePrice); break;
+				case "+": BasePrice = NextPrice(BasePrice); break;
 				default: return;
 			}
-			MovePrices(BACKPRICES, Convert.ToInt32(MoveBack.Value));
-			MovePrices(LAYPRICES, Convert.ToInt32(MoveLay.Value));
-			NotifyPropertyChanged("");
+			SyncPrices();
 		}
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
-			NotifyPropertyChanged("");
+			SyncPrices();
+		}
+		private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+		{
+			TextBox tx = sender as TextBox;
+			if (!String.IsNullOrEmpty(tx.Text))
+			{
+				BasePrice = BetfairAPI.BetfairAPI.BetfairPrice(Convert.ToDecimal(tx.Text));
+				props.BasePrice = BasePrice;
+				SyncPrices();
+				tx.Text = Convert.ToString(BasePrice);
+				NotifyPropertyChanged("");
+				props.Save();
+			}
 		}
 	}
 }

@@ -11,8 +11,8 @@
 		<Style BasedOn="{StaticResource {x:Type Slider}}" 
             TargetType="{x:Type Slider}">
 			<Setter Property="Orientation" Value="Horizontal"/>
-			<Setter Property="Minimum" Value="-50"/>
-			<Setter Property="Maximum" Value="50"/>
+			<Setter Property="Minimum" Value="-10"/>
+			<Setter Property="Maximum" Value="10"/>
 			<Setter Property="Value" Value="0"/>
 			<Setter Property="VerticalAlignment" Value="Center"/>
 			<EventSetter Event="ValueChanged" Handler="Slider_ValueChanged"/>
@@ -20,8 +20,8 @@
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
             TargetType="{x:Type Button}">
 			<Setter Property="Height" Value="28"/>
-			<Setter Property="FontSize" Value="28"/>
-			<Setter Property="Padding" Value="0,-8,0,0"/>
+			<Setter Property="FontSize" Value="18"/>
+			<Setter Property="Padding" Value="0,-4,0,0"/>
 			<EventSetter Event="Click" Handler="Button_Click"/>
 		</Style>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
@@ -47,22 +47,18 @@
 							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
 						<Button Grid.Column="0" Tag="-"  Content="-" ></Button>
-						<Label Grid.Column="1" Content="{Binding Path=Price}" Background="LightCyan"></Label>
+						<TextBox Grid.Column="1" Text="{Binding Path=BasePrice}" Background="LightCyan" LostFocus="TextBox_LostFocus" ></TextBox>
 						<Button Grid.Column="2" Tag="+" Content="+" ></Button>
 					</Grid>
 				</Grid>
-				<!--<Grid>
-					<Grid.ColumnDefinitions>
-					</Grid.ColumnDefinitions>
-					<Button Grid.Column="0" Content="Execute Bets" Background="OrangeRed" Foreground="White"/>
-				</Grid>-->
+				<Button Content="Execute Bets" Background="OrangeRed" Foreground="White"/>
 				<Grid>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="110" />
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Cut Stakes By %" HorizontalContentAlignment="Left" />
-					<Slider Grid.Column="1" Tag="CutStakes"/>
+					<Slider Grid.Column="1" Name="CutStakes" Tag="CutStakes" Minimum="0" Maximum="10" Value="10"/>
 				</Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>

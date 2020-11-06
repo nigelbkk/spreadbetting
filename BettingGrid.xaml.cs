@@ -31,19 +31,5 @@ namespace SpreadTrader
 			Values = values;
 			NotifyPropertyChanged("");
 		}
-		//public void OnSliderChanged(List<Decimal> prices, List<Decimal> stakes)
-		//{
-		//	Stakes = stakes;
-		//	Prices = prices;
-		//	NotifyPropertyChanged("");
-		//}
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-			Button b = sender as Button;
-			switch (b.Tag)
-			{
-			}
-			NotifyPropertyChanged("");
-		}
 	}
 }

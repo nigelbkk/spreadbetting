@@ -230,24 +230,36 @@ namespace SpreadTrader.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("120")]
-        public double LowerSplitter {
+        public double Splitter1 {
             get {
-                return ((double)(this["LowerSplitter"]));
+                return ((double)(this["Splitter1"]));
             }
             set {
-                this["LowerSplitter"] = value;
+                this["Splitter1"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("120")]
-        public double UpperSplitter {
+        public double Splitter2 {
             get {
-                return ((double)(this["UpperSplitter"]));
+                return ((double)(this["Splitter2"]));
             }
             set {
-                this["UpperSplitter"] = value;
+                this["Splitter2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public decimal BasePrice {
+            get {
+                return ((decimal)(this["BasePrice"]));
+            }
+            set {
+                this["BasePrice"] = value;
             }
         }
     }

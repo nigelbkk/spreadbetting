@@ -14,7 +14,7 @@
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
             TargetType="{x:Type Button}">
 			<Setter Property="FontSize" Value="12"/>
-			<EventSetter Event="Click" Handler="Button_Click"/>
+			<!--<EventSetter Event="Click" Handler="Button_Click"/>-->
 		</Style>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
@@ -69,34 +69,6 @@
 					</ItemsControl>
 				</Grid>
 				<Grid>
-					<ItemsControl Style="{StaticResource GridItemsStyle}" >
-						<Label Grid.Column="0" Content="Lay Prices" HorizontalContentAlignment="Left"/>
-						<Label Grid.Column="1" Content="{Binding Path=Values[2][0]}"/>
-						<Label Grid.Column="2" Content="{Binding Path=Values[2][1]}"/>
-						<Label Grid.Column="3" Content="{Binding Path=Values[2][2]}"/>
-						<Label Grid.Column="4" Content="{Binding Path=Values[2][3]}"/>
-						<Label Grid.Column="5" Content="{Binding Path=Values[2][4]}"/>
-						<Label Grid.Column="6" Content="{Binding Path=Values[2][5]}"/>
-						<Label Grid.Column="7" Content="{Binding Path=Values[2][6]}"/>
-						<Label Grid.Column="8" Content="{Binding Path=Values[2][7]}"/>
-						<Label Grid.Column="9" Content="{Binding Path=Values[2][8]}"/>
-					</ItemsControl>
-				</Grid>
-				<Grid>
-					<ItemsControl Style="{StaticResource GridItemsStyle}" >
-						<Label Grid.Column="0" Content="Lay Stakes" HorizontalContentAlignment="Left"/>
-						<Label Grid.Column="1" Content="{Binding Path=Values[3][0]}"/>
-						<Label Grid.Column="2" Content="{Binding Path=Values[3][1]}"/>
-						<Label Grid.Column="3" Content="{Binding Path=Values[3][2]}"/>
-						<Label Grid.Column="4" Content="{Binding Path=Values[3][3]}"/>
-						<Label Grid.Column="5" Content="{Binding Path=Values[3][4]}"/>
-						<Label Grid.Column="6" Content="{Binding Path=Values[3][5]}"/>
-						<Label Grid.Column="7" Content="{Binding Path=Values[3][6]}"/>
-						<Label Grid.Column="8" Content="{Binding Path=Values[3][7]}"/>
-						<Label Grid.Column="9" Content="{Binding Path=Values[3][8]}"/>
-					</ItemsControl>
-				</Grid>
-				<Grid>
 					<ItemsControl Style="{StaticResource GridItemsStyle}">
 						<StackPanel Orientation="Horizontal">
 							<Label Grid.Column="0" Content="Active" HorizontalContentAlignment="Left" Width="140"/>
@@ -130,6 +102,20 @@
 				<Grid>
 					<ItemsControl Style="{StaticResource GridItemsStyle}" >
 						<Label Grid.Column="0" Content="Back Stakes" HorizontalContentAlignment="Left"/>
+						<Label Grid.Column="1" Content="{Binding Path=Values[2][0]}"/>
+						<Label Grid.Column="2" Content="{Binding Path=Values[2][1]}"/>
+						<Label Grid.Column="3" Content="{Binding Path=Values[2][2]}"/>
+						<Label Grid.Column="4" Content="{Binding Path=Values[2][3]}"/>
+						<Label Grid.Column="5" Content="{Binding Path=Values[2][4]}"/>
+						<Label Grid.Column="6" Content="{Binding Path=Values[2][5]}"/>
+						<Label Grid.Column="7" Content="{Binding Path=Values[2][6]}"/>
+						<Label Grid.Column="8" Content="{Binding Path=Values[2][7]}"/>
+						<Label Grid.Column="9" Content="{Binding Path=Values[2][8]}"/>
+					</ItemsControl>
+				</Grid>
+				<Grid>
+					<ItemsControl Style="{StaticResource GridItemsStyle}" >
+						<Label Grid.Column="0" Content="Lay Prices" HorizontalContentAlignment="Left"/>
 						<Label Grid.Column="1" Content="{Binding Path=Values[1][0]}"/>
 						<Label Grid.Column="2" Content="{Binding Path=Values[1][1]}"/>
 						<Label Grid.Column="3" Content="{Binding Path=Values[1][2]}"/>
@@ -139,6 +125,20 @@
 						<Label Grid.Column="7" Content="{Binding Path=Values[1][6]}"/>
 						<Label Grid.Column="8" Content="{Binding Path=Values[1][7]}"/>
 						<Label Grid.Column="9" Content="{Binding Path=Values[1][8]}"/>
+					</ItemsControl>
+				</Grid>
+				<Grid>
+					<ItemsControl Style="{StaticResource GridItemsStyle}" >
+						<Label Grid.Column="0" Content="Lay Stakes" HorizontalContentAlignment="Left"/>
+						<Label Grid.Column="1" Content="{Binding Path=Values[3][0]}"/>
+						<Label Grid.Column="2" Content="{Binding Path=Values[3][1]}"/>
+						<Label Grid.Column="3" Content="{Binding Path=Values[3][2]}"/>
+						<Label Grid.Column="4" Content="{Binding Path=Values[3][3]}"/>
+						<Label Grid.Column="5" Content="{Binding Path=Values[3][4]}"/>
+						<Label Grid.Column="6" Content="{Binding Path=Values[3][5]}"/>
+						<Label Grid.Column="7" Content="{Binding Path=Values[3][6]}"/>
+						<Label Grid.Column="8" Content="{Binding Path=Values[3][7]}"/>
+						<Label Grid.Column="9" Content="{Binding Path=Values[3][8]}"/>
 					</ItemsControl>
 				</Grid>
 			</StackPanel>

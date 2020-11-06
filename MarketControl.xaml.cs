@@ -44,14 +44,14 @@ namespace SpreadTrader
 		private void LowerGrid_Loaded(object sender, RoutedEventArgs e)
 		{
 			Grid grid = sender as Grid;
-			if (props.LowerSplitter > 0 && grid.RowDefinitions.Count > 0)
-				grid.RowDefinitions[0].Height = new GridLength(props.LowerSplitter, GridUnitType.Pixel);
+			if (props.Splitter1 > 0 && grid.RowDefinitions.Count > 0)
+				grid.RowDefinitions[0].Height = new GridLength(props.Splitter1, GridUnitType.Pixel);
 		}
 		private void UpperGrid_Loaded(object sender, RoutedEventArgs e)
 		{
 			Grid grid = sender as Grid;
-			if (props.UpperSplitter > 0 && grid.RowDefinitions.Count > 0)
-				grid.RowDefinitions[0].Height = new GridLength(props.UpperSplitter, GridUnitType.Pixel);
+			if (props.Splitter2 > 0 && grid.RowDefinitions.Count > 0)
+				grid.RowDefinitions[0].Height = new GridLength(props.Splitter2, GridUnitType.Pixel);
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -86,12 +86,12 @@ namespace SpreadTrader
 		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
 		{
 			GridSplitter gs = sender as GridSplitter;
-			props.UpperSplitter = RunnersGrid.ActualHeight;
+			props.Splitter2 = RunnersGrid.ActualHeight;
 		}
 		private void GridSplitter_DragCompleted_1(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
 		{
 			GridSplitter gs = sender as GridSplitter;
-			props.LowerSplitter = BettingGrid.ActualHeight;
+			props.Splitter1 = BettingGrid.ActualHeight;
 		}
 	}
 }
