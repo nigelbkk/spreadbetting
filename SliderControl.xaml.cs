@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -9,20 +10,22 @@ namespace SpreadTrader
 	public partial class SliderControl : UserControl, INotifyPropertyChanged
 	{
 		private const Int32 BACKPRICES = 0;
-		private const Int32 LAYPRICES = 1;
-		private const Int32 BACKSTAKES = 2;
-		private const Int32 LAYSTAKES = 3;
+		private const Int32 BACKSTAKES = 10;
+		private const Int32 LAYPRICES = 20;
+		private const Int32 LAYSTAKES = 30;
 		public SliderChangedDelegate OnSliderChanged = null;
-		private List<List<Decimal>> Values { get; set; }
+		public Decimal[] Values { get; set; }
+
+//		private List<List<Decimal>> Values { get; set; }
 		private List<Decimal> AllPrices = null;
 		public SliderControl()
 		{
-			BasePrice = props.BasePrice;// 1.52M;
-			Values = new List<List<decimal>>();
-			Values.Add(new List<Decimal>());
-			Values.Add(new List<Decimal>());
-			Values.Add(new List<Decimal>());
-			Values.Add(new List<Decimal>());
+			Values = new Decimal[40];
+			//Values = new List<List<decimal>>();
+			//Values.Add(new List<Decimal>());
+			//Values.Add(new List<Decimal>());
+			//Values.Add(new List<Decimal>());
+			//Values.Add(new List<Decimal>());
 
 			Decimal[] MinValue = { 1.01M, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
 			Decimal[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
@@ -38,20 +41,22 @@ namespace SpreadTrader
 					AllPrices.Add(m);
 				}
 			}
+			BasePrice = props.BasePrice;
 			for (Int32 i = 0; i < 9; i++)
 			{
-				Values[BACKPRICES].Add(AllPrices[i]);
-				Values[LAYPRICES].Add(AllPrices[i]);
+				Values[BACKPRICES+i]=AllPrices[i];
+				Values[LAYPRICES+i]=AllPrices[i];
 			}
 			for (Int32 i = 0; i < 10; i++)
 			{
-				Values[BACKSTAKES].Add(i + 9);
-				Values[LAYSTAKES].Add(i + 9);
+				Values[BACKSTAKES+i]=i + 9;
+				Values[LAYSTAKES+i]=i + 9;
 			}
 			Int32 index = PriceIndex(BasePrice);
 			InitializeComponent();
 		}
-		public Decimal BasePrice { get; set; }
+		private Decimal _BasePrice;
+		public Decimal BasePrice { get { return _BasePrice; } set { _BasePrice = Math.Max(value, 1.10M); } }
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
 		{
@@ -88,23 +93,34 @@ namespace SpreadTrader
 			Int32 offset = Convert.ToInt32(CutStakes.Value);
 			for (Int32 i = 0; i < 10; i++)
 			{
-				Values[BACKSTAKES][i] = 10 * (offset + i);
-				Values[LAYSTAKES][i] = 10 * (offset + i);
+				Values[BACKSTAKES + i] = 10 * (offset + i);
+				Values[LAYSTAKES + i] = 10 * (offset + i);
 			}
 			NotifyPropertyChanged("");
 		}
 		public void SyncPrices()
 		{
-			for (Int32 side = BACKPRICES; side <= LAYPRICES; side++)
+			try
 			{
-				Int32 base_index = PriceIndex(BasePrice)-9;
-				Int32 offset = Convert.ToInt32(side == 0 ? MoveBack.Value : MoveLay.Value);
-				for (int i = 0; i < 9; i++)
+				if (BasePrice < 1000 && BasePrice > 1.01M)
 				{
-					Values[side][i] = AllPrices[base_index + offset + i];// + BasePrice - 1.01M;
+					for (Int32 side = BACKPRICES; side <= LAYPRICES; side+=20)
+					{
+						Int32 base_index = PriceIndex(BasePrice) - 9;
+						base_index = Math.Max(base_index, 10);
+						base_index = Math.Min(base_index, 338);
+						Int32 offset = Convert.ToInt32(side == 0 ? MoveBack.Value : MoveLay.Value);
+						for (int i = 0; i < 9; i++)
+						{
+							Values[side+i] = AllPrices[base_index + offset + i];// + BasePrice - 1.01M;
+						}
+					}
+					NotifyPropertyChanged("");
 				}
 			}
-			NotifyPropertyChanged("");
+			catch (Exception xe)
+			{
+			}
 		}
 		private Properties.Settings props = Properties.Settings.Default;
 		private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -121,13 +137,16 @@ namespace SpreadTrader
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			Button b = sender as Button;
-			switch (b.Tag)
+			if (BasePrice < 1000 && BasePrice > 1.01M)
 			{
-				case "-": BasePrice = PreviousPrice(BasePrice); break;
-				case "+": BasePrice = NextPrice(BasePrice); break;
-				default: return;
+				switch (b.Tag)
+				{
+					case "-": BasePrice = PreviousPrice(BasePrice); break;
+					case "+": BasePrice = NextPrice(BasePrice); break;
+					default: return;
+				}
+				SyncPrices();
 			}
-			SyncPrices();
 		}
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{

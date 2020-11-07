@@ -36,8 +36,6 @@ namespace SpreadTrader
 			};
 			SliderControl.OnSliderChanged += BettingGridControl.OnSliderChanged;
 			{
-				//Stakes = slider.Stakes;
-				//Prices = slider.Prices;
 				NotifyPropertyChanged("");
 			};
 		}
@@ -65,7 +63,7 @@ namespace SpreadTrader
 						StackPanel sp = b.Content as StackPanel;
 						if (LowerGrid.RowDefinitions[0].ActualHeight == 0)
 						{
-							LowerGrid.RowDefinitions[0].Height = new GridLength(3, GridUnitType.Star);
+							LowerGrid.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Auto);
 							sp.Children[0].Visibility = Visibility.Visible;
 							sp.Children[1].Visibility = Visibility.Collapsed;
 						}

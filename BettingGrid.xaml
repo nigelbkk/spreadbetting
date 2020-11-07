@@ -5,11 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
 	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-             mc:Ignorable="d" d:DesignWidth="600" >
+             mc:Ignorable="d" d:DesignWidth="600" Loaded="UserControl_Loaded">
 	<UserControl.Resources>
 		<Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
 			<Setter Property="VerticalAlignment" Value="Center"/>
 			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<EventSetter Event="Click" Handler="CheckBox_Click"/>
 		</Style>
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
             TargetType="{x:Type Button}">
@@ -20,6 +21,15 @@
             TargetType="{x:Type Label}">
 			<Setter Property="FontSize" Value="12"/>
 			<Setter Property="Width" Value="auto"/>
+			<Style.Triggers>
+				<DataTrigger Binding="{Binding}" Value="99">
+					<Setter Property="Background" Value="Red" />
+				</DataTrigger>
+				<DataTrigger Binding="{Binding}" Value="0">
+					<Setter Property="Background" Value="Blue"/>
+					<Setter Property="Content" Value="66"/>
+				</DataTrigger>
+			</Style.Triggers>
 		</Style>
 		<Style x:Key="GridItemsStyle"
            TargetType="ItemsControl">
@@ -49,99 +59,98 @@
 		</Style>
 	</UserControl.Resources>
 	<Grid>
-		<Grid Name="Grid" Margin="0,8,0,8">
-			<StackPanel Orientation="Vertical">
-				<Grid>
-					<ItemsControl Style="{StaticResource GridItemsStyle}">
-						<StackPanel Orientation="Horizontal">
-							<Label Grid.Column="0" Content="Active" HorizontalContentAlignment="Left" Width="140"/>
-							<CheckBox/>
-						</StackPanel>
-						<CheckBox Grid.Column="1"></CheckBox>
-						<CheckBox Grid.Column="2"></CheckBox>
-						<CheckBox Grid.Column="3"></CheckBox>
-						<CheckBox Grid.Column="4"></CheckBox>
-						<CheckBox Grid.Column="5"></CheckBox>
-						<CheckBox Grid.Column="6"></CheckBox>
-						<CheckBox Grid.Column="7"></CheckBox>
-						<CheckBox Grid.Column="8"></CheckBox>
-						<CheckBox Grid.Column="9"></CheckBox>
-					</ItemsControl>
-				</Grid>
-				<Grid>
-					<ItemsControl Style="{StaticResource GridItemsStyle}">
-						<StackPanel Orientation="Horizontal">
-							<Label Grid.Column="0" Content="Active" HorizontalContentAlignment="Left" Width="140"/>
-							<CheckBox/>
-						</StackPanel>
-						<CheckBox Grid.Column="1"></CheckBox>
-						<CheckBox Grid.Column="2"></CheckBox>
-						<CheckBox Grid.Column="3"></CheckBox>
-						<CheckBox Grid.Column="4"></CheckBox>
-						<CheckBox Grid.Column="5"></CheckBox>
-						<CheckBox Grid.Column="6"></CheckBox>
-						<CheckBox Grid.Column="7"></CheckBox>
-						<CheckBox Grid.Column="8"></CheckBox>
-						<CheckBox Grid.Column="9"></CheckBox>
-					</ItemsControl>
-				</Grid>
-				<Grid>
-					<ItemsControl Style="{StaticResource GridItemsStyle}" >
-						<Label Grid.Column="0" Content="Back Prices" HorizontalContentAlignment="Left"/>
-						<Label Grid.Column="1" Content="{Binding Path=Values[0][0]}"/>
-						<Label Grid.Column="2" Content="{Binding Path=Values[0][1]}"/>
-						<Label Grid.Column="3" Content="{Binding Path=Values[0][2]}"/>
-						<Label Grid.Column="4" Content="{Binding Path=Values[0][3]}"/>
-						<Label Grid.Column="5" Content="{Binding Path=Values[0][4]}"/>
-						<Label Grid.Column="6" Content="{Binding Path=Values[0][5]}"/>
-						<Label Grid.Column="7" Content="{Binding Path=Values[0][6]}"/>
-						<Label Grid.Column="8" Content="{Binding Path=Values[0][7]}"/>
-						<Label Grid.Column="9" Content="{Binding Path=Values[0][8]}"/>
-					</ItemsControl>
-				</Grid>
-				<Grid>
-					<ItemsControl Style="{StaticResource GridItemsStyle}" >
-						<Label Grid.Column="0" Content="Back Stakes" HorizontalContentAlignment="Left"/>
-						<Label Grid.Column="1" Content="{Binding Path=Values[2][0]}"/>
-						<Label Grid.Column="2" Content="{Binding Path=Values[2][1]}"/>
-						<Label Grid.Column="3" Content="{Binding Path=Values[2][2]}"/>
-						<Label Grid.Column="4" Content="{Binding Path=Values[2][3]}"/>
-						<Label Grid.Column="5" Content="{Binding Path=Values[2][4]}"/>
-						<Label Grid.Column="6" Content="{Binding Path=Values[2][5]}"/>
-						<Label Grid.Column="7" Content="{Binding Path=Values[2][6]}"/>
-						<Label Grid.Column="8" Content="{Binding Path=Values[2][7]}"/>
-						<Label Grid.Column="9" Content="{Binding Path=Values[2][8]}"/>
-					</ItemsControl>
-				</Grid>
-				<Grid>
-					<ItemsControl Style="{StaticResource GridItemsStyle}" >
-						<Label Grid.Column="0" Content="Lay Prices" HorizontalContentAlignment="Left"/>
-						<Label Grid.Column="1" Content="{Binding Path=Values[1][0]}"/>
-						<Label Grid.Column="2" Content="{Binding Path=Values[1][1]}"/>
-						<Label Grid.Column="3" Content="{Binding Path=Values[1][2]}"/>
-						<Label Grid.Column="4" Content="{Binding Path=Values[1][3]}"/>
-						<Label Grid.Column="5" Content="{Binding Path=Values[1][4]}"/>
-						<Label Grid.Column="6" Content="{Binding Path=Values[1][5]}"/>
-						<Label Grid.Column="7" Content="{Binding Path=Values[1][6]}"/>
-						<Label Grid.Column="8" Content="{Binding Path=Values[1][7]}"/>
-						<Label Grid.Column="9" Content="{Binding Path=Values[1][8]}"/>
-					</ItemsControl>
-				</Grid>
-				<Grid>
-					<ItemsControl Style="{StaticResource GridItemsStyle}" >
-						<Label Grid.Column="0" Content="Lay Stakes" HorizontalContentAlignment="Left"/>
-						<Label Grid.Column="1" Content="{Binding Path=Values[3][0]}"/>
-						<Label Grid.Column="2" Content="{Binding Path=Values[3][1]}"/>
-						<Label Grid.Column="3" Content="{Binding Path=Values[3][2]}"/>
-						<Label Grid.Column="4" Content="{Binding Path=Values[3][3]}"/>
-						<Label Grid.Column="5" Content="{Binding Path=Values[3][4]}"/>
-						<Label Grid.Column="6" Content="{Binding Path=Values[3][5]}"/>
-						<Label Grid.Column="7" Content="{Binding Path=Values[3][6]}"/>
-						<Label Grid.Column="8" Content="{Binding Path=Values[3][7]}"/>
-						<Label Grid.Column="9" Content="{Binding Path=Values[3][8]}"/>
-					</ItemsControl>
-				</Grid>
-			</StackPanel>
-		</Grid>
+		<StackPanel Orientation="Vertical"  Name="StackPanel">
+			<Grid>
+				<ItemsControl Style="{StaticResource GridItemsStyle}" Name="BackCheckboxes">
+					<StackPanel Orientation="Horizontal">
+						<Label Grid.Column="0" Content="Active" HorizontalContentAlignment="Left" Width="140"/>
+						<CheckBox Tag="0"  IsChecked="{Binding Path=CheckBoxes[0]}"/>
+					</StackPanel>
+					<CheckBox Grid.Column="1" IsChecked="{Binding Path=CheckBoxes[1]}"></CheckBox>
+					<CheckBox Grid.Column="2" IsChecked="{Binding Path=CheckBoxes[2]}"></CheckBox>
+					<CheckBox Grid.Column="3" IsChecked="{Binding Path=CheckBoxes[3]}"></CheckBox>
+					<CheckBox Grid.Column="4" IsChecked="{Binding Path=CheckBoxes[4]}"></CheckBox>
+					<CheckBox Grid.Column="5" IsChecked="{Binding Path=CheckBoxes[5]}"></CheckBox>
+					<CheckBox Grid.Column="6" IsChecked="{Binding Path=CheckBoxes[6]}"></CheckBox>
+					<CheckBox Grid.Column="7" IsChecked="{Binding Path=CheckBoxes[7]}"></CheckBox>
+					<CheckBox Grid.Column="8" IsChecked="{Binding Path=CheckBoxes[8]}"></CheckBox>
+					<CheckBox Grid.Column="9" IsChecked="{Binding Path=CheckBoxes[9]}"></CheckBox>
+				</ItemsControl>
+			</Grid>
+			<!--<Button Height="20" Width="20" Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplatedParent.(ItemsControl.AlternationIndex)}"  Margin="2">-->
+			<Grid>
+				<ItemsControl Style="{StaticResource GridItemsStyle}" Name="BackPrices">
+					<Label Grid.Column="0" Content="Back Prices" HorizontalContentAlignment="Left"/>
+					<Label Grid.Column="1" Content="{Binding Path=Values[0]}"/>
+					<Label Grid.Column="2" Content="{Binding Path=Values[1]}"/>
+					<Label Grid.Column="3" Content="{Binding Path=Values[2]}"/>
+					<Label Grid.Column="4" Content="{Binding Path=Values[3]}"/>
+					<Label Grid.Column="5" Content="{Binding Path=Values[4]}"/>
+					<Label Grid.Column="6" Content="{Binding Path=Values[5]}"/>
+					<Label Grid.Column="7" Content="{Binding Path=Values[6]}"/>
+					<Label Grid.Column="8" Content="{Binding Path=Values[7]}"/>
+					<Label Grid.Column="9" Content="{Binding Path=Values[8]}"/>
+				</ItemsControl>
+			</Grid>
+			<Grid>
+				<ItemsControl Style="{StaticResource GridItemsStyle}"  Name="BackStakes">
+					<Label Grid.Column="0" Content="Back Stakes" HorizontalContentAlignment="Left"/>
+					<Label Grid.Column="1" Content="{Binding Path=Values[10]}"/>
+					<Label Grid.Column="2" Content="{Binding Path=Values[11]}"/>
+					<Label Grid.Column="3" Content="{Binding Path=Values[12]}"/>
+					<Label Grid.Column="4" Content="{Binding Path=Values[13]}"/>
+					<Label Grid.Column="5" Content="{Binding Path=Values[14]}"/>
+					<Label Grid.Column="6" Content="{Binding Path=Values[15]}"/>
+					<Label Grid.Column="7" Content="{Binding Path=Values[16]}"/>
+					<Label Grid.Column="8" Content="{Binding Path=Values[17]}"/>
+					<Label Grid.Column="9" Content="{Binding Path=Values[18]}"/>
+				</ItemsControl>
+			</Grid>
+			<Grid>
+				<ItemsControl Style="{StaticResource GridItemsStyle}"  Name="LayCheckboxes">
+					<StackPanel Orientation="Horizontal">
+						<Label Grid.Column="0" Content="Active" HorizontalContentAlignment="Left" Width="140"/>
+						<CheckBox Tag="10"  IsChecked="{Binding Path=CheckBoxes[10]}" Margin="0,0,0,1.333"/>
+					</StackPanel>
+					<CheckBox Grid.Column="1" IsChecked="{Binding Path=CheckBoxes[11]}"></CheckBox>
+					<CheckBox Grid.Column="2" IsChecked="{Binding Path=CheckBoxes[12]}"></CheckBox>
+					<CheckBox Grid.Column="3" IsChecked="{Binding Path=CheckBoxes[13]}"></CheckBox>
+					<CheckBox Grid.Column="4" IsChecked="{Binding Path=CheckBoxes[14]}"></CheckBox>
+					<CheckBox Grid.Column="5" IsChecked="{Binding Path=CheckBoxes[15]}"></CheckBox>
+					<CheckBox Grid.Column="6" IsChecked="{Binding Path=CheckBoxes[16]}"></CheckBox>
+					<CheckBox Grid.Column="7" IsChecked="{Binding Path=CheckBoxes[17]}"></CheckBox>
+					<CheckBox Grid.Column="8" IsChecked="{Binding Path=CheckBoxes[18]}"></CheckBox>
+					<CheckBox Grid.Column="9" IsChecked="{Binding Path=CheckBoxes[19]}"></CheckBox>
+				</ItemsControl>
+			</Grid>
+			<Grid>
+				<ItemsControl Style="{StaticResource GridItemsStyle}"  Name="LayPrices">
+					<Label Grid.Column="0" Content="Lay Prices" HorizontalContentAlignment="Left"/>
+					<Label Grid.Column="1" Content="{Binding Path=Values[20]}"/>
+					<Label Grid.Column="2" Content="{Binding Path=Values[21]}"/>
+					<Label Grid.Column="3" Content="{Binding Path=Values[22]}"/>
+					<Label Grid.Column="4" Content="{Binding Path=Values[23]}"/>
+					<Label Grid.Column="5" Content="{Binding Path=Values[24]}"/>
+					<Label Grid.Column="6" Content="{Binding Path=Values[25]}"/>
+					<Label Grid.Column="7" Content="{Binding Path=Values[26]}"/>
+					<Label Grid.Column="8" Content="{Binding Path=Values[27]}"/>
+					<Label Grid.Column="9" Content="{Binding Path=Values[28]}"/>
+				</ItemsControl>
+			</Grid>
+			<Grid>
+				<ItemsControl Style="{StaticResource GridItemsStyle}"  Name="LayStakes">
+					<Label Grid.Column="0" Content="Lay Stakes" HorizontalContentAlignment="Left"/>
+					<Label Grid.Column="1" Content="{Binding Path=Values[30]}"/>
+					<Label Grid.Column="2" Content="{Binding Path=Values[31]}"/>
+					<Label Grid.Column="3" Content="{Binding Path=Values[32]}"/>
+					<Label Grid.Column="4" Content="{Binding Path=Values[33]}"/>
+					<Label Grid.Column="5" Content="{Binding Path=Values[34]}"/>
+					<Label Grid.Column="6" Content="{Binding Path=Values[35]}"/>
+					<Label Grid.Column="7" Content="{Binding Path=Values[36]}"/>
+					<Label Grid.Column="8" Content="{Binding Path=Values[37]}"/>
+					<Label Grid.Column="9" Content="{Binding Path=Values[38]}"/>
+				</ItemsControl>
+			</Grid>
+		</StackPanel>
 	</Grid>
 </UserControl>
