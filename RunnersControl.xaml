@@ -105,9 +105,9 @@
 						<Label Content="{Binding Path=LayStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" Visibility="Visible" MouseDown="label_MouseDown"/>
 						<TextBox Visibility="Hidden" Text="{Binding Path=LayStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" KeyDown="TextBox_KeyDown" MouseDoubleClick="TextBox_MouseDoubleClick" />
 					</Grid>
-					<Label Content="{Binding Path=Profit, Mode=OneWay, StringFormat=\{0:#.#\}}" Tag="Level Profit"  />
-					<Label Content="{Binding Path=LastPrice, Mode=OneWay, StringFormat=\{0:#.#\}}" Tag="Level Profit" />
-					<Label Content="{Binding Path=LastPrice, Mode=OneWay, StringFormat=\{0:#.#\}}" Tag="Last Price" />
+					<Label Content="{Binding Path=Profit, Mode=OneWay, StringFormat=\{0:#.#\}}"/>
+					<Label Content="{Binding Path=LevelProfit, Mode=OneWay, StringFormat=\{0:#.#\}}"/>
+					<Label Content="{Binding Path=LastPrice, Mode=OneWay, StringFormat=\{0:#.#\}}"/>
 				</StackPanel>
 			</Grid>
 		</DataTemplate>

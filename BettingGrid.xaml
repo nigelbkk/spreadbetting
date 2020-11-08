@@ -21,15 +21,11 @@
             TargetType="{x:Type Label}">
 			<Setter Property="FontSize" Value="12"/>
 			<Setter Property="Width" Value="auto"/>
-			<Style.Triggers>
-				<DataTrigger Binding="{Binding}" Value="99">
-					<Setter Property="Background" Value="Red" />
-				</DataTrigger>
-				<DataTrigger Binding="{Binding}" Value="0">
-					<Setter Property="Background" Value="Blue"/>
-					<Setter Property="Content" Value="66"/>
-				</DataTrigger>
-			</Style.Triggers>
+		</Style>
+		<Style BasedOn="{StaticResource {x:Type TextBox}}" 
+            TargetType="{x:Type TextBox}">
+			<Setter Property="FontSize" Value="12"/>
+			<Setter Property="Width" Value="auto"/>
 		</Style>
 		<Style x:Key="GridItemsStyle"
            TargetType="ItemsControl">
@@ -95,15 +91,15 @@
 			<Grid>
 				<ItemsControl Style="{StaticResource GridItemsStyle}"  Name="BackStakes">
 					<Label Grid.Column="0" Content="Back Stakes" HorizontalContentAlignment="Left"/>
-					<Label Grid.Column="1" Content="{Binding Path=Values[10]}"/>
-					<Label Grid.Column="2" Content="{Binding Path=Values[11]}"/>
-					<Label Grid.Column="3" Content="{Binding Path=Values[12]}"/>
-					<Label Grid.Column="4" Content="{Binding Path=Values[13]}"/>
-					<Label Grid.Column="5" Content="{Binding Path=Values[14]}"/>
-					<Label Grid.Column="6" Content="{Binding Path=Values[15]}"/>
-					<Label Grid.Column="7" Content="{Binding Path=Values[16]}"/>
-					<Label Grid.Column="8" Content="{Binding Path=Values[17]}"/>
-					<Label Grid.Column="9" Content="{Binding Path=Values[18]}"/>
+					<TextBox Grid.Column="1" Text="{Binding Path=Values[10], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="2" Text="{Binding Path=Values[11], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="3" Text="{Binding Path=Values[12], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="4" Text="{Binding Path=Values[13], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="5" Text="{Binding Path=Values[14], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="6" Text="{Binding Path=Values[15], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="7" Text="{Binding Path=Values[16], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="8" Text="{Binding Path=Values[17], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="9" Text="{Binding Path=Values[18], StringFormat={}{0:N0}}"/>
 				</ItemsControl>
 			</Grid>
 			<Grid>
@@ -140,15 +136,15 @@
 			<Grid>
 				<ItemsControl Style="{StaticResource GridItemsStyle}"  Name="LayStakes">
 					<Label Grid.Column="0" Content="Lay Stakes" HorizontalContentAlignment="Left"/>
-					<Label Grid.Column="1" Content="{Binding Path=Values[30]}"/>
-					<Label Grid.Column="2" Content="{Binding Path=Values[31]}"/>
-					<Label Grid.Column="3" Content="{Binding Path=Values[32]}"/>
-					<Label Grid.Column="4" Content="{Binding Path=Values[33]}"/>
-					<Label Grid.Column="5" Content="{Binding Path=Values[34]}"/>
-					<Label Grid.Column="6" Content="{Binding Path=Values[35]}"/>
-					<Label Grid.Column="7" Content="{Binding Path=Values[36]}"/>
-					<Label Grid.Column="8" Content="{Binding Path=Values[37]}"/>
-					<Label Grid.Column="9" Content="{Binding Path=Values[38]}"/>
+					<TextBox Grid.Column="1" Text="{Binding Path=Values[30], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="2" Text="{Binding Path=Values[31], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="3" Text="{Binding Path=Values[32], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="4" Text="{Binding Path=Values[33], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="5" Text="{Binding Path=Values[34], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="6" Text="{Binding Path=Values[35], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="7" Text="{Binding Path=Values[36], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="8" Text="{Binding Path=Values[37], StringFormat={}{0:N0}}"/>
+					<TextBox Grid.Column="9" Text="{Binding Path=Values[38], StringFormat={}{0:N0}}"/>
 				</ItemsControl>
 			</Grid>
 		</StackPanel>

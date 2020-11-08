@@ -12,7 +12,7 @@ namespace SpreadTrader
 	public delegate void SliderChangedDelegate(Decimal[] values);
 	public partial class BettingGrid : UserControl, INotifyPropertyChanged
 	{
-		public bool?[] CheckBoxes { get; set; }
+		public bool[] CheckBoxes { get; set; }
 		public Decimal[] Values { get; set; }
 		public List<Decimal> Prices { get; set; }
 		public List<Decimal> Stakes { get; set; }
@@ -27,12 +27,16 @@ namespace SpreadTrader
 		public BettingGrid()
 		{
 			InitializeComponent();
-			CheckBoxes = new bool?[20];
 			Values = new Decimal[40];
+			SliderControl.Values = Values;
+			CheckBoxes = new bool[20];
+			for (int i = 0; i < 20; i++)
+			{
+				CheckBoxes[i] = true;
+			}
 		}
 		public void OnSliderChanged(Decimal[] values)
 		{
-			Values = values;
 			NotifyPropertyChanged("");
 		}
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -56,22 +60,23 @@ namespace SpreadTrader
 				}
 			}
 		}
-		private void DisableLabel(Int32 idx, bool? value)
+		private void DisableLabel(Int32 idx, bool value)
 		{
 			Label label = null;
+			TextBox tb = null;
 			switch (idx / 10)
 			{
 				case 0:
 					label = BackPrices.Items[idx] as Label;
 					label.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
-					label = BackStakes.Items[idx] as Label;
-					label.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
+					tb = BackStakes.Items[idx] as TextBox;
+					tb.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
 					break;
 				case 1:
 					label = LayPrices.Items[idx-10] as Label;
 					label.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
-					label = LayStakes.Items[idx-10] as Label;
-					label.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
+					tb = LayStakes.Items[idx-10] as TextBox;
+					tb.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
 					break;
 			}
 		}
@@ -83,11 +88,11 @@ namespace SpreadTrader
 			{
 				for(int i= 1;i<10; i++)
 				{
-					CheckBoxes[tag+i] = cb.IsChecked;
-					DisableLabel(tag+i, cb.IsChecked);
+					CheckBoxes[tag+i] = cb.IsChecked==true;
+					DisableLabel(tag+i, cb.IsChecked==true);
 				}
 			}
-			DisableLabel(tag, cb.IsChecked);
+			DisableLabel(tag, cb.IsChecked==true);
 			NotifyPropertyChanged("");
 		}
 	}

@@ -35,9 +35,6 @@ namespace SpreadTrader
 				}
 			};
 			SliderControl.OnSliderChanged += BettingGridControl.OnSliderChanged;
-			{
-				NotifyPropertyChanged("");
-			};
 		}
 		private void LowerGrid_Loaded(object sender, RoutedEventArgs e)
 		{

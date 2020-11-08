@@ -14,19 +14,10 @@ namespace SpreadTrader
 		private const Int32 LAYPRICES = 20;
 		private const Int32 LAYSTAKES = 30;
 		public SliderChangedDelegate OnSliderChanged = null;
-		public Decimal[] Values { get; set; }
-
-//		private List<List<Decimal>> Values { get; set; }
+		public static Decimal[] Values { get; set; }
 		private List<Decimal> AllPrices = null;
 		public SliderControl()
 		{
-			Values = new Decimal[40];
-			//Values = new List<List<decimal>>();
-			//Values.Add(new List<Decimal>());
-			//Values.Add(new List<Decimal>());
-			//Values.Add(new List<Decimal>());
-			//Values.Add(new List<Decimal>());
-
 			Decimal[] MinValue = { 1.01M, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
 			Decimal[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
 			Decimal[] Increment = { 0.01M, 0.02M, 0.05M, 0.1M, 0.2M, 0.5M, 1, 2, 5, 10 };
@@ -42,16 +33,6 @@ namespace SpreadTrader
 				}
 			}
 			BasePrice = props.BasePrice;
-			for (Int32 i = 0; i < 9; i++)
-			{
-				Values[BACKPRICES+i]=AllPrices[i];
-				Values[LAYPRICES+i]=AllPrices[i];
-			}
-			for (Int32 i = 0; i < 10; i++)
-			{
-				Values[BACKSTAKES+i]=i + 9;
-				Values[LAYSTAKES+i]=i + 9;
-			}
 			Int32 index = PriceIndex(BasePrice);
 			InitializeComponent();
 		}
@@ -88,14 +69,33 @@ namespace SpreadTrader
 		{
 			return AllPrices[PriceIndex(v) + 1];
 		}
-		public void SyncStakes()
+		public void MoveStakes(Int32 newvalue, Int32 oldvalue)
 		{
-			Int32 offset = Convert.ToInt32(CutStakes.Value);
 			for (Int32 i = 0; i < 10; i++)
 			{
-				Values[BACKSTAKES + i] = 10 * (offset + i);
-				Values[LAYSTAKES + i] = 10 * (offset + i);
+				Decimal vb = Values[BACKSTAKES + i];
+				Decimal vl = Values[LAYSTAKES + i];
+				if (newvalue > oldvalue)
+				{
+					vb /= 9; vb *= 10;
+					vl /= 9; vl *= 10;
+					Values[BACKSTAKES + i] = vb;
+					Values[LAYSTAKES + i] = vl;
+				}
+				else if (oldvalue > newvalue)
+				{
+					vl /= 10; vl *= 9;
+					vb /= 10;	vb *= 9;
+					Values[BACKSTAKES + i] = vb;
+					Values[LAYSTAKES + i] = vl;
+				}
 			}
+			//Int32 offset = Convert.ToInt32(CutStakes.Value);
+			//for (Int32 i = 0; i < 10; i++)
+			//{
+			//	Values[BACKSTAKES + i] = Math.Round(Values[BACKSTAKES + i] * offset/10, 0);
+			//	Values[LAYSTAKES + i] = Values[LAYSTAKES + i] * offset/10;
+			//}
 			NotifyPropertyChanged("");
 		}
 		public void SyncPrices()
@@ -129,7 +129,7 @@ namespace SpreadTrader
 			String tag = slider.Tag as String;
 			switch (tag)
 			{
-				case "CutStakes": SyncStakes(); break;
+				case "CutStakes": MoveStakes((Int32) e.NewValue, (Int32) e.OldValue); break;
 				case "MoveBack": SyncPrices(); break;
 				case "MoveLay": SyncPrices(); break;
 			}
@@ -150,6 +150,15 @@ namespace SpreadTrader
 		}
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
+			for (Int32 i = 0; i < 9; i++)
+			{
+				Values[BACKPRICES + i] = AllPrices[i];
+				Values[LAYPRICES + i] = AllPrices[i];
+			}
+			for (Int32 i = 0; i < 10; i++)
+			{
+				Values[LAYSTAKES + i] = Values[BACKSTAKES + i] = 20 + i*10;
+			}
 			SyncPrices();
 		}
 		private void TextBox_LostFocus(object sender, RoutedEventArgs e)
