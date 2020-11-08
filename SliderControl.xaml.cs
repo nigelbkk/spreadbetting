@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace SpreadTrader
 {
@@ -37,6 +38,7 @@ namespace SpreadTrader
 			InitializeComponent();
 		}
 		private Decimal _BasePrice;
+		public bool AutoOn { get; set; }
 		public Decimal BasePrice { get { return _BasePrice; } set { _BasePrice = Math.Max(value, 1.10M); } }
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
@@ -73,29 +75,18 @@ namespace SpreadTrader
 		{
 			for (Int32 i = 0; i < 10; i++)
 			{
-				Decimal vb = Values[BACKSTAKES + i];
-				Decimal vl = Values[LAYSTAKES + i];
+				Decimal vb = Values[BACKSTAKES + i]; Decimal vl = Values[LAYSTAKES + i];
 				if (newvalue > oldvalue)
 				{
-					vb /= 9; vb *= 10;
-					vl /= 9; vl *= 10;
-					Values[BACKSTAKES + i] = vb;
-					Values[LAYSTAKES + i] = vl;
+					vb /= 9; vb *= 10; vl /= 9; vl *= 10;
+					Values[BACKSTAKES + i] = vb; Values[LAYSTAKES + i] = vl;
 				}
 				else if (oldvalue > newvalue)
 				{
-					vl /= 10; vl *= 9;
-					vb /= 10;	vb *= 9;
-					Values[BACKSTAKES + i] = vb;
-					Values[LAYSTAKES + i] = vl;
+					vl /= 10; vl *= 9; vb /= 10; vb *= 9;
+					Values[BACKSTAKES + i] = vb; Values[LAYSTAKES + i] = vl;
 				}
 			}
-			//Int32 offset = Convert.ToInt32(CutStakes.Value);
-			//for (Int32 i = 0; i < 10; i++)
-			//{
-			//	Values[BACKSTAKES + i] = Math.Round(Values[BACKSTAKES + i] * offset/10, 0);
-			//	Values[LAYSTAKES + i] = Values[LAYSTAKES + i] * offset/10;
-			//}
 			NotifyPropertyChanged("");
 		}
 		public void SyncPrices()
@@ -143,6 +134,11 @@ namespace SpreadTrader
 				{
 					case "-": BasePrice = PreviousPrice(BasePrice); break;
 					case "+": BasePrice = NextPrice(BasePrice); break;
+					case "Auto":
+						AutoOn = !AutoOn;
+						b.Foreground = new SolidColorBrush(AutoOn ? Colors.Black : Colors.LightGray);
+						break;
+					case "Execute":break;
 					default: return;
 				}
 				SyncPrices();

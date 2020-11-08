@@ -51,7 +51,14 @@
 						<Button Grid.Column="2" Tag="+" Content="+" ></Button>
 					</Grid>
 				</Grid>
-				<Button Content="Execute Bets" Background="OrangeRed" Foreground="White"/>
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="8.5*" />
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<Button Content="Execute Bets" Tag ="Execute" Background="OrangeRed" Foreground="White"/>
+					<Button Content="Auto" Tag="Auto" Grid.Column="1" FontSize="11"/>
+				</Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="110" />

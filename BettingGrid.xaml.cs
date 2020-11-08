@@ -70,7 +70,7 @@ namespace SpreadTrader
 					label = BackPrices.Items[idx] as Label;
 					label.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
 					tb = BackStakes.Items[idx] as TextBox;
-					tb.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
+					if (tb != null) tb.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
 					break;
 				case 1:
 					label = LayPrices.Items[idx-10] as Label;
@@ -86,13 +86,15 @@ namespace SpreadTrader
 			Int32 tag = Convert.ToInt32(cb.Tag);
 			if (tag == 0 || tag == 10)
 			{
-				for(int i= 1;i<10; i++)
+				for (int i = 1; i < 10; i++)
 				{
-					CheckBoxes[tag+i] = cb.IsChecked==true;
-					DisableLabel(tag+i, cb.IsChecked==true);
+					DisableLabel(tag + i, cb.IsChecked == true);
 				}
 			}
-			DisableLabel(tag, cb.IsChecked==true);
+			else
+			{
+				DisableLabel(tag, cb.IsChecked == true);
+			}
 			NotifyPropertyChanged("");
 		}
 	}
