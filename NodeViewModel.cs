@@ -12,6 +12,7 @@ namespace SpreadTrader
 		public NodeSelectionDelegate NodeCallback = null;
 		public ObservableCollection<LiveRunner> LiveRunners { get; set; }
 		public String FullName { get; set; }
+		public String MarketID { get; set; }
 		public String MarketName { get; set; }
 		List<EventTypeResult> EventTypes { get; set; }
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }
@@ -70,6 +71,7 @@ namespace SpreadTrader
 					{
 						FullName = String.Format("{0} - {1}", Parent.Name, Name);
 						MarketName = Parent.Name;
+						MarketID = m.marketId;
 					}
 					if (NodeCallback != null)
 					{

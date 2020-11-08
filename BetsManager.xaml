@@ -9,15 +9,15 @@
              d:DesignHeight="160" d:DesignWidth="400">
 	<UserControl.Resources>
 	</UserControl.Resources>
-    <Grid>
+    <Grid PreviewMouseDown="Grid_PreviewMouseDown">
 		<Label Content= "Bets Manager" HorizontalAlignment="Left" FontSize="18" FontWeight="Bold" Foreground ="LightGray" Margin="20,20" Width="auto" Height="32" VerticalAlignment="Top"/>
-		<DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Items}">
+		<DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Rows}">
 			<DataGrid.Columns>
 				<DataGridTextColumn Width="120" Header="Time" Binding="{Binding Time}"/>
 				<DataGridTextColumn Width="*" Header="BetID" Binding="{Binding BetID}"/>
-				<DataGridTextColumn Width="*" Header="IP" Binding="{Binding IP}"/>
-				<DataGridTextColumn Width="*" Header="SP" Binding="{Binding SP}"/>
-				<DataGridTextColumn Width="*" Header="Runner" Binding="{Binding Runner}" />
+				<!--<DataGridTextColumn Width="*" Header="IP" Binding="{Binding IP}"/>
+				<DataGridTextColumn Width="*" Header="SP" Binding="{Binding SP}"/>-->
+				<DataGridTextColumn Width="1.5*" Header="Runner" Binding="{Binding Runner}" />
 				<DataGridTextColumn Width="*" Header="Side" Binding="{Binding Side}" />
 				<DataGridTextColumn Width="*" Header="Stake" Binding="{Binding Stake}" />
 				<DataGridTextColumn Width="*" Header="Odds" Binding="{Binding Odds, StringFormat={}{0:N2}}" />
@@ -30,6 +30,5 @@
 				</DataTemplate>
 			</DataGrid.RowDetailsTemplate>
 		</DataGrid>
-		<Button Click="Button_Click"/>
 	</Grid>
 </UserControl>
