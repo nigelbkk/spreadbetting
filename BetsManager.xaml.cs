@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using BetfairAPI;
 
 namespace SpreadTrader
@@ -46,6 +47,7 @@ namespace SpreadTrader
 	}
 	public partial class BetsManager : UserControl, INotifyPropertyChanged
 	{
+		public NodeViewModel MarketNode { get; set; }
 		public List<Row> Items { get; set; }
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
@@ -66,12 +68,13 @@ namespace SpreadTrader
 			{
 				Items.Add(new Row(o));
 			}
-			//Items.Add(new Row() { Runner = "George Baker" });
-			//Items.Add(new Row() { Runner = "George Baker" });
-			//Items.Add(new Row() { Runner = "George Baker" });
-			//Items.Add(new Row() { Runner = "George Baker" });
-			//Items.Add(new Row() { Runner = "George Baker" });
 			InitializeComponent();
+		}
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			if (MarketNode != null)
+			{
+			}
 		}
 	}
 }

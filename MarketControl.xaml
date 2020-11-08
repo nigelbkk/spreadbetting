@@ -69,7 +69,7 @@
 									<local:BettingGrid x:Name="BettingGridControl"/>
 								</Border>
 								<Grid Grid.Row="1" Background="Ivory" Loaded="LowerGrid_Loaded">
-									<local:BetsManager x:Name="BetsManager"/>
+									<local:BetsManager x:Name="BetsManagerControl"/>
 								</Grid>
 								<!--<GridSplitter Grid.Row="1" Height="4" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="Gray" ResizeDirection="Rows" DragCompleted="GridSplitter_DragCompleted_1"  />-->
 							</Grid>

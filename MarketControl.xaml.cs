@@ -31,6 +31,7 @@ namespace SpreadTrader
 				if (IsLoaded)
 				{
 					MarketNode = node;
+					BetsManagerControl.MarketNode = node;
 					NotifyPropertyChanged("");
 				}
 			};

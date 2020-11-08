@@ -30,5 +30,6 @@
 				</DataTemplate>
 			</DataGrid.RowDetailsTemplate>
 		</DataGrid>
+		<Button Click="Button_Click"/>
 	</Grid>
 </UserControl>
