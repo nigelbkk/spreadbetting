@@ -72,6 +72,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bet.cs" />
+    <Compile Include="BetsManager.xaml.cs">
+      <DependentUpon>BetsManager.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BettingGrid.xaml.cs">
       <DependentUpon>BettingGrid.xaml</DependentUpon>
     </Compile>
@@ -104,6 +107,10 @@
     </Compile>
     <Compile Include="ViewModel.cs" />
     <Compile Include="WaitCursor.cs" />
+    <Page Include="BetsManager.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="BettingGrid.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -186,6 +193,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\bullet_toggle_minus.png" />
+    <Resource Include="Images\up_arrow.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\bullet_toggle_plus.png" />
@@ -222,9 +230,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\down_arrow.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\up_arrow.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
