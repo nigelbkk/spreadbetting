@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="SpreadTrader.BetsManager"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SpreadTrader"
+             mc:Ignorable="d" 
+	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
+             d:DesignHeight="160" d:DesignWidth="400">
+	<UserControl.Resources>
+	</UserControl.Resources>
+    <Grid>
+		<Label Content= "Bets Manager" HorizontalAlignment="Left" FontSize="18" FontWeight="Bold" Foreground ="LightGray" Margin="20,20" Width="auto" Height="32" VerticalAlignment="Top"/>
+		<DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Items}">
+			<DataGrid.Columns>
+				<DataGridTextColumn Width="120" Header="Time" Binding="{Binding Time}"/>
+				<DataGridTextColumn Width="*" Header="BetID" Binding="{Binding BetID}"/>
+				<DataGridTextColumn Width="*" Header="IP" Binding="{Binding IP}"/>
+				<DataGridTextColumn Width="*" Header="SP" Binding="{Binding SP}"/>
+				<DataGridTextColumn Width="*" Header="Runner" Binding="{Binding Runner}" />
+				<DataGridTextColumn Width="*" Header="Side" Binding="{Binding Side}" />
+				<DataGridTextColumn Width="*" Header="Stake" Binding="{Binding Stake}" />
+				<DataGridTextColumn Width="*" Header="Odds" Binding="{Binding Odds, StringFormat={}{0:N2}}" />
+				<DataGridTextColumn Width="*" Header="Profit" Binding="{Binding Profit, StringFormat={}{0:N2}}" />
+				<DataGridTextColumn Width="*" Header="Matched" Binding="{Binding Matched, StringFormat={}{0:N2}}" />
+			</DataGrid.Columns>
+			<DataGrid.RowDetailsTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding Items}" Margin="10" />
+				</DataTemplate>
+			</DataGrid.RowDetailsTemplate>
+		</DataGrid>
+	</Grid>
+</UserControl>

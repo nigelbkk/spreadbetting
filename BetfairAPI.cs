@@ -386,12 +386,10 @@ namespace BetfairAPI
         public CurrentOrderSummaryReport listCurrentOrders(String marketId)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
-            HashSet<String> marketIds = new HashSet<String>();
-            marketIds.Add(marketId);
-            p["marketIds"] = marketIds;
-            p["betIds"] = new HashSet<UInt64>();
+            p["marketIds"] = new String[] { marketId }; ;
+            //p["betIds"] = new HashSet<UInt64>();
             p["orderProjection"] = orderProjectionEnum.ALL.ToString();
-            p["dateRange"] = TimeRange(DateTime.UtcNow.Date, 0, 24);
+            //p["dateRange"] = TimeRange(DateTime.UtcNow.Date, 0, 24);
             return RPCRequest<CurrentOrderSummaryReport>("listCurrentOrders", p) as CurrentOrderSummaryReport;
         }
         public AccountFundsResponse getAccountFunds(Int32 ExchangeId)
