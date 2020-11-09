@@ -20,6 +20,7 @@ namespace BetfairAPI
         public DateTime sysTime = DateTime.UtcNow;
         private Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
+            String[] AccountCalls = new String[] { "getAccountFunds" };
             Dictionary<String, Object> joe = new Dictionary<string, object>();
             joe["jsonrpc"] = "2.0";
             joe["id"] = "1";
@@ -27,6 +28,11 @@ namespace BetfairAPI
             joe["params"] = Params;
 
             String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy; // "http://127.0.0.1:5055"; 
+
+            if (AccountCalls.Contains(Method))
+            {
+                joe["method"] = "AccountAPING/v1.0/" + Method;
+            }
             String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
             HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
             wr.Method = WebRequestMethods.Http.Post;

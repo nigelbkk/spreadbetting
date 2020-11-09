@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using BetfairAPI;
 
 namespace SpreadTrader
 {
@@ -14,12 +15,13 @@ namespace SpreadTrader
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged(""); } }
-		private Decimal _Balance = 2458.51M;
-		private Decimal _Exposure = -1;
-		public Decimal _Commission = 8;
+		private double _Balance = 0;
+		private double _Exposure = 0;
+		public double _Commission = 0;
 		public String Balance { get { return String.Format("Balance: {0:C}", _Balance); } }
 		public String Exposure { get { return String.Format("Exposure: {0:C}", _Exposure); } }
 		public String Commission { get { return String.Format("Commission: {0:0.00}%", _Commission); } }
+		public static BetfairAPI.BetfairAPI Betfair { get; set; }
 		EventsTree EventsTree = null;
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
@@ -33,6 +35,18 @@ namespace SpreadTrader
 		{
 			System.Net.ServicePointManager.Expect100Continue = false;
 			InitializeComponent();
+			SetWindowPosition();
+
+			Betfair = new BetfairAPI.BetfairAPI();
+
+			AccountFundsResponse response = Betfair.getAccountFunds(1);
+			_Balance = response.availableToBetBalance;
+			_Exposure = response.exposure;
+			_Commission = response.retainedCommission;
+			NotifyPropertyChanged("");
+		}
+		private void SetWindowPosition()
+		{
 			if (!props.Upgraded)
 			{
 				props.Upgrade();
@@ -53,7 +67,6 @@ namespace SpreadTrader
 			{
 				WindowState = System.Windows.WindowState.Maximized;
 			}
-			NotifyPropertyChanged("");
 		}
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{

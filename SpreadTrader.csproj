@@ -81,6 +81,7 @@
     <Compile Include="ClosableHeader.xaml.cs">
       <DependentUpon>ClosableHeader.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters.cs" />
     <Compile Include="EventsTree.xaml.cs">
       <DependentUpon>EventsTree.xaml</DependentUpon>
     </Compile>
