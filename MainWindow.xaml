@@ -31,10 +31,9 @@
 				<Button Content ="Favourites" Tag="Favourites" Name="FavouritesButton" Grid.Column="2" ToolTip="Favourites" Click="Button_Click"/>
 				<Button Content ="Settings" Tag="Settings" Grid.Column="3" ToolTip="Settings" Click="Button_Click"/>
 				<Label Width="58" />
-				<Label>Exposure: $0.00</Label>
-				<Label>Balance: $0.00</Label>
-				<Label>Exposure: $0.00</Label>
-				<Label>Commission: $0.00</Label>
+				<Label Content="{Binding Path=Balance}"/>
+				<Label Content="{Binding Path=Exposure}"/>
+				<Label Content="{Binding Path=Commission}"/>
 			</StackPanel>
 			<StatusBar DockPanel.Dock="Bottom" Height="23" VerticalAlignment="Bottom" >
 				<TextBlock Text="{Binding Path=Status}"></TextBlock>

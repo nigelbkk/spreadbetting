@@ -39,9 +39,9 @@
 				<Grid Name="UpperGrid" Loaded="UpperGrid_Loaded">
 					<Grid.RowDefinitions>
 						<RowDefinition Height="auto"/>
-						<RowDefinition Height="*"/>
+						<RowDefinition Height="auto"/>
 					</Grid.RowDefinitions>
-					<Grid Name="RunersAndSlidersGrid" Grid.Row="0" Grid.ColumnSpan="2">
+					<Grid Name="RunersAndSlidersGrid" Grid.Row="0" Grid.ColumnSpan="2" Loaded="RunersAndSlidersGrid_Loaded">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="500"/>
 							<ColumnDefinition/>
@@ -56,11 +56,11 @@
 						<Grid Name="SlidersGrid" Grid.Column="1">
 							<local:SliderControl  x:Name="SliderControl" />
 						</Grid>
-						<GridSplitter Name="VerticalSplitter" Width="4" Grid.Column="1" Grid.RowSpan="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Background="Gray" ResizeDirection="Columns" DragCompleted="GridSplitter_DragCompleted" />
+						<GridSplitter Width="4" Grid.Column="1" Grid.RowSpan="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Background="Gray" ResizeDirection="Columns" DragCompleted="GridSplitter_DragCompleted_1"/>
 					</Grid>
 					<Grid Grid.Row="1">
 						<DockPanel>
-							<Grid Name ="LowerGrid" Loaded="LowerGrid_Loaded">
+							<Grid Name ="LowerGrid">
 								<Grid.RowDefinitions>
 									<RowDefinition Height="3*"/>
 									<RowDefinition Height="*"/>
@@ -68,10 +68,9 @@
 								<Border Name="BettingGrid" Grid.Row="0" Background="Ivory" BorderBrush="DarkGray" BorderThickness="3">
 									<local:BettingGrid x:Name="BettingGridControl"/>
 								</Border>
-								<Grid Grid.Row="1" Background="Ivory" Loaded="LowerGrid_Loaded">
+								<Grid Grid.Row="1" Background="Ivory">
 									<local:BetsManager x:Name="BetsManagerControl"/>
 								</Grid>
-								<!--<GridSplitter Grid.Row="1" Height="4" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="Gray" ResizeDirection="Rows" DragCompleted="GridSplitter_DragCompleted_1"  />-->
 							</Grid>
 						</DockPanel>
 					</Grid>

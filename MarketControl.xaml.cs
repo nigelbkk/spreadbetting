@@ -26,28 +26,16 @@ namespace SpreadTrader
 		{
 			InitializeComponent();
 			NodeChangeEventSink = RunnersControl.NodeChangeEventSink;
+			NodeChangeEventSink += BetsManagerControl.NodeChangeEventSink;
 			NodeChangeEventSink += (node) =>
 			{
 				if (IsLoaded)
 				{
 					MarketNode = node;
-					BetsManagerControl.MarketNode = node;
 					NotifyPropertyChanged("");
 				}
 			};
 			SliderControl.OnSliderChanged += BettingGridControl.OnSliderChanged;
-		}
-		private void LowerGrid_Loaded(object sender, RoutedEventArgs e)
-		{
-			Grid grid = sender as Grid;
-			if (props.Splitter1 > 0 && grid.RowDefinitions.Count > 0)
-				grid.RowDefinitions[0].Height = new GridLength(props.Splitter1, GridUnitType.Pixel);
-		}
-		private void UpperGrid_Loaded(object sender, RoutedEventArgs e)
-		{
-			Grid grid = sender as Grid;
-			if (props.Splitter2 > 0 && grid.RowDefinitions.Count > 0)
-				grid.RowDefinitions[0].Height = new GridLength(props.Splitter2, GridUnitType.Pixel);
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -82,12 +70,24 @@ namespace SpreadTrader
 		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
 		{
 			GridSplitter gs = sender as GridSplitter;
-			props.Splitter2 = RunnersGrid.ActualHeight;
+			props.HorizontalSplitter = RunnersGrid.ActualHeight;
 		}
 		private void GridSplitter_DragCompleted_1(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
 		{
 			GridSplitter gs = sender as GridSplitter;
-			props.Splitter1 = BettingGrid.ActualHeight;
+			props.VerticalSplitter = RunnersGrid.ActualWidth;
+		}
+		private void UpperGrid_Loaded(object sender, RoutedEventArgs e)
+		{
+			Grid grid = sender as Grid;
+			if (props.HorizontalSplitter > 0 && grid.RowDefinitions.Count > 0)
+				grid.RowDefinitions[0].Height = new GridLength(props.HorizontalSplitter, GridUnitType.Pixel);
+		}
+		private void RunersAndSlidersGrid_Loaded(object sender, RoutedEventArgs e)
+		{
+			Grid grid = sender as Grid;
+			if (props.VerticalSplitter > 0 && grid.ColumnDefinitions.Count > 0)
+				grid.ColumnDefinitions[0].Width = new GridLength(props.VerticalSplitter, GridUnitType.Pixel);
 		}
 	}
 }

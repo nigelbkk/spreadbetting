@@ -14,7 +14,12 @@ namespace SpreadTrader
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged(""); } }
-		public Decimal UKBalance { get; set; }
+		private Decimal _Balance = 2458.51M;
+		private Decimal _Exposure = -1;
+		public Decimal _Commission = 8;
+		public String Balance { get { return String.Format("Balance: {0:C}", _Balance); } }
+		public String Exposure { get { return String.Format("Exposure: {0:C}", _Exposure); } }
+		public String Commission { get { return String.Format("Commission: {0:0.00}%", _Commission); } }
 		EventsTree EventsTree = null;
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)

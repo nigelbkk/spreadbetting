@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Markup;
 using System.Windows.Media;
 using BetfairAPI;
 
@@ -29,6 +33,7 @@ namespace SpreadTrader
 		public double Odds { get; set; }
 		public double Profit { get; set; }
 		public double Matched { get; set; }
+		public bool Override { get; set; }
 		public Row()
 		{
 			Time = DateTime.Now;
@@ -45,12 +50,18 @@ namespace SpreadTrader
 			Profit = Math.Round(Profit, 2);
 			Matched = o.sizeMatched;
 		}
+		public override string ToString()
+		{
+			return Runner;
+		}
 	}
 	public partial class BetsManager : UserControl, INotifyPropertyChanged
 	{
-		public NodeViewModel MarketNode { get; set; }
-		public List<Row> Rows { get; set; }
-		public event PropertyChangedEventHandler PropertyChanged;
+		public NodeSelectionDelegate NodeChangeEventSink = null;
+		public ObservableCollection<Row> Rows { get; set; }
+		private NodeViewModel MarketNode { get; set; }
+		private DateTime _LastUpdated { get; set; }
+		private BetfairAPI.BetfairAPI Betfair { get; set; }
 		private void NotifyPropertyChanged(String info)
 		{
 			if (PropertyChanged != null)
@@ -58,16 +69,37 @@ namespace SpreadTrader
 				Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
 			}
 		}
+		public bool UnmatchedOnly { get; set; }
+		public String LastUpdated { get { return String.Format("Bets last updated {0}", _LastUpdated.ToShortTimeString());	}  }
+		public event PropertyChangedEventHandler PropertyChanged;
 		public BetsManager()
 		{
+			Rows = new ObservableCollection<Row>();
+
+			Rows.Add(new Row() { Runner = "George Baker 1" });
+			Rows.Add(new Row() { Runner = "George Baker 2" });
+			Rows.Add(new Row() { Runner = "George Baker 3" });
+			Rows.Add(new Row() { Runner = "George Baker 4" });
 			InitializeComponent();
+			NodeChangeEventSink += (node) =>
+			{
+				if (IsLoaded)
+				{
+					MarketNode = node;
+					PopulateDataGrid();
+				}
+			};
 		}
-		private void Grid_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		private void PopulateDataGrid()
 		{
+			_LastUpdated = DateTime.Now;
 			if (MarketNode != null)
 			{
-				BetfairAPI.BetfairAPI Betfair = new BetfairAPI.BetfairAPI();
-				Rows = new List<Row>();
+				if (Betfair == null)
+				{
+					Betfair = new BetfairAPI.BetfairAPI();
+				}
+				Rows = new ObservableCollection<Row>();
 
 				CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.168283812"
 
@@ -85,9 +117,84 @@ namespace SpreadTrader
 						}
 					}
 				}
-				e.Handled = true;
 				NotifyPropertyChanged("");
 			}
+		}
+		private void RowButton_Click(object sender, RoutedEventArgs e)
+		{
+			Button b = sender as Button;
+			Int32 Tag = Convert.ToInt32(b.Tag)-1;
+			if (Betfair == null)
+			{
+				Betfair = new BetfairAPI.BetfairAPI();
+			}
+			Debug.WriteLine("cancel {0} for {1} {2}", MarketNode.MarketID, Rows[Tag].BetID, Rows[Tag].Runner);
+			//Betfair.cancelOrder(MarketNode.MarketID, Rows[Tag].BetID);
+			ObservableCollection<Row> rows = new ObservableCollection<Row>();
+			for(int i=0;i< Rows.Count;i++)
+			{
+				if (i != Tag)
+					rows.Add(Rows[i]);
+			}
+			Rows = rows;
+			NotifyPropertyChanged("");
+		}
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			if (Betfair == null)
+			{
+				Betfair = new BetfairAPI.BetfairAPI();
+			}
+			Button b = sender as Button;
+			switch(b.Tag)
+			{
+				case "Refresh": PopulateDataGrid(); break;
+				case "CancelAll":
+					List<CancelInstruction> instructions = new List<CancelInstruction>();
+					foreach(Row row in Rows)
+					{
+						if (!row.Override)
+							instructions.Add(new CancelInstruction(row.BetID));
+					}
+					if (instructions.Count > 0)
+					{
+						Debug.WriteLine("cancel all for {0} {1}", MarketNode.MarketID, MarketNode.FullName);
+						//Betfair.cancelOrders(MarketNode.MarketID, instructions); 
+					}
+					break;
+			}
+		}
+	}
+	public class RowToIndexConverter : MarkupExtension, IValueConverter
+	{
+		static RowToIndexConverter convertor;
+		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+		{
+			DataGridRow row = value as DataGridRow;
+
+			if (row != null)
+			{
+				return row.GetIndex() + 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+		public override object ProvideValue(IServiceProvider serviceProvider)
+		{
+			if (convertor == null)
+			{
+				convertor = new RowToIndexConverter();
+			}
+			return convertor;
+		}
+		public RowToIndexConverter()
+		{
 		}
 	}
 }

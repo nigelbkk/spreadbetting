@@ -95,16 +95,23 @@ namespace SpreadTrader
 			{
 				if (BasePrice < 1000 && BasePrice > 1.01M)
 				{
-					for (Int32 side = BACKPRICES; side <= LAYPRICES; side+=20)
+					Int32 base_index = PriceIndex(BasePrice) - 9;
+					Int32 side = BACKPRICES;
+					base_index = Math.Max(base_index, 10);
+					base_index = Math.Min(base_index, 338);
+					Int32 offset = Convert.ToInt32(MoveBack.Value);
+					for (int i = 0; i < 9; i++)
 					{
-						Int32 base_index = PriceIndex(BasePrice) - 9;
-						base_index = Math.Max(base_index, 10);
-						base_index = Math.Min(base_index, 338);
-						Int32 offset = Convert.ToInt32(side == 0 ? MoveBack.Value : MoveLay.Value);
-						for (int i = 0; i < 9; i++)
-						{
-							Values[side+i] = AllPrices[base_index + offset + i];// + BasePrice - 1.01M;
-						}
+						Values[side + i] = AllPrices[base_index + offset + i];
+					}
+					side = LAYPRICES;
+					base_index = PriceIndex(BasePrice) + 1;
+					base_index = Math.Max(base_index, 10);
+					base_index = Math.Min(base_index, 338);
+					offset = Convert.ToInt32(MoveLay.Value);
+					for (int i = 0; i < 9; i++)
+					{
+						Values[side + i] = AllPrices[base_index - offset + i];
 					}
 					NotifyPropertyChanged("");
 				}

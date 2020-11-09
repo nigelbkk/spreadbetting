@@ -230,24 +230,24 @@ namespace SpreadTrader.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("120")]
-        public double Splitter1 {
+        public double VerticalSplitter {
             get {
-                return ((double)(this["Splitter1"]));
+                return ((double)(this["VerticalSplitter"]));
             }
             set {
-                this["Splitter1"] = value;
+                this["VerticalSplitter"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("120")]
-        public double Splitter2 {
+        public double HorizontalSplitter {
             get {
-                return ((double)(this["Splitter2"]));
+                return ((double)(this["HorizontalSplitter"]));
             }
             set {
-                this["Splitter2"] = value;
+                this["HorizontalSplitter"] = value;
             }
         }
         
