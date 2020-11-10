@@ -53,11 +53,11 @@
 				</Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="8.5*" />
+						<ColumnDefinition Width="5*" />
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Button Content="Execute Bets" Tag ="Execute" Background="OrangeRed" Foreground="White"/>
-					<Button Content="Auto" Tag="Auto" Grid.Column="1" FontSize="11"/>
+					<CheckBox Content="Auto Back/Lay" Tag="Auto" Grid.Column="1" FontSize="11" VerticalAlignment="Center"/>
 				</Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>

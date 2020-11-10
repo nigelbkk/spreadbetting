@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" >
+             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded" >
 	<UserControl.Resources>
 		<local:OddsConverter x:Key="oconverter" />
 		<local:StakeConverter x:Key="converter" />
@@ -115,7 +115,7 @@
 		</DataTemplate>
 	</UserControl.Resources>
     <Grid SizeChanged="Grid_SizeChanged" >
-		<Grid Name="UpperGrid" Grid.Row="0" VerticalAlignment="Stretch" Background="Azure"  DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
+		<Grid Name="UpperGrid" Grid.Row="0" VerticalAlignment="Stretch" Background="Azure"  DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" PreviewMouseDown="UpperGrid_PreviewMouseDown">
 			<StackPanel Orientation="Vertical" >
 				<StackPanel Name="SV1_Header" Orientation="Horizontal" Height="36">
 					<Label Width ="135" Padding="8,0,0,0" HorizontalContentAlignment ="Left">Selection Name</Label><Label/><Label/>
@@ -125,7 +125,7 @@
 					<Label>Profit</Label><Label ><TextBlock TextAlignment="Center">Level<LineBreak/>Profit</TextBlock></Label>
 					<Label><TextBlock TextAlignment="Center">Last<LineBreak/>Price</TextBlock></Label>
 				</StackPanel>
-				<ItemsControl Name="SV1" FontFamily="Verdana" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding MarketNode.LiveRunners}" >
+				<ItemsControl Name="SV1" FontFamily="Verdana" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}" >
 					<ItemsControl.Template>
 						<ControlTemplate>
 							<ScrollViewer Padding="{TemplateBinding Control.Padding}">

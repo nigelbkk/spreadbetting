@@ -98,23 +98,26 @@ namespace SpreadTrader
 				}
 				Rows = new ObservableCollection<Row>();
 
-				CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.168283812"
+				if (MarketNode.MarketID != null)
+				{
+					CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.168283812"
 
-				foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
-				{
-					Rows.Add(new Row(o));
-				}
-				foreach (Row row in Rows)
-				{
-					foreach(LiveRunner r in MarketNode.LiveRunners)
+					foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
 					{
-						if (r.selectionId == row.SelectionID)
-						{
-							row.Runner = r.name;
-						}
+						Rows.Add(new Row(o));
 					}
+					foreach (Row row in Rows)
+					{
+						//foreach (LiveRunner r in MarketNode.LiveRunners)
+						//{
+						//	if (r.selectionId == row.SelectionID)
+						//	{
+						//		row.Runner = r.name;
+						//	}
+						//}
+					}
+					NotifyPropertyChanged("");
 				}
-				NotifyPropertyChanged("");
 			}
 		}
 		private void RowButton_Click(object sender, RoutedEventArgs e)

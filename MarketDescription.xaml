@@ -7,7 +7,7 @@
 		xmlns:local="clr-namespace:SpreadTrader"
         mc:Ignorable="d"
 		FontFamily="Sego UI"
-        Title="MarketDescription" Height="481.042" Width="571.128">
+        Title="MarketDescription" Height="380" Width="670">
 	<Grid>
 		<WPF:WebView Name ="WebView"/>
 	</Grid>

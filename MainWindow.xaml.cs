@@ -12,6 +12,7 @@ namespace SpreadTrader
 	public delegate void NodeSelectionDelegate(NodeViewModel node);
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
+		public ICommand ExpandingCommand { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged(""); } }

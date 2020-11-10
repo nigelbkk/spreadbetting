@@ -21,7 +21,7 @@
 	<Grid>
 		<DockPanel>
 			<StackPanel Orientation="Horizontal" VerticalAlignment="Top" DockPanel.Dock="Top" Height="28">
-				<Button Tag="Hide Tree" Grid.Column="0" Padding="0" HorizontalContentAlignment="Left" ToolTip="Hide The Events Tree" Width="18">
+				<Button Tag="Hide Tree" Grid.Column="0" Padding="0" HorizontalContentAlignment="Left" ToolTip="Hide The Events Tree" Width="18" Click="Button_Click">
 					<StackPanel Orientation="Vertical" Margin="2,0,2,0">
 						<Image Name="LeftArrow" Source="/SpreadTrader;component/Images/left_arrow.png"  Visibility="Visible"/>
 						<Image Name="RightArrow" Source="/SpreadTrader;component/Images/right_arrow.png" Visibility="Collapsed"/>

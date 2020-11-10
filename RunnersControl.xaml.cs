@@ -1,25 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
+using BetfairAPI;
 
 namespace SpreadTrader
 {
 	public partial class RunnersControl : UserControl, INotifyPropertyChanged
 	{
 		public NodeSelectionDelegate NodeChangeEventSink = null;
+		BackgroundWorker Worker = null;
 		public NodeViewModel MarketNode { get; set; }
+		public List<LiveRunner> LiveRunners { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
 		public void NotifyPropertyChanged(String info)
 		{
 			if (PropertyChanged != null)
 			{
-				Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
+//				Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
+				PropertyChanged(this, new PropertyChangedEventArgs(info));
 			}
 		}
 		public RunnersControl()
@@ -30,10 +33,37 @@ namespace SpreadTrader
 			{
 				if (IsLoaded)
 				{
-					MarketNode = node;
+					if (MarketNode != node)        
+					{
+						MarketNode = node;
+					}
 					NotifyPropertyChanged("");
 				}
 			};
+			Worker = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
+			Worker.ProgressChanged += (o, e) =>
+			{
+				LiveRunners = e.UserState as List<LiveRunner>;
+			};
+			Worker.DoWork += (o, ea) =>
+			{
+				BackgroundWorker sender = o as BackgroundWorker;
+				while (!sender.CancellationPending)
+				{
+					try
+					{
+						Debug.WriteLine(MarketNode.MarketName);
+						var LiveRunners = MarketNode.GetLiveRunners();
+						sender.ReportProgress(0, LiveRunners);
+					}
+					catch (Exception xe)
+					{
+						Debug.WriteLine(xe.Message);
+					}
+				}
+				System.Threading.Thread.Sleep(props.WaitBF);
+			};
+			Worker.RunWorkerAsync();
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -48,6 +78,8 @@ namespace SpreadTrader
 			{
 				Debug.WriteLine(xe.Message);
 			}
+			LiveRunners = MarketNode.GetLiveRunners();
+			NotifyPropertyChanged("");
 		}
 		private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
 		{
@@ -86,6 +118,23 @@ namespace SpreadTrader
 		private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			SV1.Height = Math.Max(25, e.NewSize.Height - SV1_Header.Height);
+		}
+
+		private void UserControl_Loaded(object sender, RoutedEventArgs e)
+		{
+//			MarketNode.Start();
+	//		bgw.RunWorkerAsync();
+		}
+		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+		{
+//			MarketNode.Stop();
+			//			bgw.CancelAsync();
+		}
+
+		private void UpperGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			LiveRunners = MarketNode.GetLiveRunners();
+			NotifyPropertyChanged("");
 		}
 	}
 }

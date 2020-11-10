@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Threading;
 using BetfairAPI;
 
 namespace SpreadTrader
@@ -10,11 +12,12 @@ namespace SpreadTrader
 	public class NodeViewModel : ViewModelBase
 	{
 		public NodeSelectionDelegate NodeCallback = null;
-		public ObservableCollection<LiveRunner> LiveRunners { get; set; }
 		public String FullName { get; set; }
+		public Market Market { get; set; }
 		public String MarketID { get; set; }
 		public String MarketName { get; set; }
 		List<EventTypeResult> EventTypes { get; set; }
+		private Properties.Settings props = Properties.Settings.Default;
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }
 		private bool _isSelected;
 		private bool _IsExpanded;
@@ -24,24 +27,26 @@ namespace SpreadTrader
 			get { return _isSelected; }
 			set
 			{
+				if (value && !_isSelected) 
+					OnItemSelected();
 				_isSelected = value;
-				if (IsSelected) OnItemSelected();
 			}
 		}
 		public delegate void CallBackDelegate();
 		public CallBackDelegate Populate = null;
-		public Object Tag { get; set; }
 		public NodeViewModel Parent { get; set; }
 		public Int32 ID { get; set; }
 		public string Name { get; set; }
+		public string Tag { get; set; }
 		public ObservableCollection<NodeViewModel> Nodes { get; set; }
 		public NodeViewModel(BetfairAPI.BetfairAPI Betfair)
 		{
 			NodeViewModel.Betfair = Betfair;
 			Nodes = new ObservableCollection<NodeViewModel>();
-			Market m = new Market();
-			m.marketId = "1.175065466";
-			Tag = m;
+			Market = new Market();
+			Market.marketId = "1.175065466";
+			MarketName = "Name";
+
 			OnItemSelected();
 		}
 		public NodeViewModel(String name)
@@ -49,45 +54,57 @@ namespace SpreadTrader
 			Name = name;
 			Nodes = new ObservableCollection<NodeViewModel>();
 		}
-		private void OnItemSelected()
+		public List<LiveRunner> GetLiveRunners()
 		{
-			Market m = Tag as Market;
-			if (m != null)
+			List<LiveRunner> LiveRunners = new List<LiveRunner>();
+			if (Market != null)
 			{
 				try
 				{
-					LiveRunners = new ObservableCollection<LiveRunner>();
-					MarketBook book = Betfair.GetMarketBook(m);
+					LiveRunners = new List<LiveRunner>();
+					MarketBook book = Betfair.GetMarketBook(Market);
 					foreach (Runner r in book.Runners)
 					{
 						if (r.removalDate == new DateTime())
 						{
 							LiveRunner rl = new LiveRunner(r);
 							LiveRunners.Add(rl);
-							if (r.ex.availableToBack.Count > 0){}
+							if (r.ex.availableToBack.Count > 0) { }
 						}
 					}
 					if (Parent != null)
 					{
 						FullName = String.Format("{0} - {1}", Parent.Name, Name);
 						MarketName = Parent.Name;
-						MarketID = m.marketId;
-					}
-					if (NodeCallback != null)
-					{
-						NodeCallback(this);
+						MarketID = Market.marketId;
 					}
 				}
 				catch (Exception xe)
 				{
-					Debug.WriteLine(xe.Message); //					NotificationCallback("Markets_SelectionChanged: " + String.Format(xe.Message.ToString()));
+					Debug.WriteLine(xe.Message);
+				}
+			}
+			return LiveRunners;
+		}
+		private void OnItemSelected()
+		{
+			if (Market != null)
+			{
+				if (Parent != null)
+				{
+					FullName = String.Format("{0} - {1}", Parent.Name, Name);
+					MarketName = Parent.Name;
+					MarketID = Market.marketId;
+				}
+				if (NodeCallback != null)
+				{
+					NodeCallback(this);
 				}
 			}
 		}
 		private void OnItemExpanding()
 		{
-			Console.WriteLine(this.Name + (IsExpanded ? @" Expanded" : @" Collapsed"));
-			if (IsExpanded && Populate != null)
+			if (IsExpanded && Populate != null && Nodes.Count <= 1)
 			{
 				Nodes.Clear();
 				Populate();
@@ -174,7 +191,7 @@ namespace SpreadTrader
 			List<Market> markets = Betfair.GetMarkets(ID).OrderBy(o => o.marketStartTime).ToList();
 			foreach (Market m in markets)
 			{
-				NodeViewModel nvm = new NodeViewModel(m.ToString()) { Tag = m };
+				NodeViewModel nvm = new NodeViewModel(m.ToString()) { Market = m};
 				//nvm.Populate = nvm.PopulateMarketBook;
 				Add(nvm);
 			}
@@ -182,14 +199,6 @@ namespace SpreadTrader
 		public override string ToString()
 		{
 			return String.Format("{0}", FullName);
-		}
-		public void SetStakes(Decimal stake, sideEnum side, Int32 runner_index)
-		{
-			if (side == sideEnum.BACK)
-				LiveRunners[runner_index].BackStake = stake;
-			else
-				LiveRunners[runner_index].LayStake = stake;
-			//NotificationCallback("");
 		}
 	}
 }

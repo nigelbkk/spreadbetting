@@ -5,11 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
              mc:Ignorable="d">
-	<TreeView Name="TreeView" FontSize="11" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=RootNode}" ItemsSource="{Binding Nodes}" Background="Ivory">
-		<TreeView.ItemContainerStyle>
+		<TreeView Name="TreeView" FontSize="11" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=RootNode}" ItemsSource="{Binding Nodes}" Background="Ivory">
+			<TreeView.ItemContainerStyle>
 				<Style TargetType="{x:Type TreeViewItem}">
 					<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
-					<Setter Property="local:Behaviours.ExpandingBehaviour" Value="{Binding DataContext.ExpandingCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+					<Setter Property="local:Behaviours.ExpandingBehaviour" Value="{Binding DataContext.ExpandingCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
 					<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
 				</Style>
 			</TreeView.ItemContainerStyle>
