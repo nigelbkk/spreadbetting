@@ -31,7 +31,24 @@ namespace SpreadTrader
 			Worker = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
 			Worker.ProgressChanged += (o, e) =>
 			{
-				LiveRunners = e.UserState as List<LiveRunner>;
+				List<LiveRunner> NewRunners = e.UserState as List<LiveRunner>;
+				if (LiveRunners != null)
+				{
+					for (int i = 0; i < LiveRunners.Count; i++)
+					{
+						LiveRunner rold = LiveRunners[i];
+						LiveRunner rnew = NewRunners[i];
+						if (rold.prices[0].price != rnew.prices[0].price)
+						{
+							rold.LastPrice = rnew.prices[0].price;
+						}
+						if (rold.prices[3].price != rnew.prices[3].price)
+						{
+							rold.LastPrice = rnew.prices[0].price;
+						}
+					}
+				}
+				LiveRunners = NewRunners;
 				MarketNode.UpdateRate = e.ProgressPercentage;
 				NotifyPropertyChanged("");
 			};

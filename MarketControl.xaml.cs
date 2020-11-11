@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace SpreadTrader
 {
@@ -25,13 +23,11 @@ namespace SpreadTrader
 			if (PropertyChanged != null)
 			{
 				PropertyChanged(this, new PropertyChangedEventArgs(info));
-				//Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
 			}
 		}
 		public MarketControl()
 		{
 			InitializeComponent();
-//			NodeChangeEventSink = RunnersControl.NodeChangeEventSink;
 			NodeChangeEventSink += BetsManagerControl.NodeChangeEventSink;
 			NodeChangeEventSink += (node) =>
 			{
@@ -94,7 +90,7 @@ namespace SpreadTrader
 		{
 			Grid grid = sender as Grid;
 			if (props.VerticalSplitter > 0 && grid.ColumnDefinitions.Count > 0)
-				grid.ColumnDefinitions[0].Width = new GridLength(props.VerticalSplitter, GridUnitType.Pixel);
+				grid.ColumnDefinitions[0].Width = new GridLength(props.VerticalSplitter + 16, GridUnitType.Pixel);
 		}
 	}
 }

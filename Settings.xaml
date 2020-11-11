@@ -5,11 +5,12 @@
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:p="clr-namespace:SpreadTrader.Properties"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Settings" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" ShowInTaskbar="False" Closing="Window_Closing" Height="190.667" Width="324.666">
+        Title="Settings" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" ShowInTaskbar="False" Closing="Window_Closing" Height="216.667" Width="324.666">
 	<Window.Resources>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
 			<Setter Property="Width" Value="100"/>
+			<Setter Property="Height" Value="20.9"/>
 			<Setter Property="Margin" Value="4,0,6,0"/>
 			<Setter Property="Padding" Value="5,3"/>
 			<Setter Property="Background" Value="#00000000"/>
@@ -19,9 +20,8 @@
             TargetType="{x:Type TextBox}">
 			<Setter Property="Width" Value="200"/>
 			<Setter Property="Height" Value="20.9"/>
-			<Setter Property="Background" Value="#00000000"/>
+			<!--<Setter Property="Background" Value="#00000000"/>-->
 			<Setter Property="HorizontalAlignment" Value="Left"/>
-			<Setter Property="HorizontalContentAlignment" Value="Left"/>
 		</Style>
 	</Window.Resources>
 	<Grid Background="Ivory"> 
@@ -29,7 +29,7 @@
 			<RowDefinition Height="280*" />
 			<RowDefinition/>
 		</Grid.RowDefinitions>
-		<Grid Margin="0,0,0,9" Grid.Row="0">
+		<Grid Grid.Row="0">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="110" />
 				<ColumnDefinition/>
@@ -53,9 +53,10 @@
 				<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=WaitBF, Mode=TwoWay}" />
 			</StackPanel>
 		</Grid>
-		<StackPanel VerticalAlignment="Bottom" Orientation="Horizontal" Height="20" Grid.RowSpan="2" >
+		<Button Content="OK" IsDefault="True" FontSize="10" Click="Button_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="51" Margin="0,0,10,8"/>
+		<!--<StackPanel VerticalAlignment="Bottom" Orientation="Horizontal" Height="20" Grid.RowSpan="2" >
 			<TextBlock Text="{Binding Path=ver, StringFormat='Version {0}'}" Margin="5,2" TextAlignment="Left" Width="245" VerticalAlignment="Center" />
 			<Button Content="OK" IsDefault="True" FontSize="10" Click="Button_Click" HorizontalAlignment="Right" Width="51" VerticalAlignment="Center" />
-		</StackPanel>
+		</StackPanel>-->
 	</Grid>
 </Window>

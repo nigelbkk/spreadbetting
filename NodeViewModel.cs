@@ -60,7 +60,6 @@ namespace SpreadTrader
 			{
 				try
 				{
-					LiveRunners = new List<LiveRunner>();
 					Market.MarketBook = Betfair.GetMarketBook(Market);
 					foreach (Runner r in Market.MarketBook.Runners)
 					{

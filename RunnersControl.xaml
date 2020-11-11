@@ -101,16 +101,16 @@
 						</StackPanel>
 					</Button>
 					<Grid Width="50">
-						<Label Content="{Binding Path=BackStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" Visibility="Visible" MouseDown="label_MouseDown"/>
-						<TextBox Visibility="Hidden" Text="{Binding Path=BackStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" KeyDown="TextBox_KeyDown" MouseDoubleClick="TextBox_MouseDoubleClick" />
+						<Label Content="{Binding Path=BackStake2, Mode=TwoWay, Converter={StaticResource sconverter}}" Visibility="Visible" MouseDown="label_MouseDown"/>
+						<TextBox Visibility="Hidden" Text="{Binding Path=BackStake2, Mode=TwoWay, Converter={StaticResource sconverter}}" KeyDown="TextBox_KeyDown" MouseDoubleClick="TextBox_MouseDoubleClick" />
 					</Grid>
 					<Grid Width="50">
-						<Label Content="{Binding Path=LayStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" Visibility="Visible" MouseDown="label_MouseDown"/>
+						<Label Content="{Binding Path=LayStake2, Mode=TwoWay, Converter={StaticResource sconverter}}" Visibility="Visible" MouseDown="label_MouseDown"/>
 						<TextBox Visibility="Hidden" Text="{Binding Path=LayStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" KeyDown="TextBox_KeyDown" MouseDoubleClick="TextBox_MouseDoubleClick" />
 					</Grid>
-					<Label Content="{Binding Path=Profit, Mode=OneWay, StringFormat=\{0:#.#\}}"/>
-					<Label Content="{Binding Path=LevelProfit, Mode=OneWay, StringFormat=\{0:#.#\}}"/>
-					<Label Content="{Binding Path=LastPrice, Mode=OneWay, StringFormat=\{0:#.#\}}"/>
+					<Label Content="{Binding Path=Profit, Mode=OneWay, StringFormat=\{0:C\}}"/>
+					<Label Content="{Binding Path=LevelProfit, Mode=OneWay, StringFormat=\{0:C\}}"/>
+					<Label Content="{Binding Path=LastPrice, Mode=OneWay, Converter={StaticResource oconverter}}"/>
 				</StackPanel>
 			</Grid>
 		</DataTemplate>

@@ -44,29 +44,16 @@
 		<Setter Property="HorizontalContentAlignment" Value="Center"/>
 		<Setter Property="VerticalContentAlignment" Value="Center"/>
 	</Style>
-	<!--<Style TargetType="{x:Type TextBlock}">
-		<Setter Property="Background" Value="ivory"/>
-		<Setter Property="FontSize" Value="10"/>
-		<Setter Property="FontWeight" Value="Normal"/>
-		<Setter Property="Padding" Value="10,0,10,0"/>
-		<Setter Property="Width" Value="50"/>
-	</Style>-->
 	<Style TargetType="{x:Type TextBox}">
-		<Setter Property="VerticalContentAlignment" Value="Center"/>
 		<Setter Property="BorderBrush" Value="DarkGray"/>
 		<Setter Property="BorderThickness" Value="0.5"/>
-		<Setter Property="Background" Value="#00000000"/>
+		<!--<Setter Property="Background" Value="#00000000"/>-->
 		<Setter Property="FontSize" Value="11"/>
 		<Setter Property="FontWeight" Value="Normal"/>
 		<Setter Property="Width" Value="auto"/>
-		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="HorizontalContentAlignment" Value="Left"/>
 	</Style>
-	<!--<SolidColorBrush x:Key="Back1Color" Color="#CACEE7"/>
-	<SolidColorBrush x:Key="Back2Color" Color="#DFE1EE"/>
-	<SolidColorBrush x:Key="Back3Color" Color="#F5F8FF"/>
-	<SolidColorBrush x:Key="Lay1Color" Color="#DBBBD2"/>
-	<SolidColorBrush x:Key="Lay2Color" Color="#EBD6E5"/>
-	<SolidColorBrush x:Key="Lay3Color" Color="#F6E5E6"/>-->
 	<SolidColorBrush x:Key="Back1Color" Color="#CBCAEC"/>
 	<SolidColorBrush x:Key="Back2Color" Color="#DFDFF0"/>
 	<SolidColorBrush x:Key="Back3Color" Color="#BCE5FE"/>

@@ -36,7 +36,7 @@ namespace SpreadTrader
         public Decimal LayStake { get; set; }
         public Decimal Profit { get { return 1.2M; } }
         public Decimal LevelProfit { get { return 1.3M; } }
-        public Decimal LastPrice { get { return 1.4M; } }
+        public double LastPrice { get; set; }
         public Decimal actualSP { get { return Convert.ToDecimal(_prices[0][6].price); } }
         public Decimal ifWin { get { return Convert.ToDecimal(_prices[0][6].size); } }
         public List<PriceSize[]> _prices = new List<PriceSize[]>();
