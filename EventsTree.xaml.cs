@@ -24,7 +24,7 @@ namespace SpreadTrader
 		public void Refresh()
 		{
 			RootNode.Clear();
-			RootNode.PopulateEventTYpes();
+			RootNode.PopulateEventTypes();
 		}
 		public void Populate()
 		{
@@ -36,7 +36,7 @@ namespace SpreadTrader
 					NodeCallback(node);
 				}
 			};
-			RootNode.PopulateEventTYpes();
+			RootNode.PopulateEventTypes();
 		}
 	}
 }

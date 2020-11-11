@@ -195,7 +195,7 @@ namespace BetfairAPI
 
             return RPCRequest<List<Market>>("listMarketCatalogue", p) as List<Market>;
         }
-        public List<Market> GetMarkets(Int32 event_id)
+        public List<Market> GetMarkets(Int32 event_type, Int32 event_id)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
@@ -203,8 +203,12 @@ namespace BetfairAPI
             filter["eventIds"] = new Int32[] { event_id };
             //filter["eventTypeIds"] = new Int32[] { event_type_id };
             //filter["marketStartTime"] = Today();
-//            filter["marketBettingTypes"] = new String[] { "ODDS" };
-//            filter["marketTypeCodes"] = new String[] { "HALF_TIME_SCORE", "MATCH_ODDS", "WIN" };
+            //            filter["marketBettingTypes"] = new String[] { "ODDS" };
+            //            filter["marketTypeCodes"] = new String[] { "HALF_TIME_SCORE", "MATCH_ODDS", "WIN" };
+            if (event_type == 7)
+            {
+                filter["marketTypeCodes"] = new String[] { "MATCH_ODDS", "WIN" };
+            }
             p["marketProjection"] = new String[] { "MARKET_DESCRIPTION", "RUNNER_DESCRIPTION", "EVENT" };
             p["filter"] = filter;
             p["maxResults"] = 200;

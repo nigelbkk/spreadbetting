@@ -409,23 +409,8 @@ namespace BetfairAPI
         public Int32 marketCount { get; set; }
 
     }
-    public class Market : INotifyPropertyChanged
+    public class Market 
     {
-        public String Notify
-        {
-            get { return null; }
-            set
-            {
-            }
-        }
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void NotifyPropertyChanged(String info)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(info));
-            }
-        }
         public struct Description
         {
             public String bettingType { get; set; }
@@ -434,14 +419,11 @@ namespace BetfairAPI
             public Boolean persistenceEnabled { get; set; }
             public Boolean rulesHasDate { get; set; }
             public Boolean turnInPlayEnabled { get; set; }
-
             public String clarifications { get; set; }
             public String rules { get; set; }
             public String wallet { get; set; }
             public String marketType { get; set; }
-//            public marketTypeEnum marketType { get; set; }
             public Double marketBaseRate { get; set; }
-
             public DateTime marketTime { get; set; }
             public DateTime suspendTime { get; set; }
         }

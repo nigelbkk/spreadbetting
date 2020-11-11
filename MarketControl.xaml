@@ -6,10 +6,18 @@
              xmlns:local="clr-namespace:SpreadTrader"
              mc:Ignorable="d" d:DesignWidth="600" >
 	<UserControl.Resources>
+		<local:TimeConverter x:Key="converter" />
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
             TargetType="{x:Type Button}">
 			<Setter Property="FontSize" Value="12"/>
 			<EventSetter Event="Click" Handler="Button_Click"/>
+		</Style>
+		<Style BasedOn="{StaticResource {x:Type Label}}" 
+            TargetType="{x:Type Label}">
+			<Setter Property="FontSize" Value="12"/>
+			<Setter Property="Width" Value="auto"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="HorizontalAlignment" Value="Left"/>
 		</Style>
 	</UserControl.Resources>
 	<Grid Name="MarketControlGrid" Background="Gray"  DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" >
@@ -17,10 +25,11 @@
 			<RowDefinition Height="auto"/>
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
-		<Grid Name ="MarketHeader" Grid.Row="0" Height="28" VerticalAlignment="Top" Background="LightBlue">
+		<Grid Name ="MarketHeader" Grid.Row="0" Height="28" VerticalAlignment="Top" Background="Ivory">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="38"/>
 				<ColumnDefinition Width="38"/>
+				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 			<Button Grid.Column="0" Tag="Market Description" ToolTip="Market Description" HorizontalAlignment="Left">
@@ -32,7 +41,8 @@
 					<Image Source="/SpreadTrader;component/Images/down_arrow.png" Visibility="Collapsed"/>
 				</StackPanel>
 			</Button>
-			<Label Grid.Column="2" Content="{Binding MarketNode.FullName}" Padding="6,0,0,0" Width="auto" HorizontalContentAlignment="Left" FontSize="12"/>
+			<Label Grid.Column="2" Content="{Binding MarketNode.FullName}" Padding="6,0,10,0"/>
+			<Label Grid.Column="3" Content="{Binding MarketNode.UpdateRate, Converter={StaticResource converter}}" Padding="6,0,6,0" HorizontalAlignment="Right"/>
 		</Grid>
 		<Grid Grid.Row="1" Background="Ivory">
 			<DockPanel>

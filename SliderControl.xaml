@@ -11,9 +11,8 @@
 		<Style BasedOn="{StaticResource {x:Type Slider}}" 
             TargetType="{x:Type Slider}">
 			<Setter Property="Orientation" Value="Horizontal"/>
-			<Setter Property="Minimum" Value="-10"/>
-			<Setter Property="Maximum" Value="10"/>
-			<Setter Property="Value" Value="0"/>
+			<Setter Property="Minimum" Value="0"/>
+			<Setter Property="Maximum" Value="20"/>
 			<Setter Property="VerticalAlignment" Value="Center"/>
 			<EventSetter Event="ValueChanged" Handler="Slider_ValueChanged"/>
 		</Style>
@@ -65,15 +64,16 @@
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Cut Stakes By %" HorizontalContentAlignment="Left" />
-					<Slider Grid.Column="1" Name="CutStakes" Tag="CutStakes" Minimum="0" Maximum="10" Value="10"/>
+					<Slider Grid.Column="1" Name="CutStakes" Minimum="0" Maximum="10" Value="10"/>
 				</Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="110" />
-						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="113*"/>
+						<ColumnDefinition Width="177*"/>
 					</Grid.ColumnDefinitions>
-					<Label Grid.Column="0" Content="Move Back Bets" HorizontalContentAlignment="Left" />
-					<Slider Grid.Column="1" Name="MoveBack" Tag="MoveBack"/>
+					<Label Grid.Column="0" Content="Move Back Bets" HorizontalContentAlignment="Left"/>
+					<Slider Grid.Column="1" Name="MoveBack" Value="1" Grid.ColumnSpan="2" Margin="0,5"/>
 				</Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>
@@ -81,7 +81,7 @@
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Move Lay Bets" HorizontalContentAlignment="Left" />
-					<Slider Grid.Column="1" Name="MoveLay" Tag="MoveLay"/>
+					<Slider Grid.Column="1" Name="MoveLay" Value="19"/>
 				</Grid>
 			</StackPanel>
 		</Grid>

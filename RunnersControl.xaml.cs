@@ -5,15 +5,15 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using BetfairAPI;
+using System.Windows.Media;
 
 namespace SpreadTrader
 {
 	public partial class RunnersControl : UserControl, INotifyPropertyChanged
 	{
-		public NodeSelectionDelegate NodeChangeEventSink = null;
-		BackgroundWorker Worker = null;
+		private BackgroundWorker Worker = null;
 		public NodeViewModel MarketNode { get; set; }
+		public	bool IsSelected { get; set; }
 		public List<LiveRunner> LiveRunners { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -21,7 +21,6 @@ namespace SpreadTrader
 		{
 			if (PropertyChanged != null)
 			{
-//				Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
 				PropertyChanged(this, new PropertyChangedEventArgs(info));
 			}
 		}
@@ -29,21 +28,12 @@ namespace SpreadTrader
 		{
 			InitializeComponent();
 			MarketNode = new NodeViewModel(new BetfairAPI.BetfairAPI());
-			NodeChangeEventSink += (node) =>
-			{
-				if (IsLoaded)
-				{
-					if (MarketNode != node)        
-					{
-						MarketNode = node;
-					}
-					NotifyPropertyChanged("");
-				}
-			};
 			Worker = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
 			Worker.ProgressChanged += (o, e) =>
 			{
 				LiveRunners = e.UserState as List<LiveRunner>;
+				MarketNode.UpdateRate = e.ProgressPercentage;
+				NotifyPropertyChanged("");
 			};
 			Worker.DoWork += (o, ea) =>
 			{
@@ -52,16 +42,21 @@ namespace SpreadTrader
 				{
 					try
 					{
-						Debug.WriteLine(MarketNode.MarketName);
-						var LiveRunners = MarketNode.GetLiveRunners();
-						sender.ReportProgress(0, LiveRunners);
+						if (MarketNode != null && MarketNode.MarketName != null && IsSelected)
+						{
+							//Debug.WriteLine(MarketNode.MarketName);
+							DateTime LastUpdate = DateTime.UtcNow;
+							var lr = MarketNode.GetLiveRunners();
+							Int32 rate = (DateTime.UtcNow - LastUpdate).Milliseconds;
+							sender.ReportProgress(rate, lr);
+						}
 					}
 					catch (Exception xe)
 					{
 						Debug.WriteLine(xe.Message);
 					}
+					System.Threading.Thread.Sleep(props.WaitBF);
 				}
-				System.Threading.Thread.Sleep(props.WaitBF);
 			};
 			Worker.RunWorkerAsync();
 		}
@@ -78,8 +73,6 @@ namespace SpreadTrader
 			{
 				Debug.WriteLine(xe.Message);
 			}
-			LiveRunners = MarketNode.GetLiveRunners();
-			NotifyPropertyChanged("");
 		}
 		private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
 		{
@@ -119,22 +112,20 @@ namespace SpreadTrader
 		{
 			SV1.Height = Math.Max(25, e.NewSize.Height - SV1_Header.Height);
 		}
-
-		private void UserControl_Loaded(object sender, RoutedEventArgs e)
+	}
+	public static class Extensions
+	{
+		public static T FindParentOfType<T>(this DependencyObject child) where T : DependencyObject
 		{
-//			MarketNode.Start();
-	//		bgw.RunWorkerAsync();
-		}
-		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
-		{
-//			MarketNode.Stop();
-			//			bgw.CancelAsync();
-		}
-
-		private void UpperGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-		{
-			LiveRunners = MarketNode.GetLiveRunners();
-			NotifyPropertyChanged("");
+			DependencyObject parentDepObj = child;
+			do
+			{
+				parentDepObj = VisualTreeHelper.GetParent(parentDepObj);
+				T parent = parentDepObj as T;
+				if (parent != null) return parent;
+			}
+			while (parentDepObj != null);
+			return null;
 		}
 	}
 }

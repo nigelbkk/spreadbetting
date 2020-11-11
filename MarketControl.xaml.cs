@@ -12,6 +12,11 @@ namespace SpreadTrader
 	{
 		public NodeSelectionDelegate NodeChangeEventSink = null;
 		public NodeViewModel MarketNode { get; set; }
+		public bool IsSelected { set 
+			{
+				RunnersControl.IsSelected = value; 
+			} 
+		}
 		public String MarketName { get { return MarketNode == null ? "No market selected" : MarketNode.Name;  } }
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -19,19 +24,21 @@ namespace SpreadTrader
 		{
 			if (PropertyChanged != null)
 			{
-				Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
+				PropertyChanged(this, new PropertyChangedEventArgs(info));
+				//Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
 			}
 		}
 		public MarketControl()
 		{
 			InitializeComponent();
-			NodeChangeEventSink = RunnersControl.NodeChangeEventSink;
+//			NodeChangeEventSink = RunnersControl.NodeChangeEventSink;
 			NodeChangeEventSink += BetsManagerControl.NodeChangeEventSink;
 			NodeChangeEventSink += (node) =>
 			{
 				if (IsLoaded)
 				{
 					MarketNode = node;
+					RunnersControl.MarketNode = MarketNode;
 					NotifyPropertyChanged("");
 				}
 			};

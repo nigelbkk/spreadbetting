@@ -160,5 +160,34 @@ namespace SpreadTrader
 		{
 			props.ColumnWidth = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
 		}
+		private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			TabControl tabControl = sender as TabControl;
+			//foreach(TabItem t in tabControl.Items)
+			//{
+			//	MarketControl o = t.Content as MarketControl;
+			//	if (o != null)
+			//		o.RunnersControl.IsSelected = false;
+			//}
+			//MarketControl mc = tabControl.SelectedContent as MarketControl;
+			//if (mc != null)
+			//	mc.RunnersControl.IsSelected = true;
+
+			if (e.RemovedItems.Count > 0)
+			{
+				TabItem tr = e.RemovedItems[0] as TabItem;
+				MarketControl mcr = tr.Content as MarketControl;
+				if (mcr != null)
+					mcr.IsSelected = false;
+			}
+
+			if (e.AddedItems.Count > 0)
+			{
+				TabItem ta = e.AddedItems[0] as TabItem;
+				MarketControl mca = ta.Content as MarketControl;
+				if (mca != null)
+					mca.IsSelected = true;
+			}
+		}
 	}
 }

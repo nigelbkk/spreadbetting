@@ -7,6 +7,30 @@ using System.Windows.Media;
 
 namespace SpreadTrader
 {
+	public class PercentConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			double val = System.Convert.ToDouble(value);
+			return String.Format("{0:0.00}%", val);
+		}
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
+	public class TimeConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			double val = System.Convert.ToDouble(value);
+			return String.Format("{0:0}ms", val);
+		}
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 	public class OddsConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -23,7 +47,7 @@ namespace SpreadTrader
 			{
 				case 0: return String.Format("{0:0}", val);
 				case 1: return String.Format("{0:0.0}", val);
-				case 2:  return String.Format("{0:0.00}", val);
+				case 2: return String.Format("{0:0.00}", val);
 			}
 			return valString;
 		}

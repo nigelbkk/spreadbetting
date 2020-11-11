@@ -5,10 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded" >
+	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
+             d:DesignHeight="450" d:DesignWidth="800" >
 	<UserControl.Resources>
 		<local:OddsConverter x:Key="oconverter" />
-		<local:StakeConverter x:Key="converter" />
+		<local:StakeConverter x:Key="sconverter" />
+		<local:PercentConverter x:Key="pconverter" />
 		<Style TargetType="{x:Type Button}">
 			<EventSetter Event="Click" Handler="Button_Click"/>
 			<Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -25,7 +27,6 @@
 			<Setter Property="FontSize" Value="9"/>
 			<Setter Property="FontWeight" Value="Normal"/>
 			<Setter Property="Width" Value="50"/>
-			<!--<Setter Property="Width" Value="auto"/>-->
 		</Style>
 		<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
 			<Setter Property="FontSize" Value="11"/>
@@ -66,37 +67,37 @@
 					<Button Tag="back3" Background = "{StaticResource Back3Color}">
 						<StackPanel Orientation="Vertical">
 							<TextBlock Text="{Binding prices[2].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding prices[2].size, Converter={StaticResource converter}}" FontSize="9" FontWeight="Normal"/>
+							<TextBlock Text="{Binding prices[2].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
 						</StackPanel>
 					</Button>
 					<Button Tag="back2" Background = "{StaticResource Back2Color}">
 						<StackPanel Orientation="Vertical">
 							<TextBlock Text="{Binding prices[1].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding prices[1].size, Converter={StaticResource converter}}" FontSize="9" FontWeight="Normal"/>
+							<TextBlock Text="{Binding prices[1].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
 						</StackPanel>
 					</Button>
 					<Button Tag="back1" Background = "{StaticResource Back1Color}">
 						<StackPanel Orientation="Vertical">
 							<TextBlock Text="{Binding prices[0].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding prices[0].size, Converter={StaticResource converter}}" FontSize="9" FontWeight="Normal"/>
+							<TextBlock Text="{Binding prices[0].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
 						</StackPanel>
 					</Button>
 					<Button Tag="lay1" Background = "{StaticResource Lay1Color}" Margin="10,0,0,0">
 						<StackPanel Orientation="Vertical">
 							<TextBlock Text="{Binding prices[3].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding prices[3].size, Converter={StaticResource converter}}" FontSize="9" FontWeight="Normal"/>
+							<TextBlock Text="{Binding prices[3].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
 						</StackPanel>
 					</Button>
 					<Button Tag="lay2" Background = "{StaticResource Lay2Color}">
 						<StackPanel Orientation="Vertical">
 							<TextBlock Text="{Binding prices[4].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding prices[4].size, Converter={StaticResource converter}}" FontSize="9" FontWeight="Normal"/>
+							<TextBlock Text="{Binding prices[4].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
 						</StackPanel>
 					</Button>
 					<Button Tag="lay3" Background = "{StaticResource Lay3Color}">
 						<StackPanel Orientation="Vertical">
 							<TextBlock Text="{Binding prices[5].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock  Text="{Binding prices[5].size, Converter={StaticResource converter}}" FontSize="9" FontWeight="Normal"/>
+							<TextBlock  Text="{Binding prices[5].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
 						</StackPanel>
 					</Button>
 					<Grid Width="50">
@@ -114,18 +115,22 @@
 			</Grid>
 		</DataTemplate>
 	</UserControl.Resources>
-    <Grid SizeChanged="Grid_SizeChanged" >
-		<Grid Name="UpperGrid" Grid.Row="0" VerticalAlignment="Stretch" Background="Azure"  DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" PreviewMouseDown="UpperGrid_PreviewMouseDown">
+    <Grid SizeChanged="Grid_SizeChanged">
+		<!--<Grid Name="UpperGrid" Grid.Row="0" VerticalAlignment="Stretch" Background="Azure"  DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">-->
+		<Grid Name="UpperGrid" Grid.Row="0" VerticalAlignment="Stretch" Background="Azure">
 			<StackPanel Orientation="Vertical" >
 				<StackPanel Name="SV1_Header" Orientation="Horizontal" Height="36">
 					<Label Width ="135" Padding="8,0,0,0" HorizontalContentAlignment ="Left">Selection Name</Label><Label/><Label/>
-					<Label>100.71%</Label><Label Width="10"></Label><Label>99.37%</Label><Label/><Label/>
+					<Label Content="{Binding Path=MarketNode.Market.MarketBook.BackBook, Converter={StaticResource pconverter}}"/><Label Width="10"/>
+					<Label Content="{Binding Path=MarketNode.Market.MarketBook.LayBook, Converter={StaticResource pconverter}}"/><Label/><Label/>
 					<Label><TextBlock TextAlignment="Center">Back<LineBreak/>Stake</TextBlock></Label>
 					<Label><TextBlock TextAlignment="Center">Lay<LineBreak/>Stake</TextBlock></Label>
-					<Label>Profit</Label><Label ><TextBlock TextAlignment="Center">Level<LineBreak/>Profit</TextBlock></Label>
+					<Label>Profit</Label><Label><TextBlock TextAlignment="Center">Level<LineBreak/>Profit</TextBlock></Label>
 					<Label><TextBlock TextAlignment="Center">Last<LineBreak/>Price</TextBlock></Label>
 				</StackPanel>
-				<ItemsControl Name="SV1" FontFamily="Verdana" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}" >
+				<ItemsControl Name="SV1" FontFamily="Verdana" FontSize="9" Foreground="#FF5F4D4D" 
+						DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+						 ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}" >
 					<ItemsControl.Template>
 						<ControlTemplate>
 							<ScrollViewer Padding="{TemplateBinding Control.Padding}">

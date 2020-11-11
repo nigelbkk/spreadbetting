@@ -10,10 +10,10 @@ namespace SpreadTrader
 {
 	public partial class SliderControl : UserControl, INotifyPropertyChanged
 	{
-		private const Int32 BACKPRICES = 0;
-		private const Int32 BACKSTAKES = 10;
-		private const Int32 LAYPRICES = 20;
-		private const Int32 LAYSTAKES = 30;
+		private const Int32 LAYPRICES = 0;
+		private const Int32 LAYSTAKES = 10;
+		private const Int32 BACKPRICES = 20;
+		private const Int32 BACKSTAKES = 30;
 		public SliderChangedDelegate OnSliderChanged = null;
 		public static Decimal[] Values { get; set; }
 		private List<Decimal> AllPrices = null;
@@ -93,25 +93,25 @@ namespace SpreadTrader
 		{
 			try
 			{
-				if (BasePrice < 1000 && BasePrice > 1.01M)
+				if (Values != null && BasePrice < 1000 && BasePrice > 1.01M)
 				{
-					Int32 base_index = PriceIndex(BasePrice) - 9;
+					Int32 base_index = PriceIndex(BasePrice) - 21;
 					Int32 side = BACKPRICES;
 					base_index = Math.Max(base_index, 10);
 					base_index = Math.Min(base_index, 338);
-					Int32 offset = Convert.ToInt32(MoveBack.Value);
+					Int32 offset = Convert.ToInt32(MoveLay.Value);
 					for (int i = 0; i < 9; i++)
 					{
-						Values[side + i] = AllPrices[base_index + offset + i];
+						Values[side + i] = AllPrices[base_index + offset - i];
 					}
 					side = LAYPRICES;
 					base_index = PriceIndex(BasePrice) + 1;
 					base_index = Math.Max(base_index, 10);
 					base_index = Math.Min(base_index, 338);
-					offset = Convert.ToInt32(MoveLay.Value);
+					offset = Convert.ToInt32(MoveBack.Value);
 					for (int i = 0; i < 9; i++)
 					{
-						Values[side + i] = AllPrices[base_index - offset + i];
+						Values[side + i] = AllPrices[base_index + offset + i];
 					}
 					NotifyPropertyChanged("");
 				}
@@ -125,7 +125,7 @@ namespace SpreadTrader
 		{
 			Slider slider = sender as Slider;
 			String tag = slider.Tag as String;
-			switch (tag)
+			switch (slider.Name)
 			{
 				case "CutStakes": MoveStakes((Int32) e.NewValue, (Int32) e.OldValue); break;
 				case "MoveBack": SyncPrices(); break;

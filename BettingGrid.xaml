@@ -106,7 +106,7 @@
 					<TextBox Grid.Column="9" Text="{Binding Path=Values[18], StringFormat={}{0:N0}}" Background="{StaticResource Back1Color}"/>
 				</ItemsControl>
 			</Grid>
-			<Border Background="#00000000" BorderBrush="DarkGray" BorderThickness="0.5" Height="14"/>
+			<Border Background="#00000000" BorderBrush="DarkGray" BorderThickness="0.5" Height="8"/>
 			<Grid>
 				<ItemsControl Style="{StaticResource GridItemsStyle}"  Name="LayCheckboxes">
 					<StackPanel Orientation="Horizontal">

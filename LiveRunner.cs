@@ -34,9 +34,9 @@ namespace SpreadTrader
         public String LayStake2 { get { return LayStake.ToString(); } set { LayStake = Convert.ToDecimal(value); NotifyPropertyChanged(""); } }
         public Decimal BackStake { get; set; }
         public Decimal LayStake { get; set; }
-        public Decimal Profit { get { return 0M; } }
-        public Decimal LevelProfit { get { return 0M; } }
-        public Decimal LastPrice { get { return 0M; } }
+        public Decimal Profit { get { return 1.2M; } }
+        public Decimal LevelProfit { get { return 1.3M; } }
+        public Decimal LastPrice { get { return 1.4M; } }
         public Decimal actualSP { get { return Convert.ToDecimal(_prices[0][6].price); } }
         public Decimal ifWin { get { return Convert.ToDecimal(_prices[0][6].size); } }
         public List<PriceSize[]> _prices = new List<PriceSize[]>();
