@@ -14,32 +14,31 @@ namespace SpreadTrader
 		public SubmitBetsDelegate SubmitBets = null;
 		public static PriceSize[] BackValues { get; set; }
 		public static PriceSize[] LayValues { get; set; }
-		private List<Decimal> AllPrices = null;
+		private List<double> AllPrices = null;
 		public SliderControl()
 		{
-			Decimal[] MinValue = { 1.01M, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
-			Decimal[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
+			double[] MinValue = { 1.01, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
+			double[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
 			Decimal[] Increment = { 0.01M, 0.02M, 0.05M, 0.1M, 0.2M, 0.5M, 1, 2, 5, 10 };
 
-			AllPrices = new List<Decimal>();
+			AllPrices = new List<double>();
 			Decimal m = 1.0M;
 			for (Int32 idx = 0; idx < MinValue.Length; idx++)
 			{
-				while (m < MaxValue[idx])
+				while (m < (Decimal) MaxValue[idx])
 				{
 					m += Increment[idx];
-					AllPrices.Add(m);
+					AllPrices.Add((double) m);
 				}
 			}
 			BackValues = new PriceSize[9];
 			LayValues = new PriceSize[9];
 			for (Int32 i = 0; i < 9; i++)
 			{
-				BackValues[i] = new PriceSize((double) AllPrices[i], 20 + 1 * 10);
-				LayValues[i] = new PriceSize((double) AllPrices[i], 20 + 1 * 10);
+				BackValues[i] = new PriceSize(AllPrices[i], 20 + 1 * 10);
+				LayValues[i] = new PriceSize(AllPrices[i], 20 + 1 * 10);
 			}
 			BasePrice = props.BasePrice;
-			Int32 index = PriceIndex(BasePrice);
 			InitializeComponent();
 		}
 		private double _BasePrice;
@@ -61,7 +60,7 @@ namespace SpreadTrader
 		{
 			for (int i = 1; i < AllPrices.Count; i++)
 			{
-				if (AllPrices[i] == (Decimal) v)
+				if (AllPrices[i] == v)
 				{
 					return i;
 				}
@@ -124,7 +123,7 @@ namespace SpreadTrader
 					Int32 offset = Convert.ToInt32(MoveLay.Value);
 					for (int i = 0; i < 9; i++)
 					{
-						BackValues[i].price = (double) AllPrices[base_index + offset - i];
+						BackValues[i].price = AllPrices[base_index + offset - i];
 					}
 					base_index = PriceIndex(BasePrice) + 1;
 					base_index = Math.Max(base_index, 10);
@@ -132,7 +131,7 @@ namespace SpreadTrader
 					offset = Convert.ToInt32(MoveBack.Value);
 					for (int i = 0; i < 9; i++)
 					{
-						LayValues[i].price = (double) AllPrices[base_index + offset + i];
+						LayValues[i].price = AllPrices[base_index + offset + i];
 					}
 					NotifyPropertyChanged("");
 				}
