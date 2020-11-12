@@ -22,25 +22,21 @@ namespace SpreadTrader
         {
             get
             {
-                if (ifWin > 0.00M)
+                if (ifWin > 0.00)
                     return Brushes.Green;
-                if (ifWin < 0.00M)
+                if (ifWin < 0.00)
                     return Brushes.Red;
 
                 return Brushes.DarkGray;
             }
         }
-        public String BackStake2 { get { return BackStake.ToString(); } set { BackStake = Convert.ToDecimal(value); NotifyPropertyChanged(""); } }
-        public String LayStake2 { get { return LayStake.ToString(); } set { LayStake = Convert.ToDecimal(value); NotifyPropertyChanged(""); } }
-        public Decimal BackStake { get; set; }
-        public Decimal LayStake { get; set; }
-        public Decimal Profit { get { return 1.2M; } }
-        public Decimal LevelProfit { get { return 1.3M; } }
+        public double BackStake { get; set; }
+        public double LayStake { get; set; }
+        public double ifWin { get { return 1.2; } }
+        public double LevelProfit { get { return 1.3; } }
         public double LastPrice { get; set; }
-        public Decimal actualSP { get { return Convert.ToDecimal(_prices[0][6].price); } }
-        public Decimal ifWin { get { return Convert.ToDecimal(_prices[0][6].size); } }
-        public List<PriceSize[]> _prices = new List<PriceSize[]>();
-        public PriceSize[] prices { get { return _prices[0]; } }
+        public List<PriceSize> BackPrices { get; set; }
+        public List<PriceSize> LayPrices { get; set; }
         public double BackLayRatio
         {
             get
@@ -65,14 +61,6 @@ namespace SpreadTrader
         }
         public LiveRunner()
         {
-            _prices.Clear();
-            _prices.Add(new PriceSize[7]);
-            _prices.Add(new PriceSize[7]);
-            for (int i = 0; i < 7; i++)
-            {
-                _prices[0][i] = new PriceSize();
-                _prices[1][i] = new PriceSize();
-            }
             BackStake = Properties.Settings.Default.BackStake;
             LayStake = Properties.Settings.Default.LayStake;
         }
@@ -83,19 +71,8 @@ namespace SpreadTrader
         }
         public void SetPrices(Runner r)
         {
-            int i = 0;
-            foreach (var p in r.ex.availableToBack)
-            {
-                _prices[0][i++] = p;
-            }
-            i = 3;      // bug in scbng
-            foreach (var p in r.ex.availableToLay)
-            {
-                _prices[0][i++] = p;
-            }
-            //_prices[0][6].size = ngrunner.ifWin;
-            _prices[0][6].price = r.sp == null ? 0 : (r.sp.nearPrice == 0 ? r.sp.actualSP : r.sp.nearPrice);
-            ngrunner.sp = r.sp;
+            BackPrices = r.ex.availableToBack;
+            LayPrices = r.ex.availableToLay;
             NotifyPropertyChanged("");
         }
 		public override string ToString()

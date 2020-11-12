@@ -1,25 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using BetfairAPI;
 
 namespace SpreadTrader
 {
-	public enum sliderEnum
-	{
-		LAYPRICES = 0,
-		LAYSTAKES = 10,
-		BACKPRICES = 20,
-		BACKSTAKES = 30,
-	}
 	public partial class SliderControl : UserControl, INotifyPropertyChanged
 	{
 		public SliderChangedDelegate OnSliderChanged = null;
 		public SubmitBetsDelegate SubmitBets = null;
-		public static Decimal[] Values { get; set; }
+		public static PriceSize[] BackValues { get; set; }
+		public static PriceSize[] LayValues { get; set; }
 		private List<Decimal> AllPrices = null;
 		public SliderControl()
 		{
@@ -27,7 +21,7 @@ namespace SpreadTrader
 			Decimal[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
 			Decimal[] Increment = { 0.01M, 0.02M, 0.05M, 0.1M, 0.2M, 0.5M, 1, 2, 5, 10 };
 
-			AllPrices = new List<decimal>();
+			AllPrices = new List<Decimal>();
 			Decimal m = 1.0M;
 			for (Int32 idx = 0; idx < MinValue.Length; idx++)
 			{
@@ -37,13 +31,20 @@ namespace SpreadTrader
 					AllPrices.Add(m);
 				}
 			}
+			BackValues = new PriceSize[9];
+			LayValues = new PriceSize[9];
+			for (Int32 i = 0; i < 9; i++)
+			{
+				BackValues[i] = new PriceSize((double) AllPrices[i], 20 + 1 * 10);
+				LayValues[i] = new PriceSize((double) AllPrices[i], 20 + 1 * 10);
+			}
 			BasePrice = props.BasePrice;
 			Int32 index = PriceIndex(BasePrice);
 			InitializeComponent();
 		}
-		private Decimal _BasePrice;
+		private double _BasePrice;
 		public bool AutoOn { get; set; }
-		public Decimal BasePrice { get { return _BasePrice; } set { _BasePrice = Math.Max(value, 1.10M); } }
+		public double BasePrice { get { return _BasePrice; } set { _BasePrice = Math.Max(value, 1.10); } }
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
 		{
@@ -56,66 +57,82 @@ namespace SpreadTrader
 				PropertyChanged(this, new PropertyChangedEventArgs(info));
 			}
 		}
-		private Int32 PriceIndex(Decimal v)
+		private Int32 PriceIndex(double v)
 		{
 			for (int i = 1; i < AllPrices.Count; i++)
 			{
-				if (AllPrices[i] == v)
+				if (AllPrices[i] == (Decimal) v)
 				{
 					return i;
 				}
 			}
 			return 1;
 		}
-		private Decimal PreviousPrice(Decimal v)
+		private double PreviousPrice(double v)
 		{
-			return AllPrices[PriceIndex(v) - 1];
+			return (double) AllPrices[PriceIndex(v) - 1];
 		}
-		private Decimal NextPrice(Decimal v)
+		private double NextPrice(double v)
 		{
-			return AllPrices[PriceIndex(v) + 1];
+			return (double) AllPrices[PriceIndex(v) + 1];
 		}
 		public void MoveStakes(Int32 newvalue, Int32 oldvalue)
 		{
-			for (Int32 i = 0; i < 10; i++)
+			//for (Int32 i = 0; i < 10; i++)
+			//{
+			//	double vb = Values[(int) sliderEnum.BACKSTAKES + i]; double vl = Values[(int)sliderEnum.LAYSTAKES + i];
+			//	if (newvalue > oldvalue)
+			//	{
+			//		vb /= 9; vb *= 10; vl /= 9; vl *= 10;
+			//		Values[(int)sliderEnum.BACKSTAKES + i] = vb; Values[(int)sliderEnum.LAYSTAKES + i] = vl;
+			//	}
+			//	else if (oldvalue > newvalue)
+			//	{
+			//		vl /= 10; vl *= 9; vb /= 10; vb *= 9;
+			//		Values[(int)sliderEnum.BACKSTAKES + i] = vb; Values[(int)sliderEnum.LAYSTAKES + i] = vl;
+			//	}
+			//}
+			for (Int32 i = 0; i < 9; i++)
 			{
-				Decimal vb = Values[(int) sliderEnum.BACKSTAKES + i]; Decimal vl = Values[(int)sliderEnum.LAYSTAKES + i];
+				PriceSize vb = BackValues[i];
+				PriceSize vl = LayValues[i];
 				if (newvalue > oldvalue)
 				{
-					vb /= 9; vb *= 10; vl /= 9; vl *= 10;
-					Values[(int)sliderEnum.BACKSTAKES + i] = vb; Values[(int)sliderEnum.LAYSTAKES + i] = vl;
+					vb.size /= 9; vb.size *= 10; vl.size /= 9; vl.size *= 10;
+					BackValues[i] = vb; 
+					LayValues[i] = vl;
 				}
 				else if (oldvalue > newvalue)
 				{
-					vl /= 10; vl *= 9; vb /= 10; vb *= 9;
-					Values[(int)sliderEnum.BACKSTAKES + i] = vb; Values[(int)sliderEnum.LAYSTAKES + i] = vl;
+					vl.size /= 10; vl.size *= 9; vb.size /= 10; vb.size *= 9;
+					BackValues[i] = vb; 
+					LayValues[i] = vl;
 				}
 			}
+
 			NotifyPropertyChanged("");
 		}
 		public void SyncPrices()
 		{
 			try
 			{
-				if (Values != null && BasePrice < 1000 && BasePrice > 1.01M)
+				if (BackValues != null && BasePrice < 1000 && BasePrice > 1.01)
 				{
 					Int32 base_index = PriceIndex(BasePrice) - 21;
-					Int32 side = (int) sliderEnum.BACKPRICES;
 					base_index = Math.Max(base_index, 10);
 					base_index = Math.Min(base_index, 338);
 					Int32 offset = Convert.ToInt32(MoveLay.Value);
 					for (int i = 0; i < 9; i++)
 					{
-						Values[side + i] = AllPrices[base_index + offset - i];
+						BackValues[i].price = (double) AllPrices[base_index + offset - i];
 					}
-					side = (int)sliderEnum.LAYPRICES;
 					base_index = PriceIndex(BasePrice) + 1;
 					base_index = Math.Max(base_index, 10);
 					base_index = Math.Min(base_index, 338);
 					offset = Convert.ToInt32(MoveBack.Value);
 					for (int i = 0; i < 9; i++)
 					{
-						Values[side + i] = AllPrices[base_index + offset + i];
+						LayValues[i].price = (double) AllPrices[base_index + offset + i];
 					}
 					NotifyPropertyChanged("");
 				}
@@ -139,7 +156,7 @@ namespace SpreadTrader
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			Button b = sender as Button;
-			if (BasePrice < 1000 && BasePrice > 1.01M)
+			if (BasePrice < 1000 && BasePrice > 1.01)
 			{
 				switch (b.Tag)
 				{
@@ -162,15 +179,17 @@ namespace SpreadTrader
 		}
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
-			for (Int32 i = 0; i < 9; i++)
-			{
-				Values[(int)sliderEnum.BACKPRICES + i] = AllPrices[i];
-				Values[(int)sliderEnum.LAYPRICES + i] = AllPrices[i];
-			}
-			for (Int32 i = 0; i < 10; i++)
-			{
-				Values[(int)sliderEnum.LAYSTAKES + i] = Values[(int)sliderEnum.BACKSTAKES + i] = 20 + i*10;
-			}
+			//for (Int32 i = 0; i < 9; i++)
+			//{
+			//	BackValues[i] = new PriceSize(AllPrices[i], 20 + 1*10);
+			//	LayValues[i] = new PriceSize(AllPrices[i], 20 + 1 * 10);
+			//	//Values[(int)sliderEnum.BACKPRICES + i] = AllPrices[i];
+			//	//Values[(int)sliderEnum.LAYPRICES + i] = AllPrices[i];
+			//}
+			//for (Int32 i = 0; i < 10; i++)
+			//{
+			//	BackValues[(int)sliderEnum.LAYSTAKES + i] = Values[(int)sliderEnum.BACKSTAKES + i] = 20 + i*10;
+			//}
 			SyncPrices();
 		}
 		private void TextBox_LostFocus(object sender, RoutedEventArgs e)
@@ -178,7 +197,7 @@ namespace SpreadTrader
 			TextBox tx = sender as TextBox;
 			if (!String.IsNullOrEmpty(tx.Text))
 			{
-				BasePrice = BetfairAPI.BetfairAPI.BetfairPrice(Convert.ToDecimal(tx.Text));
+				BasePrice = BetfairAPI.BetfairAPI.BetfairPrice(Convert.ToDouble(tx.Text));
 				props.BasePrice = BasePrice;
 				SyncPrices();
 				tx.Text = Convert.ToString(BasePrice);

@@ -15,9 +15,8 @@ namespace SpreadTrader
 	public partial class BettingGrid : UserControl, INotifyPropertyChanged
 	{
 		public bool[] CheckBoxes { get; set; }
-		public Decimal[] Values { get; set; }
-		public List<Decimal> Prices { get; set; }
-		public List<Decimal> Stakes { get; set; }
+		public PriceSize[] BackValues { get; set; }
+		public PriceSize[] LayValues { get; set; }
 		public NodeViewModel MarketNode { get; set; }
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
@@ -30,8 +29,8 @@ namespace SpreadTrader
 		public BettingGrid()
 		{
 			InitializeComponent();
-			Values = new Decimal[40];
-			SliderControl.Values = Values;
+			BackValues = SliderControl.BackValues;
+			LayValues = SliderControl.LayValues;
 			CheckBoxes = new bool[20];
 			for (int i = 0; i < 20; i++)
 			{
@@ -69,8 +68,8 @@ namespace SpreadTrader
 				List<LiveRunner> runners = new List<LiveRunner>();
 				for (Int32 i = 0; i < 9; i++)
 				{
-					laybets.Add(new PriceSize() { price = (double)Values[(int)sliderEnum.LAYPRICES + i], size = (double)Values[(int)sliderEnum.LAYSTAKES + i] });
-					backbets.Add(new PriceSize() { price = (double)Values[(int)sliderEnum.BACKPRICES + i], size = (double)Values[(int)sliderEnum.BACKSTAKES + i] });
+					laybets.Add(LayValues[i]);
+					backbets.Add(BackValues[i]);
 				}
 				laybets.Sort((a, b) => Math.Sign(b.price - a.price));
 				backbets.Sort((a, b) => Math.Sign(a.price - b.price));
@@ -141,7 +140,7 @@ namespace SpreadTrader
 				CheckBox cb = ic.Items[i] as CheckBox;
 				if (cb != null)
 				{
-					cb.Tag = i;// String.Format("BackCheckbox{0}", i);
+					cb.Tag = i;
 				}
 			}
 			ic = LayCheckboxes;

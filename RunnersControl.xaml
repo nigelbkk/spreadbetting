@@ -66,38 +66,38 @@
 					<Label Background="LightCyan"  Content="{Binding name}" Width="135" Padding="6" HorizontalContentAlignment="Left"/>
 					<Button Tag="back3" Background = "{StaticResource Back3Color}">
 						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding prices[2].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding prices[2].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
+							<TextBlock Text="{Binding BackPrices[2].price, Converter={StaticResource oconverter}}"/>
+							<TextBlock Text="{Binding BackPrices[2].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
 						</StackPanel>
 					</Button>
 					<Button Tag="back2" Background = "{StaticResource Back2Color}">
 						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding prices[1].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding prices[1].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
+							<TextBlock Text="{Binding BackPrices[1].price, Converter={StaticResource oconverter}}"/>
+							<TextBlock Text="{Binding BackPrices[1].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
 						</StackPanel>
 					</Button>
 					<Button Tag="back1" Background = "{StaticResource Back1Color}">
 						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding prices[0].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding prices[0].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
+							<TextBlock Text="{Binding BackPrices[0].price, Converter={StaticResource oconverter}}"/>
+							<TextBlock Text="{Binding BackPrices[0].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
 						</StackPanel>
 					</Button>
 					<Button Tag="lay1" Background = "{StaticResource Lay1Color}" Margin="10,0,0,0">
 						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding prices[3].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding prices[3].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
+							<TextBlock Text="{Binding LayPrices[0].price, Converter={StaticResource oconverter}}"/>
+							<TextBlock Text="{Binding LayPrices[0].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
 						</StackPanel>
 					</Button>
 					<Button Tag="lay2" Background = "{StaticResource Lay2Color}">
 						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding prices[4].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding prices[4].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
+							<TextBlock Text="{Binding LayPrices[1].price, Converter={StaticResource oconverter}}"/>
+							<TextBlock Text="{Binding LayPrices[1].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
 						</StackPanel>
 					</Button>
 					<Button Tag="lay3" Background = "{StaticResource Lay3Color}">
 						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding prices[5].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock  Text="{Binding prices[5].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
+							<TextBlock Text="{Binding LayPrices[2].price, Converter={StaticResource oconverter}}"/>
+							<TextBlock  Text="{Binding LayPrices[2].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
 						</StackPanel>
 					</Button>
 					<Grid Width="50">

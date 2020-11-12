@@ -32,19 +32,7 @@ namespace SpreadTrader
 			Worker.ProgressChanged += (o, e) =>
 			{
 				List<LiveRunner> NewRunners = e.UserState as List<LiveRunner>;
-				if (LiveRunners != null)
-				{
-					for (int i = 0; i < NewRunners.Count; i++)
-					{
-						//LiveRunner rold = LiveRunners[i];
-						//LiveRunner rnew = NewRunners[i];
-						//rnew.LastPrice = rnew.prices[3].price;
-						//if (rold.prices[0].price != rnew.prices[0].price)
-						//{
-						//	rnew.LastPrice = rnew.prices[0].price;
-						//}
-					}
-				}
+				// get last price traded and ifWin
 				LiveRunners = NewRunners;
 				MarketNode.UpdateRate = e.ProgressPercentage;
 				NotifyPropertyChanged("");
@@ -58,7 +46,6 @@ namespace SpreadTrader
 					{
 						if (MarketNode != null && MarketNode.MarketName != null && IsSelected)
 						{
-							//Debug.WriteLine(MarketNode.MarketName);
 							DateTime LastUpdate = DateTime.UtcNow;
 							var lr = MarketNode.GetLiveRunners();
 							Int32 rate = (Int32) ((DateTime.UtcNow - LastUpdate).TotalMilliseconds);

@@ -7,6 +7,8 @@
 	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
              mc:Ignorable="d" d:DesignWidth="600" Loaded="UserControl_Loaded">
 	<UserControl.Resources>
+		<local:OddsConverter x:Key="oconverter" />
+		<local:StakeConverter x:Key="sconverter" />
 		<Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
 			<Setter Property="VerticalAlignment" Value="Center"/>
 			<Setter Property="HorizontalAlignment" Value="Center"/>
@@ -27,6 +29,7 @@
             TargetType="{x:Type TextBox}">
 			<Setter Property="FontSize" Value="12"/>
 			<Setter Property="Width" Value="auto"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
 		</Style>
 		<Style x:Key="GridItemsStyle"
            TargetType="ItemsControl">
@@ -77,15 +80,15 @@
 			<Grid>
 				<ItemsControl Style="{StaticResource GridItemsStyle}" Name="BackPrices">
 					<Label Grid.Column="0" Content="Back Prices" HorizontalContentAlignment="Left"/>
-					<Label Grid.Column="1" Content="{Binding Path=Values[0]}" Background="{StaticResource Back3Color}"/>
-					<Label Grid.Column="2" Content="{Binding Path=Values[1]}" Background="{StaticResource Back3Color}"/>
-					<Label Grid.Column="3" Content="{Binding Path=Values[2]}" Background="{StaticResource Back3Color}"/>
-					<Label Grid.Column="4" Content="{Binding Path=Values[3]}" Background="{StaticResource Back2Color}"/>
-					<Label Grid.Column="5" Content="{Binding Path=Values[4]}" Background="{StaticResource Back2Color}"/>
-					<Label Grid.Column="6" Content="{Binding Path=Values[5]}" Background="{StaticResource Back2Color}"/>
-					<Label Grid.Column="7" Content="{Binding Path=Values[6]}" Background="{StaticResource Back1Color}"/>
-					<Label Grid.Column="8" Content="{Binding Path=Values[7]}" Background="{StaticResource Back1Color}"/>
-					<Label Grid.Column="9" Content="{Binding Path=Values[8]}" Background="{StaticResource Back1Color}"/>
+					<Label Grid.Column="1" Content="{Binding Path=BackValues[0].price, Converter={StaticResource oconverter}}" Background="{StaticResource Back3Color}"/>
+					<Label Grid.Column="2" Content="{Binding Path=BackValues[1].price, Converter={StaticResource oconverter}}" Background="{StaticResource Back3Color}"/>
+					<Label Grid.Column="3" Content="{Binding Path=BackValues[2].price, Converter={StaticResource oconverter}}" Background="{StaticResource Back3Color}"/>
+					<Label Grid.Column="4" Content="{Binding Path=BackValues[3].price, Converter={StaticResource oconverter}}" Background="{StaticResource Back2Color}"/>
+					<Label Grid.Column="5" Content="{Binding Path=BackValues[4].price, Converter={StaticResource oconverter}}" Background="{StaticResource Back2Color}"/>
+					<Label Grid.Column="6" Content="{Binding Path=BackValues[5].price, Converter={StaticResource oconverter}}" Background="{StaticResource Back2Color}"/>
+					<Label Grid.Column="7" Content="{Binding Path=BackValues[6].price, Converter={StaticResource oconverter}}" Background="{StaticResource Back1Color}"/>
+					<Label Grid.Column="8" Content="{Binding Path=BackValues[7].price, Converter={StaticResource oconverter}}" Background="{StaticResource Back1Color}"/>
+					<Label Grid.Column="9" Content="{Binding Path=BackValues[8].price, Converter={StaticResource oconverter}}" Background="{StaticResource Back1Color}"/>
 				</ItemsControl>
 			</Grid>
 			<Grid>
@@ -95,16 +98,16 @@
 				</Grid.ColumnDefinitions>
 				<ItemsControl Style="{StaticResource GridItemsStyle}"  Name="BackStakes" Grid.ColumnSpan="2" Margin="0,0,0,0.333">
 					<Label Grid.Column="0" Content="Back Stakes" HorizontalContentAlignment="Left"/>
-					<TextBox Grid.Column="1" Text="{Binding Path=Values[10], StringFormat={}{0:N0}}" Background="{StaticResource Back3Color}"/>
-					<TextBox Grid.Column="2" Text="{Binding Path=Values[11], StringFormat={}{0:N0}}" Background="{StaticResource Back3Color}"/>
-					<TextBox Grid.Column="3" Text="{Binding Path=Values[12], StringFormat={}{0:N0}}" Background="{StaticResource Back3Color}"/>
-					<TextBox Grid.Column="4" Text="{Binding Path=Values[13], StringFormat={}{0:N0}}" Background="{StaticResource Back2Color}"/>
-					<TextBox Grid.Column="5" Text="{Binding Path=Values[14], StringFormat={}{0:N0}}" Background="{StaticResource Back2Color}"/>
-					<TextBox Grid.Column="6" Text="{Binding Path=Values[15], StringFormat={}{0:N0}}" Background="{StaticResource Back2Color}"/>
-					<TextBox Grid.Column="7" Text="{Binding Path=Values[16], StringFormat={}{0:N0}}" Background="{StaticResource Back1Color}"/>
-					<TextBox Grid.Column="8" Text="{Binding Path=Values[17], StringFormat={}{0:N0}}" Background="{StaticResource Back1Color}"/>
-					<TextBox Grid.Column="9" Text="{Binding Path=Values[18], StringFormat={}{0:N0}}" Background="{StaticResource Back1Color}"/>
-				</ItemsControl>
+					<TextBox Grid.Column="1" Text="{Binding Path=BackValues[0].size, Converter={StaticResource sconverter}}" Background="{StaticResource Back3Color}"/>
+					<TextBox Grid.Column="2" Text="{Binding Path=BackValues[1].size, Converter={StaticResource sconverter}}" Background="{StaticResource Back3Color}"/>
+					<TextBox Grid.Column="3" Text="{Binding Path=BackValues[2].size, Converter={StaticResource sconverter}}" Background="{StaticResource Back3Color}"/>
+					<TextBox Grid.Column="4" Text="{Binding Path=BackValues[3].size, Converter={StaticResource sconverter}}" Background="{StaticResource Back2Color}"/>
+					<TextBox Grid.Column="5" Text="{Binding Path=BackValues[4].size, Converter={StaticResource sconverter}}" Background="{StaticResource Back2Color}"/>
+					<TextBox Grid.Column="6" Text="{Binding Path=BackValues[5].size, Converter={StaticResource sconverter}}" Background="{StaticResource Back2Color}"/>
+					<TextBox Grid.Column="7" Text="{Binding Path=BackValues[6].size, Converter={StaticResource sconverter}}" Background="{StaticResource Back1Color}"/>
+					<TextBox Grid.Column="8" Text="{Binding Path=BackValues[7].size, Converter={StaticResource sconverter}}" Background="{StaticResource Back1Color}"/>
+					<TextBox Grid.Column="9" Text="{Binding Path=BackValues[8].size, Converter={StaticResource sconverter}}" Background="{StaticResource Back1Color}"/>
+				</ItemsControl>												   
 			</Grid>
 			<Border Background="#00000000" BorderBrush="DarkGray" BorderThickness="0.5" Height="8"/>
 			<Grid>
@@ -127,29 +130,29 @@
 			<Grid>
 				<ItemsControl Style="{StaticResource GridItemsStyle}"  Name="LayPrices">
 					<Label Grid.Column="0" Content="Lay Prices" HorizontalContentAlignment="Left"/>
-					<Label Grid.Column="1" Content="{Binding Path=Values[20]}" Background="{StaticResource Lay1Color}"/>
-					<Label Grid.Column="2" Content="{Binding Path=Values[21]}" Background="{StaticResource Lay1Color}"/>
-					<Label Grid.Column="3" Content="{Binding Path=Values[22]}" Background="{StaticResource Lay1Color}"/>
-					<Label Grid.Column="4" Content="{Binding Path=Values[23]}" Background="{StaticResource Lay2Color}"/>
-					<Label Grid.Column="5" Content="{Binding Path=Values[24]}" Background="{StaticResource Lay2Color}"/>
-					<Label Grid.Column="6" Content="{Binding Path=Values[25]}" Background="{StaticResource Lay2Color}"/>
-					<Label Grid.Column="7" Content="{Binding Path=Values[26]}" Background="{StaticResource Lay3Color}"/>
-					<Label Grid.Column="8" Content="{Binding Path=Values[27]}" Background="{StaticResource Lay3Color}"/>
-					<Label Grid.Column="9" Content="{Binding Path=Values[28]}" Background="{StaticResource Lay3Color}"/>
-				</ItemsControl>
+					<Label Grid.Column="1" Content="{Binding Path=LayValues[0].price, Converter={StaticResource oconverter}}" Background="{StaticResource Lay1Color}"/>
+					<Label Grid.Column="2" Content="{Binding Path=LayValues[1].price, Converter={StaticResource oconverter}}" Background="{StaticResource Lay1Color}"/>
+					<Label Grid.Column="3" Content="{Binding Path=LayValues[2].price, Converter={StaticResource oconverter}}" Background="{StaticResource Lay1Color}"/>
+					<Label Grid.Column="4" Content="{Binding Path=LayValues[3].price, Converter={StaticResource oconverter}}" Background="{StaticResource Lay2Color}"/>
+					<Label Grid.Column="5" Content="{Binding Path=LayValues[4].price, Converter={StaticResource oconverter}}" Background="{StaticResource Lay2Color}"/>
+					<Label Grid.Column="6" Content="{Binding Path=LayValues[5].price, Converter={StaticResource oconverter}}" Background="{StaticResource Lay2Color}"/>
+					<Label Grid.Column="7" Content="{Binding Path=LayValues[6].price, Converter={StaticResource oconverter}}" Background="{StaticResource Lay3Color}"/>
+					<Label Grid.Column="8" Content="{Binding Path=LayValues[7].price, Converter={StaticResource oconverter}}" Background="{StaticResource Lay3Color}"/>
+					<Label Grid.Column="9" Content="{Binding Path=LayValues[8].price, Converter={StaticResource oconverter}}" Background="{StaticResource Lay3Color}"/>
+				</ItemsControl>									  
 			</Grid>
 			<Grid>
 				<ItemsControl Style="{StaticResource GridItemsStyle}"  Name="LayStakes">
 					<Label Grid.Column="0" Content="Lay Stakes" HorizontalContentAlignment="Left"/>
-					<TextBox Grid.Column="1" Text="{Binding Path=Values[30], StringFormat={}{0:N0}}" Background="{StaticResource Lay1Color}"/>
-					<TextBox Grid.Column="2" Text="{Binding Path=Values[31], StringFormat={}{0:N0}}" Background="{StaticResource Lay1Color}"/>
-					<TextBox Grid.Column="3" Text="{Binding Path=Values[32], StringFormat={}{0:N0}}" Background="{StaticResource Lay1Color}"/>
-					<TextBox Grid.Column="4" Text="{Binding Path=Values[33], StringFormat={}{0:N0}}" Background="{StaticResource Lay2Color}"/>
-					<TextBox Grid.Column="5" Text="{Binding Path=Values[34], StringFormat={}{0:N0}}" Background="{StaticResource Lay2Color}"/>
-					<TextBox Grid.Column="6" Text="{Binding Path=Values[35], StringFormat={}{0:N0}}" Background="{StaticResource Lay2Color}"/>
-					<TextBox Grid.Column="7" Text="{Binding Path=Values[36], StringFormat={}{0:N0}}" Background="{StaticResource Lay3Color}"/>
-					<TextBox Grid.Column="8" Text="{Binding Path=Values[37], StringFormat={}{0:N0}}" Background="{StaticResource Lay3Color}"/>
-					<TextBox Grid.Column="9" Text="{Binding Path=Values[38], StringFormat={}{0:N0}}" Background="{StaticResource Lay3Color}"/>
+					<TextBox Grid.Column="1" Text="{Binding Path=LayValues[0].size, Converter={StaticResource sconverter} }" Background="{StaticResource Lay1Color}"/>
+					<TextBox Grid.Column="2" Text="{Binding Path=LayValues[1].size, Converter={StaticResource sconverter} }" Background="{StaticResource Lay1Color}"/>
+					<TextBox Grid.Column="3" Text="{Binding Path=LayValues[2].size, Converter={StaticResource sconverter} }" Background="{StaticResource Lay1Color}"/>
+					<TextBox Grid.Column="4" Text="{Binding Path=LayValues[3].size, Converter={StaticResource sconverter} }" Background="{StaticResource Lay2Color}"/>
+					<TextBox Grid.Column="5" Text="{Binding Path=LayValues[4].size, Converter={StaticResource sconverter} }" Background="{StaticResource Lay2Color}"/>
+					<TextBox Grid.Column="6" Text="{Binding Path=LayValues[5].size, Converter={StaticResource sconverter} }" Background="{StaticResource Lay2Color}"/>
+					<TextBox Grid.Column="7" Text="{Binding Path=LayValues[6].size, Converter={StaticResource sconverter} }" Background="{StaticResource Lay3Color}"/>
+					<TextBox Grid.Column="8" Text="{Binding Path=LayValues[7].size, Converter={StaticResource sconverter} }" Background="{StaticResource Lay3Color}"/>
+					<TextBox Grid.Column="9" Text="{Binding Path=LayValues[8].size, Converter={StaticResource sconverter} }" Background="{StaticResource Lay3Color}"/>
 				</ItemsControl>
 			</Grid>
 		</StackPanel>

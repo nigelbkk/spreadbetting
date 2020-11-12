@@ -222,6 +222,7 @@ namespace BetfairAPI
     }
     public class PriceSize
     {
+        public PriceSize(double price, double size)        { this.price = price; this.size = size; }
         public Double price { get; set; }
         public Double size { get; set; }
 		public override string ToString()

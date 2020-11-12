@@ -23,10 +23,10 @@
     <Setting Name="Maximised" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="BackStake" Type="System.Decimal" Scope="User">
+    <Setting Name="BackStake" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">100</Value>
     </Setting>
-    <Setting Name="LayStake" Type="System.Decimal" Scope="User">
+    <Setting Name="LayStake" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">150</Value>
     </Setting>
     <Setting Name="AppKey" Type="System.String" Scope="User">
@@ -59,7 +59,7 @@
     <Setting Name="HorizontalSplitter" Type="System.Double" Scope="User">
       <Value Profile="(Default)">120</Value>
     </Setting>
-    <Setting Name="BasePrice" Type="System.Decimal" Scope="User">
+    <Setting Name="BasePrice" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>

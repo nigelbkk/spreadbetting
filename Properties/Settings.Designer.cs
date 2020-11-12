@@ -110,9 +110,9 @@ namespace SpreadTrader.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("100")]
-        public decimal BackStake {
+        public int BackStake {
             get {
-                return ((decimal)(this["BackStake"]));
+                return ((int)(this["BackStake"]));
             }
             set {
                 this["BackStake"] = value;
@@ -122,9 +122,9 @@ namespace SpreadTrader.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("150")]
-        public decimal LayStake {
+        public int LayStake {
             get {
-                return ((decimal)(this["LayStake"]));
+                return ((int)(this["LayStake"]));
             }
             set {
                 this["LayStake"] = value;
@@ -254,9 +254,9 @@ namespace SpreadTrader.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal BasePrice {
+        public double BasePrice {
             get {
-                return ((decimal)(this["BasePrice"]));
+                return ((double)(this["BasePrice"]));
             }
             set {
                 this["BasePrice"] = value;
