@@ -46,7 +46,7 @@
 							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
 						<Button Grid.Column="0" Tag="-"  Content="-" ></Button>
-						<TextBox Grid.Column="1" Text="{Binding Path=BasePrice}" Background="LightCyan" LostFocus="TextBox_LostFocus" ></TextBox>
+						<TextBox Grid.Column="1" Text="{Binding Path=BasePrice}" Background="LightCyan" LostFocus="TextBox_LostFocus" HorizontalContentAlignment="Center"></TextBox>
 						<Button Grid.Column="2" Tag="+" Content="+" ></Button>
 					</Grid>
 				</Grid>
@@ -56,7 +56,7 @@
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Button Content="Execute Bets" Tag ="Execute" Background="OrangeRed" Foreground="White"/>
-					<CheckBox Content="Auto Back/Lay" Tag="Auto" Grid.Column="1" FontSize="11" VerticalAlignment="Center"/>
+					<CheckBox Content="Auto Back/Lay" Tag="Auto" Grid.Column="1" FontSize="11" VerticalAlignment="Center" Width="auto" Margin="4,0,0,0"/>
 				</Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>

@@ -34,18 +34,15 @@ namespace SpreadTrader
 				List<LiveRunner> NewRunners = e.UserState as List<LiveRunner>;
 				if (LiveRunners != null)
 				{
-					for (int i = 0; i < LiveRunners.Count; i++)
+					for (int i = 0; i < NewRunners.Count; i++)
 					{
-						LiveRunner rold = LiveRunners[i];
-						LiveRunner rnew = NewRunners[i];
-						if (rold.prices[0].price != rnew.prices[0].price)
-						{
-							rold.LastPrice = rnew.prices[0].price;
-						}
-						if (rold.prices[3].price != rnew.prices[3].price)
-						{
-							rold.LastPrice = rnew.prices[0].price;
-						}
+						//LiveRunner rold = LiveRunners[i];
+						//LiveRunner rnew = NewRunners[i];
+						//rnew.LastPrice = rnew.prices[3].price;
+						//if (rold.prices[0].price != rnew.prices[0].price)
+						//{
+						//	rnew.LastPrice = rnew.prices[0].price;
+						//}
 					}
 				}
 				LiveRunners = NewRunners;
@@ -64,7 +61,7 @@ namespace SpreadTrader
 							//Debug.WriteLine(MarketNode.MarketName);
 							DateTime LastUpdate = DateTime.UtcNow;
 							var lr = MarketNode.GetLiveRunners();
-							Int32 rate = (DateTime.UtcNow - LastUpdate).Milliseconds;
+							Int32 rate = (Int32) ((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 							sender.ReportProgress(rate, lr);
 						}
 					}

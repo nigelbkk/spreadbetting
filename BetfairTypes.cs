@@ -224,7 +224,11 @@ namespace BetfairAPI
     {
         public Double price { get; set; }
         public Double size { get; set; }
-    }
+		public override string ToString()
+		{
+			return String.Format("{0}:{1}", price, size);
+		}
+	}
     public class Runner
     {
         public class Order
@@ -738,7 +742,7 @@ namespace BetfairAPI
         [JsonIgnore]
         public sideEnum sideEnum { get; set; }
         [JsonIgnore]
-        public String Horse { get; set; }
+        public String Runner { get; set; }
         [JsonIgnore]
         public marketTypeEnum marketTypeEnum { get; set; }
         [JsonIgnore]
@@ -751,8 +755,7 @@ namespace BetfairAPI
         public String side { get { return sideEnum.ToString(); } set { } }
         public String marketType { get { return marketTypeEnum.ToString(); } set { } }
         public String orderType { get { return orderTypeEnum.ToString(); } set { } }
-        public Int32 selectionId { get; set; }
-//        public Double handicap { get; set; }
+        public Int64 selectionId { get; set; }
         public LimitOrder limitOrder { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public LimitOnCloseOrder limitOnCloseOrder { get; set; }
@@ -763,13 +766,12 @@ namespace BetfairAPI
         {
             if (limitOrder != null)
             {
-                return String.Format("{0}:{1}:{2}:{3}: Stake: {4} Price: {5}", orderType, marketType, side, Horse, limitOrder.size, limitOrder.price);
+                return String.Format("{0},{1},{2},{3},{4},{5},{6}", orderType, marketType, side, Runner, limitOrder.size, limitOrder.price, DateTime.UtcNow.Millisecond);
             }
             if (marketOnCloseOrder != null)
             {
-                return String.Format("{0}:{1}:{2}:{3}: Liability: {4}", orderType, marketType.ToString(), side, Horse, marketOnCloseOrder.liability);
+                return String.Format("{0},{1},{2},{3},{4}", orderType, marketType.ToString(), side, Runner, marketOnCloseOrder.liability);
             }
-
             return base.ToString();
         }
     }

@@ -414,9 +414,8 @@ namespace BetfairAPI
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             p["marketIds"] = new String[] { marketId };
-//            p["exchangeIds"] = new Int32[] { Int32.Parse(marketId.Split('.')[0]) };
-            p["includeSettledBets"] = false;
-            p["includeBspBets"] = false;
+            p["includeSettledBets"] = true;
+            p["includeBspBets"] = true;
             p["netOfCommission"] = true;
             return RPCRequest<List<MarketProfitAndLoss>>("listMarketProfitAndLoss", p) as List<MarketProfitAndLoss>;
         }

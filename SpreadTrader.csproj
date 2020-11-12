@@ -71,7 +71,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Bet.cs" />
     <Compile Include="BetsManager.xaml.cs">
       <DependentUpon>BetsManager.xaml</DependentUpon>
     </Compile>

@@ -34,11 +34,14 @@ namespace SpreadTrader
 				if (IsLoaded)
 				{
 					MarketNode = node;
+					BettingGridControl.MarketNode = node;
+					RunnersControl.LiveRunners = null;
 					RunnersControl.MarketNode = MarketNode;
 					NotifyPropertyChanged("");
 				}
 			};
 			SliderControl.OnSliderChanged += BettingGridControl.OnSliderChanged;
+			SliderControl.SubmitBets += BettingGridControl.SubmitBets;
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{

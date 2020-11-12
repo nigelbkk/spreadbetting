@@ -8,13 +8,17 @@ using System.Windows.Media;
 
 namespace SpreadTrader
 {
+	public enum sliderEnum
+	{
+		LAYPRICES = 0,
+		LAYSTAKES = 10,
+		BACKPRICES = 20,
+		BACKSTAKES = 30,
+	}
 	public partial class SliderControl : UserControl, INotifyPropertyChanged
 	{
-		private const Int32 LAYPRICES = 0;
-		private const Int32 LAYSTAKES = 10;
-		private const Int32 BACKPRICES = 20;
-		private const Int32 BACKSTAKES = 30;
 		public SliderChangedDelegate OnSliderChanged = null;
+		public SubmitBetsDelegate SubmitBets = null;
 		public static Decimal[] Values { get; set; }
 		private List<Decimal> AllPrices = null;
 		public SliderControl()
@@ -45,7 +49,7 @@ namespace SpreadTrader
 		{
 			if (OnSliderChanged != null)
 			{
-				OnSliderChanged(Values);
+				OnSliderChanged();
 			}
 			if (PropertyChanged != null)
 			{
@@ -75,16 +79,16 @@ namespace SpreadTrader
 		{
 			for (Int32 i = 0; i < 10; i++)
 			{
-				Decimal vb = Values[BACKSTAKES + i]; Decimal vl = Values[LAYSTAKES + i];
+				Decimal vb = Values[(int) sliderEnum.BACKSTAKES + i]; Decimal vl = Values[(int)sliderEnum.LAYSTAKES + i];
 				if (newvalue > oldvalue)
 				{
 					vb /= 9; vb *= 10; vl /= 9; vl *= 10;
-					Values[BACKSTAKES + i] = vb; Values[LAYSTAKES + i] = vl;
+					Values[(int)sliderEnum.BACKSTAKES + i] = vb; Values[(int)sliderEnum.LAYSTAKES + i] = vl;
 				}
 				else if (oldvalue > newvalue)
 				{
 					vl /= 10; vl *= 9; vb /= 10; vb *= 9;
-					Values[BACKSTAKES + i] = vb; Values[LAYSTAKES + i] = vl;
+					Values[(int)sliderEnum.BACKSTAKES + i] = vb; Values[(int)sliderEnum.LAYSTAKES + i] = vl;
 				}
 			}
 			NotifyPropertyChanged("");
@@ -96,7 +100,7 @@ namespace SpreadTrader
 				if (Values != null && BasePrice < 1000 && BasePrice > 1.01M)
 				{
 					Int32 base_index = PriceIndex(BasePrice) - 21;
-					Int32 side = BACKPRICES;
+					Int32 side = (int) sliderEnum.BACKPRICES;
 					base_index = Math.Max(base_index, 10);
 					base_index = Math.Min(base_index, 338);
 					Int32 offset = Convert.ToInt32(MoveLay.Value);
@@ -104,7 +108,7 @@ namespace SpreadTrader
 					{
 						Values[side + i] = AllPrices[base_index + offset - i];
 					}
-					side = LAYPRICES;
+					side = (int)sliderEnum.LAYPRICES;
 					base_index = PriceIndex(BasePrice) + 1;
 					base_index = Math.Max(base_index, 10);
 					base_index = Math.Min(base_index, 338);
@@ -145,7 +149,12 @@ namespace SpreadTrader
 						AutoOn = !AutoOn;
 						b.Foreground = new SolidColorBrush(AutoOn ? Colors.Black : Colors.LightGray);
 						break;
-					case "Execute":break;
+					case "Execute":
+						if (SubmitBets != null)
+						{
+							SubmitBets();
+						}
+						break;
 					default: return;
 				}
 				SyncPrices();
@@ -155,12 +164,12 @@ namespace SpreadTrader
 		{
 			for (Int32 i = 0; i < 9; i++)
 			{
-				Values[BACKPRICES + i] = AllPrices[i];
-				Values[LAYPRICES + i] = AllPrices[i];
+				Values[(int)sliderEnum.BACKPRICES + i] = AllPrices[i];
+				Values[(int)sliderEnum.LAYPRICES + i] = AllPrices[i];
 			}
 			for (Int32 i = 0; i < 10; i++)
 			{
-				Values[LAYSTAKES + i] = Values[BACKSTAKES + i] = 20 + i*10;
+				Values[(int)sliderEnum.LAYSTAKES + i] = Values[(int)sliderEnum.BACKSTAKES + i] = 20 + i*10;
 			}
 			SyncPrices();
 		}
