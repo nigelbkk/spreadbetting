@@ -119,15 +119,6 @@ namespace SpreadTrader
 				}
 			}
 		}
-
-		//foreach (var o in laybets)
-		//{
-		//	PlaceExecutionReport report = placeOrder(o);
-		//}
-		//foreach (var o in backbets)
-		//{
-		//	PlaceExecutionReport report = placeOrder(o);
-		//}
 		public void OnSliderChanged()
 		{
 			NotifyPropertyChanged("");

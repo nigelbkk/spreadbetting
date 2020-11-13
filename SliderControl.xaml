@@ -12,7 +12,7 @@
             TargetType="{x:Type Slider}">
 			<Setter Property="Orientation" Value="Horizontal"/>
 			<Setter Property="Minimum" Value="0"/>
-			<Setter Property="Maximum" Value="20"/>
+			<Setter Property="Maximum" Value="30"/>
 			<Setter Property="VerticalAlignment" Value="Center"/>
 			<EventSetter Event="ValueChanged" Handler="Slider_ValueChanged"/>
 		</Style>
@@ -73,7 +73,7 @@
 						<ColumnDefinition Width="177*"/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Move Back Bets" HorizontalContentAlignment="Left"/>
-					<Slider Grid.Column="1" Name="MoveBack" Value="1" Grid.ColumnSpan="2" Margin="0,5"/>
+					<Slider Grid.Column="1" Name="MoveBack" Value="10" Grid.ColumnSpan="2" Margin="0,5"/>
 				</Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>
@@ -81,7 +81,7 @@
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Move Lay Bets" HorizontalContentAlignment="Left" />
-					<Slider Grid.Column="1" Name="MoveLay" Value="19"/>
+					<Slider Grid.Column="1" Name="MoveLay" Value="22"/>
 				</Grid>
 			</StackPanel>
 		</Grid>
