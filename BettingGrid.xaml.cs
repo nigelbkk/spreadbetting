@@ -125,24 +125,24 @@ namespace SpreadTrader
 		}
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
-			ItemsControl ic = BackCheckboxes;
-			for (int i = 0; i < ic.Items.Count; i++)
-			{
-				CheckBox cb = ic.Items[i] as CheckBox;
-				if (cb != null)
-				{
-					cb.Tag = i;
-				}
-			}
-			ic = LayCheckboxes;
-			for (int i = 0; i < ic.Items.Count; i++)
-			{
-				CheckBox cb = ic.Items[i] as CheckBox;
-				if (cb != null)
-				{
-					cb.Tag = 10+i;
-				}
-			}
+			//ItemsControl ic = BackCheckboxes;
+			//for (int i = 0; i < ic.Items.Count; i++)
+			//{
+			//	CheckBox cb = ic.Items[i] as CheckBox;
+			//	if (cb != null)
+			//	{
+			//		cb.Tag = i;
+			//	}
+			//}
+			//ic = LayCheckboxes;
+			//for (int i = 0; i < ic.Items.Count; i++)
+			//{
+			//	CheckBox cb = ic.Items[i] as CheckBox;
+			//	if (cb != null)
+			//	{
+			//		cb.Tag = 10+i;
+			//	}
+			//}
 		}
 		private void DisableLabel(Int32 idx, bool value)
 		{
@@ -150,18 +150,18 @@ namespace SpreadTrader
 			TextBox tb = null;
 			switch (idx / 10)
 			{
-				case 0:
-					label = BackPrices.Items[idx] as Label;
-					label.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
-					tb = BackStakes.Items[idx] as TextBox;
-					if (tb != null) tb.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
-					break;
-				case 1:
-					label = LayPrices.Items[idx-10] as Label;
-					label.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
-					tb = LayStakes.Items[idx-10] as TextBox;
-					tb.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
-					break;
+				//case 0:
+				//	label = BackPrices.Items[idx] as Label;
+				//	label.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
+				//	tb = BackStakes.Items[idx] as TextBox;
+				//	if (tb != null) tb.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
+				//	break;
+				//case 1:
+				//	label = LayPrices.Items[idx-10] as Label;
+				//	label.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
+				//	tb = LayStakes.Items[idx-10] as TextBox;
+				//	tb.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
+				//	break;
 			}
 		}
 		private void CheckBox_Click(object sender, RoutedEventArgs e)

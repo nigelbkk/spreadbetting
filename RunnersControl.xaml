@@ -116,7 +116,6 @@
 		</DataTemplate>
 	</UserControl.Resources>
     <Grid SizeChanged="Grid_SizeChanged">
-		<!--<Grid Name="UpperGrid" Grid.Row="0" VerticalAlignment="Stretch" Background="Azure"  DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">-->
 		<Grid Name="UpperGrid" Grid.Row="0" VerticalAlignment="Stretch" Background="Azure">
 			<StackPanel Orientation="Vertical" >
 				<StackPanel Name="SV1_Header" Orientation="Horizontal" Height="36">

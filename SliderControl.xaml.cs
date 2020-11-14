@@ -125,11 +125,7 @@ namespace SpreadTrader
 					{
 						BackValues[i].price = AllPrices[base_index + offset - j];
 					}
-					for (int i = 0;i < 9; i++)
-					{
-						BackValues[i].price = AllPrices[base_index + offset - i];
-					}
-					base_index = PriceIndex(BasePrice) + 1;
+					base_index = PriceIndex(BasePrice) -1;
 					base_index = Math.Max(base_index, 10);
 					base_index = Math.Min(base_index, 338);
 					offset = Convert.ToInt32(MoveBack.Value);
