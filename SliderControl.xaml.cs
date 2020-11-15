@@ -8,7 +8,7 @@ using BetfairAPI;
 
 namespace SpreadTrader
 {
-	public partial class SliderControl : UserControl, INotifyPropertyChanged
+	public partial class SliderControl : UserControl
 	{
 		public SubmitBetsDelegate SubmitBets = null;
 		public static PriceSize[] BackValues { get; set; }
@@ -43,18 +43,6 @@ namespace SpreadTrader
 		private double _BasePrice;
 		public bool AutoOn { get; set; }
 		public double BasePrice { get { return _BasePrice; } set { _BasePrice = Math.Max(value, 1.10); } }
-		public event PropertyChangedEventHandler PropertyChanged;
-		//private void NotifyPropertyChanged(String info)
-		//{
-		//	if (OnSliderChanged != null)
-		//	{
-		//		OnSliderChanged();
-		//	}
-		//	if (PropertyChanged != null)
-		//	{
-		//		PropertyChanged(this, new PropertyChangedEventArgs(info));
-		//	}
-		//}
 		private Int32 PriceIndex(double v)
 		{
 			for (int i = 1; i < AllPrices.Count; i++)
@@ -76,20 +64,6 @@ namespace SpreadTrader
 		}
 		public void MoveStakes(Int32 newvalue, Int32 oldvalue)
 		{
-			//for (Int32 i = 0; i < 10; i++)
-			//{
-			//	double vb = Values[(int) sliderEnum.BACKSTAKES + i]; double vl = Values[(int)sliderEnum.LAYSTAKES + i];
-			//	if (newvalue > oldvalue)
-			//	{
-			//		vb /= 9; vb *= 10; vl /= 9; vl *= 10;
-			//		Values[(int)sliderEnum.BACKSTAKES + i] = vb; Values[(int)sliderEnum.LAYSTAKES + i] = vl;
-			//	}
-			//	else if (oldvalue > newvalue)
-			//	{
-			//		vl /= 10; vl *= 9; vb /= 10; vb *= 9;
-			//		Values[(int)sliderEnum.BACKSTAKES + i] = vb; Values[(int)sliderEnum.LAYSTAKES + i] = vl;
-			//	}
-			//}
 			for (Int32 i = 0; i < 9; i++)
 			{
 				PriceSize vb = BackValues[i];
@@ -107,36 +81,27 @@ namespace SpreadTrader
 					LayValues[i] = vl;
 				}
 			}
-
-			//NotifyPropertyChanged("");
 		}
 		public void SyncPrices()
 		{
-			try
+			if (BackValues != null && BasePrice < 1000 && BasePrice > 1.01)
 			{
-				if (BackValues != null && BasePrice < 1000 && BasePrice > 1.01)
+				Int32 base_index = PriceIndex(BasePrice) - 21;
+				base_index = Math.Max(base_index, 10);
+				base_index = Math.Min(base_index, 338);
+				Int32 offset = Convert.ToInt32(MoveLay.Value);
+				for (int i = 0, j = 8; i < 9; i++, j--)
 				{
-					Int32 base_index = PriceIndex(BasePrice) - 21;
-					base_index = Math.Max(base_index, 10);
-					base_index = Math.Min(base_index, 338);
-					Int32 offset = Convert.ToInt32(MoveLay.Value);
-					for (int i = 0, j = 8; i < 9; i++, j--)
-					{
-						BackValues[i].price = AllPrices[base_index + offset - j];
-					}
-					base_index = PriceIndex(BasePrice) -1;
-					base_index = Math.Max(base_index, 10);
-					base_index = Math.Min(base_index, 338);
-					offset = Convert.ToInt32(MoveBack.Value);
-					for (int i = 0; i < 9; i++)
-					{
-						LayValues[i].price = AllPrices[base_index + offset + i];
-					}
-					//NotifyPropertyChanged("");
+					BackValues[i].price = AllPrices[base_index + offset - j];
 				}
-			}
-			catch (Exception xe)
-			{
+				base_index = PriceIndex(BasePrice) - 1;
+				base_index = Math.Max(base_index, 10);
+				base_index = Math.Min(base_index, 338);
+				offset = Convert.ToInt32(MoveBack.Value);
+				for (int i = 0; i < 9; i++)
+				{
+					LayValues[i].price = AllPrices[base_index + offset + i];
+				}
 			}
 		}
 		private Properties.Settings props = Properties.Settings.Default;
@@ -199,7 +164,6 @@ namespace SpreadTrader
 				props.BasePrice = BasePrice;
 				SyncPrices();
 				tx.Text = Convert.ToString(BasePrice);
-				//NotifyPropertyChanged("");
 				props.Save();
 			}
 		}

@@ -5,14 +5,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
 	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-             mc:Ignorable="d" d:DesignWidth="600" Loaded="UserControl_Loaded">
+             mc:Ignorable="d" d:DesignWidth="600">
 	<UserControl.Resources>
 		<local:OddsConverter x:Key="oconverter" />
 		<local:StakeConverter x:Key="sconverter" />
 		<Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
 			<Setter Property="VerticalAlignment" Value="Center"/>
 			<Setter Property="HorizontalAlignment" Value="Center"/>
-			<EventSetter Event="Click" Handler="CheckBox_Click"/>
+			<Setter Property="BorderBrush" Value="DarkGray"/>
+			<Setter Property="BorderThickness" Value="0.5"/>
+			<Setter Property="Margin" Value="10,2,0,2"/>
+			<!--<EventSetter Event="Click" Handler="CheckBox_Click"/>-->
 		</Style>
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
             TargetType="{x:Type Button}">
@@ -23,6 +26,7 @@
             TargetType="{x:Type Label}">
 			<Setter Property="FontSize" Value="12"/>
 			<Setter Property="Width" Value="auto"/>
+			<Setter Property="HorizontalContentAlignment" Value="Left"/>
 			<Setter Property="Background" Value="#00000000"/>
 		</Style>
 		<Style BasedOn="{StaticResource {x:Type TextBox}}" 
@@ -30,6 +34,7 @@
 			<Setter Property="FontSize" Value="12"/>
 			<Setter Property="Width" Value="auto"/>
 			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="Background" Value="#00000000"/>
 		</Style>
 		<Style x:Key="GridItemsStyle"
            TargetType="ItemsControl">
@@ -49,18 +54,44 @@
 			</Setter>
 		</Style>
 		<DataTemplate  x:Key="Our_DataTemplate">
-			<StackPanel>
-				<Border BorderBrush="DarkGray" BorderThickness="0.5">
-					<StackPanel Orientation="Vertical">
-						<TextBox Text="{Binding Path=price}"/>
-						<TextBox Text="{Binding Path=size}"/>
-					</StackPanel>
-				</Border>
-			</StackPanel>
+			<Grid Background="{Binding Color}">
+				<StackPanel>
+					<Border BorderBrush="DarkGray" BorderThickness="0.5">
+						<StackPanel Orientation="Vertical">
+							<CheckBox IsChecked="{Binding Path=IsChecked}"/>
+							<TextBox Text="{Binding Path=price, Converter={StaticResource oconverter}}" Foreground="{Binding Path=ForeGround}"/>
+							<TextBox Text="{Binding Path=size, Converter={StaticResource sconverter}}" Foreground="{Binding Path=ForeGround}"/>
+						</StackPanel>
+					</Border>
+				</StackPanel>
+			</Grid>
 		</DataTemplate>
 	</UserControl.Resources>
-	<StackPanel>
-		<ItemsControl Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource Our_DataTemplate}" ItemsSource="{Binding Path=LayValues}"/>
-		<ItemsControl Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource Our_DataTemplate}" ItemsSource="{Binding Path=BackValues}"/>
+	<StackPanel >
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="160"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<StackPanel Grid.Column="0">
+				<CheckBox Content="Active" HorizontalAlignment="Left" IsChecked="{Binding Path=LayActive}"/>
+				<Label>Back Prices</Label>
+				<Label>Back Stakes</Label>
+			</StackPanel>
+			<ItemsControl  Grid.Column="1" Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource Our_DataTemplate}" ItemsSource="{Binding Path=LayValues}"/>
+		</Grid>
+		<Border Background="#00000000" BorderBrush="DarkGray" BorderThickness="0.5" Height="8"/>
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="160"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<StackPanel Grid.Column="0">
+				<CheckBox Content="Active" Margin="10,0,0,0" HorizontalAlignment="Left" IsChecked="{Binding Path=BackActive}"/>
+				<Label>Lay Prices</Label>
+				<Label>Lay Stakes</Label>
+			</StackPanel>
+			<ItemsControl Grid.Column="1"  Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource Our_DataTemplate}" ItemsSource="{Binding Path=BackValues}"/>
+		</Grid>
 	</StackPanel>
 </UserControl>

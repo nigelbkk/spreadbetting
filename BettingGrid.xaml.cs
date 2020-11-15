@@ -12,17 +12,21 @@ namespace SpreadTrader
 {
 	public class PriceSize : INotifyPropertyChanged
 	{
-		public PriceSize(double price, double size) { this.price = price; this.size = size; }
+		public PriceSize(double price, double size) { this.price = price; this.size = size; IsChecked = true;  }
+		private bool _IsChecked { get; set; }
+		public bool IsChecked { get { return _IsChecked; } set { _IsChecked = value;  ForeGround = new SolidColorBrush(value ? Colors.Green : Colors.DarkGray); NotifyPropertyChanged(""); } }
 		private Double _price { get; set; }
 		public Double price { get { return _price; } set { _price = value; NotifyPropertyChanged(""); } }
 		private Double _size { get; set; }
 		public Double size { get { return _size; } set { _size = value; NotifyPropertyChanged(""); } }
+		public SolidColorBrush Color { get; set; }
+		public SolidColorBrush ForeGround { get; set; }
 		public override string ToString()
 		{
 			return String.Format("{0}:{1}", price, size);
 		}
 		public event PropertyChangedEventHandler PropertyChanged;
-		private void NotifyPropertyChanged(String info)
+		public void NotifyPropertyChanged(String info)
 		{
 			if (PropertyChanged != null)
 			{
@@ -30,11 +34,35 @@ namespace SpreadTrader
 			}
 		}
 	}
-
 	public delegate void SubmitBetsDelegate();
 	public partial class BettingGrid : UserControl
 	{
-		public bool[] CheckBoxes { get; set; }
+		private bool _BackActive { get; set; }
+		public bool BackActive
+		{
+			get { return _BackActive; }
+			set
+			{
+				_BackActive = value;
+				foreach (PriceSize o in BackValues)
+				{
+					o.IsChecked = value;
+				}
+			}
+		}
+		private bool _LayActive { get; set; }
+		public bool LayActive
+		{
+			get { return _LayActive; }
+			set
+			{
+				_LayActive = value;
+				foreach (PriceSize o in LayValues)
+				{
+					o.IsChecked = value;
+				}
+			}
+		}
 		public PriceSize[] BackValues { get; set; }
 		public PriceSize[] LayValues { get; set; }
 		public NodeViewModel MarketNode { get; set; }
@@ -43,11 +71,13 @@ namespace SpreadTrader
 			InitializeComponent();
 			BackValues = SliderControl.BackValues;
 			LayValues = SliderControl.LayValues;
-			CheckBoxes = new bool[20];
-			for (int i = 0; i < 20; i++)
-			{
-				CheckBoxes[i] = true;
-			}
+			for (int i = 0; i < 3; i++) BackValues[i].Color = Application.Current.FindResource("Lay1Color") as SolidColorBrush;
+			for (int i = 3; i < 6; i++) BackValues[i].Color = Application.Current.FindResource("Lay2Color") as SolidColorBrush;
+			for (int i = 6; i < 9; i++) BackValues[i].Color = Application.Current.FindResource("Lay3Color") as SolidColorBrush;
+			for (int i = 0; i < 3; i++) LayValues[i].Color = Application.Current.FindResource("Back3Color") as SolidColorBrush;
+			for (int i = 3; i < 6; i++) LayValues[i].Color = Application.Current.FindResource("Back2Color") as SolidColorBrush;
+			for (int i = 6; i < 9; i++) LayValues[i].Color = Application.Current.FindResource("Back1Color") as SolidColorBrush;
+			BackActive = LayActive = true;
 		}
 		private PlaceExecutionReport placeOrders(String marketId, List<PlaceInstruction> instructions)
 		{
@@ -131,62 +161,4 @@ namespace SpreadTrader
 				}
 			}
 		}
-		private void UserControl_Loaded(object sender, RoutedEventArgs e)
-		{
-			//ItemsControl ic = BackCheckboxes;
-			//for (int i = 0; i < ic.Items.Count; i++)
-			//{
-			//	CheckBox cb = ic.Items[i] as CheckBox;
-			//	if (cb != null)
-			//	{
-			//		cb.Tag = i;
-			//	}
-			//}
-			//ic = LayCheckboxes;
-			//for (int i = 0; i < ic.Items.Count; i++)
-			//{
-			//	CheckBox cb = ic.Items[i] as CheckBox;
-			//	if (cb != null)
-			//	{
-			//		cb.Tag = 10+i;
-			//	}
-			//}
-		}
-		private void DisableLabel(Int32 idx, bool value)
-		{
-			Label label = null;
-			TextBox tb = null;
-			switch (idx / 10)
-			{
-				//case 0:
-				//	label = BackPrices.Items[idx] as Label;
-				//	label.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
-				//	tb = BackStakes.Items[idx] as TextBox;
-				//	if (tb != null) tb.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
-				//	break;
-				//case 1:
-				//	label = LayPrices.Items[idx-10] as Label;
-				//	label.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
-				//	tb = LayStakes.Items[idx-10] as TextBox;
-				//	tb.Foreground = new SolidColorBrush(value == true ? Colors.Black : Colors.LightGray);
-				//	break;
-			}
-		}
-		private void CheckBox_Click(object sender, RoutedEventArgs e)
-		{
-			CheckBox cb = sender as CheckBox;
-			Int32 tag = Convert.ToInt32(cb.Tag);
-			if (tag == 0 || tag == 10)
-			{
-				for (int i = 1; i < 10; i++)
-				{
-					DisableLabel(tag + i, cb.IsChecked == true);
-				}
-			}
-			else
-			{
-				DisableLabel(tag, cb.IsChecked == true);
-			}
-		}
-	}
 }
