@@ -6,7 +6,7 @@ using System.Windows.Controls;
 
 namespace SpreadTrader
 {
-	public partial class MarketControl : UserControl, INotifyPropertyChanged
+	public partial class MarketControl : UserControl
 	{
 		public NodeSelectionDelegate NodeChangeEventSink = null;
 		public NodeViewModel MarketNode { get; set; }
@@ -17,14 +17,6 @@ namespace SpreadTrader
 		}
 		public String MarketName { get { return MarketNode == null ? "No market selected" : MarketNode.Name;  } }
 		private Properties.Settings props = Properties.Settings.Default;
-		public event PropertyChangedEventHandler PropertyChanged;
-		public void NotifyPropertyChanged(String info)
-		{
-			if (PropertyChanged != null)
-			{
-				PropertyChanged(this, new PropertyChangedEventArgs(info));
-			}
-		}
 		public MarketControl()
 		{
 			InitializeComponent();
@@ -37,10 +29,8 @@ namespace SpreadTrader
 					BettingGridControl.MarketNode = node;
 					RunnersControl.LiveRunners = null;
 					RunnersControl.MarketNode = MarketNode;
-					NotifyPropertyChanged("");
 				}
 			};
-			SliderControl.OnSliderChanged += BettingGridControl.OnSliderChanged;
 			SliderControl.SubmitBets += BettingGridControl.SubmitBets;
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)

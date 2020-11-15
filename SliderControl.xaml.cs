@@ -10,7 +10,6 @@ namespace SpreadTrader
 {
 	public partial class SliderControl : UserControl, INotifyPropertyChanged
 	{
-		public SliderChangedDelegate OnSliderChanged = null;
 		public SubmitBetsDelegate SubmitBets = null;
 		public static PriceSize[] BackValues { get; set; }
 		public static PriceSize[] LayValues { get; set; }
@@ -45,17 +44,17 @@ namespace SpreadTrader
 		public bool AutoOn { get; set; }
 		public double BasePrice { get { return _BasePrice; } set { _BasePrice = Math.Max(value, 1.10); } }
 		public event PropertyChangedEventHandler PropertyChanged;
-		private void NotifyPropertyChanged(String info)
-		{
-			if (OnSliderChanged != null)
-			{
-				OnSliderChanged();
-			}
-			if (PropertyChanged != null)
-			{
-				PropertyChanged(this, new PropertyChangedEventArgs(info));
-			}
-		}
+		//private void NotifyPropertyChanged(String info)
+		//{
+		//	if (OnSliderChanged != null)
+		//	{
+		//		OnSliderChanged();
+		//	}
+		//	if (PropertyChanged != null)
+		//	{
+		//		PropertyChanged(this, new PropertyChangedEventArgs(info));
+		//	}
+		//}
 		private Int32 PriceIndex(double v)
 		{
 			for (int i = 1; i < AllPrices.Count; i++)
@@ -109,7 +108,7 @@ namespace SpreadTrader
 				}
 			}
 
-			NotifyPropertyChanged("");
+			//NotifyPropertyChanged("");
 		}
 		public void SyncPrices()
 		{
@@ -133,7 +132,7 @@ namespace SpreadTrader
 					{
 						LayValues[i].price = AllPrices[base_index + offset + i];
 					}
-					NotifyPropertyChanged("");
+					//NotifyPropertyChanged("");
 				}
 			}
 			catch (Exception xe)
@@ -200,7 +199,7 @@ namespace SpreadTrader
 				props.BasePrice = BasePrice;
 				SyncPrices();
 				tx.Text = Convert.ToString(BasePrice);
-				NotifyPropertyChanged("");
+				//NotifyPropertyChanged("");
 				props.Save();
 			}
 		}

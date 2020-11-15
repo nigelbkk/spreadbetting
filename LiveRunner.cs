@@ -71,8 +71,8 @@ namespace SpreadTrader
         }
         public void SetPrices(Runner r)
         {
-            BackPrices = r.ex.availableToBack;
-            LayPrices = r.ex.availableToLay;
+            //BackPrices = r.ex.availableToBack;
+            //LayPrices = r.ex.availableToLay;
             NotifyPropertyChanged("");
         }
 		public override string ToString()

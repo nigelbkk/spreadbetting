@@ -10,14 +10,17 @@ using BetfairAPI;
 
 namespace SpreadTrader
 {
-	public delegate void SliderChangedDelegate();
-	public delegate void SubmitBetsDelegate();
-	public partial class BettingGrid : UserControl, INotifyPropertyChanged
+	public class PriceSize : INotifyPropertyChanged
 	{
-		public bool[] CheckBoxes { get; set; }
-		public PriceSize[] BackValues { get; set; }
-		public PriceSize[] LayValues { get; set; }
-		public NodeViewModel MarketNode { get; set; }
+		public PriceSize(double price, double size) { this.price = price; this.size = size; }
+		private Double _price { get; set; }
+		public Double price { get { return _price; } set { _price = value; NotifyPropertyChanged(""); } }
+		private Double _size { get; set; }
+		public Double size { get { return _size; } set { _size = value; NotifyPropertyChanged(""); } }
+		public override string ToString()
+		{
+			return String.Format("{0}:{1}", price, size);
+		}
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
 		{
@@ -26,6 +29,15 @@ namespace SpreadTrader
 				PropertyChanged(this, new PropertyChangedEventArgs(info));
 			}
 		}
+	}
+
+	public delegate void SubmitBetsDelegate();
+	public partial class BettingGrid : UserControl
+	{
+		public bool[] CheckBoxes { get; set; }
+		public PriceSize[] BackValues { get; set; }
+		public PriceSize[] LayValues { get; set; }
+		public NodeViewModel MarketNode { get; set; }
 		public BettingGrid()
 		{
 			InitializeComponent();
@@ -119,10 +131,6 @@ namespace SpreadTrader
 				}
 			}
 		}
-		public void OnSliderChanged()
-		{
-			NotifyPropertyChanged("");
-		}
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
 			//ItemsControl ic = BackCheckboxes;
@@ -179,7 +187,6 @@ namespace SpreadTrader
 			{
 				DisableLabel(tag, cb.IsChecked == true);
 			}
-			NotifyPropertyChanged("");
 		}
 	}
 }

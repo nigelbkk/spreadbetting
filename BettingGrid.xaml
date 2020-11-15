@@ -60,7 +60,7 @@
 		</DataTemplate>
 	</UserControl.Resources>
 	<StackPanel>
-		<ItemsControl Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource Our_DataTemplate}" ItemsSource="{Binding Path=BackValues}"/>
 		<ItemsControl Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource Our_DataTemplate}" ItemsSource="{Binding Path=LayValues}"/>
+		<ItemsControl Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource Our_DataTemplate}" ItemsSource="{Binding Path=BackValues}"/>
 	</StackPanel>
 </UserControl>
