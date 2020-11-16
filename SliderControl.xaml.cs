@@ -94,7 +94,7 @@ namespace SpreadTrader
 		{
 			if (BackValues != null && BasePrice < 1000 && BasePrice > 1.01)
 			{
-				Int32 base_index = PriceIndex(BasePrice) - 20;
+				Int32 base_index = PriceIndex(BasePrice) - 23;
 				base_index = Math.Max(base_index, 10);
 				base_index = Math.Min(base_index, 338);
 				Int32 offset = Convert.ToInt32(MoveLay.Value);
@@ -102,7 +102,7 @@ namespace SpreadTrader
 				{
 					BackValues[i].price = AllPrices[base_index + offset - j];
 				}
-				base_index = PriceIndex(BasePrice) - 1;
+				base_index = PriceIndex(BasePrice);
 				base_index = Math.Max(base_index, 10);
 				base_index = Math.Min(base_index, 338);
 				offset = Convert.ToInt32(MoveBack.Value);

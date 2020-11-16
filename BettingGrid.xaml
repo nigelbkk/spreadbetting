@@ -53,10 +53,10 @@
 				</Setter.Value>
 			</Setter>
 		</Style>
-		<DataTemplate  x:Key="Our_DataTemplate">
+		<DataTemplate  x:Key="ButtonTemplate">
 			<Grid Background="{Binding Color}">
 				<StackPanel>
-					<Border BorderBrush="DarkGray" BorderThickness="0.5">
+					<Border BorderBrush="DarkGray" BorderThickness="0.0">
 						<StackPanel Orientation="Vertical">
 							<CheckBox IsChecked="{Binding Path=IsChecked}"/>
 							<TextBox Text="{Binding Path=price, Converter={StaticResource oconverter}}" Opacity="{Binding Path=Opacity}"/>
@@ -78,7 +78,7 @@
 				<Label>Back Prices</Label>
 				<Label>Back Stakes</Label>
 			</StackPanel>
-			<ItemsControl  Grid.Column="1" Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource Our_DataTemplate}" ItemsSource="{Binding Path=LayValues}"/>
+			<ItemsControl  Grid.Column="1" Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource ButtonTemplate}" ItemsSource="{Binding Path=LayValues}"/>
 		</Grid>
 		<Border Background="#00000000" BorderBrush="DarkGray" BorderThickness="0.5" Height="8"/>
 		<Grid>
@@ -91,7 +91,7 @@
 				<Label>Lay Prices</Label>
 				<Label>Lay Stakes</Label>
 			</StackPanel>
-			<ItemsControl Grid.Column="1"  Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource Our_DataTemplate}" ItemsSource="{Binding Path=BackValues}"/>
+			<ItemsControl Grid.Column="1"  Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource ButtonTemplate}" ItemsSource="{Binding Path=BackValues}"/>
 		</Grid>
 	</StackPanel>
 </UserControl>

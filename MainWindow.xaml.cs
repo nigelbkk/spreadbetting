@@ -40,11 +40,18 @@ namespace SpreadTrader
 
 			Betfair = new BetfairAPI.BetfairAPI();
 
-			AccountFundsResponse response = Betfair.getAccountFunds(1);
-			_Balance = response.availableToBetBalance;
-			_Exposure = response.exposure;
-			_Commission = response.retainedCommission;
-			NotifyPropertyChanged("");
+			try
+			{
+				AccountFundsResponse response = Betfair.getAccountFunds(1);
+				_Balance = response.availableToBetBalance;
+				_Exposure = response.exposure;
+				_Commission = response.retainedCommission;
+				NotifyPropertyChanged("");
+			}
+			catch(Exception xe)
+			{
+				Debug.WriteLine(xe.Message);
+			}
 		}
 		private void SetWindowPosition()
 		{
@@ -56,10 +63,10 @@ namespace SpreadTrader
 				Trace.WriteLine("INFO: Settings upgraded from previous version");
 			}
 			this.Language = System.Windows.Markup.XmlLanguage.GetLanguage(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
-			this.Top = props.Top;
-			this.Left = props.Left;
-			this.Height = props.Height;
-			this.Width = props.Width;
+			//this.Top = props.Top;
+			//this.Left = props.Left;
+			//this.Height = props.Height;
+			//this.Width = props.Width;
 
 			if (props.ColumnWidth > 0)
 				OuterGrid.ColumnDefinitions[0].Width = new GridLength(props.ColumnWidth, GridUnitType.Pixel);

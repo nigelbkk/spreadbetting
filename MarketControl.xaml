@@ -57,7 +57,7 @@
 							<ColumnDefinition Width="500"/>
 							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
-						<Grid Name="RunnersGrid" Background="LightBlue">
+						<Grid Name="RunnersGrid" Background="Ivory">
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="83*"/>
 								<ColumnDefinition Width="67*"/>
