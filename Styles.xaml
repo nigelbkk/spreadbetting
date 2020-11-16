@@ -55,10 +55,10 @@
 		<Setter Property="VerticalContentAlignment" Value="Center"/>
 		<Setter Property="HorizontalContentAlignment" Value="Left"/>
 	</Style>
-	<SolidColorBrush x:Key="Back1Color" Color="#CBCAEC"/>
-	<SolidColorBrush x:Key="Back2Color" Color="#DFDFF0"/>
-	<SolidColorBrush x:Key="Back3Color" Color="#BCE5FE"/>
-	<SolidColorBrush x:Key="Lay1Color" Color="#DCBAD2"/>
-	<SolidColorBrush x:Key="Lay2Color" Color="#EBD6E5"/>
-	<SolidColorBrush x:Key="Lay3Color" Color="#F6E5E6"/>
+	<SolidColorBrush x:Key="Back0Color" Color="#CBCAEC"/>
+	<SolidColorBrush x:Key="Back1Color" Color="#DFDFF0"/>
+	<SolidColorBrush x:Key="Back2Color" Color="#BCE5FE"/>
+	<SolidColorBrush x:Key="Lay0Color" Color="#DCBAD2"/>
+	<SolidColorBrush x:Key="Lay1Color" Color="#EBD6E5"/>
+	<SolidColorBrush x:Key="Lay2Color" Color="#F6E5E6"/>
 </ResourceDictionary>

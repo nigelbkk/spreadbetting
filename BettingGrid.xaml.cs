@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -10,30 +9,6 @@ using BetfairAPI;
 
 namespace SpreadTrader
 {
-	public class PriceSize : INotifyPropertyChanged
-	{
-		public PriceSize(double price, double size) { this.price = price; this.size = size; IsChecked = true;  }
-		private bool _IsChecked { get; set; }
-		public bool IsChecked { get { return _IsChecked; } set { _IsChecked = value;  ForeGround = new SolidColorBrush(value ? Colors.Green : Colors.DarkGray); NotifyPropertyChanged(""); } }
-		private Double _price { get; set; }
-		public Double price { get { return _price; } set { _price = value; NotifyPropertyChanged(""); } }
-		private Double _size { get; set; }
-		public Double size { get { return _size; } set { _size = value; NotifyPropertyChanged(""); } }
-		public SolidColorBrush Color { get; set; }
-		public SolidColorBrush ForeGround { get; set; }
-		public override string ToString()
-		{
-			return String.Format("{0}:{1}", price, size);
-		}
-		public event PropertyChangedEventHandler PropertyChanged;
-		public void NotifyPropertyChanged(String info)
-		{
-			if (PropertyChanged != null)
-			{
-				PropertyChanged(this, new PropertyChangedEventArgs(info));
-			}
-		}
-	}
 	public delegate void SubmitBetsDelegate();
 	public partial class BettingGrid : UserControl
 	{
@@ -71,12 +46,12 @@ namespace SpreadTrader
 			InitializeComponent();
 			BackValues = SliderControl.BackValues;
 			LayValues = SliderControl.LayValues;
-			for (int i = 0; i < 3; i++) BackValues[i].Color = Application.Current.FindResource("Lay1Color") as SolidColorBrush;
-			for (int i = 3; i < 6; i++) BackValues[i].Color = Application.Current.FindResource("Lay2Color") as SolidColorBrush;
-			for (int i = 6; i < 9; i++) BackValues[i].Color = Application.Current.FindResource("Lay3Color") as SolidColorBrush;
-			for (int i = 0; i < 3; i++) LayValues[i].Color = Application.Current.FindResource("Back3Color") as SolidColorBrush;
-			for (int i = 3; i < 6; i++) LayValues[i].Color = Application.Current.FindResource("Back2Color") as SolidColorBrush;
-			for (int i = 6; i < 9; i++) LayValues[i].Color = Application.Current.FindResource("Back1Color") as SolidColorBrush;
+			for (int i = 0; i < 3; i++) BackValues[i].Color = Application.Current.FindResource("Lay0Color") as SolidColorBrush;
+			for (int i = 3; i < 6; i++) BackValues[i].Color = Application.Current.FindResource("Lay1Color") as SolidColorBrush;
+			for (int i = 6; i < 9; i++) BackValues[i].Color = Application.Current.FindResource("Lay2Color") as SolidColorBrush;
+			for (int i = 0; i < 3; i++) LayValues[i].Color = Application.Current.FindResource("Back2Color") as SolidColorBrush;
+			for (int i = 3; i < 6; i++) LayValues[i].Color = Application.Current.FindResource("Back1Color") as SolidColorBrush;
+			for (int i = 6; i < 9; i++) LayValues[i].Color = Application.Current.FindResource("Back0Color") as SolidColorBrush;
 			BackActive = LayActive = true;
 		}
 		private PlaceExecutionReport placeOrders(String marketId, List<PlaceInstruction> instructions)
@@ -161,4 +136,5 @@ namespace SpreadTrader
 				}
 			}
 		}
+	}
 }

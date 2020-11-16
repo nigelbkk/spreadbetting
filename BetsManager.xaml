@@ -15,7 +15,6 @@
 			<RowDefinition Height="auto"/>
 			<RowDefinition/>
 		</Grid.RowDefinitions>
-		<!--<Label Content= "Bets Manager" Grid.Row="0" HorizontalAlignment="Left" FontSize="18" FontWeight="Bold" Foreground ="LightGray" Margin="20,20" Width="auto" Height="32" VerticalAlignment="Top"/>-->
 		<StackPanel Orientation="Horizontal" Grid.Row="0" Height="30">
 			<TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="{Binding Path=LastUpdated}"/>
 			<Button Margin="36,0,0,0" Tag="Refresh" Click="Button_Click">Refresh Bets</Button>

@@ -11,134 +11,110 @@
 		<local:OddsConverter x:Key="oconverter" />
 		<local:StakeConverter x:Key="sconverter" />
 		<local:PercentConverter x:Key="pconverter" />
-		<Style TargetType="{x:Type Button}">
-			<EventSetter Event="Click" Handler="Button_Click"/>
-			<Setter Property="VerticalContentAlignment" Value="Center"/>
-			<Setter Property="BorderBrush" Value="DarkGray"/>
-			<Setter Property="BorderThickness" Value="0.5"/>
-			<Setter Property="Background" Value="Yellow"/>
-			<Setter Property="FontSize" Value="11"/>
-			<Setter Property="FontWeight" Value="Bold"/>
-			<Setter Property="Width" Value="50"/>
-			<Setter Property="Height" Value="40"/>
-			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Style BasedOn="{StaticResource {x:Type Label}}" 
+            TargetType="{x:Type Label}">
+			<!--<Setter Property="FontSize" Value="110"/>-->
 		</Style>
 		<Style TargetType="{x:Type TextBlock}">
-			<Setter Property="FontSize" Value="9"/>
-			<Setter Property="FontWeight" Value="Normal"/>
-			<Setter Property="Width" Value="50"/>
+			<Setter Property="FontSize" Value="29"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
 		</Style>
-		<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
-			<Setter Property="FontSize" Value="11"/>
-			<Setter Property="Padding" Value="0"/>
-		</Style>
-		<Style x:Key="styleOutcome" TargetType="TextBlock">
+		<Style TargetType="{x:Type Button}">
 			<Style.Triggers>
-				<DataTrigger Binding="{Binding Path=ProfitIfWin}" Value="True">
-					<Setter Property="Foreground" Value="green"/>
-				</DataTrigger>
-				<DataTrigger Binding="{Binding Path=ProfitIfWin}" Value="False">
-					<Setter Property="Foreground" Value="red"/>
-				</DataTrigger>
+				<MultiTrigger>
+					<MultiTrigger.Conditions>
+						<Condition Property="IsPressed" Value="False" />
+						<Condition Property="IsMouseOver" Value="True" />
+					</MultiTrigger.Conditions>
+				</MultiTrigger>
+				<Trigger Property="IsPressed" Value="True">
+					<Setter Property="Button.Background" Value="Purple" />
+					<Setter Property="Button.Effect">
+						<Setter.Value>
+							<DropShadowEffect Color="DarkGray" Direction="320" ShadowDepth="0" BlurRadius="0" Opacity="0" />
+						</Setter.Value>
+					</Setter>
+				</Trigger>
+
 			</Style.Triggers>
+			<EventSetter Event="Click" Handler="Button_Click"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+			<Setter Property="Background" Value="DarkGray"/>
+			<Setter Property="BorderBrush" Value="DarkGray"/>
+			<Setter Property="BorderThickness" Value="0.5"/>
+			<Setter Property="Width" Value="50"/>
+			<Setter Property="Margin" Value="0,0,3,3"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="Button.Effect">
+				<Setter.Value>
+					<DropShadowEffect Color="DarkGray" Direction="320" ShadowDepth="3" BlurRadius="5" Opacity="0.5" />
+				</Setter.Value>
+			</Setter>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate>
+						<ControlTemplate.Resources>
+							<Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+								<Setter Property="TextAlignment" Value="Center"/>
+								<Setter Property="FontSize" Value="9.5"/>
+								<Setter Property="FontWeight" Value="Light"/>
+								<Setter Property="Background" Value="#00000000"/>
+							</Style>
+							<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+								<Setter Property="Width" Value="160"/>
+								<Setter Property="HorizontalContentAlignment" Value="Left"/>
+								<Setter Property="Background" Value="#00000000"/>
+								<Setter Property="FontSize" Value="9.5"/>
+								<Setter Property="Background" Value="#00000000"/>
+							</Style>
+						</ControlTemplate.Resources>
+						<Grid>
+							<Grid>
+								<StackPanel Orientation="Vertical" Background="{TemplateBinding Background}" Height="30" VerticalAlignment="Center">
+									<TextBlock Text="{Binding Path=price, Converter={StaticResource oconverter}}" Margin="0,4,0,0"/>
+									<TextBlock Text="{Binding Path=size, Converter={StaticResource sconverter}}" FontSize="8" FontWeight="Normal"/>
+								</StackPanel>
+							</Grid>
+							<!--<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />-->
+						</Grid>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
 		</Style>
-		<DataTemplate x:Key="DataTemplate_Runner">
+
+		<DataTemplate  x:Key="DataTemplate_Runner">
 			<DataTemplate.Resources>
-				<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
-					<Setter Property="FontSize" Value="11"/>
-				</Style>
-				<Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-					<Setter Property="TextAlignment" Value="Center"/>
-					<Setter Property="FontSize" Value="11"/>
-					<Setter Property="Background" Value="#00000000"/>
-					<Style.Triggers>
-						<Trigger Property="Text" Value="0.00">
-							<Setter Property="Foreground" Value="#00000000" />
-						</Trigger>
-						<Trigger Property="Text" Value="0">
-							<Setter Property="Foreground" Value="#00000000" />
-						</Trigger>
-					</Style.Triggers>
-				</Style>
 			</DataTemplate.Resources>
-			<Grid>
-				<StackPanel Orientation="Horizontal" Tag="{Binding selectionId}" >
-					<Label Background="LightCyan"  Content="{Binding name}" Width="135" Padding="6" HorizontalContentAlignment="Left"/>
-					<Button Tag="back3" Background = "{StaticResource Back3Color}">
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding BackPrices[2].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding BackPrices[2].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
+			<UniformGrid Rows="1"  >
+				<StackPanel>
+					<Border BorderBrush="DarkGray" BorderThickness="0.5">
+						<StackPanel Orientation="Horizontal">
+							<Label Content="{Binding Path=Name}" Width="160" HorizontalContentAlignment="Left"/>
+							<Button DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
+							<Button DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
+							<Button DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
+							<Button DataContext="{Binding LayValues[0]}" Background="{StaticResource Lay0Color}"/>
+							<Button DataContext="{Binding LayValues[1]}" Background="{StaticResource Lay1Color}"/>
+							<Button DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
 						</StackPanel>
-					</Button>
-					<Button Tag="back2" Background = "{StaticResource Back2Color}">
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding BackPrices[1].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding BackPrices[1].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
-						</StackPanel>
-					</Button>
-					<Button Tag="back1" Background = "{StaticResource Back1Color}">
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding BackPrices[0].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding BackPrices[0].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
-						</StackPanel>
-					</Button>
-					<Button Tag="lay1" Background = "{StaticResource Lay1Color}" Margin="10,0,0,0">
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding LayPrices[0].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding LayPrices[0].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
-						</StackPanel>
-					</Button>
-					<Button Tag="lay2" Background = "{StaticResource Lay2Color}">
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding LayPrices[1].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock Text="{Binding LayPrices[1].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
-						</StackPanel>
-					</Button>
-					<Button Tag="lay3" Background = "{StaticResource Lay3Color}">
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="{Binding LayPrices[2].price, Converter={StaticResource oconverter}}"/>
-							<TextBlock  Text="{Binding LayPrices[2].size, Converter={StaticResource sconverter}}" FontSize="9" FontWeight="Normal"/>
-						</StackPanel>
-					</Button>
-					<Grid Width="50">
-						<Label Content="{Binding Path=BackStake2, Mode=TwoWay, Converter={StaticResource sconverter}}" Visibility="Visible" MouseDown="label_MouseDown"/>
-						<TextBox Visibility="Hidden" Text="{Binding Path=BackStake2, Mode=TwoWay, Converter={StaticResource sconverter}}" KeyDown="TextBox_KeyDown" MouseDoubleClick="TextBox_MouseDoubleClick" />
-					</Grid>
-					<Grid Width="50">
-						<Label Content="{Binding Path=LayStake2, Mode=TwoWay, Converter={StaticResource sconverter}}" Visibility="Visible" MouseDown="label_MouseDown"/>
-						<TextBox Visibility="Hidden" Text="{Binding Path=LayStake2, Mode=TwoWay, StringFormat=\{0:#.#\}}" KeyDown="TextBox_KeyDown" MouseDoubleClick="TextBox_MouseDoubleClick" />
-					</Grid>
-					<Label Content="{Binding Path=Profit, Mode=OneWay, StringFormat=\{0:C\}}"/>
-					<Label Content="{Binding Path=LevelProfit, Mode=OneWay, StringFormat=\{0:C\}}"/>
-					<Label Content="{Binding Path=LastPrice, Mode=OneWay, Converter={StaticResource oconverter}}"/>
+					</Border>
 				</StackPanel>
-			</Grid>
+			</UniformGrid>
 		</DataTemplate>
 	</UserControl.Resources>
     <Grid SizeChanged="Grid_SizeChanged">
-		<Grid Name="UpperGrid" Grid.Row="0" VerticalAlignment="Stretch" Background="Azure">
-			<StackPanel Orientation="Vertical" >
-				<StackPanel Name="SV1_Header" Orientation="Horizontal" Height="36">
-					<Label Width ="135" Padding="8,0,0,0" HorizontalContentAlignment ="Left">Selection Name</Label><Label/><Label/>
-					<Label Content="{Binding Path=MarketNode.Market.MarketBook.BackBook, Converter={StaticResource pconverter}}"/><Label Width="10"/>
-					<Label Content="{Binding Path=MarketNode.Market.MarketBook.LayBook, Converter={StaticResource pconverter}}"/><Label/><Label/>
-					<Label><TextBlock TextAlignment="Center">Back<LineBreak/>Stake</TextBlock></Label>
-					<Label><TextBlock TextAlignment="Center">Lay<LineBreak/>Stake</TextBlock></Label>
-					<Label>Profit</Label><Label><TextBlock TextAlignment="Center">Level<LineBreak/>Profit</TextBlock></Label>
-					<Label><TextBlock TextAlignment="Center">Last<LineBreak/>Price</TextBlock></Label>
-				</StackPanel>
-				<ItemsControl Name="SV1" FontFamily="Verdana" FontSize="9" Foreground="#FF5F4D4D" 
+		<Grid>
+			<ItemsControl Name="SV1" FontFamily="Verdana" FontSize="9" Foreground="#FF5F4D4D" 
 						DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
 						 ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}" >
-					<ItemsControl.Template>
-						<ControlTemplate>
-							<ScrollViewer Padding="{TemplateBinding Control.Padding}">
-								<ItemsPresenter />
-							</ScrollViewer>
-						</ControlTemplate>
-					</ItemsControl.Template>
-				</ItemsControl>
-			</StackPanel>
+				<ItemsControl.Template>
+					<ControlTemplate>
+						<ScrollViewer Padding="{TemplateBinding Control.Padding}">
+							<ItemsPresenter />
+						</ScrollViewer>
+					</ControlTemplate>
+				</ItemsControl.Template>
+			</ItemsControl>
 		</Grid>
 	</Grid>
 </UserControl>

@@ -26,8 +26,11 @@ namespace SpreadTrader
 		}
 		public RunnersControl()
 		{
-			InitializeComponent();
 			MarketNode = new NodeViewModel(new BetfairAPI.BetfairAPI());
+
+			InitializeComponent();
+			NotifyPropertyChanged("");
+
 			Worker = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
 			Worker.ProgressChanged += (o, e) =>
 			{
@@ -111,7 +114,7 @@ namespace SpreadTrader
 		}
 		private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			SV1.Height = Math.Max(25, e.NewSize.Height - SV1_Header.Height);
+			//SV1.Height = Math.Max(25, e.NewSize.Height - SV1_Header.Height);
 		}
 	}
 	public static class Extensions

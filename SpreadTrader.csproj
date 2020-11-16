@@ -96,6 +96,7 @@
       <DependentUpon>MarketDescription.xaml</DependentUpon>
     </Compile>
     <Compile Include="NodeViewModel.cs" />
+    <Compile Include="PriceSize.cs" />
     <Compile Include="RunnersControl.xaml.cs">
       <DependentUpon>RunnersControl.xaml</DependentUpon>
     </Compile>
