@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
-             mc:Ignorable="d" d:DesignWidth="600" >
+             mc:Ignorable="d" d:DesignWidth="600" Loaded="UserControl_Loaded" >
 	<UserControl.Resources>
 		<local:TimeConverter x:Key="converter" />
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
@@ -14,12 +14,13 @@
 		</Style>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
-			<Setter Property="FontSize" Value="12"/>
+			<Setter Property="FontSize" Value="11"/>
 			<Setter Property="Width" Value="auto"/>
 			<Setter Property="BorderThickness" Value="0"/>
 			<Setter Property="HorizontalAlignment" Value="Left"/>
 		</Style>
 	</UserControl.Resources>
+	<!--DataContext="{Binding RelativeSource={RelativeSource Self}}"-->
 	<Grid Name="MarketControlGrid" Background="Gray"  DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" >
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto"/>
@@ -51,7 +52,7 @@
 						<RowDefinition Height="auto"/>
 						<RowDefinition Height="auto"/>
 					</Grid.RowDefinitions>
-					<Grid Name="RunersAndSlidersGrid" Grid.Row="0" Grid.ColumnSpan="2" Loaded="RunersAndSlidersGrid_Loaded">
+					<Grid Name="RunnersAndSlidersGrid" Grid.Row="0" Grid.ColumnSpan="2">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="500"/>
 							<ColumnDefinition/>

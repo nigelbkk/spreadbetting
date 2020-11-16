@@ -55,7 +55,7 @@ namespace SpreadTrader
 		}
 		public List<LiveRunner> GetLiveRunners()
 		{
-			List<LiveRunner> LiveRunners = new List<LiveRunner>();
+			List<LiveRunner> Runners = new List<LiveRunner>();
 			if (Market != null)
 			{
 				try
@@ -63,12 +63,7 @@ namespace SpreadTrader
 					Market.MarketBook = Betfair.GetMarketBook(Market);
 					foreach (Runner r in Market.MarketBook.Runners)
 					{
-						if (r.removalDate == new DateTime())
-						{
-							LiveRunner rl = new LiveRunner(r);
-							LiveRunners.Add(rl);
-							if (r.ex.availableToBack.Count > 0) { }
-						}
+						Runners.Add(new LiveRunner(r));
 					}
 					if (Parent != null)
 					{
@@ -82,7 +77,7 @@ namespace SpreadTrader
 					Debug.WriteLine(xe.Message);
 				}
 			}
-			return LiveRunners;
+			return Runners;
 		}
 		private void OnItemSelected()
 		{

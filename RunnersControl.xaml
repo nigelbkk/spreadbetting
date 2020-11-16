@@ -13,7 +13,6 @@
 		<local:PercentConverter x:Key="pconverter" />
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
-			<!--<Setter Property="FontSize" Value="110"/>-->
 		</Style>
 		<Style TargetType="{x:Type TextBlock}">
 			<Setter Property="FontSize" Value="29"/>
@@ -75,7 +74,7 @@
 									<TextBlock Text="{Binding Path=size, Converter={StaticResource sconverter}}" FontSize="8" FontWeight="Normal"/>
 								</StackPanel>
 							</Grid>
-							<!--<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />-->
+							<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
 						</Grid>
 					</ControlTemplate>
 				</Setter.Value>

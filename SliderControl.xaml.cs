@@ -8,12 +8,20 @@ using BetfairAPI;
 
 namespace SpreadTrader
 {
-	public partial class SliderControl : UserControl
+	public partial class SliderControl : UserControl, INotifyPropertyChanged
 	{
 		public SubmitBetsDelegate SubmitBets = null;
 		public static PriceSize[] BackValues { get; set; }
 		public static PriceSize[] LayValues { get; set; }
 		private List<double> AllPrices = null;
+		public event PropertyChangedEventHandler PropertyChanged;
+		public void NotifyPropertyChanged(String info)
+		{
+			if (PropertyChanged != null)
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(info));
+			}
+		}
 		public SliderControl()
 		{
 			double[] MinValue = { 1.01, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
@@ -86,7 +94,7 @@ namespace SpreadTrader
 		{
 			if (BackValues != null && BasePrice < 1000 && BasePrice > 1.01)
 			{
-				Int32 base_index = PriceIndex(BasePrice) - 21;
+				Int32 base_index = PriceIndex(BasePrice) - 20;
 				base_index = Math.Max(base_index, 10);
 				base_index = Math.Min(base_index, 338);
 				Int32 offset = Convert.ToInt32(MoveLay.Value);
@@ -102,6 +110,7 @@ namespace SpreadTrader
 				{
 					LayValues[i].price = AllPrices[base_index + offset + i];
 				}
+				NotifyPropertyChanged("");
 			}
 		}
 		private Properties.Settings props = Properties.Settings.Default;

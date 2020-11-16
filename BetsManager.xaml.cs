@@ -55,6 +55,7 @@ namespace SpreadTrader
 	public partial class BetsManager : UserControl, INotifyPropertyChanged
 	{
 		public NodeSelectionDelegate NodeChangeEventSink = null;
+		public RunnersControl RunnersControl { get; set; }
 		public ObservableCollection<Row> Rows { get; set; }
 		private NodeViewModel MarketNode { get; set; }
 		private DateTime _LastUpdated { get; set; }
@@ -84,6 +85,7 @@ namespace SpreadTrader
 				{
 					MarketNode = node;
 					PopulateDataGrid();
+					Debug.WriteLine("BetsManager");
 				}
 			};
 		}
@@ -104,17 +106,9 @@ namespace SpreadTrader
 
 					foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
 					{
-						Rows.Add(new Row(o));
-					}
-					foreach (Row row in Rows)
-					{
-						//foreach (LiveRunner r in MarketNode.LiveRunners)
-						//{
-						//	if (r.selectionId == row.SelectionID)
-						//	{
-						//		row.Runner = r.name;
-						//	}
-						//}
+						Rows.Add(new Row(o) {
+							Runner = RunnersControl.GetRunnerName(o.selectionId)
+						});
 					}
 					NotifyPropertyChanged("");
 				}

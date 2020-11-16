@@ -59,17 +59,22 @@ namespace SpreadTrader
         {
             BackStake = Properties.Settings.Default.BackStake;
             LayStake = Properties.Settings.Default.LayStake;
-
             BackValues = new List<PriceSize>();
-            LayValues = new List<PriceSize>();
+			LayValues = new List<PriceSize>();
 
-            BackValues.Add(new PriceSize(1.43, 10));
-            BackValues.Add(new PriceSize(1.43, 10));
-            BackValues.Add(new PriceSize(1.43, 10));
-            LayValues.Add(new PriceSize(1.43, 10));
-            LayValues.Add(new PriceSize(1.43, 10));
-            LayValues.Add(new PriceSize(1.43, 10));
-        }
+			BackValues.Add(new PriceSize());
+			BackValues.Add(new PriceSize());
+			BackValues.Add(new PriceSize());
+			LayValues.Add(new PriceSize());
+			LayValues.Add(new PriceSize());
+			LayValues.Add(new PriceSize());
+			//BackValues.Add(new PriceSize(1.43, 10));
+			//BackValues.Add(new PriceSize(1.43, 10));
+			//BackValues.Add(new PriceSize(1.43, 10));
+			//LayValues.Add(new PriceSize(1.43, 10));
+			//LayValues.Add(new PriceSize(1.43, 10));
+			//LayValues.Add(new PriceSize(1.43, 10));
+		}
         public LiveRunner(Runner r) : this()
         {
             ngrunner = r;
@@ -89,7 +94,6 @@ namespace SpreadTrader
                 LayValues[i].price = ps.price;
                 LayValues[i++].size = ps.size;
             }
-            //LayPrices = r.ex.availableToLay;
             NotifyPropertyChanged("");
         }
 		public override string ToString()

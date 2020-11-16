@@ -6,20 +6,30 @@ using System.Windows.Controls;
 
 namespace SpreadTrader
 {
-	public partial class MarketControl : UserControl
+	public partial class MarketControl : UserControl, INotifyPropertyChanged
 	{
 		public NodeSelectionDelegate NodeChangeEventSink = null;
-		public NodeViewModel MarketNode { get; set; }
+		public NodeViewModel _MarketNode { get; set; }
+		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; NotifyPropertyChanged(""); } }
 		public bool IsSelected { set 
 			{
 				RunnersControl.IsSelected = value; 
 			} 
 		}
-		public String MarketName { get { return MarketNode == null ? "No market selected" : MarketNode.Name;  } }
 		private Properties.Settings props = Properties.Settings.Default;
+		public event PropertyChangedEventHandler PropertyChanged;
+		public void NotifyPropertyChanged(String info)
+		{
+			if (PropertyChanged != null)
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(info));
+			}
+		}
 		public MarketControl()
 		{
 			InitializeComponent();
+			BetsManagerControl.RunnersControl = RunnersControl;
+			NodeChangeEventSink += RunnersControl.NodeChangeEventSink;
 			NodeChangeEventSink += BetsManagerControl.NodeChangeEventSink;
 			NodeChangeEventSink += (node) =>
 			{
@@ -27,7 +37,6 @@ namespace SpreadTrader
 				{
 					MarketNode = node;
 					BettingGridControl.MarketNode = node;
-					RunnersControl.LiveRunners = null;
 					RunnersControl.MarketNode = MarketNode;
 				}
 			};
@@ -79,11 +88,9 @@ namespace SpreadTrader
 			if (props.HorizontalSplitter > 0 && grid.RowDefinitions.Count > 0)
 				grid.RowDefinitions[0].Height = new GridLength(props.HorizontalSplitter, GridUnitType.Pixel);
 		}
-		private void RunersAndSlidersGrid_Loaded(object sender, RoutedEventArgs e)
+		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
-			Grid grid = sender as Grid;
-			if (props.VerticalSplitter > 0 && grid.ColumnDefinitions.Count > 0)
-				grid.ColumnDefinitions[0].Width = new GridLength(props.VerticalSplitter + 16, GridUnitType.Pixel);
+			BetsManagerControl.RunnersControl = RunnersControl;
 		}
 	}
 }

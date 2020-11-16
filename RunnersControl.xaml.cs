@@ -11,8 +11,10 @@ namespace SpreadTrader
 {
 	public partial class RunnersControl : UserControl, INotifyPropertyChanged
 	{
+		public NodeSelectionDelegate NodeChangeEventSink = null;
 		private BackgroundWorker Worker = null;
-		public NodeViewModel MarketNode { get; set; }
+		public NodeViewModel _MarketNode { get; set; }
+		public NodeViewModel MarketNode { get { return _MarketNode;  } set { _MarketNode = value; NotifyPropertyChanged(""); } }
 		public	bool IsSelected { get; set; }
 		public List<LiveRunner> LiveRunners { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
@@ -27,9 +29,18 @@ namespace SpreadTrader
 		public RunnersControl()
 		{
 			MarketNode = new NodeViewModel(new BetfairAPI.BetfairAPI());
-
+			LiveRunners = new List<LiveRunner>();
 			InitializeComponent();
-			NotifyPropertyChanged("");
+
+			NodeChangeEventSink += (node) =>
+			{
+				if (IsLoaded)
+				{
+					MarketNode = node;
+					LiveRunners = MarketNode.GetLiveRunners();
+					Debug.WriteLine("RunnersControl");
+				}
+			};
 
 			Worker = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
 			Worker.ProgressChanged += (o, e) =>
@@ -59,10 +70,20 @@ namespace SpreadTrader
 					{
 						Debug.WriteLine(xe.Message);
 					}
+					//break;
 					System.Threading.Thread.Sleep(props.WaitBF);
 				}
 			};
 			Worker.RunWorkerAsync();
+		}
+		public String GetRunnerName(Int64 SelectionID)
+		{
+			foreach(LiveRunner r in LiveRunners)
+			{
+				if (r.SelectionId == SelectionID)
+					return r.Name;
+			}
+			return null;
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
