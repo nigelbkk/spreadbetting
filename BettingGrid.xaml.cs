@@ -43,7 +43,6 @@ namespace SpreadTrader
 		public NodeViewModel MarketNode { get; set; }
 		public BettingGrid()
 		{
-			InitializeComponent();
 			BackValues = SliderControl.BackValues;
 			LayValues = SliderControl.LayValues;
 			for (int i = 0; i < 3; i++) BackValues[i].Color = Application.Current.FindResource("Lay0Color") as SolidColorBrush;
@@ -53,6 +52,7 @@ namespace SpreadTrader
 			for (int i = 3; i < 6; i++) LayValues[i].Color = Application.Current.FindResource("Back1Color") as SolidColorBrush;
 			for (int i = 6; i < 9; i++) LayValues[i].Color = Application.Current.FindResource("Back0Color") as SolidColorBrush;
 			BackActive = LayActive = true;
+			InitializeComponent();
 		}
 		private PlaceExecutionReport placeOrders(String marketId, List<PlaceInstruction> instructions)
 		{

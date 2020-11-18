@@ -4,6 +4,7 @@ using System.ComponentModel;
 using BetfairAPI;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using System.Collections.ObjectModel;
 
 namespace SpreadTrader
 {
@@ -28,11 +29,11 @@ namespace SpreadTrader
         }
         public double BackStake { get; set; }
         public double LayStake { get; set; }
-        public double ifWin { get { return 1.2; } }
-        public double LevelProfit { get { return 1.3; } }
+        public double ifWin { get { return 21.345; } }// ngrunner.ifWin; } }
+        public double LevelProfit { get; set; }
         public double LastPrice { get; set; }
         public List<PriceSize> BackValues { get; set; }
-        public List<PriceSize> LayValues { get; set; }
+        public ObservableCollection<PriceSize> LayValues { get; set; }
         public double BackLayRatio
         {
             get
@@ -60,7 +61,7 @@ namespace SpreadTrader
             BackStake = Properties.Settings.Default.BackStake;
             LayStake = Properties.Settings.Default.LayStake;
             BackValues = new List<PriceSize>();
-			LayValues = new List<PriceSize>();
+			LayValues = new ObservableCollection<PriceSize>();
 
 			BackValues.Add(new PriceSize());
 			BackValues.Add(new PriceSize());
@@ -68,12 +69,6 @@ namespace SpreadTrader
 			LayValues.Add(new PriceSize());
 			LayValues.Add(new PriceSize());
 			LayValues.Add(new PriceSize());
-			//BackValues.Add(new PriceSize(1.43, 10));
-			//BackValues.Add(new PriceSize(1.43, 10));
-			//BackValues.Add(new PriceSize(1.43, 10));
-			//LayValues.Add(new PriceSize(1.43, 10));
-			//LayValues.Add(new PriceSize(1.43, 10));
-			//LayValues.Add(new PriceSize(1.43, 10));
 		}
         public LiveRunner(Runner r) : this()
         {

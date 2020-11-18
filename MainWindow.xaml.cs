@@ -65,8 +65,8 @@ namespace SpreadTrader
 			this.Language = System.Windows.Markup.XmlLanguage.GetLanguage(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
 			//this.Top = props.Top;
 			//this.Left = props.Left;
-			//this.Height = props.Height;
-			//this.Width = props.Width;
+			this.Height = props.Height;
+			this.Width = props.Width;
 
 			if (props.ColumnWidth > 0)
 				OuterGrid.ColumnDefinitions[0].Width = new GridLength(props.ColumnWidth, GridUnitType.Pixel);
@@ -75,26 +75,6 @@ namespace SpreadTrader
 			{
 				WindowState = System.Windows.WindowState.Maximized;
 			}
-		}
-		private void Window_Closing(object sender, CancelEventArgs e)
-		{
-			if (WindowState == System.Windows.WindowState.Maximized)
-			{
-				props.Top = RestoreBounds.Top;
-				props.Left = RestoreBounds.Left;
-				props.Height = RestoreBounds.Height;
-				props.Width = RestoreBounds.Width;
-				props.Maximised = true;
-			}
-			else
-			{
-				props.Top = this.Top;
-				props.Left = this.Left;
-				props.Height = this.Height;
-				props.Width = this.Width;
-				props.Maximised = false;
-			}
-			props.Save();
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -170,16 +150,6 @@ namespace SpreadTrader
 		private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			TabControl tabControl = sender as TabControl;
-			//foreach(TabItem t in tabControl.Items)
-			//{
-			//	MarketControl o = t.Content as MarketControl;
-			//	if (o != null)
-			//		o.RunnersControl.IsSelected = false;
-			//}
-			//MarketControl mc = tabControl.SelectedContent as MarketControl;
-			//if (mc != null)
-			//	mc.RunnersControl.IsSelected = true;
-
 			if (e.RemovedItems.Count > 0)
 			{
 				TabItem tr = e.RemovedItems[0] as TabItem;
@@ -187,7 +157,6 @@ namespace SpreadTrader
 				if (mcr != null)
 					mcr.IsSelected = false;
 			}
-
 			if (e.AddedItems.Count > 0)
 			{
 				TabItem ta = e.AddedItems[0] as TabItem;
@@ -195,6 +164,12 @@ namespace SpreadTrader
 				if (mca != null)
 					mca.IsSelected = true;
 			}
+		}
+		private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			props.Width = e.NewSize.Width;
+			props.Height = e.NewSize.Height;
+			props.Save();
 		}
 	}
 }

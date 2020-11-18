@@ -261,38 +261,52 @@ namespace BetfairAPI
         }
         public MarketBook GetMarketBook(Market m)
         {
-            Dictionary<String, Object> p = new Dictionary<string, object>();
-            p["marketIds"] = new String[] { m.marketId };
-            p["priceProjection"] = new priceProjection()
+            try
             {
-                priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.SP_AVAILABLE | priceDataEnum.EX_BEST_OFFERS))
-            };
-            List<MarketBook> books = RPCRequest<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
-            //CalculateProfitAndLoss(books.First());
-            MarketBook book = books.First();
+                Dictionary<String, Object> p = new Dictionary<string, object>();
+                p["marketIds"] = new String[] { m.marketId };
+				p["priceProjection"] = new priceProjection()
+				{
+					priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.EX_BEST_OFFERS))
+				};
+				//priceProjection pp = new priceProjection();
+    //            pp.priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.EX_BEST_OFFERS));
+    //            pp.exBestOffersOverrides = new List<priceProjection.ExBestOffersOverrides>();
+    //            pp.exBestOffersOverrides.Add(new priceProjection.ExBestOffersOverrides() { bestPricesDepth = 10 });
+    //            pp.exBestOffersOverrides.Add(new priceProjection.ExBestOffersOverrides() { rollupModel = "NONE"});
+    //            p["priceProjection"] = pp;
+                List<MarketBook> books = RPCRequest<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
+                CalculateProfitAndLoss(books.First());
+                MarketBook book = books.First();
 
-            if (m.runners == null)
-            {
-                m.runners = new List<Market.RunnerCatalog>();
-                foreach (Runner runner in book.Runners)
+                if (m.runners == null)
                 {
-                    m.runners.Add(new Market.RunnerCatalog()
+                    m.runners = new List<Market.RunnerCatalog>();
+                    foreach (Runner runner in book.Runners)
                     {
-                        selectionId = runner.selectionId,
-                    });
-                }
-            }
-            foreach (Runner runner in book.Runners)
-            {
-                foreach (Market.RunnerCatalog cat in m.runners)
-                {
-                    if (cat.selectionId == runner.selectionId)
-                    {
-                        runner.Catalog = cat;
+                        m.runners.Add(new Market.RunnerCatalog()
+                        {
+                            selectionId = runner.selectionId,
+                        });
                     }
                 }
+                foreach (Runner runner in book.Runners)
+                {
+                    foreach (Market.RunnerCatalog cat in m.runners)
+                    {
+                        if (cat.selectionId == runner.selectionId)
+                        {
+                            runner.Catalog = cat;
+                        }
+                    }
+                }
+                return book;
             }
-            return book;
+            catch (Exception xe)
+			{
+
+			}
+            return null;
         }
         public List<ClearedOrder> GetClearedOrders(Int32 ExchangeId, String mid, betStatusEnum status)
         {

@@ -6,17 +6,29 @@
              xmlns:local="clr-namespace:SpreadTrader"
              mc:Ignorable="d" 
 	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-             d:DesignHeight="450" d:DesignWidth="800" >
+             d:DesignHeight="250" d:DesignWidth="600" >
 	<UserControl.Resources>
 		<local:OddsConverter x:Key="oconverter" />
 		<local:StakeConverter x:Key="sconverter" />
 		<local:PercentConverter x:Key="pconverter" />
+		<local:CurrencyConverter x:Key="cconverter" />
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
+			<Setter Property="FontSize" Value="12"/>
+			<Setter Property="Width" Value="53"/>
+			<Setter Property="HorizontalAlignment" Value="Left"/>
+			<Setter Property="Padding" Value="0"/>
+		</Style>
+		<Style TargetType="{x:Type TextBox}">
+			<Setter Property="FontSize" Value="12"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+			<Setter Property="Width" Value="53"/>
+			<Setter Property="Background" Value="#00000000"/>
+			<Setter Property="BorderThickness" Value="0.2"/>
 		</Style>
 		<Style TargetType="{x:Type TextBlock}">
-			<Setter Property="FontSize" Value="29"/>
-			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="FontSize" Value="10"/>
 		</Style>
 		<Style TargetType="{x:Type Button}">
 			<Style.Triggers>
@@ -55,21 +67,22 @@
 						<ControlTemplate.Resources>
 							<Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
 								<Setter Property="TextAlignment" Value="Center"/>
-								<Setter Property="FontSize" Value="9.5"/>
-								<Setter Property="FontWeight" Value="Light"/>
+								<Setter Property="Margin" Value="1"/>
+								<Setter Property="FontSize" Value="11"/>
+								<Setter Property="FontWeight" Value="Normal"/>
 								<Setter Property="Background" Value="#00000000"/>
 							</Style>
 							<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
 								<Setter Property="Width" Value="160"/>
 								<Setter Property="HorizontalContentAlignment" Value="Left"/>
 								<Setter Property="Background" Value="#00000000"/>
-								<Setter Property="FontSize" Value="9.5"/>
+								<Setter Property="FontSize" Value="12"/>
 								<Setter Property="Background" Value="#00000000"/>
 							</Style>
 						</ControlTemplate.Resources>
 						<Grid>
 							<Grid>
-								<StackPanel Orientation="Vertical" Background="{TemplateBinding Background}" Height="30" VerticalAlignment="Center">
+								<StackPanel Orientation="Vertical" Background="{TemplateBinding Background}" Height="35" VerticalAlignment="Center">
 									<TextBlock Text="{Binding Path=price, Converter={StaticResource oconverter}}" Margin="0,4,0,0"/>
 									<TextBlock Text="{Binding Path=size, Converter={StaticResource sconverter}}" FontSize="8" FontWeight="Normal"/>
 								</StackPanel>
@@ -82,19 +95,23 @@
 		</Style>
 
 		<DataTemplate  x:Key="DataTemplate_Runner">
-			<DataTemplate.Resources>
-			</DataTemplate.Resources>
 			<UniformGrid Rows="1"  >
 				<StackPanel>
-					<Border BorderBrush="DarkGray" BorderThickness="0.5">
+					<Border BorderBrush="DarkGray" BorderThickness="0">
 						<StackPanel Orientation="Horizontal">
-							<Label Content="{Binding Path=Name}" Width="160" HorizontalContentAlignment="Left"/>
+							<Label Content="{Binding Path=Name}" Width="160" Padding="8" HorizontalContentAlignment="Left"/>
 							<Button DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
 							<Button DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
 							<Button DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
+							<Border Width="10"/>
 							<Button DataContext="{Binding LayValues[0]}" Background="{StaticResource Lay0Color}"/>
 							<Button DataContext="{Binding LayValues[1]}" Background="{StaticResource Lay1Color}"/>
 							<Button DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
+							<TextBox Text="{Binding BackStake}"/>
+							<TextBox Text="{Binding LayStake}"/>
+							<Label Content="{Binding ifWin, Converter={StaticResource cconverter} }" />
+							<Label Content="{Binding LevelProfit, Converter={StaticResource cconverter} }" />
+							<Label Content="{Binding LastPrice, Converter={StaticResource cconverter} }" />
 						</StackPanel>
 					</Border>
 				</StackPanel>
@@ -102,18 +119,39 @@
 		</DataTemplate>
 	</UserControl.Resources>
     <Grid SizeChanged="Grid_SizeChanged">
-		<Grid>
-			<ItemsControl Name="SV1" FontFamily="Verdana" FontSize="9" Foreground="#FF5F4D4D" 
-						DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-						 ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}" >
+		<StackPanel>
+			<StackPanel Name="Header" Orientation="Horizontal" VerticalAlignment="Top" Height="36">
+				<Label Width ="160" Padding="8,0,0,0" HorizontalContentAlignment ="Left">Selection Name</Label>
+				<Label/>
+				<Label/>
+				<Label Content="{Binding Path=BackBook, Converter={StaticResource pconverter}}"/>
+				<Label Width="10"/>
+				<Label Content="{Binding Path=LayBook, Converter={StaticResource pconverter}}"/>
+				<Label/>
+				<Label/>
+				<Label>
+					<TextBlock>Back<LineBreak/>Stake</TextBlock>
+				</Label>
+				<Label>
+					<TextBlock>Lay<LineBreak/>Stake</TextBlock>
+				</Label>
+				<Label>Profit</Label>
+				<Label>
+					<TextBlock>Level<LineBreak/>Profit</TextBlock>
+				</Label>
+				<Label>
+					<TextBlock>Last<LineBreak/>Price</TextBlock>
+				</Label>
+			</StackPanel>
+			<ItemsControl Name="SV1" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}" >
 				<ItemsControl.Template>
 					<ControlTemplate>
-						<ScrollViewer Padding="{TemplateBinding Control.Padding}">
+						<ScrollViewer>
 							<ItemsPresenter />
 						</ScrollViewer>
 					</ControlTemplate>
 				</ItemsControl.Template>
 			</ItemsControl>
-		</Grid>
+		</StackPanel>
 	</Grid>
 </UserControl>

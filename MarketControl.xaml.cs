@@ -41,6 +41,7 @@ namespace SpreadTrader
 				}
 			};
 			SliderControl.SubmitBets += BettingGridControl.SubmitBets;
+			RunnersAndSlidersGrid.ColumnDefinitions[0].Width = new GridLength(props.VerticalSplitter);
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -76,11 +77,12 @@ namespace SpreadTrader
 		{
 			GridSplitter gs = sender as GridSplitter;
 			props.HorizontalSplitter = RunnersGrid.ActualHeight;
+			props.Save();
 		}
 		private void GridSplitter_DragCompleted_1(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
 		{
-			GridSplitter gs = sender as GridSplitter;
-			props.VerticalSplitter = RunnersGrid.ActualWidth;
+			props.VerticalSplitter = RunnersAndSlidersGrid.ColumnDefinitions[0].Width.Value;
+			props.Save();
 		}
 		private void UpperGrid_Loaded(object sender, RoutedEventArgs e)
 		{

@@ -3,10 +3,20 @@ using System.Globalization;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
-using System.Windows.Media;
 
 namespace SpreadTrader
 {
+	public class CurrencyConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			return String.Format("{0}{1:0.00}", culture.NumberFormat.CurrencySymbol, System.Convert.ToDouble(value));
+		}
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 	public class PercentConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

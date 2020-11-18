@@ -4,7 +4,7 @@
 		xmlns:properties="clr-namespace:SpreadTrader.Properties"
         xmlns:local="clr-namespace:SpreadTrader"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="SpreadTrader" Height="598" Width="1089" WindowStartupLocation="CenterScreen" Closing="Window_Closing" Loaded="Window_Loaded" >
+        Title="SpreadTrader" Height="598" Width="1089" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" >
 	<Window.Resources>
 		<ResourceDictionary>
 			<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">

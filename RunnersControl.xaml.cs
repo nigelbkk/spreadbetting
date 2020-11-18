@@ -15,7 +15,9 @@ namespace SpreadTrader
 		private BackgroundWorker Worker = null;
 		public NodeViewModel _MarketNode { get; set; }
 		public NodeViewModel MarketNode { get { return _MarketNode;  } set { _MarketNode = value; NotifyPropertyChanged(""); } }
-		public	bool IsSelected { get; set; }
+		public bool IsSelected { get; set; }
+		public double BackBook { get { return _MarketNode.Market.MarketBook == null ? 0.00 : _MarketNode.Market.MarketBook.BackBook; } }
+		public double LayBook { get { return _MarketNode.Market.MarketBook == null ? 0.00 : _MarketNode.Market.MarketBook.LayBook; } }
 		public List<LiveRunner> LiveRunners { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -135,7 +137,7 @@ namespace SpreadTrader
 		}
 		private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			//SV1.Height = Math.Max(25, e.NewSize.Height - SV1_Header.Height);
+			SV1.Height = Math.Max(25, e.NewSize.Height - Header.Height);
 		}
 	}
 	public static class Extensions
