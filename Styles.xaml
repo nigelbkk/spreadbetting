@@ -48,7 +48,6 @@
 	<Style TargetType="{x:Type TextBox}">
 		<Setter Property="BorderBrush" Value="DarkGray"/>
 		<Setter Property="BorderThickness" Value="0.5"/>
-		<!--<Setter Property="Background" Value="#00000000"/>-->
 		<Setter Property="FontSize" Value="11"/>
 		<Setter Property="FontWeight" Value="Normal"/>
 		<Setter Property="Width" Value="auto"/>

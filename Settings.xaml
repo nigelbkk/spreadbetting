@@ -5,11 +5,11 @@
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:p="clr-namespace:SpreadTrader.Properties"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Settings" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" ShowInTaskbar="False" Closing="Window_Closing" Height="216.667" Width="324.666">
+        Title="Settings" ResizeMode="NoResize" ShowInTaskbar="False" Closing="Window_Closing" Height="340" Width="369.332">
 	<Window.Resources>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
-			<Setter Property="Width" Value="100"/>
+			<Setter Property="Width" Value="160"/>
 			<Setter Property="Height" Value="20.9"/>
 			<Setter Property="Margin" Value="4,0,6,0"/>
 			<Setter Property="Padding" Value="5,3"/>
@@ -18,45 +18,65 @@
 		</Style>
 		<Style BasedOn="{StaticResource {x:Type TextBox}}" 
             TargetType="{x:Type TextBox}">
-			<Setter Property="Width" Value="200"/>
+			<Setter Property="Width" Value="190"/>
 			<Setter Property="Height" Value="20.9"/>
 			<!--<Setter Property="Background" Value="#00000000"/>-->
 			<Setter Property="HorizontalAlignment" Value="Left"/>
 		</Style>
+		<Style BasedOn="{StaticResource {x:Type CheckBox}}" 
+            TargetType="{x:Type CheckBox}">
+			<Setter Property="Height" Value="18.9"/>
+			<Setter Property="Margin" Value="0,2,0,0"/>
+		</Style>
 	</Window.Resources>
 	<Grid Background="Ivory"> 
-		<Grid.RowDefinitions>
-			<RowDefinition Height="280*" />
-			<RowDefinition/>
-		</Grid.RowDefinitions>
-		<Grid Grid.Row="0">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="110" />
-				<ColumnDefinition/>
-			</Grid.ColumnDefinitions>
-			<StackPanel Grid.Column="0">
-				<Label Content="Betfair User"/>
-				<Label Content="Betfair Password"  />
-				<Label Content="Betfair AppKey"  />
-				<Label Content="X509 Cert File"  />
-				<Label Content="Cert File Password"  />
-				<Label Content="Proxy"  />
-				<Label Content="Wait (ms)" />
-			</StackPanel>
-			<StackPanel Grid.Column="1">
-				<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=BFUser, Mode=TwoWay}" />
-				<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=BFPassword, Mode=TwoWay}" />
-				<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=AppKey, Mode=TwoWay}" />
-				<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=CertFile, Mode=TwoWay}" />
-				<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=CertPassword, Mode=TwoWay}" />
-				<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=Proxy, Mode=TwoWay}" />
-				<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=WaitBF, Mode=TwoWay}" />
-			</StackPanel>
-		</Grid>
+		<DockPanel>
+			<Grid DockPanel.Dock="Left">
+				<StackPanel>
+					<Label Content="Betfair User"/>
+					<Label Content="Betfair Password"  />
+					<Label Content="Betfair AppKey"  />
+					<Label Content="X509 Cert File"  />
+					<Label Content="Cert File Password"  />
+					<Label Content="Proxy"  />
+					<Label Content="Wait (ms)" />
+					<Label Content="Matched Bet Alert" />
+					<Label Content="Default Action" />
+					<Label Content="Net of Commissions" />
+					<Label Content="Show Cross Matched" />
+					<Label Content="Apply Cross Match Formula" />
+					<Label Content="Hilite Unselected When matched" />
+				</StackPanel>
+			</Grid>
+			<Grid DockPanel.Dock="Right" Width="auto">
+				<StackPanel>
+					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=BFUser, Mode=TwoWay}" />
+					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=BFPassword, Mode=TwoWay}" />
+					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=AppKey, Mode=TwoWay}" />
+					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=CertFile, Mode=TwoWay}" />
+					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=CertPassword, Mode=TwoWay}" />
+					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=Proxy, Mode=TwoWay}" />
+					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=WaitBF, Mode=TwoWay}" />
+
+					<StackPanel Orientation="Horizontal">
+						<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=MatchedBetAlert, Mode=TwoWay}" Width="136" />
+						<Button Margin="2,0" Height="14.9" Width="20" Padding="0" Click="Button_Click2">...</Button>
+						<Button Margin="2,0" Height="14.9" Width="20" Padding="0" Click="Button_Click3">o</Button>
+					</StackPanel>
+					<ComboBox SelectedIndex="{Binding Source={x:Static p:Settings.Default}, Path=DefaultAction, Mode=TwoWay}" HorizontalAlignment="Stretch">
+						<ComboBoxItem>Cancel</ComboBoxItem>
+						<ComboBoxItem>Keep in Play</ComboBoxItem>
+						<ComboBoxItem>Convert to SP</ComboBoxItem>
+						<ComboBoxItem>Keep Offset in Play</ComboBoxItem>
+						<ComboBoxItem>Keep Offset at SP</ComboBoxItem>
+					</ComboBox>
+					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=NetOfCommission, Mode=TwoWay}" />
+					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=CrossMatched, Mode=TwoWay}" />
+					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=CrossMatchingFormula, Mode=TwoWay}" />
+					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=HiliteUnselected, Mode=TwoWay}" />
+				</StackPanel>
+			</Grid>
+		</DockPanel>
 		<Button Content="OK" IsDefault="True" FontSize="10" Click="Button_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="51" Margin="0,0,10,8"/>
-		<!--<StackPanel VerticalAlignment="Bottom" Orientation="Horizontal" Height="20" Grid.RowSpan="2" >
-			<TextBlock Text="{Binding Path=ver, StringFormat='Version {0}'}" Margin="5,2" TextAlignment="Left" Width="245" VerticalAlignment="Center" />
-			<Button Content="OK" IsDefault="True" FontSize="10" Click="Button_Click" HorizontalAlignment="Right" Width="51" VerticalAlignment="Center" />
-		</StackPanel>-->
 	</Grid>
 </Window>

@@ -262,5 +262,77 @@ namespace SpreadTrader.Properties {
                 this["BasePrice"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int DefaultAction {
+            get {
+                return ((int)(this["DefaultAction"]));
+            }
+            set {
+                this["DefaultAction"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool NetOfCommission {
+            get {
+                return ((bool)(this["NetOfCommission"]));
+            }
+            set {
+                this["NetOfCommission"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CrossMatched {
+            get {
+                return ((bool)(this["CrossMatched"]));
+            }
+            set {
+                this["CrossMatched"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CrossMatchingFormula {
+            get {
+                return ((bool)(this["CrossMatchingFormula"]));
+            }
+            set {
+                this["CrossMatchingFormula"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HiliteUnselected {
+            get {
+                return ((bool)(this["HiliteUnselected"]));
+            }
+            set {
+                this["HiliteUnselected"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MatchedBetAlert {
+            get {
+                return ((string)(this["MatchedBetAlert"]));
+            }
+            set {
+                this["MatchedBetAlert"] = value;
+            }
+        }
     }
 }

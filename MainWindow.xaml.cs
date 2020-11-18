@@ -16,12 +16,9 @@ namespace SpreadTrader
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged(""); } }
-		private double _Balance = 0;
-		private double _Exposure = 0;
-		public double _Commission = 0;
-		public String Balance { get { return String.Format("Balance: {0:C}", _Balance); } }
-		public String Exposure { get { return String.Format("Exposure: {0:C}", _Exposure); } }
-		public String Commission { get { return String.Format("Commission: {0:0.00}%", _Commission); } }
+		public double Balance { get; set; }
+		public double Exposure { get; set; }
+		public double Commission { get; set; }
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }
 		EventsTree EventsTree = null;
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -39,16 +36,19 @@ namespace SpreadTrader
 			SetWindowPosition();
 
 			Betfair = new BetfairAPI.BetfairAPI();
-
+			UpdateAccountInformation();
+		}
+		private void UpdateAccountInformation()
+		{
 			try
 			{
 				AccountFundsResponse response = Betfair.getAccountFunds(1);
-				_Balance = response.availableToBetBalance;
-				_Exposure = response.exposure;
-				_Commission = response.retainedCommission;
+				Balance = response.availableToBetBalance;
+				Exposure = response.exposure;
+				Commission = response.retainedCommission;
 				NotifyPropertyChanged("");
 			}
-			catch(Exception xe)
+			catch (Exception xe)
 			{
 				Debug.WriteLine(xe.Message);
 			}
@@ -95,7 +95,7 @@ namespace SpreadTrader
 						}
 						break;
 					case "Settings":
-						new Settings().ShowDialog();
+						new Settings(this, b).ShowDialog();
 						break;
 					case "Refresh":
 						EventsTree.Refresh();
@@ -170,6 +170,11 @@ namespace SpreadTrader
 			props.Width = e.NewSize.Width;
 			props.Height = e.NewSize.Height;
 			props.Save();
+		}
+		private void StackPanel_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			UpdateAccountInformation();
+			NotifyPropertyChanged("");
 		}
 	}
 }

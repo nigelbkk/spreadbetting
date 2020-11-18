@@ -16,7 +16,7 @@ namespace SpreadTrader
 		public ObservableCollection<EventType> AllEventTypes { get; set; }
 		public Favourites(Visual visual, Button b, List<EventTypeResult> eventTypes)
 		{
-			Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(80, 24)));
+			Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(b.ActualWidth, b.ActualHeight)));
 			Top = coords.Y;
 			Left = coords.X;
 
