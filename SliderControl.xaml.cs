@@ -11,8 +11,12 @@ namespace SpreadTrader
 	public partial class SliderControl : UserControl, INotifyPropertyChanged
 	{
 		public SubmitBetsDelegate SubmitBets = null;
+		public double CutStakes { get; set; }
+		public double MoveBack { get; set; }
+		public double MoveLay { get; set; }
 		public static PriceSize[] BackValues { get; set; }
 		public static PriceSize[] LayValues { get; set; }
+		public static bool AutoBackLay { get; set; }
 		private List<double> AllPrices = null;
 		public event PropertyChangedEventHandler PropertyChanged;
 		public void NotifyPropertyChanged(String info)
@@ -27,6 +31,10 @@ namespace SpreadTrader
 			double[] MinValue = { 1.01, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
 			double[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
 			Decimal[] Increment = { 0.01M, 0.02M, 0.05M, 0.1M, 0.2M, 0.5M, 1, 2, 5, 10 };
+
+			CutStakes = 10;
+			MoveBack = 10;
+			MoveLay = 22;
 
 			AllPrices = new List<double>();
 			Decimal m = 1.0M;
@@ -49,7 +57,6 @@ namespace SpreadTrader
 			InitializeComponent();
 		}
 		private double _BasePrice;
-		public bool AutoOn { get; set; }
 		public double BasePrice { get { return _BasePrice; } set { _BasePrice = Math.Max(value, 1.10); } }
 		private Int32 PriceIndex(double v)
 		{
@@ -97,7 +104,7 @@ namespace SpreadTrader
 				Int32 base_index = PriceIndex(BasePrice) - 23;
 				base_index = Math.Max(base_index, 10);
 				base_index = Math.Min(base_index, 338);
-				Int32 offset = Convert.ToInt32(MoveLay.Value);
+				Int32 offset = Convert.ToInt32(MoveLay);
 				for (int i = 0, j = 8; i < 9; i++, j--)
 				{
 					BackValues[i].price = AllPrices[base_index + offset - j];
@@ -105,7 +112,7 @@ namespace SpreadTrader
 				base_index = PriceIndex(BasePrice);
 				base_index = Math.Max(base_index, 10);
 				base_index = Math.Min(base_index, 338);
-				offset = Convert.ToInt32(MoveBack.Value);
+				offset = Convert.ToInt32(MoveBack);
 				for (int i = 0; i < 9; i++)
 				{
 					LayValues[i].price = AllPrices[base_index + offset + i];
@@ -116,14 +123,7 @@ namespace SpreadTrader
 		private Properties.Settings props = Properties.Settings.Default;
 		private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
-			Slider slider = sender as Slider;
-			String tag = slider.Tag as String;
-			switch (slider.Name)
-			{
-				case "CutStakes": MoveStakes((Int32) e.NewValue, (Int32) e.OldValue); break;
-				case "MoveBack": SyncPrices(); break;
-				case "MoveLay": SyncPrices(); break;
-			}
+			SyncPrices();
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -134,10 +134,6 @@ namespace SpreadTrader
 				{
 					case "-": BasePrice = PreviousPrice(BasePrice); break;
 					case "+": BasePrice = NextPrice(BasePrice); break;
-					case "Auto":
-						AutoOn = !AutoOn;
-						b.Foreground = new SolidColorBrush(AutoOn ? Colors.Black : Colors.LightGray);
-						break;
 					case "Execute":
 						if (SubmitBets != null)
 						{
@@ -149,22 +145,7 @@ namespace SpreadTrader
 				SyncPrices();
 			}
 		}
-		private void UserControl_Loaded(object sender, RoutedEventArgs e)
-		{
-			//for (Int32 i = 0; i < 9; i++)
-			//{
-			//	BackValues[i] = new PriceSize(AllPrices[i], 20 + 1*10);
-			//	LayValues[i] = new PriceSize(AllPrices[i], 20 + 1 * 10);
-			//	//Values[(int)sliderEnum.BACKPRICES + i] = AllPrices[i];
-			//	//Values[(int)sliderEnum.LAYPRICES + i] = AllPrices[i];
-			//}
-			//for (Int32 i = 0; i < 10; i++)
-			//{
-			//	BackValues[(int)sliderEnum.LAYSTAKES + i] = Values[(int)sliderEnum.BACKSTAKES + i] = 20 + i*10;
-			//}
-			SyncPrices();
-		}
-		private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+		private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			TextBox tx = sender as TextBox;
 			if (!String.IsNullOrEmpty(tx.Text))
@@ -175,6 +156,10 @@ namespace SpreadTrader
 				tx.Text = Convert.ToString(BasePrice);
 				props.Save();
 			}
+		}
+		private void Slider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
+		{
+			MoveStakes((Int32)e.NewValue, (Int32)e.OldValue);
 		}
 	}
 }

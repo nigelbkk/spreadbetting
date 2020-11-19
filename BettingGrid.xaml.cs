@@ -45,6 +45,7 @@ namespace SpreadTrader
 		{
 			BackValues = SliderControl.BackValues;
 			LayValues = SliderControl.LayValues;
+
 			for (int i = 0; i < 3; i++) BackValues[i].Color = Application.Current.FindResource("Lay0Color") as SolidColorBrush;
 			for (int i = 3; i < 6; i++) BackValues[i].Color = Application.Current.FindResource("Lay1Color") as SolidColorBrush;
 			for (int i = 6; i < 9; i++) BackValues[i].Color = Application.Current.FindResource("Lay2Color") as SolidColorBrush;
@@ -80,6 +81,7 @@ namespace SpreadTrader
 			}
 			if (MarketNode != null)
 			{
+				bool auto_back_lay = SliderControl.AutoBackLay;
 				List<PriceSize> laybets = new List<PriceSize>();
 				List<PriceSize> backbets = new List<PriceSize>();
 				List<LiveRunner> runners = new List<LiveRunner>();

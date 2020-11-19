@@ -232,6 +232,11 @@ namespace BetfairAPI
             CurrentOrderSummaryReport Orders = listCurrentOrders(book.marketId);
             foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in Orders.currentOrders)
             {
+#if DEBUG
+                o.sizeMatched = o.priceSize.size;
+                o.averagePriceMatched = o.priceSize.price;
+#endif
+
                 foreach (Runner r in book.Runners)
                 {
                     if (r.selectionId == o.selectionId)
@@ -307,6 +312,11 @@ namespace BetfairAPI
 
 			}
             return null;
+        }
+        public List<MarketBook> GetRunnerBook()
+        {
+            List<MarketBook> books = new List<MarketBook>();
+            return books;
         }
         public List<ClearedOrder> GetClearedOrders(Int32 ExchangeId, String mid, betStatusEnum status)
         {

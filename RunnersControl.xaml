@@ -100,18 +100,18 @@
 					<Border BorderBrush="DarkGray" BorderThickness="0">
 						<StackPanel Orientation="Horizontal">
 							<Label Content="{Binding Path=Name}" Width="160" Padding="8" HorizontalContentAlignment="Left"/>
-							<Button DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
-							<Button DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
-							<Button DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
+							<Button Tag="2" DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
+							<Button Tag="1" DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
+							<Button Tag="0" DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
 							<Border Width="10"/>
-							<Button DataContext="{Binding LayValues[0]}" Background="{StaticResource Lay0Color}"/>
-							<Button DataContext="{Binding LayValues[1]}" Background="{StaticResource Lay1Color}"/>
-							<Button DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
+							<Button Tag="10" DataContext="{Binding LayValues[0]}" Background="{StaticResource Lay0Color}"/>
+							<Button Tag="11" DataContext="{Binding LayValues[1]}" Background="{StaticResource Lay1Color}"/>
+							<Button Tag="12" DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
 							<TextBox Text="{Binding BackStake}"/>
 							<TextBox Text="{Binding LayStake}"/>
 							<Label Content="{Binding ifWin, Converter={StaticResource cconverter} }" />
 							<Label Content="{Binding LevelProfit, Converter={StaticResource cconverter} }" />
-							<Label Content="{Binding LastPrice, Converter={StaticResource cconverter} }" />
+							<Label Content="{Binding LastPriceTraded, Converter={StaticResource oconverter} }" />
 						</StackPanel>
 					</Border>
 				</StackPanel>

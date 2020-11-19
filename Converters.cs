@@ -10,7 +10,11 @@ namespace SpreadTrader
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			return String.Format("{0}{1:0.00}", culture.NumberFormat.CurrencySymbol, System.Convert.ToDouble(value));
+			double val = System.Convert.ToDouble(value);
+			if (val == 0)
+				return string.Empty;
+			String sign = val < 0 ? "-" : "";
+			return String.Format("{0}{1}{2:0.00}", sign, culture.NumberFormat.CurrencySymbol, Math.Abs(val));
 		}
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{

@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:SpreadTrader"
 	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
              mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="400" Loaded="UserControl_Loaded">
+             d:DesignHeight="200" d:DesignWidth="400">
 	<UserControl.Resources>
 		<Style BasedOn="{StaticResource {x:Type Slider}}" 
             TargetType="{x:Type Slider}">
@@ -14,6 +14,7 @@
 			<Setter Property="Minimum" Value="0"/>
 			<Setter Property="Maximum" Value="30"/>
 			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Margin" Value="0,5"/>
 			<EventSetter Event="ValueChanged" Handler="Slider_ValueChanged"/>
 		</Style>
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
@@ -28,6 +29,8 @@
 			<Setter Property="Height" Value="28"/>
 			<Setter Property="FontSize" Value="12"/>
 			<Setter Property="Width" Value="auto"/>
+		</Style>
+		<Style TargetType="Grid">
 		</Style>
 	</UserControl.Resources>
 	<Grid>
@@ -46,34 +49,35 @@
 							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
 						<Button Grid.Column="0" Tag="-"  Content="-" ></Button>
-						<TextBox Grid.Column="1" Text="{Binding Path=BasePrice}" Background="LightCyan" LostFocus="TextBox_LostFocus" HorizontalContentAlignment="Center"></TextBox>
+						<TextBox Grid.Column="1" Text="{Binding Path=BasePrice}" Background="LightCyan" HorizontalContentAlignment="Center" TextChanged="TextBox_TextChanged"></TextBox>
 						<Button Grid.Column="2" Tag="+" Content="+" ></Button>
 					</Grid>
 				</Grid>
+
 				<Grid>
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="5*" />
-						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="110" />
+						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
-					<Button Content="Execute Bets" Tag ="Execute" Background="OrangeRed" Foreground="White"/>
-					<CheckBox Content="Auto Back/Lay" Tag="Auto" Grid.Column="1" FontSize="11" VerticalAlignment="Center" Width="auto" Margin="4,0,0,0"/>
+					<CheckBox Grid.Column="0" Content="Auto Back/Lay" IsChecked="{Binding Path=AutoBackLay}" Margin="8,8,0,0"/>
+					<Button Grid.Column="1" Content="Execute Bets" Tag ="Execute" Background="OrangeRed" Foreground="White"/>
 				</Grid>
+				
 				<Grid>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="110" />
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Cut Stakes By %" HorizontalContentAlignment="Left" />
-					<Slider Grid.Column="1" Name="CutStakes" Minimum="0" Maximum="10" Value="10"/>
+					<Slider Grid.Column="1" Minimum="0" Maximum="10" Value="{Binding Path=CutStakes}" ValueChanged="Slider_ValueChanged_1" />
 				</Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="110" />
-						<ColumnDefinition Width="113*"/>
-						<ColumnDefinition Width="177*"/>
+						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Move Back Bets" HorizontalContentAlignment="Left"/>
-					<Slider Grid.Column="1" Name="MoveBack" Value="10" Grid.ColumnSpan="2" Margin="0,5"/>
+					<Slider Grid.Column="1" Value="{Binding Path=MoveBack}"/>
 				</Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>
@@ -81,7 +85,7 @@
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Move Lay Bets" HorizontalContentAlignment="Left" />
-					<Slider Grid.Column="1" Name="MoveLay" Value="22"/>
+					<Slider Grid.Column="1" Value="{Binding Path=MoveLay}"/>
 				</Grid>
 			</StackPanel>
 		</Grid>

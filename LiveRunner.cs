@@ -29,9 +29,9 @@ namespace SpreadTrader
         }
         public double BackStake { get; set; }
         public double LayStake { get; set; }
-        public double ifWin { get { return 21.345; } }// ngrunner.ifWin; } }
+        public double ifWin { get { return ngrunner.ifWin; } }
         public double LevelProfit { get; set; }
-        public double LastPrice { get; set; }
+        public double LastPriceTraded { get { return ngrunner.lastPriceTraded;  } }
         public List<PriceSize> BackValues { get; set; }
         public ObservableCollection<PriceSize> LayValues { get; set; }
         public double BackLayRatio

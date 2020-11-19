@@ -767,11 +767,11 @@ namespace BetfairAPI
         {
             if (limitOrder != null)
             {
-                return String.Format("{0},{1},{2},{3},{4},{5},{6}", orderType, marketType, side, Runner, limitOrder.size, limitOrder.price, DateTime.UtcNow.Millisecond);
+                return String.Format("{0},{1},{2},{3},{4:0},{5:0.00},{6}", orderType, marketType, side, Runner, limitOrder.size, limitOrder.price, DateTime.UtcNow.Millisecond);
             }
             if (marketOnCloseOrder != null)
             {
-                return String.Format("{0},{1},{2},{3},{4}", orderType, marketType.ToString(), side, Runner, marketOnCloseOrder.liability);
+                return String.Format("{0},{1},{2},{3},{4:0.00}", orderType, marketType.ToString(), side, Runner, marketOnCloseOrder.liability);
             }
             return base.ToString();
         }

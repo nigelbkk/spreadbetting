@@ -92,48 +92,35 @@ namespace SpreadTrader
 			Button b = sender as Button;
 			try
 			{
-				switch (b.Tag)
-				{
-				}
+				Int32 idx = Convert.ToInt32(b.Tag);
+				var parent = VisualTreeHelper.GetParent(b);
+				var parent2 = VisualTreeHelper.GetParent(parent);
+				var parent3 = VisualTreeHelper.GetParent(parent2);
+				var parent4 = VisualTreeHelper.GetParent(parent3);
+				var parent5 = VisualTreeHelper.GetParent(parent4);
+				ContentPresenter cp = parent5 as ContentPresenter;
+				LiveRunner live_runner = cp.Content as LiveRunner;
+
+				var vb = VisualTreeHelper.GetChild(parent, 8);
+				TextBox tb = VisualTreeHelper.GetChild(parent, 8) as TextBox;
+				TextBox tl = VisualTreeHelper.GetChild(parent, 9) as TextBox;
+				Int32 bs = Convert.ToInt32(tb.Text);
+				Int32 ls = Convert.ToInt32(tl.Text);
+
+				var grid = VisualTreeHelper.GetChild(b, 0);
+				grid = VisualTreeHelper.GetChild(grid, 0);
+				var sp = VisualTreeHelper.GetChild(grid, 0);
+				var t1 = VisualTreeHelper.GetChild(sp, 0) as TextBlock;
+
+				double odds = Convert.ToDouble(t1.Text);
+
+				ConfirmationDialog dlg = new ConfirmationDialog(this, b, live_runner, idx >= 10 ? "Lay" : "Back", odds, idx >= 10 ? ls : bs);
+				dlg.ShowDialog();
 			}
 			catch (Exception xe)
 			{
 				Debug.WriteLine(xe.Message);
 			}
-		}
-		private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-		{
-			TextBox textbox = sender as TextBox;
-			if (e.Key == Key.Return || e.Key == Key.Escape)
-			{
-				Grid grid = textbox.Parent as Grid;
-				Label label = grid.Children[0] as Label;
-				label.Visibility = Visibility.Visible;
-				textbox.Visibility = Visibility.Hidden;
-			}
-		}
-		private void label_MouseDown(object sender, MouseButtonEventArgs e)
-		{
-			Label label = sender as Label;
-			Grid grid = label.Parent as Grid;
-			TextBox textbox = grid.Children[1] as TextBox;
-			Application.Current.Dispatcher.Invoke(new Action(() =>
-			{
-				textbox.Focus();
-				Keyboard.Focus(textbox);
-			}));
-			label.Visibility = Visibility.Hidden;
-			textbox.Visibility = Visibility.Visible;
-			NotifyPropertyChanged("");
-		}
-		private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-		{
-			TextBox textbox = sender as TextBox;
-			Grid grid = textbox.Parent as Grid;
-			Label label = grid.Children[0] as Label;
-			label.Visibility = Visibility.Visible;
-			textbox.Visibility = Visibility.Hidden;
-			NotifyPropertyChanged("");
 		}
 		private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
