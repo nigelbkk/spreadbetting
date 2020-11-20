@@ -54,6 +54,10 @@
 		<Setter Property="VerticalContentAlignment" Value="Center"/>
 		<Setter Property="HorizontalContentAlignment" Value="Left"/>
 	</Style>
+	<Style TargetType="{x:Type FrameworkElement}" x:Key="TextBlock">
+		<Setter Property="TextElement.FontSize" Value="11"/>
+		<Setter Property="TextElement.FontWeight" Value="Normal"/>
+	</Style>
 	<SolidColorBrush x:Key="Back0Color" Color="#CBCAEC"/>
 	<SolidColorBrush x:Key="Back1Color" Color="#DFDFF0"/>
 	<SolidColorBrush x:Key="Back2Color" Color="#BCE5FE"/>

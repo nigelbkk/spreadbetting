@@ -75,10 +75,6 @@ namespace SpreadTrader
 		}
 		public void SubmitBets()
 		{
-			using (StreamWriter sw = File.CreateText("log.csv"))
-			{
-				sw.WriteLine("Market Name, Order, Market, Side, Runner, Stake, Odds, Time");
-			}
 			if (MarketNode != null)
 			{
 				bool auto_back_lay = SliderControl.AutoBackLay;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -63,8 +64,6 @@ namespace SpreadTrader
 				Trace.WriteLine("INFO: Settings upgraded from previous version");
 			}
 			this.Language = System.Windows.Markup.XmlLanguage.GetLanguage(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
-			//this.Top = props.Top;
-			//this.Left = props.Left;
 			this.Height = props.Height;
 			this.Width = props.Width;
 
@@ -74,6 +73,10 @@ namespace SpreadTrader
 			if (props.Maximised)
 			{
 				WindowState = System.Windows.WindowState.Maximized;
+			}
+			using (StreamWriter sw = File.CreateText(props.LogFile))
+			{
+				sw.WriteLine("Market Name, Market, Side, Runner, Stake, Odds, Time");
 			}
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)

@@ -92,7 +92,6 @@ namespace SpreadTrader
 			Button b = sender as Button;
 			try
 			{
-//				Int32 idx = Convert.ToInt32(b.Tag);
 				var parent = VisualTreeHelper.GetParent(b);
 				var parent2 = VisualTreeHelper.GetParent(parent);
 				var parent3 = VisualTreeHelper.GetParent(parent2);
@@ -104,8 +103,6 @@ namespace SpreadTrader
 				var vb = VisualTreeHelper.GetChild(parent, 8);
 				TextBox tb = VisualTreeHelper.GetChild(parent, 8) as TextBox;
 				TextBox tl = VisualTreeHelper.GetChild(parent, 9) as TextBox;
-				//Int32 bs = Convert.ToInt32(tb.Text);
-				//Int32 ls = Convert.ToInt32(tl.Text);
 
 				var grid = VisualTreeHelper.GetChild(b, 0);
 				grid = VisualTreeHelper.GetChild(grid, 0);
@@ -115,18 +112,17 @@ namespace SpreadTrader
 				double odds = Convert.ToDouble(t1.Text);
 
 				String side = "Back";
-				Int32 stake = Convert.ToInt32(tb.Text);
+//				Int32 stake = Convert.ToInt32(tb.Text);
 				for (int i = 1; i < VisualTreeHelper.GetChildrenCount(parent); i++)
 				{
 					if (VisualTreeHelper.GetChild(parent, i) == b && i > 3)
 					{
 						side = "Lay";
-						stake = Convert.ToInt32(tl.Text);
+	//					stake = Convert.ToInt32(tl.Text);
 						break;
 					}
 				}
-
-				ConfirmationDialog dlg = new ConfirmationDialog(this, b, live_runner, side, odds, stake);
+				ConfirmationDialog dlg = new ConfirmationDialog(this, b, live_runner, side, odds);
 				dlg.ShowDialog();
 			}
 			catch (Exception xe)
