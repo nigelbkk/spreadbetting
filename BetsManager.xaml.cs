@@ -85,7 +85,6 @@ namespace SpreadTrader
 				{
 					MarketNode = node;
 					PopulateDataGrid();
-					Debug.WriteLine("BetsManager");
 				}
 			};
 		}

@@ -72,7 +72,7 @@
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 			<StackPanel Grid.Column="0">
-				<CheckBox Content="Active" HorizontalAlignment="Left" IsChecked="{Binding Path=LayActive}"/>
+				<CheckBox Content="Active" HorizontalAlignment="Left" IsChecked="{Binding Path=BackActive}"/>
 				<Label>Back Prices</Label>
 				<Label>Back Stakes</Label>
 			</StackPanel>
@@ -85,7 +85,7 @@
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 			<StackPanel Grid.Column="0">
-				<CheckBox Content="Active" Margin="10,0,0,0" HorizontalAlignment="Left" IsChecked="{Binding Path=BackActive}"/>
+				<CheckBox Content="Active" Margin="10,0,0,0" HorizontalAlignment="Left" IsChecked="{Binding Path=LayActive}"/>
 				<Label>Lay Prices</Label>
 				<Label>Lay Stakes</Label>
 			</StackPanel>

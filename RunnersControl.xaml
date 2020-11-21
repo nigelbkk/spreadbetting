@@ -99,7 +99,7 @@
 				<StackPanel>
 					<Border BorderBrush="DarkGray" BorderThickness="0">
 						<StackPanel Orientation="Horizontal">
-							<Label Content="{Binding Path=Name}" Width="160" Padding="8" HorizontalContentAlignment="Left"/>
+							<Label Content="{Binding Path=Name}" Width="160" Padding="8" Background="{Binding Path=FavoritesColor}" HorizontalContentAlignment="Left" PreviewMouseDown="Label_PreviewMouseDown"/>
 							<Button DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
 							<Button DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
 							<Button DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>

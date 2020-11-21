@@ -16,7 +16,7 @@ public class PriceSize : INotifyPropertyChanged
 	public double Opacity { get; set; }
 	public override string ToString()
 	{
-		return String.Format("{0}:{1}", price, size);
+		return String.Format("{0:0.00}:{1:0.00}", price, size);
 	}
 	public event PropertyChangedEventHandler PropertyChanged;
 	public void NotifyPropertyChanged(String info)

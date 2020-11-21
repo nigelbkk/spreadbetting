@@ -33,14 +33,16 @@ namespace SpreadTrader
 			NodeChangeEventSink += BetsManagerControl.NodeChangeEventSink;
 			NodeChangeEventSink += (node) =>
 			{
+				// new market selected from the tree control
 				if (IsLoaded)
 				{
 					MarketNode = node;
 					BettingGridControl.MarketNode = node;
 					RunnersControl.MarketNode = MarketNode;
+					LiveRunner.Favorite = null;
 				}
 			};
-			SliderControl.SubmitBets += BettingGridControl.SubmitBets;
+			SliderControl.SubmitBets += RunnersControl.SubmitBets;
 			RunnersAndSlidersGrid.ColumnDefinitions[0].Width = new GridLength(props.VerticalSplitter);
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)

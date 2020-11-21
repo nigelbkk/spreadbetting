@@ -53,9 +53,9 @@ namespace BetfairAPI
             using (Stream stream = response.GetResponseStream())
             using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
             {
-               var jsonResponse = reader.ReadToEnd();
-               var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
-               if (err != null)
+                var jsonResponse = reader.ReadToEnd();
+                var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
+                if (err != null)
                 {
                     ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
                     throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));

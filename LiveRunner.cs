@@ -13,7 +13,7 @@ namespace SpreadTrader
         public Runner ngrunner { get; set; }
         private BitmapImage _colors = null;
         public BitmapImage Colors { get { return _colors; } set { _colors = value; NotifyPropertyChanged("Colors"); } }
-        public String Name { get { return String.Format("{0} {1}",  ngrunner.Catalog.name, ngrunner.handicap == 0 ? "" : ngrunner.handicap.ToString()).Trim(); } }
+        public String Name { get { return String.Format("{0}{1}",  ngrunner.Catalog.name, ngrunner.handicap == 0 ? "" : ngrunner.handicap.ToString()).Trim(); } }
         public Int64 SelectionId { get { return ngrunner.selectionId; } }
         public Brush OutComeColor
         {
@@ -25,6 +25,19 @@ namespace SpreadTrader
                     return Brushes.Red;
 
                 return Brushes.DarkGray;
+            }
+        }
+        private bool _IsFavorite { get; set; }
+        public bool IsFavorite { get { return _IsFavorite; } set { _IsFavorite = value; NotifyPropertyChanged(""); } }
+        public static LiveRunner Favorite { get; set; }
+        public Brush FavoritesColor
+        {
+            get
+            {
+                if (IsFavorite)
+                    return Brushes.Aquamarine;
+
+                return Brushes.Ivory;
             }
         }
         public double BackStake { get; set; }

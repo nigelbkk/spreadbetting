@@ -1,7 +1,9 @@
-﻿using System;
+﻿using BetfairAPI;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,7 +16,7 @@ namespace SpreadTrader
 		public NodeSelectionDelegate NodeChangeEventSink = null;
 		private BackgroundWorker Worker = null;
 		public NodeViewModel _MarketNode { get; set; }
-		public NodeViewModel MarketNode { get { return _MarketNode;  } set { _MarketNode = value; NotifyPropertyChanged(""); } }
+		public NodeViewModel MarketNode { get { return _MarketNode;  } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
 		public bool IsSelected { get; set; }
 		public double BackBook { get { return _MarketNode.Market.MarketBook == null ? 0.00 : _MarketNode.Market.MarketBook.BackBook; } }
 		public double LayBook { get { return _MarketNode.Market.MarketBook == null ? 0.00 : _MarketNode.Market.MarketBook.LayBook; } }
@@ -40,7 +42,6 @@ namespace SpreadTrader
 				{
 					MarketNode = node;
 					LiveRunners = MarketNode.GetLiveRunners();
-					Debug.WriteLine("RunnersControl");
 				}
 			};
 
@@ -48,8 +49,15 @@ namespace SpreadTrader
 			Worker.ProgressChanged += (o, e) =>
 			{
 				List<LiveRunner> NewRunners = e.UserState as List<LiveRunner>;
-				// get last price traded and ifWin
-				LiveRunners = NewRunners;
+
+				if (LiveRunners.Count != NewRunners.Count)
+				{
+					LiveRunners = NewRunners;
+				}
+				for (int i=0;i<LiveRunners.Count;i++)
+				{
+					LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
+				}
 				MarketNode.UpdateRate = e.ProgressPercentage;
 				NotifyPropertyChanged("");
 			};
@@ -77,6 +85,68 @@ namespace SpreadTrader
 				}
 			};
 			Worker.RunWorkerAsync();
+		}
+
+		private PlaceExecutionReport placeOrder(String marketId, LiveRunner runner, sideEnum side,  PriceSize ps)
+		{
+			BetfairAPI.BetfairAPI Betfair = new BetfairAPI.BetfairAPI();
+
+			PlaceInstruction pi = new PlaceInstruction()
+			{
+				orderTypeEnum = orderTypeEnum.LIMIT,
+				sideEnum = side,
+				Runner = runner.Name,
+				marketTypeEnum = marketTypeEnum.WIN,
+				selectionId = runner.SelectionId,
+				limitOrder = new LimitOrder()
+				{
+					persistenceTypeEnum = persistenceTypeEnum.LAPSE,
+					price = ps.price,
+					size = ps.size,
+				}
+			};
+			using (StreamWriter w = File.AppendText(props.LogFile))
+			{
+					w.WriteLine(MarketNode.FullName + "," + pi);
+					Debug.WriteLine(pi);
+			}
+			//PlaceExecutionReport report = Betfair.placeOrders(bet.MarketId, instructions);
+			return new PlaceExecutionReport();
+		}
+		public void SubmitBets(PriceSize[] LayValues, PriceSize[] BackValues)
+		{
+			if (MarketNode != null)
+			{
+				BetfairAPI.BetfairAPI betfairAPI = new BetfairAPI.BetfairAPI();
+				bool auto_back_lay = SliderControl.AutoBackLay;
+				List<PriceSize> laybets = new List<PriceSize>();
+				List<PriceSize> backbets = new List<PriceSize>();
+				for (Int32 i = 0; i < 9; i++)
+				{
+					laybets.Add(LayValues[i]);
+					backbets.Add(BackValues[i]);
+				}
+				laybets.Sort((a, b) => Math.Sign(b.price - a.price));
+				backbets.Sort((a, b) => Math.Sign(a.price - b.price));
+				if (LiveRunner.Favorite == null)
+				{
+					MessageBox.Show("Please Choose a Favourite", "Submit Bets", MessageBoxButton.OK, MessageBoxImage.Exclamation );
+					return;
+				}
+				for (Int32 i = 0; i < 9; i++)
+				{
+					if (laybets[i].IsChecked)
+					{
+						placeOrder(MarketNode.Market.marketId, LiveRunner.Favorite, sideEnum.LAY, laybets[i]);
+					}
+				}
+				for (Int32 i = 0; i < 9; i++)
+				{
+					if (backbets[i].IsChecked)
+					{
+						placeOrder(MarketNode.Market.marketId, LiveRunner.Favorite, sideEnum.BACK, backbets[i]);
+					}
+				}			}
 		}
 		public String GetRunnerName(Int64 SelectionID)
 		{
@@ -133,6 +203,26 @@ namespace SpreadTrader
 		private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			SV1.Height = Math.Max(25, e.NewSize.Height - Header.Height);
+		}
+		private void Label_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			Label lb = sender as Label;
+			try
+			{
+				var parent = VisualTreeHelper.GetParent(lb);
+				var parent2 = VisualTreeHelper.GetParent(parent);
+				var parent3 = VisualTreeHelper.GetParent(parent2);
+				var parent4 = VisualTreeHelper.GetParent(parent3);
+				var parent5 = VisualTreeHelper.GetParent(parent4);
+				ContentPresenter cp = parent5 as ContentPresenter;
+				if (LiveRunner.Favorite != null) LiveRunner.Favorite.IsFavorite = false;
+				LiveRunner.Favorite = cp.Content as LiveRunner;
+				LiveRunner.Favorite.IsFavorite = true;
+			}
+			catch (Exception xe)
+			{
+
+			}
 		}
 	}
 	public static class Extensions
