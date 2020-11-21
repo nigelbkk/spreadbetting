@@ -76,7 +76,7 @@
 				<Label>Back Prices</Label>
 				<Label>Back Stakes</Label>
 			</StackPanel>
-			<ItemsControl  Grid.Column="1" Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource ButtonTemplate}" ItemsSource="{Binding Path=LayValues}"/>
+			<ItemsControl  Grid.Column="1" Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource ButtonTemplate}" ItemsSource="{Binding Path=BackValues}"/>
 		</Grid>
 		<Border Background="#00000000" BorderBrush="DarkGray" BorderThickness="0.5" Height="8"/>
 		<Grid>
@@ -89,7 +89,7 @@
 				<Label>Lay Prices</Label>
 				<Label>Lay Stakes</Label>
 			</StackPanel>
-			<ItemsControl Grid.Column="1"  Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource ButtonTemplate}" ItemsSource="{Binding Path=BackValues}"/>
+			<ItemsControl Grid.Column="1"  Style="{StaticResource GridItemsStyle}" ItemTemplate ="{DynamicResource ButtonTemplate}" ItemsSource="{Binding Path=LayValues}"/>
 		</Grid>
 	</StackPanel>
 </UserControl>

@@ -1,0 +1,89 @@
+﻿using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using BetfairAPI;
+
+namespace SpreadTrader
+{
+	public partial class ConfirmationDialog : Window, INotifyPropertyChanged
+	{
+		public String Side { get; set; }
+		public String MarketId { get; set; }
+		public String MarketName { get; set; }
+		public String Runner { get; set; }
+		public Int64 SelectionId { get; set; }
+		public double Stake   { get; set; }
+		public double Odds   { get; set; }
+		public  double Liability   { get; set; }
+		public double Payout  { get; set; }
+		public String Header { get { return String.Format("{0} {1} for {2}", Side, Runner, Odds); } }
+		public event PropertyChangedEventHandler PropertyChanged;
+		public void NotifyPropertyChanged(String info)
+		{
+			if (PropertyChanged != null)
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(info));
+			}
+		}
+		public ConfirmationDialog(Visual visual, Button b, LiveRunner runner, String side, double odds)
+		{
+			Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(b.ActualWidth, b.ActualHeight)));
+			Top = coords.Y;
+			Left = coords.X;
+			Runner = runner.Name;
+			Side = side;
+			Odds = odds;
+			InitializeComponent();
+		}
+		private void Submit(object sender, RoutedEventArgs e)
+		{
+			Button b = sender as Button;
+			String cs = b.Content as String;
+			if (cs != null)
+			{
+				if (!cs.All(char.IsNumber))
+				{
+					Close();
+					return;
+				}
+				Int32 stake = Convert.ToInt32(b.Content);
+				BetfairAPI.BetfairAPI betfair = new BetfairAPI.BetfairAPI();
+				try
+				{
+					using (StreamWriter w = File.AppendText("log.csv"))
+					{
+						String cs2 = String.Format("{1},{2},{3},{4:0},{5:0.00},{6}", "", "WIN", Side, Runner, stake, Odds, DateTime.UtcNow.Millisecond);
+						w.WriteLine(cs2);
+						Debug.WriteLine(cs2);
+					}
+					//PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side, stake, Odds);
+				}
+				catch (Exception xe) { Debug.WriteLine(xe.Message); }
+			}
+		}
+
+		private void ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+			UpDownControl control = sender as UpDownControl;
+			Odds = Convert.ToDouble(control.Value);
+			NotifyPropertyChanged("");
+		}
+	}
+	public class UpDownControl : Xceed.Wpf.Toolkit.DoubleUpDown
+	{
+		//private BetfairPrices betfairPrices = new BetfairPrices();
+		//protected override double IncrementValue(double value, double increment)
+		//{
+		//	return betfairPrices.Next(value);
+		//}
+		//protected override double DecrementValue(double value, double increment)
+		//{
+		//	return betfairPrices.Previous(value);
+		//}
+	}
+}

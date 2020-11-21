@@ -107,7 +107,7 @@ namespace SpreadTrader
 				Int32 offset = Convert.ToInt32(MoveLay);
 				for (int i = 0, j = 8; i < 9; i++, j--)
 				{
-					BackValues[i].price = AllPrices[base_index + offset - j];
+					LayValues[i].price = AllPrices[base_index + offset - j];
 				}
 				base_index = PriceIndex(BasePrice);
 				base_index = Math.Max(base_index, 10);
@@ -115,7 +115,7 @@ namespace SpreadTrader
 				offset = Convert.ToInt32(MoveBack);
 				for (int i = 0; i < 9; i++)
 				{
-					LayValues[i].price = AllPrices[base_index + offset + i];
+					BackValues[i].price = AllPrices[base_index + offset + i];
 				}
 				NotifyPropertyChanged("");
 			}
