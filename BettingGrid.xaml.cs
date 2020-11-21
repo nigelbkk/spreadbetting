@@ -90,47 +90,53 @@ namespace SpreadTrader
 				backbets.Sort((a, b) => Math.Sign(a.price - b.price));
 				for (Int32 i = 0; i < 9; i++)
 				{
-					List<PlaceInstruction> instructions = new List<PlaceInstruction>();
-					foreach (var runner in MarketNode.Market.runners)
+					if (laybets[i].IsChecked)
 					{
-						instructions.Add(new PlaceInstruction()
+						List<PlaceInstruction> instructions = new List<PlaceInstruction>();
+						foreach (var runner in MarketNode.Market.runners)
 						{
-							orderTypeEnum = orderTypeEnum.LIMIT,
-							sideEnum = sideEnum.LAY,
-							Runner = String.Format("{0} {1}", runner.name, runner.handicap > 0 ? runner.handicap.ToString() : ""),
-							marketTypeEnum = marketTypeEnum.WIN,
-							selectionId = runner.selectionId,
-							limitOrder = new LimitOrder()
+							instructions.Add(new PlaceInstruction()
 							{
-								persistenceTypeEnum = persistenceTypeEnum.LAPSE,
-								price = laybets[i].price,
-								size = laybets[i].size,
-							}
-						});
+								orderTypeEnum = orderTypeEnum.LIMIT,
+								sideEnum = sideEnum.LAY,
+								Runner = String.Format("{0}{1}", runner.name, runner.handicap > 0 ? runner.handicap.ToString() : ""),
+								marketTypeEnum = marketTypeEnum.WIN,
+								selectionId = runner.selectionId,
+								limitOrder = new LimitOrder()
+								{
+									persistenceTypeEnum = persistenceTypeEnum.LAPSE,
+									price = laybets[i].price,
+									size = laybets[i].size,
+								}
+							});
+						}
+						placeOrders(MarketNode.MarketID, instructions);
 					}
-					placeOrders(MarketNode.MarketID, instructions);
 				}
 				for (Int32 i = 0; i < 9; i++)
 				{
-					List<PlaceInstruction> instructions = new List<PlaceInstruction>();
-					foreach (var runner in MarketNode.Market.runners)
+					if (backbets[i].IsChecked)
 					{
-						instructions.Add(new PlaceInstruction()
+						List<PlaceInstruction> instructions = new List<PlaceInstruction>();
+						foreach (var runner in MarketNode.Market.runners)
 						{
-							orderTypeEnum = orderTypeEnum.LIMIT,
-							sideEnum = sideEnum.BACK,
-							Runner = runner.name,
-							marketTypeEnum = marketTypeEnum.WIN,
-							selectionId = runner.selectionId,
-							limitOrder = new LimitOrder()
+							instructions.Add(new PlaceInstruction()
 							{
-								persistenceTypeEnum = persistenceTypeEnum.LAPSE,
-								price = backbets[i].price,
-								size = backbets[i].size,
-							}
-						});
+								orderTypeEnum = orderTypeEnum.LIMIT,
+								sideEnum = sideEnum.BACK,
+								Runner = runner.name,
+								marketTypeEnum = marketTypeEnum.WIN,
+								selectionId = runner.selectionId,
+								limitOrder = new LimitOrder()
+								{
+									persistenceTypeEnum = persistenceTypeEnum.LAPSE,
+									price = backbets[i].price,
+									size = backbets[i].size,
+								}
+							});
+						}
+						placeOrders(MarketNode.MarketID, instructions);
 					}
-					placeOrders(MarketNode.MarketID, instructions);
 				}
 			}
 		}

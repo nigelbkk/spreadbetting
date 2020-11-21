@@ -13,7 +13,7 @@ namespace SpreadTrader
         public Runner ngrunner { get; set; }
         private BitmapImage _colors = null;
         public BitmapImage Colors { get { return _colors; } set { _colors = value; NotifyPropertyChanged("Colors"); } }
-        public String Name { get { return String.Format("{0} {1}",  ngrunner.Catalog.name, ngrunner.handicap == 0 ? "" : ngrunner.handicap.ToString()).Trim(); } }
+        public String Name { get { return String.Format("{0}{1}",  ngrunner.Catalog.name, ngrunner.handicap == 0 ? "" : ngrunner.handicap.ToString()).Trim(); } }
         public Int64 SelectionId { get { return ngrunner.selectionId; } }
         public Brush OutComeColor
         {
