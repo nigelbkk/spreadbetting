@@ -12,6 +12,7 @@ namespace SpreadTrader
 {
 	public partial class ConfirmationDialog : Window, INotifyPropertyChanged
 	{
+		public DependencyObject ParentObject { get; set; }
 		public String Side { get; set; }
 		public String MarketId { get; set; }
 		public String MarketName { get; set; }
@@ -32,6 +33,7 @@ namespace SpreadTrader
 		}
 		public ConfirmationDialog(Visual visual, Button b, LiveRunner runner, String side, double odds)
 		{
+			ParentObject = visual as DependencyObject;
 			Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(b.ActualWidth, b.ActualHeight)));
 			Top = coords.Y;
 			Left = coords.X;
@@ -39,6 +41,7 @@ namespace SpreadTrader
 			Side = side;
 			Odds = odds;
 			InitializeComponent();
+			UpDown.Value = Odds;
 		}
 		private void Submit(object sender, RoutedEventArgs e)
 		{
@@ -63,7 +66,11 @@ namespace SpreadTrader
 					}
 					//PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side, stake, Odds);
 				}
-				catch (Exception xe) { Debug.WriteLine(xe.Message); }
+				catch (Exception xe) {
+					Debug.WriteLine(xe.Message);
+					MainWindow mw = Extensions.FindParentOfType<MainWindow>(ParentObject);
+					if (mw != null) mw.Status = xe.Message;
+				}
 			}
 		}
 
@@ -76,14 +83,14 @@ namespace SpreadTrader
 	}
 	public class UpDownControl : Xceed.Wpf.Toolkit.DoubleUpDown
 	{
-		//private BetfairPrices betfairPrices = new BetfairPrices();
-		//protected override double IncrementValue(double value, double increment)
-		//{
-		//	return betfairPrices.Next(value);
-		//}
-		//protected override double DecrementValue(double value, double increment)
-		//{
-		//	return betfairPrices.Previous(value);
-		//}
+		private BetfairPrices betfairPrices = new BetfairPrices();
+		protected override double IncrementValue(double value, double increment)
+		{
+			return betfairPrices.Next(value);
+		}
+		protected override double DecrementValue(double value, double increment)
+		{
+			return betfairPrices.Previous(value);
+		}
 	}
 }

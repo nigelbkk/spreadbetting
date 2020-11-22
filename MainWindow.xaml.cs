@@ -16,7 +16,7 @@ namespace SpreadTrader
 		public ICommand ExpandingCommand { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
-		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged(""); } }
+		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged("");} }
 		public double Balance { get; set; }
 		public double Exposure { get; set; }
 		public double Commission { get; set; }

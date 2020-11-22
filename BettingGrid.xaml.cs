@@ -21,7 +21,7 @@ namespace SpreadTrader
 				_BackActive = value;
 				foreach (PriceSize o in BackValues)
 				{
-					o.IsChecked = value;
+					o.ParentChecked = value;
 				}
 			}
 		}
@@ -34,7 +34,7 @@ namespace SpreadTrader
 				_LayActive = value;
 				foreach (PriceSize o in LayValues)
 				{
-					o.IsChecked = value;
+					o.ParentChecked = value;
 				}
 			}
 		}
@@ -55,90 +55,5 @@ namespace SpreadTrader
 			BackActive = LayActive = true;
 			InitializeComponent();
 		}
-		//private PlaceExecutionReport placeOrders(String marketId, List<PlaceInstruction> instructions)
-		//{
-		//	BetfairAPI.BetfairAPI Betfair = new BetfairAPI.BetfairAPI();
-		//	try
-		//	{
-		//		//using (StreamWriter w = File.AppendText("log.csv"))
-		//		//{
-		//		//	foreach (PlaceInstruction pi in instructions)
-		//		//	{
-		//		//		w.WriteLine(MarketNode.FullName + "," + pi);
-		//		//		Debug.WriteLine(pi);
-		//		//	}
-		//		//}
-		//	}
-		//	catch (Exception xe) { Debug.WriteLine(xe.Message); }
-		//	//PlaceExecutionReport report = Betfair.placeOrders(bet.MarketId, instructions);
-		//	return new PlaceExecutionReport();
-		//}
-	//	public void SubmitBets()
-	//	{
-	//		if (MarketNode != null)
-	//		{
-	//			bool auto_back_lay = SliderControl.AutoBackLay;
-	//			List<PriceSize> laybets = new List<PriceSize>();
-	//			List<PriceSize> backbets = new List<PriceSize>();
-	//			List<LiveRunner> runners = new List<LiveRunner>();
-	//			for (Int32 i = 0; i < 9; i++)
-	//			{
-	//				laybets.Add(LayValues[i]);
-	//				backbets.Add(BackValues[i]);
-	//			}
-	//			laybets.Sort((a, b) => Math.Sign(b.price - a.price));
-	//			backbets.Sort((a, b) => Math.Sign(a.price - b.price));
-	//			for (Int32 i = 0; i < 9; i++)
-	//			{
-	//				if (laybets[i].IsChecked)
-	//				{
-	//					List<PlaceInstruction> instructions = new List<PlaceInstruction>();
-	//					foreach (var runner in MarketNode.Market.runners)
-	//					{
-	//						instructions.Add(new PlaceInstruction()
-	//						{
-	//							orderTypeEnum = orderTypeEnum.LIMIT,
-	//							sideEnum = sideEnum.LAY,
-	//							Runner = String.Format("{0}{1}", runner.name, runner.handicap > 0 ? runner.handicap.ToString() : ""),
-	//							marketTypeEnum = marketTypeEnum.WIN,
-	//							selectionId = runner.selectionId,
-	//							limitOrder = new LimitOrder()
-	//							{
-	//								persistenceTypeEnum = persistenceTypeEnum.LAPSE,
-	//								price = laybets[i].price,
-	//								size = laybets[i].size,
-	//							}
-	//						});
-	//					}
-	//					placeOrders(MarketNode.MarketID, instructions);
-	//				}
-	//			}
-	//			for (Int32 i = 0; i < 9; i++)
-	//			{
-	//				if (backbets[i].IsChecked)
-	//				{
-	//					List<PlaceInstruction> instructions = new List<PlaceInstruction>();
-	//					foreach (var runner in MarketNode.Market.runners)
-	//					{
-	//						instructions.Add(new PlaceInstruction()
-	//						{
-	//							orderTypeEnum = orderTypeEnum.LIMIT,
-	//							sideEnum = sideEnum.BACK,
-	//							Runner = runner.name,
-	//							marketTypeEnum = marketTypeEnum.WIN,
-	//							selectionId = runner.selectionId,
-	//							limitOrder = new LimitOrder()
-	//							{
-	//								persistenceTypeEnum = persistenceTypeEnum.LAPSE,
-	//								price = backbets[i].price,
-	//								size = backbets[i].size,
-	//							}
-	//						});
-	//					}
-	//					placeOrders(MarketNode.MarketID, instructions);
-	//				}
-	//			}
-	//		}
-	//	}
 	}
 }

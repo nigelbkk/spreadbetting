@@ -111,6 +111,7 @@
     <Compile Include="EventsTree.xaml.cs">
       <DependentUpon>EventsTree.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Extensions.cs" />
     <Compile Include="Favourites.xaml.cs">
       <DependentUpon>Favourites.xaml</DependentUpon>
     </Compile>

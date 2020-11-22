@@ -14,6 +14,7 @@ namespace SpreadTrader
 		public Market Market { get; set; }
 		public String MarketID { get; set; }
 		public String MarketName { get; set; }
+		public double TotalMatched { get { return Market == null ? 0 : Market.totalMatched;  } }
 		private Int32 _UpdateRate { get; set; }
 		public Int32 UpdateRate { get { return _UpdateRate; } set { _UpdateRate = value; OnPropertyChanged("UpdateRate"); } }
 		List<EventTypeResult> EventTypes { get; set; }
@@ -58,8 +59,6 @@ namespace SpreadTrader
 			List<LiveRunner> Runners = new List<LiveRunner>();
 			if (Market != null)
 			{
-				try
-				{
 					Market.MarketBook = Betfair.GetMarketBook(Market);
 					foreach (Runner r in Market.MarketBook.Runners)
 					{
@@ -71,11 +70,6 @@ namespace SpreadTrader
 						MarketName = Parent.Name;
 						MarketID = Market.marketId;
 					}
-				}
-				catch (Exception xe)
-				{
-					Debug.WriteLine(xe.Message);
-				}
 			}
 			return Runners;
 		}

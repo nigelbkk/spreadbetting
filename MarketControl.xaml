@@ -7,6 +7,8 @@
              mc:Ignorable="d" d:DesignWidth="600" Loaded="UserControl_Loaded" >
 	<UserControl.Resources>
 		<local:TimeConverter x:Key="converter" />
+		<local:OddsConverter x:Key="oconverter" />
+		<local:CurrencyConverter x:Key="cconverter" />
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
             TargetType="{x:Type Button}">
 			<Setter Property="FontSize" Value="12"/>
@@ -32,6 +34,7 @@
 				<ColumnDefinition Width="38"/>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 			<Button Grid.Column="0" Tag="Market Description" ToolTip="Market Description" HorizontalAlignment="Left">
 				<Image Source="/SpreadTrader;component/Images/info.png" />
@@ -43,7 +46,13 @@
 				</StackPanel>
 			</Button>
 			<Label Grid.Column="2" Content="{Binding MarketNode.FullName}" Padding="6,0,10,0"/>
-			<Label Grid.Column="3" Content="{Binding MarketNode.UpdateRate, Converter={StaticResource converter}}" Padding="6,0,6,0" HorizontalAlignment="Right"/>
+			<Label Grid.Column="3" Padding="6,0,10,0">
+				<StackPanel Orientation="Horizontal">
+					<TextBlock Text ="Total Matched: "/>
+					<TextBlock Text="{Binding MarketNode.TotalMatched, Mode=OneWay, Converter={StaticResource cconverter}}"/>
+				</StackPanel>
+			</Label>
+			<Label Grid.Column="4" Content="{Binding MarketNode.UpdateRate, Converter={StaticResource converter}}" Padding="6,0,6,0" HorizontalAlignment="Right"/>
 		</Grid>
 		<Grid Grid.Row="1" Background="Ivory">
 			<DockPanel>

@@ -41,7 +41,16 @@ namespace SpreadTrader
 				if (IsLoaded)
 				{
 					MarketNode = node;
-					LiveRunners = MarketNode.GetLiveRunners();
+					try
+					{
+						LiveRunners = MarketNode.GetLiveRunners();
+					}
+					catch (Exception xe)
+					{
+						Debug.WriteLine(xe.Message);
+						MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
+						if (mw != null) mw.Status = xe.Message;
+					}
 				}
 			};
 
@@ -79,6 +88,8 @@ namespace SpreadTrader
 					catch (Exception xe)
 					{
 						Debug.WriteLine(xe.Message);
+						MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
+						if (mw != null) mw.Status = xe.Message;
 					}
 					//break;
 					System.Threading.Thread.Sleep(props.WaitBF);
@@ -130,23 +141,24 @@ namespace SpreadTrader
 				backbets.Sort((a, b) => Math.Sign(a.price - b.price));
 				if (LiveRunner.Favorite == null)
 				{
-					MessageBox.Show("Please Choose a Favourite", "Submit Bets", MessageBoxButton.OK, MessageBoxImage.Exclamation );
+					MessageBox.Show("Please Select the Favourite", "Submit Bets", MessageBoxButton.OK, MessageBoxImage.Exclamation);
 					return;
 				}
 				for (Int32 i = 0; i < 9; i++)
 				{
-					if (laybets[i].IsChecked)
+					if (laybets[i].IsChecked && laybets[i].ParentChecked)
 					{
 						placeOrder(MarketNode.Market.marketId, LiveRunner.Favorite, sideEnum.LAY, laybets[i]);
 					}
 				}
 				for (Int32 i = 0; i < 9; i++)
 				{
-					if (backbets[i].IsChecked)
+					if (backbets[i].IsChecked && backbets[i].ParentChecked)
 					{
 						placeOrder(MarketNode.Market.marketId, LiveRunner.Favorite, sideEnum.BACK, backbets[i]);
 					}
-				}			}
+				}
+			}
 		}
 		public String GetRunnerName(Int64 SelectionID)
 		{
@@ -163,41 +175,40 @@ namespace SpreadTrader
 			try
 			{
 				var parent = VisualTreeHelper.GetParent(b);
-				var parent2 = VisualTreeHelper.GetParent(parent);
-				var parent3 = VisualTreeHelper.GetParent(parent2);
-				var parent4 = VisualTreeHelper.GetParent(parent3);
-				var parent5 = VisualTreeHelper.GetParent(parent4);
-				ContentPresenter cp = parent5 as ContentPresenter;
-				LiveRunner live_runner = cp.Content as LiveRunner;
-
-				var vb = VisualTreeHelper.GetChild(parent, 8);
-				TextBox tb = VisualTreeHelper.GetChild(parent, 8) as TextBox;
-				TextBox tl = VisualTreeHelper.GetChild(parent, 9) as TextBox;
-
-				var grid = VisualTreeHelper.GetChild(b, 0);
-				grid = VisualTreeHelper.GetChild(grid, 0);
-				var sp = VisualTreeHelper.GetChild(grid, 0);
-				var t1 = VisualTreeHelper.GetChild(sp, 0) as TextBlock;
-
-				double odds = Convert.ToDouble(t1.Text);
-
-				String side = "Back";
-//				Int32 stake = Convert.ToInt32(tb.Text);
-				for (int i = 1; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+				ContentPresenter cp = Extensions.FindParentOfType<ContentPresenter>(b);
+				if (cp != null)
 				{
-					if (VisualTreeHelper.GetChild(parent, i) == b && i > 3)
+					LiveRunner live_runner = cp.Content as LiveRunner;
+
+					var vb = VisualTreeHelper.GetChild(parent, 8);
+					TextBox tb = VisualTreeHelper.GetChild(parent, 8) as TextBox;
+					TextBox tl = VisualTreeHelper.GetChild(parent, 9) as TextBox;
+
+					var grid = VisualTreeHelper.GetChild(b, 0);
+					grid = VisualTreeHelper.GetChild(grid, 0);
+					var sp = VisualTreeHelper.GetChild(grid, 0);
+					var t1 = VisualTreeHelper.GetChild(sp, 0) as TextBlock;
+
+					double odds = Convert.ToDouble(t1.Text);
+
+					String side = "Back";
+					for (int i = 1; i < VisualTreeHelper.GetChildrenCount(parent); i++)
 					{
-						side = "Lay";
-	//					stake = Convert.ToInt32(tl.Text);
-						break;
+						if (VisualTreeHelper.GetChild(parent, i) == b && i > 3)
+						{
+							side = "Lay";
+							break;
+						}
 					}
+					ConfirmationDialog dlg = new ConfirmationDialog(this, b, live_runner, side, odds);
+					dlg.ShowDialog();
 				}
-				ConfirmationDialog dlg = new ConfirmationDialog(this, b, live_runner, side, odds);
-				dlg.ShowDialog();
 			}
 			catch (Exception xe)
 			{
 				Debug.WriteLine(xe.Message);
+				MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
+				if (mw != null) mw.Status = xe.Message;
 			}
 		}
 		private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -209,35 +220,14 @@ namespace SpreadTrader
 			Label lb = sender as Label;
 			try
 			{
-				var parent = VisualTreeHelper.GetParent(lb);
-				var parent2 = VisualTreeHelper.GetParent(parent);
-				var parent3 = VisualTreeHelper.GetParent(parent2);
-				var parent4 = VisualTreeHelper.GetParent(parent3);
-				var parent5 = VisualTreeHelper.GetParent(parent4);
-				ContentPresenter cp = parent5 as ContentPresenter;
+				ContentPresenter cp = Extensions.FindParentOfType<ContentPresenter>(lb);
 				if (LiveRunner.Favorite != null) LiveRunner.Favorite.IsFavorite = false;
 				LiveRunner.Favorite = cp.Content as LiveRunner;
 				LiveRunner.Favorite.IsFavorite = true;
 			}
 			catch (Exception xe)
 			{
-
 			}
-		}
-	}
-	public static class Extensions
-	{
-		public static T FindParentOfType<T>(this DependencyObject child) where T : DependencyObject
-		{
-			DependencyObject parentDepObj = child;
-			do
-			{
-				parentDepObj = VisualTreeHelper.GetParent(parentDepObj);
-				T parent = parentDepObj as T;
-				if (parent != null) return parent;
-			}
-			while (parentDepObj != null);
-			return null;
 		}
 	}
 }

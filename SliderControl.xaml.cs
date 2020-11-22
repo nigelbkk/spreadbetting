@@ -79,10 +79,6 @@ namespace SpreadTrader
 				{
 					BackValues[i].price = betfairPrices[base_index + offset + i];
 				}
-				//for (int i = 0, j = 8; i < 9; i++, j--)
-				//{
-				//	BackValues[i].price = betfairPrices[base_index + offset - j];
-				//}
 				offset = Convert.ToInt32(MoveLay)-31;
 				for (int i = 0; i < 9; i++)
 				{
@@ -112,9 +108,11 @@ namespace SpreadTrader
 							{
 								SubmitBets(LayValues, BackValues);
 							}
-							catch(Exception xe)
+							catch (Exception xe)
 							{
 								Debug.WriteLine(xe.Message);
+								MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
+								if (mw != null) mw.Status = xe.Message;
 							}
 						}
 						break;
