@@ -35,6 +35,7 @@
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="auto"/>
 			</Grid.ColumnDefinitions>
 			<Button Grid.Column="0" Tag="Market Description" ToolTip="Market Description" HorizontalAlignment="Left">
 				<Image Source="/SpreadTrader;component/Images/info.png" />
@@ -52,7 +53,12 @@
 					<TextBlock Text="{Binding MarketNode.TotalMatched, Mode=OneWay, Converter={StaticResource cconverter}}"/>
 				</StackPanel>
 			</Label>
-			<Label Grid.Column="4" Content="{Binding MarketNode.UpdateRate, Converter={StaticResource converter}}" Padding="6,0,6,0" HorizontalAlignment="Right"/>
+			<Label Grid.Column="4" Padding="6,0,10,0"  HorizontalAlignment="Right">
+				<StackPanel Orientation="Horizontal">
+					<Label Grid.Column="4" Content="{Binding MarketNode.UpdateRate, Converter={StaticResource converter}}" Padding="6,0,6,0" HorizontalAlignment="Right"  BorderThickness="1"/>
+					<Label Grid.Column="5" Content="{Binding MarketNode.TurnaroundTime, Converter={StaticResource converter}}" Padding="6,0,6,0" HorizontalAlignment="Right" BorderThickness="1"/>
+				</StackPanel>
+			</Label>
 		</Grid>
 		<Grid Grid.Row="1" Background="Ivory">
 			<DockPanel>

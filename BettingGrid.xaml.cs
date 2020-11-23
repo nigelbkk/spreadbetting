@@ -21,7 +21,7 @@ namespace SpreadTrader
 				_BackActive = value;
 				foreach (PriceSize o in BackValues)
 				{
-					o.ParentChecked = value;
+					o.IsChecked = o.ParentChecked = value;
 				}
 			}
 		}
@@ -34,7 +34,7 @@ namespace SpreadTrader
 				_LayActive = value;
 				foreach (PriceSize o in LayValues)
 				{
-					o.ParentChecked = value;
+					o.IsChecked = o.ParentChecked = value;
 				}
 			}
 		}

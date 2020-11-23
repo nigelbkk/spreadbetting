@@ -128,6 +128,7 @@ namespace SpreadTrader
 		{
 			if (MarketNode != null)
 			{
+				DateTime LastUpdate = DateTime.UtcNow;
 				BetfairAPI.BetfairAPI betfairAPI = new BetfairAPI.BetfairAPI();
 				bool auto_back_lay = SliderControl.AutoBackLay;
 				List<PriceSize> laybets = new List<PriceSize>();
@@ -158,6 +159,7 @@ namespace SpreadTrader
 						placeOrder(MarketNode.Market.marketId, LiveRunner.Favorite, sideEnum.BACK, backbets[i]);
 					}
 				}
+				MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 			}
 		}
 		public String GetRunnerName(Int64 SelectionID)

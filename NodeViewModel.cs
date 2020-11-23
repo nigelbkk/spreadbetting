@@ -16,7 +16,9 @@ namespace SpreadTrader
 		public String MarketName { get; set; }
 		public double TotalMatched { get { return Market == null ? 0 : Market.totalMatched;  } }
 		private Int32 _UpdateRate { get; set; }
+		private Int32 _TurnaroundTime { get; set; }
 		public Int32 UpdateRate { get { return _UpdateRate; } set { _UpdateRate = value; OnPropertyChanged("UpdateRate"); } }
+		public Int32 TurnaroundTime { get { return _TurnaroundTime; } set { _TurnaroundTime = value; OnPropertyChanged("TurnaroundTime"); } }
 		List<EventTypeResult> EventTypes { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }

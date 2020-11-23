@@ -45,31 +45,45 @@ namespace SpreadTrader
 		}
 		private void Submit(object sender, RoutedEventArgs e)
 		{
+			BetfairAPI.BetfairAPI betfair = new BetfairAPI.BetfairAPI();
 			Button b = sender as Button;
 			String cs = b.Content as String;
 			if (cs != null)
 			{
-				if (!cs.All(char.IsNumber))
+				if (cs == "Cancel")
 				{
 					Close();
 					return;
 				}
-				Int32 stake = Convert.ToInt32(b.Content);
-				BetfairAPI.BetfairAPI betfair = new BetfairAPI.BetfairAPI();
-				try
+				if (cs == "Submit")
 				{
 					using (StreamWriter w = File.AppendText("log.csv"))
 					{
-						String cs2 = String.Format("{1},{2},{3},{4:0},{5:0.00},{6}", "", "WIN", Side, Runner, stake, Odds, DateTime.UtcNow.Millisecond);
+						String cs2 = String.Format("{1},{2},{3},{4:0},{5:0.00},{6}", "", "WIN", Side, Runner, Stake, Odds, DateTime.UtcNow.Millisecond);
 						w.WriteLine(cs2);
 						Debug.WriteLine(cs2);
 					}
 					//PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side, stake, Odds);
 				}
-				catch (Exception xe) {
-					Debug.WriteLine(xe.Message);
-					MainWindow mw = Extensions.FindParentOfType<MainWindow>(ParentObject);
-					if (mw != null) mw.Status = xe.Message;
+				else
+				{
+					Int32 stake = Convert.ToInt32(b.Content);
+					try
+					{
+						using (StreamWriter w = File.AppendText("log.csv"))
+						{
+							String cs2 = String.Format("{1},{2},{3},{4:0},{5:0.00},{6}", "", "WIN", Side, Runner, stake, Odds, DateTime.UtcNow.Millisecond);
+							w.WriteLine(cs2);
+							Debug.WriteLine(cs2);
+						}
+						//PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side, stake, Odds);
+					}
+					catch (Exception xe)
+					{
+						Debug.WriteLine(xe.Message);
+						MainWindow mw = Extensions.FindParentOfType<MainWindow>(ParentObject);
+						if (mw != null) mw.Status = xe.Message;
+					}
 				}
 			}
 		}
