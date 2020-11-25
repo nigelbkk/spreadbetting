@@ -11,9 +11,13 @@ using System.Windows.Media;
 
 namespace SpreadTrader
 {
+	public delegate void StreamUpdateDelegate(List<LiveRunner> liveRunners);
+
 	public partial class RunnersControl : UserControl, INotifyPropertyChanged
 	{
 		public NodeSelectionDelegate NodeChangeEventSink = null;
+		public StreamUpdateDelegate StreamUpdateEventSink = null;
+		private StreamingAPI streamingAPI = new StreamingAPI();
 		private BackgroundWorker Worker = null;
 		public NodeViewModel _MarketNode { get; set; }
 		public NodeViewModel MarketNode { get { return _MarketNode;  } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
@@ -21,6 +25,7 @@ namespace SpreadTrader
 		public double BackBook { get { return _MarketNode.Market.MarketBook == null ? 0.00 : _MarketNode.Market.MarketBook.BackBook; } }
 		public double LayBook { get { return _MarketNode.Market.MarketBook == null ? 0.00 : _MarketNode.Market.MarketBook.LayBook; } }
 		public List<LiveRunner> LiveRunners { get; set; }
+		//private static List<LiveRunner> _LiveRunners { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
 		public void NotifyPropertyChanged(String info)
@@ -35,7 +40,18 @@ namespace SpreadTrader
 			MarketNode = new NodeViewModel(new BetfairAPI.BetfairAPI());
 			LiveRunners = new List<LiveRunner>();
 			InitializeComponent();
-
+			StreamingAPI.Callback += (liveRunners) =>
+			{
+				Int32 ct = Math.Min(LiveRunners.Count, liveRunners.Count); //TODO
+				for(int i=0;i<ct; i++)
+				{
+					LiveRunners[i].BackValues = liveRunners[i].BackValues;
+					LiveRunners[i].LayValues = liveRunners[i].LayValues;
+					LiveRunners[i].NotifyPropertyChanged("");
+				}
+				if (Worker.IsBusy)
+					Worker.CancelAsync();
+			};
 			NodeChangeEventSink += (node) =>
 			{
 				if (IsLoaded)
@@ -44,6 +60,16 @@ namespace SpreadTrader
 					try
 					{
 						LiveRunners = MarketNode.GetLiveRunners();
+						if (props.UseStreaming)
+						{
+							streamingAPI.Start(MarketNode.MarketID);
+						}
+						else
+						{
+							streamingAPI.Stop();
+						}
+						if (!Worker.IsBusy)
+							Worker.RunWorkerAsync();
 					}
 					catch (Exception xe)
 					{
@@ -59,16 +85,22 @@ namespace SpreadTrader
 			{
 				List<LiveRunner> NewRunners = e.UserState as List<LiveRunner>;
 
-				if (LiveRunners.Count != NewRunners.Count)
+				if (NewRunners != null)
 				{
-					LiveRunners = NewRunners;
+					if (LiveRunners.Count != NewRunners.Count)
+					{
+						LiveRunners = NewRunners;
+					}
+					for (int i = 0; i < LiveRunners.Count; i++)
+					{
+						if (NewRunners[i].ngrunner != null)
+						{
+							LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
+						}
+					}
+					MarketNode.UpdateRate = e.ProgressPercentage;
+					NotifyPropertyChanged("");
 				}
-				for (int i=0;i<LiveRunners.Count;i++)
-				{
-					LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
-				}
-				MarketNode.UpdateRate = e.ProgressPercentage;
-				NotifyPropertyChanged("");
 			};
 			Worker.DoWork += (o, ea) =>
 			{
@@ -79,9 +111,10 @@ namespace SpreadTrader
 					{
 						if (MarketNode != null && MarketNode.MarketName != null && IsSelected)
 						{
+							var runners = streamingAPI.LiveRunners;
 							DateTime LastUpdate = DateTime.UtcNow;
 							var lr = MarketNode.GetLiveRunners();
-							Int32 rate = (Int32) ((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+							Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 							sender.ReportProgress(rate, lr);
 						}
 					}
@@ -91,13 +124,11 @@ namespace SpreadTrader
 						MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
 						if (mw != null) mw.Status = xe.Message;
 					}
-					//break;
 					System.Threading.Thread.Sleep(props.WaitBF);
 				}
 			};
 			Worker.RunWorkerAsync();
 		}
-
 		private PlaceExecutionReport placeOrder(String marketId, LiveRunner runner, sideEnum side,  PriceSize ps)
 		{
 			BetfairAPI.BetfairAPI Betfair = new BetfairAPI.BetfairAPI();

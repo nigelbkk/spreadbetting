@@ -322,5 +322,17 @@ namespace SpreadTrader.Properties {
                 this["LogFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseStreaming {
+            get {
+                return ((bool)(this["UseStreaming"]));
+            }
+            set {
+                this["UseStreaming"] = value;
+            }
+        }
     }
 }

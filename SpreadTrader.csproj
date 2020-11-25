@@ -134,6 +134,7 @@
     <Compile Include="SliderControl.xaml.cs">
       <DependentUpon>SliderControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="StreamingAPI.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="WaitCursor.cs" />
     <Page Include="BetsManager.xaml">
@@ -263,6 +264,16 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\down_arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VIP\Betfair.ESAClient\Betfair.ESAClient.csproj">
+      <Project>{c6f11e1b-da85-41bc-9dee-b941d3c6a805}</Project>
+      <Name>Betfair.ESAClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VIP\Betfair.ESASwagger\Betfair.ESASwagger.csproj">
+      <Project>{05419e45-cad4-4fb6-bc46-b93119d9f22d}</Project>
+      <Name>Betfair.ESASwagger</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

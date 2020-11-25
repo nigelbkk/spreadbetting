@@ -77,5 +77,8 @@
     <Setting Name="LogFile" Type="System.String" Scope="User">
       <Value Profile="(Default)">log.csv</Value>
     </Setting>
+    <Setting Name="UseStreaming" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

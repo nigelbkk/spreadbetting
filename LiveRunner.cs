@@ -5,6 +5,7 @@ using BetfairAPI;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
+using Betfair.ESAClient.Cache;
 
 namespace SpreadTrader
 {
@@ -13,8 +14,8 @@ namespace SpreadTrader
         public Runner ngrunner { get; set; }
         private BitmapImage _colors = null;
         public BitmapImage Colors { get { return _colors; } set { _colors = value; NotifyPropertyChanged("Colors"); } }
-        public String Name { get { return String.Format("{0}{1}",  ngrunner.Catalog.name, ngrunner.handicap == 0 ? "" : ngrunner.handicap.ToString()).Trim(); } }
-        public Int64 SelectionId { get { return ngrunner.selectionId; } }
+        public String Name { get; set; }
+        public Int64 SelectionId { get; set; } 
         public Brush OutComeColor
         {
             get
@@ -42,25 +43,12 @@ namespace SpreadTrader
         }
         public double BackStake { get; set; }
         public double LayStake { get; set; }
-        public double ifWin { get { return ngrunner.ifWin; } }
+        public double ifWin { get; set; } 
         public double LevelProfit { get; set; }
-        public double LastPriceTraded { get { return ngrunner.lastPriceTraded;  } }
+        public double LastPriceTraded { get; set; } 
         public List<PriceSize> BackValues { get; set; }
         public ObservableCollection<PriceSize> LayValues { get; set; }
-        public double BackLayRatio
-        {
-            get
-            {
-                if (ngrunner.ex.availableToLay.Count > 0 && ngrunner.ex.availableToBack.Count > 0)
-                {
-                    double BackLayRatio = Math.Abs(ngrunner.ex.availableToBack[0].price - ngrunner.ex.availableToLay[0].price);
-
-                    BackLayRatio /= ngrunner.ex.availableToBack[0].price;
-                    return BackLayRatio *= 100;
-                }
-                return 0;
-            }
-        }
+        public double BackLayRatio { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propName)
         {
@@ -86,22 +74,49 @@ namespace SpreadTrader
         public LiveRunner(Runner r) : this()
         {
             ngrunner = r;
-            SetPrices(ngrunner);
+            SetPrices(r);
+        }
+        public void SetPrices(MarketRunnerSnap r)
+		{
+            int i = 0;
+            foreach (var ps in r.Prices.BestAvailableToBack)
+            {
+                BackValues[i].price = ps.Price;
+                BackValues[i++].size = ps.Size;
+            }
+            i = 0;
+            foreach (var ps in r.Prices.BestAvailableToLay)
+            {
+                LayValues[i].price = ps.Price;
+                LayValues[i++].size = ps.Size;
+            }
+//            Name = String.Format("Not available");
+            //ifWin = r.;
+            //LastPriceTraded = r.lastPriceTraded;
+            //BackLayRatio = r.BackLayRatio;
+            NotifyPropertyChanged("");
         }
         public void SetPrices(Runner r)
         {
             int i = 0;
-            foreach (var ps in r.ex.availableToBack)
+            if (r.ex != null)
             {
-                BackValues[i].price = ps.price;
-                BackValues[i++].size = ps.size;
+                foreach (var ps in r.ex.availableToBack)
+                {
+                    BackValues[i].price = ps.price;
+                    BackValues[i++].size = ps.size;
+                }
+                i = 0;
+                foreach (var ps in r.ex.availableToLay)
+                {
+                    LayValues[i].price = ps.price;
+                    LayValues[i++].size = ps.size;
+                }
             }
-            i = 0;
-            foreach (var ps in r.ex.availableToLay)
-            {
-                LayValues[i].price = ps.price;
-                LayValues[i++].size = ps.size;
-            }
+            Name = String.Format("{0}{1}", r.Catalog.name, r.handicap == 0 ? "" : " " + r.handicap.ToString()); 
+            ifWin = r.ifWin;
+            LastPriceTraded = r.lastPriceTraded;
+            BackLayRatio = r.BackLayRatio;
             NotifyPropertyChanged("");
         }
 		public override string ToString()
