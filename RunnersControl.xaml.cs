@@ -25,7 +25,6 @@ namespace SpreadTrader
 		public double BackBook { get { return _MarketNode.Market.MarketBook == null ? 0.00 : _MarketNode.Market.MarketBook.BackBook; } }
 		public double LayBook { get { return _MarketNode.Market.MarketBook == null ? 0.00 : _MarketNode.Market.MarketBook.LayBook; } }
 		public List<LiveRunner> LiveRunners { get; set; }
-		//private static List<LiveRunner> _LiveRunners { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
 		public void NotifyPropertyChanged(String info)
@@ -40,6 +39,7 @@ namespace SpreadTrader
 			MarketNode = new NodeViewModel(new BetfairAPI.BetfairAPI());
 			LiveRunners = new List<LiveRunner>();
 			InitializeComponent();
+
 			StreamingAPI.Callback += (liveRunners) =>
 			{
 				Int32 ct = Math.Min(LiveRunners.Count, liveRunners.Count); //TODO
@@ -264,6 +264,16 @@ namespace SpreadTrader
 			catch (Exception xe)
 			{
 			}
+		}
+
+		private void UserControl_Loaded(object sender, RoutedEventArgs e)
+		{
+			MainWindow mw2 = Extensions.FindParentOfType<MainWindow>(SV1);
+			if (mw2 != null)
+				mw2.OnShutdown += () =>
+				{
+					streamingAPI.Stop();
+				};
 		}
 	}
 }

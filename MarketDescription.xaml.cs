@@ -22,8 +22,6 @@ namespace SpreadTrader
 		{
 			if (node != null && node.Market != null && node.Market.description.rules != null)
 				wb.NavigateToString(string.Format("<body style = \"font-family:Arial\" >{0}</body>", node.Market.description.rules));
-			//if (node != null && node.Market != null && node.Market.description.rules != null)
-			//	WebView.NavigateToString(string.Format("<body style = \"font-family:Arial\" >{0}</body>", node.Market.description.rules));
 		}
 	}
 }

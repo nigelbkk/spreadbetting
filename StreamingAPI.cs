@@ -55,6 +55,8 @@ namespace SpreadTrader
 					Client client = new Client(_host, _port, SessionProvider);
 					_clientCache = new ClientCache(client);
 					_clientCache.MarketCache.MarketChanged += OnMarketChanged;
+					_clientCache.OrderCache.OrderMarketChanged += OnOrderChanged;
+
 				}
 				return _clientCache;
 			}
@@ -71,6 +73,15 @@ namespace SpreadTrader
 					_LiveRunners.Add(lr);
 				}
 				Callback?.Invoke(_LiveRunners);
+			}
+			catch (Exception xe)
+			{
+			}
+		}
+		private static void OnOrderChanged(object sender, OrderMarketChangedEventArgs e)
+		{
+			try
+			{
 			}
 			catch (Exception xe)
 			{
@@ -111,7 +122,12 @@ namespace SpreadTrader
 				SegmentationEnabled = true
 			};
 			ClientCache.SubscribeMarkets(msm);
-			string line = JsonConvert.SerializeObject(msm, Newtonsoft.Json.Formatting.None);
+
+			OrderSubscriptionMessage osm = new OrderSubscriptionMessage()
+			{
+				SegmentationEnabled = true
+			};
+			ClientCache.SubscribeOrders(osm);
 		}
 		public void Stop()
 		{

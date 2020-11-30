@@ -11,8 +11,10 @@ using BetfairAPI;
 namespace SpreadTrader
 {
 	public delegate void NodeSelectionDelegate(NodeViewModel node);
+	public delegate void OnShutdownDelegate();
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
+		public OnShutdownDelegate OnShutdown = null;
 		public ICommand ExpandingCommand { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
@@ -178,6 +180,14 @@ namespace SpreadTrader
 		{
 			UpdateAccountInformation();
 			NotifyPropertyChanged("");
+		}
+
+		private void Window_Closing(object sender, CancelEventArgs e)
+		{
+			if (OnShutdown != null)
+			{
+				OnShutdown();
+			};
 		}
 	}
 }
