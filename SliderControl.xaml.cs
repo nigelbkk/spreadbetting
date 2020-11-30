@@ -121,7 +121,11 @@ namespace SpreadTrader
 				SyncPrices();
 			}
 		}
-		private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+		private void Slider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
+		{
+			MoveStakes((Int32)e.NewValue, (Int32)e.OldValue);
+		}
+		private void TextBox_LostFocus(object sender, RoutedEventArgs e)
 		{
 			TextBox tx = sender as TextBox;
 			if (!String.IsNullOrEmpty(tx.Text))
@@ -132,10 +136,6 @@ namespace SpreadTrader
 				tx.Text = Convert.ToString(BasePrice);
 				props.Save();
 			}
-		}
-		private void Slider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
-		{
-			MoveStakes((Int32)e.NewValue, (Int32)e.OldValue);
 		}
 	}
 }

@@ -4,11 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:WPF="clr-namespace:Microsoft.Toolkit.Wpf.UI.Controls;assembly=Microsoft.Toolkit.Wpf.UI.Controls.WebView"
-		xmlns:local="clr-namespace:SpreadTrader"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"		xmlns:local="clr-namespace:SpreadTrader"
         mc:Ignorable="d"
 		FontFamily="Sego UI"
-        Title="MarketDescription" Height="380" Width="670">
+        Title="MarketDescription" Height="380" Width="670" Loaded="Window_Loaded">
 	<Grid>
-		<WPF:WebView Name ="WebView"/>
+		<!--<wv2:WebView2 Name ="webView"/>-->
+    	<WebBrowser Name="wb"/>
 	</Grid>
 </Window>
