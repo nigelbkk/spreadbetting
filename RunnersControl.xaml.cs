@@ -116,6 +116,8 @@ namespace SpreadTrader
 							var lr = MarketNode.GetLiveRunners();
 							Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 							sender.ReportProgress(rate, lr);
+							if (stop_async)
+								break;
 						}
 					}
 					catch (Exception xe)
@@ -202,6 +204,7 @@ namespace SpreadTrader
 			}
 			return null;
 		}
+		bool stop_async = false;
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			Button b = sender as Button;
