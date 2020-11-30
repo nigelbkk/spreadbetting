@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace SpreadTrader
 {
-	public delegate void StreamUpdateDelegate(List<LiveRunner> liveRunners);
+	public delegate void StreamUpdateDelegate(List<LiveRunner> liveRunners, double tradedVolume);
 
 	public partial class RunnersControl : UserControl, INotifyPropertyChanged
 	{
@@ -22,8 +22,8 @@ namespace SpreadTrader
 		public NodeViewModel _MarketNode { get; set; }
 		public NodeViewModel MarketNode { get { return _MarketNode;  } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
 		public bool IsSelected { get; set; }
-		public double BackBook { get { return _MarketNode.Market.MarketBook == null ? 0.00 : _MarketNode.Market.MarketBook.BackBook; } }
-		public double LayBook { get { return _MarketNode.Market.MarketBook == null ? 0.00 : _MarketNode.Market.MarketBook.LayBook; } }
+		public double BackBook { get; set; }
+		public double LayBook { get; set; }
 		public List<LiveRunner> LiveRunners { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -40,15 +40,27 @@ namespace SpreadTrader
 			LiveRunners = new List<LiveRunner>();
 			InitializeComponent();
 
-			StreamingAPI.Callback += (liveRunners) =>
+			StreamingAPI.Callback += (liveRunners, tradedVolume) =>
 			{
-				Int32 ct = Math.Min(LiveRunners.Count, liveRunners.Count); //TODO
+				double totalBack = 0;
+				double totalLay = 0;
+				Int32 ct = Math.Min(LiveRunners.Count, liveRunners.Count); //TOCHECK
 				for(int i=0;i<ct; i++)
 				{
+					totalBack += 100/liveRunners[i].BackValues[0].price;
+					totalLay += 100/liveRunners[i].LayValues[0].price;
 					LiveRunners[i].BackValues = liveRunners[i].BackValues;
 					LiveRunners[i].LayValues = liveRunners[i].LayValues;
+					LiveRunners[i].LastPriceTraded = liveRunners[i].LastPriceTraded;
+					LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
+					LiveRunners[i].ifWin = liveRunners[i].ifWin;
+					LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
 					LiveRunners[i].NotifyPropertyChanged("");
 				}
+				MarketNode.TotalMatched = tradedVolume;
+				BackBook = totalBack;
+				LayBook = totalLay;
+				NotifyPropertyChanged("");
 				if (Worker.IsBusy)
 					Worker.CancelAsync();
 			};

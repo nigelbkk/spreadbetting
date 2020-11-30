@@ -65,14 +65,18 @@ namespace SpreadTrader
 		{
 			try
 			{
+				double tradedVolume = 0;
+
 				_LiveRunners = new List<LiveRunner>();
+				Debug.WriteLine(e.Snap.MarketRunners[0].Prices.LastTradedPrice);
 				for (int i = 0; i < e.Snap.MarketRunners.Count; i++)
 				{
 					LiveRunner lr = new LiveRunner();
 					lr.SetPrices(e.Snap.MarketRunners[i]);
 					_LiveRunners.Add(lr);
+					tradedVolume += e.Snap.MarketRunners[i].Prices.TradedVolume;
 				}
-				Callback?.Invoke(_LiveRunners);
+				Callback?.Invoke(_LiveRunners, tradedVolume);
 			}
 			catch (Exception xe)
 			{

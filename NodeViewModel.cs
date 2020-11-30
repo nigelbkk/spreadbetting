@@ -14,7 +14,12 @@ namespace SpreadTrader
 		public Market Market { get; set; }
 		public String MarketID { get; set; }
 		public String MarketName { get; set; }
-		public double TotalMatched { get { return Market == null ? 0 : Market.totalMatched;  } }
+		private double _TotalMatched { get; set; }
+		private double _BackBook{ get; set; }
+		private double _LayBook { get; set; }
+		public double TotalMatched { get { return _TotalMatched; } set { _TotalMatched = value; OnPropertyChanged(""); } }
+		public double BackBook { get { return _BackBook; } set { _BackBook = value; OnPropertyChanged(""); } }
+		public double LayBook { get { return _LayBook; } set { _LayBook = value; OnPropertyChanged(""); } }
 		private Int32 _UpdateRate { get; set; }
 		private Int32 _TurnaroundTime { get; set; }
 		public Int32 UpdateRate { get { return _UpdateRate; } set { _UpdateRate = value; OnPropertyChanged("UpdateRate"); } }

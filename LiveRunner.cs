@@ -45,7 +45,7 @@ namespace SpreadTrader
         public double LayStake { get; set; }
         public double ifWin { get; set; } 
         public double LevelProfit { get; set; }
-        public double LastPriceTraded { get; set; } 
+        public double LastPriceTraded { get; set; }
         public List<PriceSize> BackValues { get; set; }
         public ObservableCollection<PriceSize> LayValues { get; set; }
         public double BackLayRatio { get; set; }
@@ -90,11 +90,13 @@ namespace SpreadTrader
                 LayValues[i].price = ps.Price;
                 LayValues[i++].size = ps.Size;
             }
-//            Name = String.Format("Not available");
+            //            Name = String.Format("Not available");
             //ifWin = r.Prices.;
             LastPriceTraded = r.Prices.LastTradedPrice;
-           // LevelProfit = r.Prices.
+
+            // LevelProfit = r.Prices.
             //BackLayRatio = r.BackLayRatio;
+
             NotifyPropertyChanged("");
         }
         public void SetPrices(Runner r)
