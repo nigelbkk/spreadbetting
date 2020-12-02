@@ -69,7 +69,7 @@
 								<Setter Property="TextAlignment" Value="Center"/>
 								<Setter Property="Margin" Value="1"/>
 								<Setter Property="FontSize" Value="11"/>
-								<Setter Property="FontWeight" Value="Normal"/>
+								<Setter Property="FontWeight" Value="Bold"/>
 								<Setter Property="Background" Value="#00000000"/>
 							</Style>
 							<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">

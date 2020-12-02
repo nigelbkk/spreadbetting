@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:SpreadTrader"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="{Binding Path=Header}" Height="239" Width="432" Topmost="True">
+        Title="{Binding Path=Header}" Height="239" Width="432" Topmost="True" Closing="Window_Closing">
 	<Window.Resources>
 		<local:CurrencyConverter x:Key="cconverter" />
 		<local:StakeConverter x:Key="sconverter" />
@@ -46,7 +46,7 @@
 	</Window.Resources>
 
 	<DockPanel>
-	<UniformGrid DockPanel.Dock="Top" Columns="3" Margin="4">
+		<UniformGrid DockPanel.Dock="Top" Columns="3" Margin="4" FocusManager.FocusedElement="{Binding ElementName=UpDown}">
 		<Button>2000</Button>
 		<Button>1500</Button>
 		<Button>1000</Button>

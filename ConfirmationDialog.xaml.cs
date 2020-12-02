@@ -23,6 +23,7 @@ namespace SpreadTrader
 		public  double Liability   { get; set; }
 		public double Payout  { get; set; }
 		public String Header { get { return String.Format("{0} {1} for {2}", Side, Runner, Odds); } }
+		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
 		public void NotifyPropertyChanged(String info)
 		{
@@ -33,10 +34,18 @@ namespace SpreadTrader
 		}
 		public ConfirmationDialog(Visual visual, Button b, LiveRunner runner, String side, double odds)
 		{
-			ParentObject = visual as DependencyObject;
-			Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(b.ActualWidth, b.ActualHeight)));
-			Top = coords.Y;
-			Left = coords.X;
+			if (props.ConfirmationX > 0 && props.ConfirmationY > 0)
+			{
+				Top = props.ConfirmationY;
+				Left = props.ConfirmationX;
+			}
+			else
+			{
+				ParentObject = visual as DependencyObject;
+				Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(b.ActualWidth, b.ActualHeight)));
+				Top = coords.Y;
+				Left = coords.X;
+			}
 			Runner = runner.Name;
 			Side = side;
 			Odds = odds;
@@ -76,6 +85,7 @@ namespace SpreadTrader
 							w.WriteLine(cs2);
 							Debug.WriteLine(cs2);
 						}
+						UpDown.Focus(); 
 						//PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side, stake, Odds);
 					}
 					catch (Exception xe)
@@ -93,6 +103,13 @@ namespace SpreadTrader
 			UpDownControl control = sender as UpDownControl;
 			Odds = Convert.ToDouble(control.Value);
 			NotifyPropertyChanged("");
+		}
+
+		private void Window_Closing(object sender, CancelEventArgs e)
+		{
+			props.ConfirmationX = this.Left;
+			props.ConfirmationY = this.Top;
+			props.Save();
 		}
 	}
 	public class UpDownControl : Xceed.Wpf.Toolkit.DoubleUpDown

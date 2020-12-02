@@ -334,5 +334,29 @@ namespace SpreadTrader.Properties {
                 this["UseStreaming"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double ConfirmationX {
+            get {
+                return ((double)(this["ConfirmationX"]));
+            }
+            set {
+                this["ConfirmationX"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double ConfirmationY {
+            get {
+                return ((double)(this["ConfirmationY"]));
+            }
+            set {
+                this["ConfirmationY"] = value;
+            }
+        }
     }
 }
