@@ -68,7 +68,6 @@ namespace SpreadTrader
 				double tradedVolume = 0;
 
 				_LiveRunners = new List<LiveRunner>();
-				Debug.WriteLine(e.Snap.MarketRunners[0].Prices.LastTradedPrice);
 				for (int i = 0; i < e.Snap.MarketRunners.Count; i++)
 				{
 					LiveRunner lr = new LiveRunner();
@@ -76,7 +75,7 @@ namespace SpreadTrader
 					_LiveRunners.Add(lr);
 					tradedVolume += e.Snap.MarketRunners[i].Prices.TradedVolume;
 				}
-				Callback?.Invoke(_LiveRunners, tradedVolume);
+				Callback?.Invoke(_LiveRunners, tradedVolume, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay==true);
 			}
 			catch (Exception xe)
 			{

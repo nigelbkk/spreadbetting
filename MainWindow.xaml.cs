@@ -151,6 +151,7 @@ namespace SpreadTrader
 		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
 		{
 			props.ColumnWidth = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
+			props.Save();
 		}
 		private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{

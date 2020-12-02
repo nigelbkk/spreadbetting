@@ -2,12 +2,14 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace SpreadTrader
 {
 	class ClosableTab : TabItem
 	{
 		public NodeSelectionDelegate NodeChangeEventSink;
+		public StreamUpdateDelegate StreamUpdateEventSink = null;
 		public string Title { set { ((ClosableHeader)this.Header).Label.Content = value; } }
 		public ClosableTab()
 		{
@@ -19,6 +21,13 @@ namespace SpreadTrader
 				{
 					OurHeader.Label.Content = node.MarketName.Trim();
 				}
+			};
+			StreamingAPI.Callback += (liveRunners, tradedVolume, inplay) =>
+			{
+				this.Dispatcher.Invoke(() =>
+				{
+					OurHeader.Label.Foreground = inplay ? Brushes.LightGreen : Brushes.DarkGray;
+				});
 			};
 		}
 	}

@@ -14,8 +14,8 @@
 		<local:CurrencyConverter x:Key="cconverter" />
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
-			<Setter Property="FontSize" Value="12"/>
-			<Setter Property="Width" Value="53"/>
+			<Setter Property="FontSize" Value="11"/>
+			<Setter Property="Width" Value="45"/>
 			<Setter Property="HorizontalAlignment" Value="Left"/>
 			<Setter Property="Padding" Value="0"/>
 		</Style>
@@ -23,7 +23,7 @@
 			<Setter Property="FontSize" Value="12"/>
 			<Setter Property="HorizontalContentAlignment" Value="Center"/>
 			<Setter Property="VerticalContentAlignment" Value="Center"/>
-			<Setter Property="Width" Value="53"/>
+			<Setter Property="Width" Value="45"/>
 			<Setter Property="Background" Value="#00000000"/>
 			<Setter Property="BorderThickness" Value="0.2"/>
 		</Style>
@@ -53,7 +53,7 @@
 			<Setter Property="Background" Value="DarkGray"/>
 			<Setter Property="BorderBrush" Value="DarkGray"/>
 			<Setter Property="BorderThickness" Value="0.5"/>
-			<Setter Property="Width" Value="50"/>
+			<Setter Property="Width" Value="42"/>
 			<Setter Property="Margin" Value="0,0,3,3"/>
 			<Setter Property="HorizontalContentAlignment" Value="Center"/>
 			<Setter Property="Button.Effect">
@@ -73,7 +73,7 @@
 								<Setter Property="Background" Value="#00000000"/>
 							</Style>
 							<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
-								<Setter Property="Width" Value="160"/>
+								<Setter Property="Width" Value="140"/>
 								<Setter Property="HorizontalContentAlignment" Value="Left"/>
 								<Setter Property="Background" Value="#00000000"/>
 								<Setter Property="FontSize" Value="12"/>
@@ -99,7 +99,7 @@
 				<StackPanel>
 					<Border BorderBrush="DarkGray" BorderThickness="0">
 						<StackPanel Orientation="Horizontal">
-							<Label Content="{Binding Path=Name}" Width="160" Padding="8" Background="{Binding Path=FavoritesColor}" HorizontalContentAlignment="Left" PreviewMouseDown="Label_PreviewMouseDown"/>
+							<Label Content="{Binding Path=Name}" Width="140" Padding="8" Background="{Binding Path=FavoritesColor}" HorizontalContentAlignment="Left" PreviewMouseDown="Label_PreviewMouseDown"/>
 							<Button DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
 							<Button DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
 							<Button DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
@@ -121,7 +121,7 @@
     <Grid SizeChanged="Grid_SizeChanged">
 		<StackPanel>
 			<StackPanel Name="Header" Orientation="Horizontal" VerticalAlignment="Top" Height="36">
-				<Label Width ="160" Padding="8,0,0,0" HorizontalContentAlignment ="Left">Selection Name</Label>
+				<Label Width ="140" Padding="8,0,0,0" HorizontalContentAlignment ="Left">Selection Name</Label>
 				<Label/>
 				<Label/>
 				<Label Content="{Binding Path=BackBook, Converter={StaticResource pconverter}}"/>

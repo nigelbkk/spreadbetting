@@ -83,11 +83,11 @@ namespace SpreadTrader
 			props.HorizontalSplitter = RunnersGrid.ActualHeight;
 			props.Save();
 		}
-		private void GridSplitter_DragCompleted_1(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-		{
-			props.VerticalSplitter = RunnersAndSlidersGrid.ColumnDefinitions[0].Width.Value;
-			props.Save();
-		}
+		//private void GridSplitter_DragCompleted_1(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+		//{
+		//	props.VerticalSplitter = RunnersAndSlidersGrid.ColumnDefinitions[0].Width.Value;
+		//	props.Save();
+		//}
 		private void UpperGrid_Loaded(object sender, RoutedEventArgs e)
 		{
 			Grid grid = sender as Grid;

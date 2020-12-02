@@ -20,6 +20,7 @@ namespace SpreadTrader
 		public double TotalMatched { get { return _TotalMatched; } set { _TotalMatched = value; OnPropertyChanged(""); } }
 		public double BackBook { get { return _BackBook; } set { _BackBook = value; OnPropertyChanged(""); } }
 		public double LayBook { get { return _LayBook; } set { _LayBook = value; OnPropertyChanged(""); } }
+		public bool InPlay { get; set; }
 		private Int32 _UpdateRate { get; set; }
 		private Int32 _TurnaroundTime { get; set; }
 		public Int32 UpdateRate { get { return _UpdateRate; } set { _UpdateRate = value; OnPropertyChanged("UpdateRate"); } }
@@ -35,7 +36,7 @@ namespace SpreadTrader
 			get { return _isSelected; }
 			set
 			{
-				if (value)// && !_isSelected) 
+				if (value && !_isSelected) 
 					OnItemSelected();
 				_isSelected = value;
 			}

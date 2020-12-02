@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace SpreadTrader
 {
-	public delegate void StreamUpdateDelegate(List<LiveRunner> liveRunners, double tradedVolume);
+	public delegate void StreamUpdateDelegate(List<LiveRunner> liveRunners, double tradedVolume, bool inplay);
 
 	public partial class RunnersControl : UserControl, INotifyPropertyChanged
 	{
@@ -40,15 +40,17 @@ namespace SpreadTrader
 			LiveRunners = new List<LiveRunner>();
 			InitializeComponent();
 
-			StreamingAPI.Callback += (liveRunners, tradedVolume) =>
+			StreamingAPI.Callback += (liveRunners, tradedVolume, inplay) =>
 			{
 				double totalBack = 0;
 				double totalLay = 0;
 				Int32 ct = Math.Min(LiveRunners.Count, liveRunners.Count); //TOCHECK
 				for(int i=0;i<ct; i++)
 				{
-					totalBack += 100/liveRunners[i].BackValues[0].price;
-					totalLay += 100/liveRunners[i].LayValues[0].price;
+					if (liveRunners[i].BackValues[0].price > 0)
+						totalBack += 100/liveRunners[i].BackValues[0].price;
+					if (liveRunners[i].LayValues[0].price > 0)
+						totalLay += 100/liveRunners[i].LayValues[0].price;
 					LiveRunners[i].BackValues = liveRunners[i].BackValues;
 					LiveRunners[i].LayValues = liveRunners[i].LayValues;
 					LiveRunners[i].LastPriceTraded = liveRunners[i].LastPriceTraded;
@@ -74,7 +76,12 @@ namespace SpreadTrader
 						LiveRunners = MarketNode.GetLiveRunners();
 						if (props.UseStreaming)
 						{
-							streamingAPI.Start(MarketNode.MarketID);
+							BackgroundWorker bw = new BackgroundWorker();
+							bw.DoWork += (o, e) =>
+							{
+								streamingAPI.Start(MarketNode.MarketID);
+							};
+							bw.RunWorkerAsync();
 						}
 						else
 						{
