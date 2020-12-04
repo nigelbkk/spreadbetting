@@ -15,6 +15,8 @@ namespace SpreadTrader
         private BitmapImage _colors = null;
         public BitmapImage Colors { get { return _colors; } set { _colors = value; NotifyPropertyChanged("Colors"); } }
         public String Name { get; set; }
+        private double _Width { get; set; }
+        public double Width { get { return _Width; } set { _Width = value; NotifyPropertyChanged("Width"); } }
         public Int64 SelectionId { get; set; } 
         public Brush OutComeColor
         {
@@ -70,6 +72,7 @@ namespace SpreadTrader
 			LayValues.Add(new PriceSize());
 			LayValues.Add(new PriceSize());
 			LayValues.Add(new PriceSize());
+            _Width = 160;
 		}
         public LiveRunner(Runner r) : this()
         {

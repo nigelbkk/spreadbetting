@@ -99,7 +99,7 @@
 				<StackPanel>
 					<Border BorderBrush="DarkGray" BorderThickness="0">
 						<StackPanel Orientation="Horizontal">
-							<Label Content="{Binding Path=Name}" Width="140" Padding="8" Background="{Binding Path=FavoritesColor}" HorizontalContentAlignment="Left" PreviewMouseDown="Label_PreviewMouseDown"/>
+							<Label Content="{Binding Path=Name}" Width="{Binding Path=Width}" Padding="8" Background="{Binding Path=FavoritesColor}" HorizontalContentAlignment="Left" PreviewMouseDown="Label_PreviewMouseDown"/>
 							<Button DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
 							<Button DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
 							<Button DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
@@ -120,29 +120,43 @@
 	</UserControl.Resources>
     <Grid SizeChanged="Grid_SizeChanged">
 		<StackPanel>
-			<StackPanel Name="Header" Orientation="Horizontal" VerticalAlignment="Top" Height="36">
-				<Label Width ="140" Padding="8,0,0,0" HorizontalContentAlignment ="Left">Selection Name</Label>
-				<Label/>
-				<Label/>
-				<Label Content="{Binding Path=BackBook, Converter={StaticResource pconverter}}"/>
-				<Label Width="10"/>
-				<Label Content="{Binding Path=LayBook, Converter={StaticResource pconverter}}"/>
-				<Label/>
-				<Label/>
-				<Label>
-					<TextBlock>Back<LineBreak/>Stake</TextBlock>
-				</Label>
-				<Label>
-					<TextBlock>Lay<LineBreak/>Stake</TextBlock>
-				</Label>
-				<Label>Profit</Label>
-				<Label>
-					<TextBlock>Level<LineBreak/>Profit</TextBlock>
-				</Label>
-				<Label>
-					<TextBlock>Last<LineBreak/>Price</TextBlock>
-				</Label>
-			</StackPanel>
+			<Grid Name="ItemsGrid">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="160"/>
+					<ColumnDefinition Width="auto" />
+					<ColumnDefinition/>
+				</Grid.ColumnDefinitions>
+				<Border Grid.Column ="0" BorderBrush="DarkGray" BorderThickness="0.5">
+					<Label HorizontalAlignment="Left" Padding="8,0,0,0" BorderThickness="0" Width="auto">Selection Name</Label>
+				</Border>
+				<GridSplitter Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Stretch" Background="DarkGray" ShowsPreview="false" Width="3" ResizeDirection="Columns" DragCompleted="GridSplitter_DragCompleted" />
+				<Border Grid.Column ="1" BorderBrush="DarkGray" BorderThickness="0">
+					<StackPanel Name="Header" Orientation="Horizontal" VerticalAlignment="Top" Height="36">
+						<Label Padding="8,0,0,0" HorizontalContentAlignment ="Left">Selection Name</Label>
+						<Label/>
+						<Label/>
+						<Label Content="{Binding Path=BackBook, Converter={StaticResource pconverter}}"/>
+						<Label Width="10"/>
+						<Label Content="{Binding Path=LayBook, Converter={StaticResource pconverter}}"/>
+						<Label/>
+						<Label/>
+						<Label>
+							<TextBlock>Back<LineBreak/>Stake</TextBlock>
+						</Label>
+						<Label>
+							<TextBlock>Lay<LineBreak/>Stake</TextBlock>
+						</Label>
+						<Label>Profit</Label>
+						<Label>
+							<TextBlock>Level<LineBreak/>Profit</TextBlock>
+						</Label>
+						<Label>
+							<TextBlock>Last<LineBreak/>Price</TextBlock>
+						</Label>
+					</StackPanel>
+				</Border>
+			</Grid>
+
 			<ItemsControl Name="SV1" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}" >
 				<ItemsControl.Template>
 					<ControlTemplate>

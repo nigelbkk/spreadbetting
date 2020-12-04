@@ -58,6 +58,7 @@ namespace SpreadTrader
 					LiveRunners[i].ifWin = liveRunners[i].ifWin;
 					LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
 					LiveRunners[i].NotifyPropertyChanged("");
+					LiveRunners[i].Width = ItemsGrid.ColumnDefinitions[0].ActualWidth;
 				}
 				MarketNode.TotalMatched = tradedVolume;
 				BackBook = totalBack;
@@ -293,6 +294,13 @@ namespace SpreadTrader
 				{
 					streamingAPI.Stop();
 				};
+		}
+		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+		{
+			foreach (LiveRunner v in SV1.Items)
+			{
+				v.Width = ItemsGrid.ColumnDefinitions[0].Width.Value;
+			}
 		}
 	}
 }
