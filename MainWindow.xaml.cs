@@ -32,6 +32,18 @@ namespace SpreadTrader
 				Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
 			}
 		}
+		private Tuple<Int32, String> OnOrderChanged(String json)
+		{
+			try
+			{
+				Debug.WriteLine(json);
+				return new Tuple<Int32, String>(200, json);
+			}
+			catch (Exception xe)
+			{
+				return new Tuple<Int32, String>(400, xe.Message);
+			}
+		}
 		public MainWindow()
 		{
 			System.Net.ServicePointManager.Expect100Continue = false;
@@ -40,6 +52,9 @@ namespace SpreadTrader
 
 			Betfair = new BetfairAPI.BetfairAPI();
 			UpdateAccountInformation();
+
+			HTTPListener http = new HTTPListener();
+			http.Start(5055, new HTTPListener.HttpCallbackDelegate(OnOrderChanged));
 		}
 		private void UpdateAccountInformation()
 		{

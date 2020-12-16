@@ -60,6 +60,17 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Betfair.ESAClient, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Betfair.ESAClient.dll</HintPath>
+    </Reference>
+    <Reference Include="Betfair.ESASwagger, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Betfair.ESASwagger.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Client">
+      <HintPath>..\Microsoft.AspNet.SignalR.Client.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Newtonsoft.Json.dll</HintPath>
@@ -115,6 +126,7 @@
     <Compile Include="Favourites.xaml.cs">
       <DependentUpon>Favourites.xaml</DependentUpon>
     </Compile>
+    <Compile Include="HTTPListener.cs" />
     <Compile Include="LiveRunner.cs" />
     <Compile Include="BetfairTypes.cs" />
     <Compile Include="MarketControl.xaml.cs">
@@ -267,16 +279,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\down_arrow.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\VIP\Betfair.ESAClient\Betfair.ESAClient.csproj">
-      <Project>{c6f11e1b-da85-41bc-9dee-b941d3c6a805}</Project>
-      <Name>Betfair.ESAClient</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VIP\Betfair.ESASwagger\Betfair.ESASwagger.csproj">
-      <Project>{05419e45-cad4-4fb6-bc46-b93119d9f22d}</Project>
-      <Name>Betfair.ESASwagger</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

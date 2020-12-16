@@ -3,9 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.AspNet.SignalR.Client;
 using BetfairAPI;
+using System.Threading.Tasks;
+using Betfair.ESAClient.Cache;
+using Newtonsoft.Json;
 
 namespace SpreadTrader
 {
@@ -70,10 +75,40 @@ namespace SpreadTrader
 		public bool UnmatchedOnly { get; set; }
 		public String LastUpdated { get { return String.Format("Bets last updated {0}", _LastUpdated.ToShortTimeString());	}  }
 		public event PropertyChangedEventHandler PropertyChanged;
+		private String _Status = "Ready";
+		public String Status { get { return _Status; } set { _Status = value; NotifyPropertyChanged(""); } }
+		private bool _SubscribedOrders = false;
+		private bool _Connected { get { return !String.IsNullOrEmpty(hubConnection.ConnectionId); } }
+		public bool IsConnected { get { return _Connected; } }
+		public Brush StreamingColor { get { return IsConnected ? Brushes.LightGreen : Brushes.Ivory; } }
+		private IHubProxy hubProxy = null;
+		private HubConnection hubConnection = null;
 		public BetsManager()
 		{
+			string url = "http://88.202.183.202:8088";
+			//			url = "http://192.168.1.6:8088";
+			//			url = "http://127.0.0.1:8088";
+			hubConnection = new HubConnection(url);
+			hubConnection.TraceLevel = TraceLevels.None;
+			hubConnection.TraceWriter = Console.Error;
+			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
+
+			hubProxy.On<string>("ordersChanged", (json) =>
+			{
+				Debug.WriteLine(json);
+				Task.Run(() =>
+				{
+					OrderMarketSnap Snap = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
+					Debug.WriteLine(Snap.MarketId);
+				});
+			});
+
 			Rows = new ObservableCollection<Row>();
 
+			Rows.Add(new Row() { Runner = "George Baker 1" });
+			Rows.Add(new Row() { Runner = "George Baker 2" });
+			Rows.Add(new Row() { Runner = "George Baker 3" });
+			Rows.Add(new Row() { Runner = "George Baker 4" });
 			Rows.Add(new Row() { Runner = "George Baker 1" });
 			Rows.Add(new Row() { Runner = "George Baker 2" });
 			Rows.Add(new Row() { Runner = "George Baker 3" });
@@ -132,6 +167,59 @@ namespace SpreadTrader
 			Rows = rows;
 			NotifyPropertyChanged("");
 		}
+		private void Connect()
+		{
+			hubConnection.Start().ContinueWith(task =>
+			{
+				if (OnFail(task))
+				{
+					Status = "Failed to Connect";
+					return;
+				}
+				Status = "Connected";
+			}).Wait(2000);
+		}
+		private void Disconnect()
+		{
+			hubConnection.Stop(new TimeSpan(1000));
+			Status = "Disconnected";
+		}
+		private bool OnFail(Task task)
+		{
+			if (task.IsFaulted)
+			{
+				Debug.WriteLine("Exception:{0}", task.Exception.GetBaseException());
+			}
+			return task.IsFaulted;
+		}
+		private void SendMessage(String msg)
+		{
+			hubProxy.Invoke<String>("Send", msg).ContinueWith(task =>
+			{
+				Debug.Assert(!task.IsFaulted);
+			}).Wait();
+		}
+		private bool RemoteCall(String name)
+		{
+			bool retval = true;
+			hubProxy.Invoke<String>(name).ContinueWith(task => { retval = OnFail(task); }).Wait();
+			return retval;
+		}
+		private bool RemoteCall(String name, String arg)
+		{
+			bool retval = true;
+			hubProxy.Invoke<String>(name, arg).ContinueWith(task => { retval = OnFail(task); }).Wait();
+			return retval;
+		}
+		private void SubscribeOrders()
+		{
+			bool success = !RemoteCall(_SubscribedOrders ? "UnsubscribeOrders" : "SubscribeOrders");
+			if (success)
+			{
+				_SubscribedOrders = !_SubscribedOrders;
+				Status = _SubscribedOrders ? "Subscribed" : "Unsubscribed";
+			}
+		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			if (Betfair == null)
@@ -141,6 +229,7 @@ namespace SpreadTrader
 			Button b = sender as Button;
 			switch(b.Tag)
 			{
+				case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
 				case "Refresh": PopulateDataGrid(); break;
 				case "CancelAll":
 					List<CancelInstruction> instructions = new List<CancelInstruction>();
@@ -151,8 +240,11 @@ namespace SpreadTrader
 					}
 					if (instructions.Count > 0)
 					{
-						Debug.WriteLine("cancel all for {0} {1}", MarketNode.MarketID, MarketNode.FullName);
-						//Betfair.cancelOrders(MarketNode.MarketID, instructions); 
+						if (MarketNode != null)
+						{
+							Debug.WriteLine("cancel all for {0} {1}", MarketNode.MarketID, MarketNode.FullName);
+							//Betfair.cancelOrders(MarketNode.MarketID, instructions); 
+						}
 					}
 					break;
 			}

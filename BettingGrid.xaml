@@ -17,8 +17,7 @@
 			<Setter Property="Margin" Value="10,2,0,2"/>
 			<!--<EventSetter Event="Click" Handler="CheckBox_Click"/>-->
 		</Style>
-		<Style BasedOn="{StaticResource {x:Type Button}}" 
-            TargetType="{x:Type Button}">
+		<Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
 			<Setter Property="FontSize" Value="12"/>
 			<!--<EventSetter Event="Click" Handler="Button_Click"/>-->
 		</Style>

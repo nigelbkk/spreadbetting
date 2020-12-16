@@ -5,23 +5,38 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
              mc:Ignorable="d" 
-	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-             d:DesignHeight="160" d:DesignWidth="400">
+	         DataContext="{Binding RelativeSource={RelativeSource Self}}">
 	<UserControl.Resources>
 		<local:RowToIndexConverter x:Key="RowToIndexConverter" />
+
+		<!--<Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
+			<Setter Property="Button.Effect">
+				<Setter.Value>
+					<DropShadowEffect Color="Black" Direction="320" ShadowDepth="3" BlurRadius="5" Opacity="0.5" />
+				</Setter.Value>
+			</Setter>
+		</Style>-->
+
 	</UserControl.Resources>
-    <Grid>
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="57*"/>
+			<ColumnDefinition Width="23*"/>
+		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto"/>
 			<RowDefinition/>
 		</Grid.RowDefinitions>
-		<StackPanel Orientation="Horizontal" Grid.Row="0" Height="30">
+		<StackPanel Orientation="Horizontal" Grid.Row="0" Height="30" Grid.ColumnSpan="2">
 			<TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="{Binding Path=LastUpdated}"/>
-			<Button Margin="36,0,0,0" Tag="Refresh" Click="Button_Click">Refresh Bets</Button>
+			<Button Margin="30,0,0,0" Tag="Stream" Click="Button_Click" Background="{Binding Path=StreamingColor}">Streaming</Button>
+			<!--<Button Margin="10,0,0,0" Tag="Stream" Click="Button_Click" >Streaming</Button>-->
 			<Button Margin="10,0,0,0" Tag="CancelAll"  Click="Button_Click">Cancel All Bets</Button>
 			<CheckBox Margin="16,0,0,0" IsChecked="{Binding Path=UnmatchedOnly}" VerticalAlignment="Center">Unmatched only</CheckBox>
+			<TextBlock Text	="Status:" Padding="7,7"/>
+			<TextBlock Text	="{Binding Path=Status}" Padding="7,7"/>
 		</StackPanel>
-		<DataGrid Grid.Row="1" AutoGenerateColumns="False" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" AlternatingRowBackground="AliceBlue">
+		<DataGrid Grid.Row="1" AutoGenerateColumns="False" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" AlternatingRowBackground="AliceBlue" Grid.ColumnSpan="2">
 			<DataGrid.Columns>
 				<DataGridTemplateColumn>
 					<DataGridTemplateColumn.CellTemplate>
