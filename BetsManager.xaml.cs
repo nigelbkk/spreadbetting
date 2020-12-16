@@ -10,7 +10,9 @@ using Microsoft.AspNet.SignalR.Client;
 using BetfairAPI;
 using System.Threading.Tasks;
 using Betfair.ESAClient.Cache;
+using Betfair.ESASwagger;
 using Newtonsoft.Json;
+using Betfair.ESASwagger.Model;
 
 namespace SpreadTrader
 {
@@ -25,7 +27,7 @@ namespace SpreadTrader
 			}
 		}
 		public DateTime Time { get; set; }
-		public Int64 SelectionID { get; set; }
+		public long SelectionID { get; set; }
 		public UInt64 BetID { get; set; }
 		public bool IP { get; set; }
 		public bool SP { get; set; }
@@ -39,6 +41,17 @@ namespace SpreadTrader
 		public Row()
 		{
 			Time = DateTime.Now;
+		}
+		public Row(KeyValuePair<string, Order> kvp)
+		{
+			Order o = kvp.Value;
+			BetID = Convert.ToUInt64(o.Id);
+			SelectionID = o.Md.HasValue ? o.Md.Value : 0; 
+			Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
+			Stake = o.Sr.HasValue ? o.Sr.Value : 0;
+			Odds = o.P.HasValue ? o.P.Value : 0;
+			Profit = o.Side == Order.SideEnum.L ? o.S.Value * (o.P.Value - 1) : o.S.Value;
+			Profit = Math.Round(Profit, 2);
 		}
 		public Row(CurrentOrderSummaryReport.CurrentOrderSummary o)
 		{
@@ -81,6 +94,7 @@ namespace SpreadTrader
 		private bool _Connected { get { return !String.IsNullOrEmpty(hubConnection.ConnectionId); } }
 		public bool IsConnected { get { return _Connected; } }
 		public Brush StreamingColor { get { return IsConnected ? Brushes.LightGreen : Brushes.Ivory; } }
+		public String StreamingButtonText { get { return IsConnected ? "Streaming Connected" : "Streaming Disconnected"; } }
 		private IHubProxy hubProxy = null;
 		private HubConnection hubConnection = null;
 		public BetsManager()
@@ -100,26 +114,30 @@ namespace SpreadTrader
 				{
 					OrderMarketSnap Snap = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
 					Debug.WriteLine(Snap.MarketId);
+					Dispatcher.BeginInvoke(new Action(() => { Rows.Clear(); }));
+					foreach (var runner in Snap.OrderMarketRunners)
+					{
+						foreach (KeyValuePair<string, Order> kvp in runner.UnmatchedOrders)
+						{
+							Dispatcher.BeginInvoke(new Action(() => { Rows.Add(new Row(kvp)); }));
+						}
+					}
 				});
 			});
 
 			Rows = new ObservableCollection<Row>();
 
-			Rows.Add(new Row() { Runner = "George Baker 1" });
-			Rows.Add(new Row() { Runner = "George Baker 2" });
-			Rows.Add(new Row() { Runner = "George Baker 3" });
-			Rows.Add(new Row() { Runner = "George Baker 4" });
-			Rows.Add(new Row() { Runner = "George Baker 1" });
-			Rows.Add(new Row() { Runner = "George Baker 2" });
-			Rows.Add(new Row() { Runner = "George Baker 3" });
-			Rows.Add(new Row() { Runner = "George Baker 4" });
+			//Rows.Add(new Row() { Runner = "George Baker 1" });
+			//Rows.Add(new Row() { Runner = "George Baker 2" });
+			//Rows.Add(new Row() { Runner = "George Baker 3" });
+			//Rows.Add(new Row() { Runner = "George Baker 4" });
 			InitializeComponent();
 			NodeChangeEventSink += (node) =>
 			{
 				if (IsLoaded)
 				{
 					MarketNode = node;
-					PopulateDataGrid();
+				//	PopulateDataGrid();
 				}
 			};
 		}
@@ -230,7 +248,7 @@ namespace SpreadTrader
 			switch(b.Tag)
 			{
 				case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
-				case "Refresh": PopulateDataGrid(); break;
+//				case "Refresh": PopulateDataGrid(); break;
 				case "CancelAll":
 					List<CancelInstruction> instructions = new List<CancelInstruction>();
 					foreach(Row row in Rows)
@@ -250,4 +268,21 @@ namespace SpreadTrader
 			}
 		}
 	}
+	public class OrderMarketSnap
+	{
+		public string MarketId { get; set; }
+		public bool IsClosed { get; set; }
+		public IEnumerable<OrderMarketRunnerSnap> OrderMarketRunners { get; set; }
+	}
+	public class OrderMarketRunnerSnap
+	{
+		public IList<PriceSize> MatchedLay { get; set; }
+		public IList<PriceSize> MatchedBack { get; set; }
+		public Dictionary<string, Order> UnmatchedOrders { get; set; }
+	}
+	//public class PriceSize
+	//{
+	//	public double Price { get; set; }
+	//	public double Size { get; set; }
+	//}
 }

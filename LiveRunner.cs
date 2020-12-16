@@ -77,6 +77,7 @@ namespace SpreadTrader
         public LiveRunner(Runner r) : this()
         {
             ngrunner = r;
+            SelectionId = r.selectionId;
             SetPrices(r);
         }
         public void SetPrices(MarketRunnerSnap r)

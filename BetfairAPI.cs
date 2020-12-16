@@ -381,12 +381,12 @@ namespace BetfairAPI
             p["instructions"] = instructions;
             return RPCRequest<CancelExecutionReport>("cancelOrders", p) as CancelExecutionReport;
         }
-        public PlaceExecutionReport placeOrder(String marketId, Int64 selectionId, String side, Double size, Double price)
+        public PlaceExecutionReport placeOrder(String marketId, Int64 selectionId, sideEnum side, Double size, Double price)
         {
             List<PlaceInstruction> pis = new List<PlaceInstruction>();
             PlaceInstruction pi = new PlaceInstruction();
             pi.selectionId = selectionId;
-            pi.side = side;
+            pi.sideEnum = side;
             pi.orderTypeEnum = orderTypeEnum.LIMIT;
             pi.limitOrder = new LimitOrder()
             {

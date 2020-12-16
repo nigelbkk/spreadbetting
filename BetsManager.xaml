@@ -8,15 +8,6 @@
 	         DataContext="{Binding RelativeSource={RelativeSource Self}}">
 	<UserControl.Resources>
 		<local:RowToIndexConverter x:Key="RowToIndexConverter" />
-
-		<!--<Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
-			<Setter Property="Button.Effect">
-				<Setter.Value>
-					<DropShadowEffect Color="Black" Direction="320" ShadowDepth="3" BlurRadius="5" Opacity="0.5" />
-				</Setter.Value>
-			</Setter>
-		</Style>-->
-
 	</UserControl.Resources>
 	<Grid>
 		<Grid.ColumnDefinitions>
@@ -29,12 +20,13 @@
 		</Grid.RowDefinitions>
 		<StackPanel Orientation="Horizontal" Grid.Row="0" Height="30" Grid.ColumnSpan="2">
 			<TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="{Binding Path=LastUpdated}"/>
-			<Button Margin="30,0,0,0" Tag="Stream" Click="Button_Click" Background="{Binding Path=StreamingColor}">Streaming</Button>
 			<!--<Button Margin="10,0,0,0" Tag="Stream" Click="Button_Click" >Streaming</Button>-->
-			<Button Margin="10,0,0,0" Tag="CancelAll"  Click="Button_Click">Cancel All Bets</Button>
+			<Button Margin="30,0,0,0" Tag="CancelAll"  Click="Button_Click">Cancel All Bets</Button>
 			<CheckBox Margin="16,0,0,0" IsChecked="{Binding Path=UnmatchedOnly}" VerticalAlignment="Center">Unmatched only</CheckBox>
 			<TextBlock Text	="Status:" Padding="7,7"/>
-			<TextBlock Text	="{Binding Path=Status}" Padding="7,7"/>
+			<Button Margin="10,0,0,0" Tag="Stream" Click="Button_Click" Content="{Binding Path=StreamingButtonText}"/>
+			<TextBlock Text	="Status: " Padding="7,8"/>
+			<TextBlock Text	="{Binding Path=Status}" Padding="7,8"/>
 		</StackPanel>
 		<DataGrid Grid.Row="1" AutoGenerateColumns="False" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" AlternatingRowBackground="AliceBlue" Grid.ColumnSpan="2">
 			<DataGrid.Columns>

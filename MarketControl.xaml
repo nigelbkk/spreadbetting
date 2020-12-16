@@ -90,10 +90,10 @@
 									<RowDefinition Height="3*"/>
 									<RowDefinition Height="*"/>
 								</Grid.RowDefinitions>
-								<Border Name="BettingGrid" Grid.Row="0" Background="Ivory" BorderBrush="DarkGray" BorderThickness="0,0,0,3">
+								<Border Name="BettingGrid" Grid.Row="0" Background="Ivory" BorderBrush="DarkGray" BorderThickness="0,0,2,2">
 									<local:BettingGrid x:Name="BettingGridControl"/>
 								</Border>
-								<Border Name="BetsManager" Grid.Row="1" BorderBrush="DarkGray" BorderThickness="0,0,0,3" VerticalAlignment="Stretch">
+								<Border Name="BetsManager" Grid.Row="1" BorderBrush="DarkGray" BorderThickness="0,0,2,2">
 									<local:BetsManager x:Name="BetsManagerControl" />
 								</Border>
 							</Grid>

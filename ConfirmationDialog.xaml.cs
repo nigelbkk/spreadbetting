@@ -32,7 +32,7 @@ namespace SpreadTrader
 				PropertyChanged(this, new PropertyChangedEventArgs(info));
 			}
 		}
-		public ConfirmationDialog(Visual visual, Button b, LiveRunner runner, String side, double odds)
+		public ConfirmationDialog(Visual visual, Button b, String MarketId, LiveRunner runner, String side, double odds)
 		{
 			if (props.ConfirmationX > 0 && props.ConfirmationY > 0)
 			{
@@ -47,8 +47,10 @@ namespace SpreadTrader
 				Left = coords.X;
 			}
 			Runner = runner.Name;
+			SelectionId = runner.SelectionId;
 			Side = side;
 			Odds = odds;
+			this.MarketId = MarketId;
 			InitializeComponent();
 			UpDown.Value = Odds;
 		}
@@ -72,7 +74,21 @@ namespace SpreadTrader
 						w.WriteLine(cs2);
 						Debug.WriteLine(cs2);
 					}
-					//PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side, stake, Odds);
+					try
+					{
+						//					PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side, stake, Odds);
+						PlaceExecutionReport report = null;
+						if (Side == "Lay")
+						{
+							report = betfair.placeOrder(MarketId, SelectionId, sideEnum.LAY, 2.00, 1.01);
+						}
+					}
+					catch (Exception xe)
+					{
+						Debug.WriteLine(xe.Message);
+						MainWindow mw = Extensions.FindParentOfType<MainWindow>(this);
+						if (mw != null) mw.Status = xe.Message;
+					}
 				}
 				else
 				{
