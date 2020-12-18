@@ -18,7 +18,7 @@ namespace SpreadTrader
 		public ICommand ExpandingCommand { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
-		public String Status { get { return _Status; } set { _Status = value; Trace.WriteLine(value); NotifyPropertyChanged("");} }
+		public String Status { get { return _Status; } set { _Status = value; Debug.WriteLine(value); NotifyPropertyChanged("");} }
 		public double Balance { get; set; }
 		public double Exposure { get; set; }
 		public double Commission { get; set; }
@@ -52,9 +52,6 @@ namespace SpreadTrader
 
 			Betfair = new BetfairAPI.BetfairAPI();
 			UpdateAccountInformation();
-
-			HTTPListener http = new HTTPListener();
-			http.Start(5055, new HTTPListener.HttpCallbackDelegate(OnOrderChanged));
 		}
 		private void UpdateAccountInformation()
 		{
@@ -174,16 +171,22 @@ namespace SpreadTrader
 			if (e.RemovedItems.Count > 0)
 			{
 				TabItem tr = e.RemovedItems[0] as TabItem;
-				MarketControl mcr = tr.Content as MarketControl;
-				if (mcr != null)
-					mcr.IsSelected = false;
+				if (tr != null)
+				{
+					MarketControl mcr = tr.Content as MarketControl;
+					if (mcr != null)
+						mcr.IsSelected = false;
+				}
 			}
 			if (e.AddedItems.Count > 0)
 			{
 				TabItem ta = e.AddedItems[0] as TabItem;
-				MarketControl mca = ta.Content as MarketControl;
-				if (mca != null)
-					mca.IsSelected = true;
+				if (ta != null)
+				{
+					MarketControl mca = ta.Content as MarketControl;
+					if (mca != null)
+						mca.IsSelected = true;
+				}
 			}
 		}
 		private void Window_SizeChanged(object sender, SizeChangedEventArgs e)

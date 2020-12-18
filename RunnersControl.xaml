@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:SpreadTrader"
              mc:Ignorable="d" 
 	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-             d:DesignHeight="250" d:DesignWidth="600" Loaded="UserControl_Loaded" >
+             d:DesignHeight="250" d:DesignWidth="600" >
 	<UserControl.Resources>
 		<local:OddsConverter x:Key="oconverter" />
 		<local:StakeConverter x:Key="sconverter" />

@@ -82,6 +82,7 @@ namespace SpreadTrader
 						{
 							report = betfair.placeOrder(MarketId, SelectionId, sideEnum.LAY, 2.00, 1.01);
 						}
+						OrdersStatic.BetID2SelectionID[report.instructionReports[0].betId] = SelectionId;
 					}
 					catch (Exception xe)
 					{

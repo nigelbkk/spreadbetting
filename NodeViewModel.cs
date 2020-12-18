@@ -62,6 +62,8 @@ namespace SpreadTrader
 			Name = name;
 			Nodes = new ObservableCollection<NodeViewModel>();
 		}
+		List<LiveRunner> LiveRunners = null;// new List<LiveRunner>();
+
 		public List<LiveRunner> GetLiveRunners()
 		{
 			List<LiveRunner> Runners = new List<LiveRunner>();
@@ -79,6 +81,7 @@ namespace SpreadTrader
 						MarketID = Market.marketId;
 					}
 			}
+			LiveRunners = Runners;
 			return Runners;
 		}
 		private void OnItemSelected()
@@ -96,6 +99,15 @@ namespace SpreadTrader
 					NodeCallback(this);
 				}
 			}
+		}
+		public String GetRunnerName(Int64 SelectionID)
+		{
+			foreach (LiveRunner r in LiveRunners)
+			{
+				if (r.SelectionId == SelectionID)
+					return r.Name;
+			}
+			return null;
 		}
 		private void OnItemExpanding()
 		{
