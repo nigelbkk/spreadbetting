@@ -124,7 +124,7 @@ namespace SpreadTrader
 		{
 			string url = "http://88.202.183.202:8088";
 			//			url = "http://192.168.1.6:8088";
-			//			url = "http://127.0.0.1:8088";
+						url = "http://127.0.0.1:8088";
 			hubConnection = new HubConnection(url);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
