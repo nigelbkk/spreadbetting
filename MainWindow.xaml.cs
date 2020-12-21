@@ -53,7 +53,7 @@ namespace SpreadTrader
 			Betfair = new BetfairAPI.BetfairAPI();
 			UpdateAccountInformation();
 		}
-		private void UpdateAccountInformation()
+		public void UpdateAccountInformation()
 		{
 			try
 			{

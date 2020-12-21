@@ -46,6 +46,7 @@ namespace SpreadTrader
 				Top = coords.Y;
 				Left = coords.X;
 			}
+			Stake = 2.00;
 			Runner = runner.Name;
 			SelectionId = runner.SelectionId;
 			Side = side;
@@ -66,51 +67,27 @@ namespace SpreadTrader
 					Close();
 					return;
 				}
-				if (cs == "Submit")
+				Int32 stake = (int)Stake;
+				if (cs != "Submit")
 				{
-					using (StreamWriter w = File.AppendText("log.csv"))
-					{
-						String cs2 = String.Format("{1},{2},{3},{4:0},{5:0.00},{6}", "", "WIN", Side, Runner, Stake, Odds, DateTime.UtcNow.Millisecond);
-						w.WriteLine(cs2);
-						Debug.WriteLine(cs2);
-					}
-					try
-					{
-						//					PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side, stake, Odds);
-						PlaceExecutionReport report = null;
-						if (Side == "Lay")
-						{
-							report = betfair.placeOrder(MarketId, SelectionId, sideEnum.LAY, 2.00, 1.01);
-						}
-						OrdersStatic.BetID2SelectionID[report.instructionReports[0].betId] = SelectionId;
-					}
-					catch (Exception xe)
-					{
-						Debug.WriteLine(xe.Message);
-						MainWindow mw = Extensions.FindParentOfType<MainWindow>(this);
-						if (mw != null) mw.Status = xe.Message;
-					}
+					stake = Convert.ToInt32(b.Content);
 				}
-				else
+				using (StreamWriter w = File.AppendText("log.csv"))
 				{
-					Int32 stake = Convert.ToInt32(b.Content);
-					try
-					{
-						using (StreamWriter w = File.AppendText("log.csv"))
-						{
-							String cs2 = String.Format("{1},{2},{3},{4:0},{5:0.00},{6}", "", "WIN", Side, Runner, stake, Odds, DateTime.UtcNow.Millisecond);
-							w.WriteLine(cs2);
-							Debug.WriteLine(cs2);
-						}
-						UpDown.Focus(); 
-						//PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side, stake, Odds);
-					}
-					catch (Exception xe)
-					{
-						Debug.WriteLine(xe.Message);
-						MainWindow mw = Extensions.FindParentOfType<MainWindow>(ParentObject);
-						if (mw != null) mw.Status = xe.Message;
-					}
+					String cs2 = String.Format("{1},{2},{3},{4:0},{5:0.00},{6}", "", "WIN", Side, Runner, stake, Odds, DateTime.UtcNow.Millisecond);
+					w.WriteLine(cs2);
+					Debug.WriteLine(cs2);
+				}
+				try
+				{
+					PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
+					OrdersStatic.BetID2SelectionID[report.instructionReports[0].betId] = SelectionId;
+				}
+				catch (Exception xe)
+				{
+					Debug.WriteLine(xe.Message);
+					MainWindow mw = Extensions.FindParentOfType<MainWindow>(this);
+					if (mw != null) mw.Status = xe.Message;
 				}
 			}
 		}

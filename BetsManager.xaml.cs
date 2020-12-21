@@ -13,6 +13,7 @@ using Betfair.ESAClient.Cache;
 using Betfair.ESASwagger;
 using Newtonsoft.Json;
 using Betfair.ESASwagger.Model;
+using System.Media;
 
 namespace SpreadTrader
 {
@@ -37,8 +38,13 @@ namespace SpreadTrader
 		public String Side { get; set; }
 		public double Stake { get; set; }
 		public double Odds { get; set; }
-		public double Profit { get; set; }
-		public double Matched { get; set; }
+		public double Profit { get {
+				double p = Side == "Lay" ? Stake * (Odds - 1) : Stake;
+				return Math.Round(p, 2);
+			}
+		}
+		public double _Matched { get; set; }
+		public double Matched { get { return _Matched; } set { _Matched = value; NotifyPropertyChanged("Matched"); } }
 		private bool _Hidden = false;
 		public bool Hidden { get { return _Hidden; } set { _Hidden = value; NotifyPropertyChanged(""); } }
 		public bool Override { get; set; }
@@ -54,8 +60,8 @@ namespace SpreadTrader
 			Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
 			Stake = o.Sr.HasValue ? o.Sr.Value : 0;
 			Odds = o.P.HasValue ? o.P.Value : 0;
-			Profit = o.Side == Order.SideEnum.L ? o.S.Value * (o.P.Value - 1) : o.S.Value;
-			Profit = Math.Round(Profit, 2);
+			//Profit = o.Side == Order.SideEnum.L ? o.S.Value * (o.P.Value - 1) : o.S.Value;
+			//Profit = Math.Round(Profit, 2);
 			Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
 		}
 		public Row(CurrentOrderSummaryReport.CurrentOrderSummary o)
@@ -66,8 +72,8 @@ namespace SpreadTrader
 			Side = o.side;
 			Stake = o.priceSize.size;
 			Odds = o.priceSize.price;
-			Profit = o.side == "LAY" ? o.priceSize.size * (o.priceSize.price - 1) : o.priceSize.size;
-			Profit = Math.Round(Profit, 2);
+			//Profit = o.side == "LAY" ? o.priceSize.size * (o.priceSize.price - 1) : o.priceSize.size;
+			//Profit = Math.Round(Profit, 2);
 			Matched = o.sizeMatched;
 		}
 		public override string ToString()
@@ -135,55 +141,71 @@ namespace SpreadTrader
 						Dispatcher.BeginInvoke(new Action(() => {
 							try
 							{
-								foreach (OrderRunnerChange orc in change.Orc)
+								if (change.Orc != null)
 								{
-									if (orc.Uo != null) foreach (Order o in orc.Uo)
+									foreach (OrderRunnerChange orc in change.Orc)
+									{
+										if (orc.Uo != null)
 										{
-											if (o.Status == Order.StatusEnum.Ec && o.Sc > 0)
+											foreach (Order o in orc.Uo)
 											{
-												Row r = FindRow(o.Id);
-												Rows.Remove(r);
-											}
-											else
-											{
-												Row row = new Row();
-												row.SelectionID = orc.Id.Value;
-												row.Runner = MarketNode.GetRunnerName(row.SelectionID);
-												row.BetID = Convert.ToUInt64(o.Id);
-												row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
-												row.Odds = o.P.Value;
-												row.Stake = o.S.Value;
-												row.Matched = o.Sm.Value;
-												row.Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
-												Rows.Add(row);
-												Debug.WriteLine("new row");
+												Row row = FindRow(o.Id);
+												if (o.Status == Order.StatusEnum.Ec && o.Sc > 0 && o.Sm == 0) // it was cancelled
+												{
+													Rows.Remove(row);
+													Debug.WriteLine("canceled");
+												}
+												else if (row == null)
+												{
+													row = new Row();
+													row.SelectionID = orc.Id.Value;
+													row.Runner = MarketNode.GetRunnerName(row.SelectionID);
+													row.BetID = Convert.ToUInt64(o.Id);
+													row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
+													row.Odds = o.P.Value;
+													row.Stake = o.S.Value;
+													//row.Matched = o.Sm.Value;
+													row.Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
+													Rows.Add(row);
+													Debug.WriteLine("new row");
+												}
+												else if (o.Sm > 0)      // it was matched
+												{
+													Debug.WriteLine("matched");
+													(new SoundPlayer(Properties.Settings.Default.MatchedBetAlert)).PlaySync();
+												}
 											}
 										}
+									}
 								}
+								MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
 								foreach (OrderMarketRunnerSnap runner in snap.OrderMarketRunners)
 								{
-									Int32 idx = 0;
 									Row row = null;
 									foreach (KeyValuePair<String, Order> kvp in runner.UnmatchedOrders)
 									{
 										Order o = kvp.Value;
 										row = FindRow(o.Id);
 
-										if (row != null && o.Status == Order.StatusEnum.E)
+										if (row != null)
 										{
-											row.BetID = Convert.ToUInt64(o.Id);
-											row.Runner = MarketNode.GetRunnerName(row.SelectionID);
-											row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
-											row.Odds = o.P.Value;
-											row.Matched = o.Sm.Value;
+											foreach (PriceSize mb in runner.MatchedBack)
+											{
+												if (row != null && row.Side.ToUpper() == "BACK")
+												{
+													row.Matched += mb.size;
+													if (mw != null) mw.UpdateAccountInformation();
+												}
+											}
+											foreach (PriceSize ml in runner.MatchedLay)
+											{
+												if (row != null && row.Side.ToUpper() == "LAY")
+												{
+													row.Matched += ml.size;
+													if (mw != null) mw.UpdateAccountInformation();
+												}
+											}
 										}
-										idx++;
-									}
-									foreach (PriceSize mb in runner.MatchedBack)
-									{
-									}
-									foreach (PriceSize ml in runner.MatchedLay)
-									{
 									}
 								}
 							}
@@ -204,6 +226,7 @@ namespace SpreadTrader
 					PopulateDataGrid();
 				}
 			};
+			Connect();
 		}
 		private void PopulateDataGrid()
 		{
