@@ -10,6 +10,7 @@ namespace SpreadTrader
 	{
 		public NodeSelectionDelegate NodeChangeEventSink = null;
 		public NodeViewModel _MarketNode { get; set; }
+		public double TotalMatched { get { return MarketNode == null ? 0 : MarketNode.Market.MarketBook.totalMatched; }  }
 		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; NotifyPropertyChanged(""); } }
 		public bool IsSelected { set 
 			{
@@ -84,11 +85,6 @@ namespace SpreadTrader
 			props.HorizontalSplitter = RunnersGrid.ActualHeight;
 			props.Save();
 		}
-		//private void GridSplitter_DragCompleted_1(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-		//{
-		//	props.VerticalSplitter = RunnersAndSlidersGrid.ColumnDefinitions[0].Width.Value;
-		//	props.Save();
-		//}
 		private void UpperGrid_Loaded(object sender, RoutedEventArgs e)
 		{
 			Grid grid = sender as Grid;

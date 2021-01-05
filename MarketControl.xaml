@@ -50,7 +50,7 @@
 			<Label Grid.Column="3" Padding="6,0,10,0">
 				<StackPanel Orientation="Horizontal">
 					<TextBlock Text ="Total Matched: "/>
-					<TextBlock Text="{Binding MarketNode.TotalMatched, Mode=OneWay, Converter={StaticResource cconverter}}"/>
+					<TextBlock Text="{Binding TotalMatched, Mode=OneWay, Converter={StaticResource cconverter}}"/>
 				</StackPanel>
 			</Label>
 			<Label Grid.Column="4" Padding="6,0,10,0"  HorizontalAlignment="Right">

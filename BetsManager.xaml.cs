@@ -37,7 +37,7 @@ namespace SpreadTrader
 		public double Stake { get; set; }
 		public double Odds { get; set; }
 		public double Profit { get {
-				double p = Side == "Lay" ? Stake * (Odds - 1) : Stake;
+				double p = Side == "BACK" ? Stake * (Odds - 1) : Stake;
 				return Math.Round(p, 2);
 			}
 		}
@@ -238,18 +238,30 @@ namespace SpreadTrader
 
 				if (MarketNode.MarketID != null)
 				{
-					CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.168283812"
-
-					foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
+					try
 					{
-						OrdersStatic.BetID2SelectionID[o.betId] = o.selectionId;
-						Row.RunnerNames[o.selectionId] = RunnersControl.GetRunnerName(o.selectionId);
-						Rows.Add(new Row(o)
+						CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.168283812"
+
+						foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
 						{
-							Runner = RunnersControl.GetRunnerName(o.selectionId),
-						});
+							OrdersStatic.BetID2SelectionID[o.betId] = o.selectionId;
+							Row.RunnerNames[o.selectionId] = RunnersControl.GetRunnerName(o.selectionId);
+							Rows.Add(new Row(o)
+							{
+								Runner = RunnersControl.GetRunnerName(o.selectionId),
+							});
+						}
+						NotifyPropertyChanged("");
 					}
-					NotifyPropertyChanged("");
+					catch (Exception xe) 
+					{ 
+						Debug.WriteLine(xe.Message);
+						Dispatcher.BeginInvoke(new Action(() =>
+						{
+							MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
+							if (mw != null) mw.Status = xe.Message;
+						}));
+					}
 				}
 			}
 		}
