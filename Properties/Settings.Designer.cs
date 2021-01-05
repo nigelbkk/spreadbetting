@@ -358,5 +358,17 @@ namespace SpreadTrader.Properties {
                 this["ConfirmationY"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double VerticalSplitter2 {
+            get {
+                return ((double)(this["VerticalSplitter2"]));
+            }
+            set {
+                this["VerticalSplitter2"] = value;
+            }
+        }
     }
 }

@@ -50,7 +50,7 @@
 			<Label Grid.Column="3" Padding="6,0,10,0">
 				<StackPanel Orientation="Horizontal">
 					<TextBlock Text ="Total Matched: "/>
-					<TextBlock Text="{Binding MarketNode.TotalMatched, Mode=OneWay, Converter={StaticResource cconverter}}"/>
+					<TextBlock Text="{Binding TotalMatched, Mode=OneWay, Converter={StaticResource cconverter}}"/>
 				</StackPanel>
 			</Label>
 			<Label Grid.Column="4" Padding="6,0,10,0"  HorizontalAlignment="Right">
@@ -67,9 +67,9 @@
 						<RowDefinition Height="auto"/>
 						<RowDefinition Height="auto"/>
 					</Grid.RowDefinitions>
-					<Grid Name="RunnersAndSlidersGrid" Grid.Row="0" Grid.ColumnSpan="2">
+					<Grid Name="RunnersAndSlidersGrid" Grid.Row="0">
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="500"/>
+							<ColumnDefinition Width="600"/>
 							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
 						<Grid Name="RunnersGrid" Background="Ivory">
@@ -79,7 +79,8 @@
 							</Grid.ColumnDefinitions>
 							<local:RunnersControl x:Name="RunnersControl" Grid.ColumnSpan="2" />
 						</Grid>
-						<Grid Grid.Column="1">
+						<GridSplitter Grid.Column="1" Width="3" VerticalAlignment="Stretch" HorizontalAlignment="Left" Background="Gray" ResizeDirection="Columns" DragCompleted="GridSplitter_DragCompleted_1"/>
+						<Grid Grid.Column="1" Margin="2,0">
 							<local:SliderControl  x:Name="SliderControl" />
 						</Grid>
 					</Grid>

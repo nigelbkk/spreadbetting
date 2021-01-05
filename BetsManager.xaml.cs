@@ -9,8 +9,6 @@ using System.Windows.Controls;
 using Microsoft.AspNet.SignalR.Client;
 using BetfairAPI;
 using System.Threading.Tasks;
-using Betfair.ESAClient.Cache;
-using Betfair.ESASwagger;
 using Newtonsoft.Json;
 using Betfair.ESASwagger.Model;
 using System.Media;
@@ -39,7 +37,7 @@ namespace SpreadTrader
 		public double Stake { get; set; }
 		public double Odds { get; set; }
 		public double Profit { get {
-				double p = Side == "Lay" ? Stake * (Odds - 1) : Stake;
+				double p = Side == "BACK" ? Stake * (Odds - 1) : Stake;
 				return Math.Round(p, 2);
 			}
 		}
@@ -164,7 +162,6 @@ namespace SpreadTrader
 													row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
 													row.Odds = o.P.Value;
 													row.Stake = o.S.Value;
-													//row.Matched = o.Sm.Value;
 													row.Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
 													Rows.Add(row);
 													Debug.WriteLine("new row");
@@ -241,18 +238,30 @@ namespace SpreadTrader
 
 				if (MarketNode.MarketID != null)
 				{
-					CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.168283812"
-
-					foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
+					try
 					{
-						OrdersStatic.BetID2SelectionID[o.betId] = o.selectionId;
-						Row.RunnerNames[o.selectionId] = RunnersControl.GetRunnerName(o.selectionId);
-						Rows.Add(new Row(o)
+						CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.168283812"
+
+						foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
 						{
-							Runner = RunnersControl.GetRunnerName(o.selectionId),
-						});
+							OrdersStatic.BetID2SelectionID[o.betId] = o.selectionId;
+							Row.RunnerNames[o.selectionId] = RunnersControl.GetRunnerName(o.selectionId);
+							Rows.Add(new Row(o)
+							{
+								Runner = RunnersControl.GetRunnerName(o.selectionId),
+							});
+						}
+						NotifyPropertyChanged("");
 					}
-					NotifyPropertyChanged("");
+					catch (Exception xe) 
+					{ 
+						Debug.WriteLine(xe.Message);
+						Dispatcher.BeginInvoke(new Action(() =>
+						{
+							MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
+							if (mw != null) mw.Status = xe.Message;
+						}));
+					}
 				}
 			}
 		}
@@ -342,7 +351,7 @@ namespace SpreadTrader
 					List<CancelInstruction> instructions = new List<CancelInstruction>();
 					foreach(Row row in Rows)
 					{
-						if (!row.Override)
+						if (!row.Override && row.BetID > 0)
 							instructions.Add(new CancelInstruction(row.BetID));
 					}
 					if (instructions.Count > 0)

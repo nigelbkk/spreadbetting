@@ -15,6 +15,7 @@ namespace SpreadTrader
 
 	public partial class RunnersControl : UserControl, INotifyPropertyChanged
 	{
+		public BetsManager betsManager = null;
 		public NodeSelectionDelegate NodeChangeEventSink = null;
 		public StreamUpdateDelegate StreamUpdateEventSink = null;
 		private StreamingAPI streamingAPI = new StreamingAPI();
@@ -153,6 +154,10 @@ namespace SpreadTrader
 				}
 			};
 			Worker.RunWorkerAsync();
+		}
+		public void NotifyNewBet(Row row)
+		{
+
 		}
 		private PlaceExecutionReport placeOrder(String marketId, LiveRunner runner, sideEnum side,  PriceSize ps)
 		{
@@ -300,10 +305,12 @@ namespace SpreadTrader
 		}
 		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
 		{
+			double diff = ItemsGrid.ColumnDefinitions[0].Width.Value - SV1.ActualWidth;
 			foreach (LiveRunner v in SV1.Items)
 			{
 				v.Width = ItemsGrid.ColumnDefinitions[0].Width.Value;
 			}
+//			SV1.Width = diff;
 		}
 	}
 }
