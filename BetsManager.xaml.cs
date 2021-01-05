@@ -9,8 +9,6 @@ using System.Windows.Controls;
 using Microsoft.AspNet.SignalR.Client;
 using BetfairAPI;
 using System.Threading.Tasks;
-using Betfair.ESAClient.Cache;
-using Betfair.ESASwagger;
 using Newtonsoft.Json;
 using Betfair.ESASwagger.Model;
 using System.Media;
@@ -164,7 +162,6 @@ namespace SpreadTrader
 													row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
 													row.Odds = o.P.Value;
 													row.Stake = o.S.Value;
-													//row.Matched = o.Sm.Value;
 													row.Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
 													Rows.Add(row);
 													Debug.WriteLine("new row");
@@ -342,7 +339,7 @@ namespace SpreadTrader
 					List<CancelInstruction> instructions = new List<CancelInstruction>();
 					foreach(Row row in Rows)
 					{
-						if (!row.Override)
+						if (!row.Override && row.BetID > 0)
 							instructions.Add(new CancelInstruction(row.BetID));
 					}
 					if (instructions.Count > 0)

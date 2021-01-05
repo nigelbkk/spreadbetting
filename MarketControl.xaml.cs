@@ -29,6 +29,7 @@ namespace SpreadTrader
 		{
 			InitializeComponent();
 			BetsManagerControl.RunnersControl = RunnersControl;
+			RunnersControl.betsManager = BetsManagerControl;
 			NodeChangeEventSink += RunnersControl.NodeChangeEventSink;
 			NodeChangeEventSink += BetsManagerControl.NodeChangeEventSink;
 			NodeChangeEventSink += (node) =>
@@ -93,10 +94,17 @@ namespace SpreadTrader
 			Grid grid = sender as Grid;
 			if (props.HorizontalSplitter > 0 && grid.RowDefinitions.Count > 0)
 				grid.RowDefinitions[0].Height = new GridLength(props.HorizontalSplitter, GridUnitType.Pixel);
+			if (props.VerticalSplitter2 > 0)// && grid.RowDefinitions.Count > 0)
+				RunnersAndSlidersGrid.ColumnDefinitions[0].Width = new GridLength(props.VerticalSplitter2, GridUnitType.Pixel);
 		}
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
 			BetsManagerControl.RunnersControl = RunnersControl;
+		}
+		private void GridSplitter_DragCompleted_1(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+		{
+			props.VerticalSplitter2 = RunnersAndSlidersGrid.ColumnDefinitions[0].Width.Value;
+			props.Save();
 		}
 	}
 }

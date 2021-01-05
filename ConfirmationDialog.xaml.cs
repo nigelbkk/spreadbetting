@@ -12,6 +12,7 @@ namespace SpreadTrader
 {
 	public partial class ConfirmationDialog : Window, INotifyPropertyChanged
 	{
+		private RunnersControl runnersControl = null;
 		public DependencyObject ParentObject { get; set; }
 		public String Side { get; set; }
 		public String MarketId { get; set; }
@@ -34,6 +35,7 @@ namespace SpreadTrader
 		}
 		public ConfirmationDialog(Visual visual, Button b, String MarketId, LiveRunner runner, String side, double odds)
 		{
+			runnersControl = visual as RunnersControl;
 			if (props.ConfirmationX > 0 && props.ConfirmationY > 0)
 			{
 				Top = props.ConfirmationY;
