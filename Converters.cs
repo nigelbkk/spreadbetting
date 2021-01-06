@@ -1,11 +1,36 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
+using System.Windows.Media;
 
 namespace SpreadTrader
 {
+	public class ColorConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			SolidColorBrush matched = Application.Current.FindResource("MatchedColor") as SolidColorBrush;
+			SolidColorBrush unmatched = Application.Current.FindResource("UnmatchedColor") as SolidColorBrush;
+			bool input = bool.Parse(value.ToString());
+			switch (input)
+			{
+				case true:
+					return matched;
+				case false:
+					return unmatched
+						;
+				default:
+					return DependencyProperty.UnsetValue;
+			}
+		}
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 	public class CurrencyConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

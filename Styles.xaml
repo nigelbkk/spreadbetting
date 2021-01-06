@@ -64,4 +64,6 @@
 	<SolidColorBrush x:Key="Lay0Color" Color="#DCBAD2"/>
 	<SolidColorBrush x:Key="Lay1Color" Color="#EBD6E5"/>
 	<SolidColorBrush x:Key="Lay2Color" Color="#F6E5E6"/>
+	<SolidColorBrush x:Key="MatchedColor" Color="#90ee90"/>
+	<SolidColorBrush x:Key="UnmatchedColor" Color="#ffa500"/>
 </ResourceDictionary>

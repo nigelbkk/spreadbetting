@@ -8,6 +8,7 @@
 	         DataContext="{Binding RelativeSource={RelativeSource Self}}">
 	<UserControl.Resources>
 		<local:RowToIndexConverter x:Key="RowToIndexConverter" />
+		<local:ColorConverter x:Key="ColorConverter" />
 	</UserControl.Resources>
 	<Grid>
 		<Grid.ColumnDefinitions>
@@ -26,7 +27,7 @@
 			<TextBlock Text	="Status: " Padding="7,8"/>
 			<TextBlock Text	="{Binding Path=Status}" Padding="7,8"/>
 		</StackPanel>
-		<DataGrid Grid.Row="1" AutoGenerateColumns="False" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" AlternatingRowBackground="AliceBlue" Grid.ColumnSpan="2">
+		<DataGrid Grid.Row="1" AutoGenerateColumns="False" Name="dataGrid" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" AlternatingRowBackground="AliceBlue" Grid.ColumnSpan="2" IsReadOnly="True">
 			<DataGrid.ItemContainerStyle>
 				<Style TargetType="DataGridRow">
 					<Style.Triggers>
@@ -45,17 +46,20 @@
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 				<DataGridCheckBoxColumn Binding="{Binding Override}"/>
-				<!--<DataGridTextColumn Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={local:RowToIndexConverter}}" />-->
 				<DataGridTextColumn Width="130" Header="Time" Binding="{Binding Time}"/>
 				<DataGridTextColumn Width="*" Header="BetID" Binding="{Binding BetID}"/>
-				<!--<DataGridTextColumn Width="*" Header="IP" Binding="{Binding IP}"/>
-				<DataGridTextColumn Width="*" Header="SP" Binding="{Binding SP}"/>-->
 				<DataGridTextColumn Width="1.5*" Header="Runner" Binding="{Binding Runner}" />
 				<DataGridTextColumn Width="*" Header="Side" Binding="{Binding Side}" />
 				<DataGridTextColumn Width="*" Header="Stake" Binding="{Binding Stake}" />
 				<DataGridTextColumn Width="*" Header="Odds" Binding="{Binding Odds, StringFormat={}{0:N2}}" />
-				<DataGridTextColumn Width="*" Header="Profit" Binding="{Binding Profit, StringFormat={}{0:N2}}" />
-				<DataGridTextColumn Width="*" Header="Matched" Binding="{Binding Matched, StringFormat={}{0:N2}}" />
+				<DataGridTextColumn Width="*" Header="Profit" Binding="{Binding Profit, StringFormat={}{0:N2}, Mode=OneWay}"/>
+				<DataGridTextColumn Width="*" Header="Matched" Binding="{Binding Matched, StringFormat={}{0:N2}}">
+					<DataGridTextColumn.ElementStyle>
+						<Style TargetType="{x:Type TextBlock}">
+							<Setter Property="Background" Value="{Binding IsMatched, Converter={StaticResource ColorConverter}}"/>
+						</Style>
+					</DataGridTextColumn.ElementStyle>
+				</DataGridTextColumn>
 			</DataGrid.Columns>
 			<!--<DataGrid.RowDetailsTemplate>
 				<DataTemplate>

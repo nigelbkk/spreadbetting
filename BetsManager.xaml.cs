@@ -43,6 +43,7 @@ namespace SpreadTrader
 		}
 		public double _Matched { get; set; }
 		public double Matched { get { return _Matched; } set { _Matched = value; NotifyPropertyChanged("Matched"); } }
+		public bool IsMatched { get { return _Matched >= Stake; } }
 		private bool _Hidden = false;
 		public bool Hidden { get { return _Hidden; } set { _Hidden = value; NotifyPropertyChanged(""); } }
 		public bool Override { get; set; }
