@@ -10,7 +10,8 @@ namespace SpreadTrader
 	{
 		public NodeSelectionDelegate NodeChangeEventSink = null;
 		public NodeViewModel _MarketNode { get; set; }
-		public double TotalMatched { get { return MarketNode == null ? 0 : MarketNode.Market.MarketBook.totalMatched; }  }
+		public double TotalMatched { get { return MarketNode == null ? 0 :  MarketNode.TotalMatched; } }
+//		public double TotalMatched { get; set; }
 		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; NotifyPropertyChanged(""); } }
 		public bool IsSelected { set 
 			{
@@ -43,6 +44,14 @@ namespace SpreadTrader
 					RunnersControl.MarketNode = MarketNode;
 					LiveRunner.Favorite = null;
 				}
+			};
+			StreamingAPI.Callback += (liveRunners, tradedVolume, inplay) =>
+			{
+				//TotalMatched = tradedVolume;
+				this.Dispatcher.Invoke(() =>
+				{
+					NotifyPropertyChanged("");
+				});
 			};
 			SliderControl.SubmitBets += RunnersControl.SubmitBets;
 			RunnersAndSlidersGrid.ColumnDefinitions[0].Width = new GridLength(props.VerticalSplitter);
@@ -101,6 +110,9 @@ namespace SpreadTrader
 		{
 			props.VerticalSplitter2 = RunnersAndSlidersGrid.ColumnDefinitions[0].Width.Value;
 			props.Save();
+		}
+		private void LowerGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
 		}
 	}
 }

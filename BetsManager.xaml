@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
              mc:Ignorable="d" 
-	         DataContext="{Binding RelativeSource={RelativeSource Self}}">
+	         DataContext="{Binding RelativeSource={RelativeSource Self}}" d:DesignWidth="606.667">
 	<UserControl.Resources>
 		<local:RowToIndexConverter x:Key="RowToIndexConverter" />
 		<local:ColorConverter x:Key="ColorConverter" />
@@ -25,47 +25,53 @@
 			<CheckBox Margin="16,0,0,0" IsChecked="{Binding Path=UnmatchedOnly}" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" >Unmatched only</CheckBox>
 			<Button Margin="10,0,0,0" Tag="Stream" Click="Button_Click" Content="{Binding Path=StreamingButtonText}"/>
 			<TextBlock Text	="Status: " Padding="7,8"/>
-			<TextBlock Text	="{Binding Path=Status}" Padding="7,8"/>
+			<TextBox TextWrapping="Wrap" Text="{Binding Path=DebugID}" Width="49" HorizontalContentAlignment="Center"/>
+			<Button Content="Reset" Margin="0" Width="75" Click="Button_Click_1"/>
+			<!--<TextBox TextWrapping="Wrap" Text="{Binding Path=MatchAmount}" Width="49" HorizontalContentAlignment="Center"/>-->
+			<Button Content="Next" Margin="0" Width="70" Click="Button_Click_2"/>
+			<!--<Button Content="M2" Margin="0" Width="35" Click="Button_Click_3"/>
+			<Button Content="C" Margin="0" Width="35" Click="Button_Click_4"/>-->
 		</StackPanel>
-		<DataGrid Grid.Row="1" AutoGenerateColumns="False" Name="dataGrid" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" AlternatingRowBackground="AliceBlue" Grid.ColumnSpan="2" IsReadOnly="True">
-			<DataGrid.ItemContainerStyle>
-				<Style TargetType="DataGridRow">
-					<Style.Triggers>
-						<DataTrigger Binding="{Binding Path=Hidden}"  Value="True">
-							<Setter Property="Visibility" Value="Collapsed"/>
-						</DataTrigger>
-					</Style.Triggers>
-				</Style>
-			</DataGrid.ItemContainerStyle>
-			<DataGrid.Columns>
-				<DataGridTemplateColumn>
-					<DataGridTemplateColumn.CellTemplate>
-						<DataTemplate>
-							<Button Tag="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={local:RowToIndexConverter}}" Content="X" FontWeight="Bold" Background="Orange" Foreground="White" Click="RowButton_Click" />
-						</DataTemplate>
-					</DataGridTemplateColumn.CellTemplate>
-				</DataGridTemplateColumn>
-				<DataGridCheckBoxColumn Binding="{Binding Override}"/>
-				<DataGridTextColumn Width="130" Header="Time" Binding="{Binding Time}"/>
-				<DataGridTextColumn Width="*" Header="BetID" Binding="{Binding BetID}"/>
-				<DataGridTextColumn Width="1.5*" Header="Runner" Binding="{Binding Runner}" />
-				<DataGridTextColumn Width="*" Header="Side" Binding="{Binding Side}" />
-				<DataGridTextColumn Width="*" Header="Stake" Binding="{Binding Stake}" />
-				<DataGridTextColumn Width="*" Header="Odds" Binding="{Binding Odds, StringFormat={}{0:N2}}" />
-				<DataGridTextColumn Width="*" Header="Profit" Binding="{Binding Profit, StringFormat={}{0:N2}, Mode=OneWay}"/>
-				<DataGridTextColumn Width="*" Header="Matched" Binding="{Binding Matched, StringFormat={}{0:N2}}">
-					<DataGridTextColumn.ElementStyle>
-						<Style TargetType="{x:Type TextBlock}">
-							<Setter Property="Background" Value="{Binding IsMatched, Converter={StaticResource ColorConverter}}"/>
-						</Style>
-					</DataGridTextColumn.ElementStyle>
-				</DataGridTextColumn>
-			</DataGrid.Columns>
-			<!--<DataGrid.RowDetailsTemplate>
-				<DataTemplate>
-					<TextBlock Text="{Binding Items}" Margin="10" />
-				</DataTemplate>
-			</DataGrid.RowDetailsTemplate>-->
-		</DataGrid>
+		<ContentControl Grid.Row="1" >
+			<DataGrid AutoGenerateColumns="False" Name="dataGrid" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" AlternatingRowBackground="AliceBlue" Grid.ColumnSpan="2" IsReadOnly="True"
+				ScrollViewer.CanContentScroll="True" 
+				ScrollViewer.VerticalScrollBarVisibility="Auto"
+				ScrollViewer.HorizontalScrollBarVisibility="Auto"
+					  MaxHeight="300">
+				<DataGrid.ItemContainerStyle>
+					<Style TargetType="DataGridRow">
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding Path=Hidden}"  Value="True">
+								<Setter Property="Visibility" Value="Collapsed"/>
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</DataGrid.ItemContainerStyle>
+				<DataGrid.Columns>
+					<DataGridTemplateColumn>
+						<DataGridTemplateColumn.CellTemplate>
+							<DataTemplate>
+								<Button Tag="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={local:RowToIndexConverter}}" Content="X" FontWeight="Bold" Background="Orange" Foreground="White" Click="RowButton_Click" />
+							</DataTemplate>
+						</DataGridTemplateColumn.CellTemplate>
+					</DataGridTemplateColumn>
+					<DataGridCheckBoxColumn Binding="{Binding Override}"/>
+					<DataGridTextColumn Width="130" Header="Time" Binding="{Binding Time}"/>
+					<DataGridTextColumn Width="*" Header="BetID" Binding="{Binding BetID}"/>
+					<DataGridTextColumn Width="1.5*" Header="Runner" Binding="{Binding Runner}" />
+					<DataGridTextColumn Width="0.9*" Header="Side" Binding="{Binding Side}" />
+					<DataGridTextColumn Width="*" Header="Stake" Binding="{Binding Stake}" />
+					<DataGridTextColumn Width="*" Header="Odds" Binding="{Binding Odds, StringFormat={}{0:N2}}" />
+					<DataGridTextColumn Width="1.09*" Header="Profit/Liability" Binding="{Binding Profit, StringFormat={}{0:N2}, Mode=OneWay}"/>
+					<DataGridTextColumn Width="*" Header="Matched" Binding="{Binding Matched, StringFormat={}{0:N2}}">
+						<DataGridTextColumn.ElementStyle>
+							<Style TargetType="{x:Type TextBlock}">
+								<Setter Property="Background" Value="{Binding IsMatched, Converter={StaticResource ColorConverter}}"/>
+							</Style>
+						</DataGridTextColumn.ElementStyle>
+					</DataGridTextColumn>
+				</DataGrid.Columns>
+			</DataGrid>
+		</ContentControl>
 	</Grid>
 </UserControl>

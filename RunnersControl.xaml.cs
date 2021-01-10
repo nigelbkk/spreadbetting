@@ -56,7 +56,7 @@ namespace SpreadTrader
 					LiveRunners[i].LayValues = liveRunners[i].LayValues;
 					LiveRunners[i].LastPriceTraded = liveRunners[i].LastPriceTraded;
 					LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
-					LiveRunners[i].ifWin = liveRunners[i].ifWin;
+//					LiveRunners[i].ifWin = liveRunners[i].ifWin;
 					LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
 					LiveRunners[i].NotifyPropertyChanged("");
 					LiveRunners[i].Width = ItemsGrid.ColumnDefinitions[0].ActualWidth;
@@ -154,10 +154,6 @@ namespace SpreadTrader
 				}
 			};
 			Worker.RunWorkerAsync();
-		}
-		public void NotifyNewBet(Row row)
-		{
-
 		}
 		private PlaceExecutionReport placeOrder(String marketId, LiveRunner runner, sideEnum side,  PriceSize ps)
 		{
