@@ -234,8 +234,8 @@ namespace BetfairAPI
             foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in Orders.currentOrders)
             {
 #if DEBUG
-                o.sizeMatched = o.priceSize.size;
-                o.averagePriceMatched = o.priceSize.price;
+                //o.sizeMatched = o.priceSize.size;
+                //o.averagePriceMatched = o.priceSize.price;
 #endif
 
                 foreach (Runner r in book.Runners)
@@ -273,8 +273,10 @@ namespace BetfairAPI
             {
                 priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.EX_BEST_OFFERS))
             };
+            p["orderProjection"] = orderProjectionEnum.ALL.ToString();
             List<MarketBook> books = RPCRequest<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
-            //CalculateProfitAndLoss(books.First());
+            if (books.Count>0)
+                CalculateProfitAndLoss(books.First());
             MarketBook book = books.First();
 
             if (m.runners == null)

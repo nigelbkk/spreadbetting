@@ -69,17 +69,18 @@ namespace SpreadTrader
 			List<LiveRunner> Runners = new List<LiveRunner>();
 			if (Market != null)
 			{
-					Market.MarketBook = Betfair.GetMarketBook(Market);
-					foreach (Runner r in Market.MarketBook.Runners)
-					{
-						Runners.Add(new LiveRunner(r));
-					}
-					if (Parent != null)
-					{
-						FullName = String.Format("{0} - {1}", Parent.Name, Name);
-						MarketName = Parent.Name;
-						MarketID = Market.marketId;
-					}
+				Market.MarketBook = Betfair.GetMarketBook(Market);
+				TotalMatched = Market.MarketBook.totalMatched;
+				foreach (Runner r in Market.MarketBook.Runners)
+				{
+					Runners.Add(new LiveRunner(r));
+				}
+				if (Parent != null)
+				{
+					FullName = String.Format("{0} - {1}", Parent.Name, Name);
+					MarketName = Parent.Name;
+					MarketID = Market.marketId;
+				}
 			}
 			LiveRunners = Runners;
 			return Runners;
@@ -107,7 +108,7 @@ namespace SpreadTrader
 				if (r.SelectionId == SelectionID)
 					return r.Name;
 			}
-			return null;
+			return SelectionID.ToString();
 		}
 		private void OnItemExpanding()
 		{

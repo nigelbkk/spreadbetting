@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Betfair.ESASwagger.Model;
 using System.Media;
+using System.IO;
 
 namespace SpreadTrader
 {
@@ -20,7 +21,7 @@ namespace SpreadTrader
 		public static Dictionary<long, String> RunnerNames = new Dictionary<long, string>();
 
 		public event PropertyChangedEventHandler PropertyChanged;
-		private void NotifyPropertyChanged(String info)
+		public void NotifyPropertyChanged(String info)
 		{
 			if (PropertyChanged != null)
 			{
@@ -37,12 +38,14 @@ namespace SpreadTrader
 		public double Stake { get; set; }
 		public double Odds { get; set; }
 		public double Profit { get {
-				double p = Side == "BACK" ? Stake * (Odds - 1) : Stake;
+				double p = Side.ToLower() == "back" ? Stake * (Odds - 1) : Stake;
+				p = Matched * (Odds - 1);
 				return Math.Round(p, 2);
 			}
 		}
 		public double _Matched { get; set; }
 		public double Matched { get { return _Matched; } set { _Matched = value; NotifyPropertyChanged("Matched"); } }
+		public bool IsMatched { get { return _Matched > 0; } }
 		private bool _Hidden = false;
 		public bool Hidden { get { return _Hidden; } set { _Hidden = value; NotifyPropertyChanged(""); } }
 		public bool Override { get; set; }
@@ -88,13 +91,15 @@ namespace SpreadTrader
 		private NodeViewModel MarketNode { get; set; }
 		private DateTime _LastUpdated { get; set; }
 		private BetfairAPI.BetfairAPI Betfair { get; set; }
-		private void NotifyPropertyChanged(String info)
+		public void NotifyPropertyChanged(String info)
 		{
 			if (PropertyChanged != null)
 			{
 				Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
 			}
 		}
+		public Int32 DebugID { get; set; }
+		public double MatchAmount { get; set; }
 		public bool UnmatchedOnly { get; set; }
 		public String LastUpdated { get { return String.Format("Bets last updated {0}", _LastUpdated.ToShortTimeString());	}  }
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -120,6 +125,8 @@ namespace SpreadTrader
 		}
 		public BetsManager()
 		{
+			//PlaceAmount = 1.10;
+			MatchAmount = 1.25;
 			string url = "http://88.202.183.202:8088";
 			//			url = "http://192.168.1.6:8088";
 						url = "http://127.0.0.1:8088";
@@ -128,91 +135,25 @@ namespace SpreadTrader
 
 			hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
 			{
+				try
+				{
+					using (StreamWriter w = File.AppendText("json.csv"))
+					{
+						w.WriteLine(json1);
+					}
+				}
+				catch (Exception xe) { Debug.WriteLine(xe.Message); }
+
 				Task.Run(() =>
 				{
-					OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json1);
-					Betfair.ESAClient.Cache.OrderMarket market = JsonConvert.DeserializeObject<Betfair.ESAClient.Cache.OrderMarket> (json2);
 					OrderMarketSnap snap = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
-					Debug.WriteLine(snap.MarketId);
 					if (MarketNode != null && snap.MarketId == MarketNode.MarketID)
 					{
-						Dispatcher.BeginInvoke(new Action(() => {
-							try
-							{
-								if (change.Orc != null)
-								{
-									foreach (OrderRunnerChange orc in change.Orc)
-									{
-										if (orc.Uo != null)
-										{
-											foreach (Order o in orc.Uo)
-											{
-												Row row = FindRow(o.Id);
-												if (o.Status == Order.StatusEnum.Ec && o.Sc > 0 && o.Sm == 0) // it was cancelled
-												{
-													Rows.Remove(row);
-													Debug.WriteLine("canceled");
-												}
-												else if (row == null)
-												{
-													row = new Row();
-													row.SelectionID = orc.Id.Value;
-													row.Runner = MarketNode.GetRunnerName(row.SelectionID);
-													row.BetID = Convert.ToUInt64(o.Id);
-													row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
-													row.Odds = o.P.Value;
-													row.Stake = o.S.Value;
-													row.Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
-													Rows.Add(row);
-													Debug.WriteLine("new row");
-												}
-												else if (o.Sm > 0)      // it was matched
-												{
-													Debug.WriteLine("matched");
-													(new SoundPlayer(Properties.Settings.Default.MatchedBetAlert)).PlaySync();
-												}
-											}
-										}
-									}
-								}
-								MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
-								foreach (OrderMarketRunnerSnap runner in snap.OrderMarketRunners)
-								{
-									Row row = null;
-									foreach (KeyValuePair<String, Order> kvp in runner.UnmatchedOrders)
-									{
-										Order o = kvp.Value;
-										row = FindRow(o.Id);
-
-										if (row != null)
-										{
-											foreach (PriceSize mb in runner.MatchedBack)
-											{
-												if (row != null && row.Side.ToUpper() == "BACK")
-												{
-													row.Matched += mb.size;
-													if (mw != null) mw.UpdateAccountInformation();
-												}
-											}
-											foreach (PriceSize ml in runner.MatchedLay)
-											{
-												if (row != null && row.Side.ToUpper() == "LAY")
-												{
-													row.Matched += ml.size;
-													if (mw != null) mw.UpdateAccountInformation();
-												}
-											}
-										}
-									}
-								}
-							}
-							catch(Exception xe)
-							{
-							}
-						}));
+						Dispatcher.BeginInvoke(new Action(() => OnOrderChanged(json1)));
 					}
 				});
 			});
+			
 			Rows = new ObservableCollection<Row>();
 			InitializeComponent();
 			NodeChangeEventSink += (node) =>
@@ -224,6 +165,84 @@ namespace SpreadTrader
 				}
 			};
 			Connect();
+		}
+		private void OnOrderChanged(String json1)
+		{
+			OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json1);
+//			Betfair.ESAClient.Cache.OrderMarket market = JsonConvert.DeserializeObject<Betfair.ESAClient.Cache.OrderMarket>(json2);
+			try
+			{
+				if (change.Closed == true)
+				{
+					Debug.WriteLine("market closed");
+					Rows.Clear();
+				}
+				if (change.Orc != null)
+				{
+					foreach (OrderRunnerChange orc in change.Orc)
+					{
+						if (orc.Uo != null)
+						{
+							foreach (Order o in orc.Uo)
+							{
+								if (o.Status == Order.StatusEnum.E) // new order
+								{
+									Row row = new Row();
+									row.SelectionID = orc.Id.Value;
+									row.Runner = MarketNode.GetRunnerName(row.SelectionID);
+									row.BetID = Convert.ToUInt64(o.Id);
+									row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
+									row.Odds = o.P.Value;
+									row.Stake = o.S.Value;
+									row.Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
+									Rows.Add(row);
+									Debug.WriteLine("new unmatched");
+								}
+								if (o.Status == Order.StatusEnum.Ec) // order changed
+								{
+									if (o.Sc > 0) // order cancelled
+									{
+										Debug.WriteLine("cancelled");
+										Row row = FindRow(o.Id);
+										Rows.Remove(row);
+									}
+									else if (o.Sr == 0)	// fully matched
+									{
+										Row row = FindRow(o.Id);
+										row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Md.Value).ToLocalTime();
+										row.Odds = o.Avp.Value;
+										row.Stake = o.S.Value;
+										row.Matched = o.Sm.Value;
+										row.NotifyPropertyChanged("");
+										Debug.WriteLine("fully matched");
+									}
+									else if (orc.Mb != null)
+									{
+										foreach (var mb in orc.Mb)
+										{
+											Row row = new Row();
+											row.SelectionID = orc.Id.Value;
+											row.Runner = MarketNode.GetRunnerName(row.SelectionID);
+											row.BetID = Convert.ToUInt64(o.Id);
+											row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Md.Value).ToLocalTime();
+											row.Odds = o.Avp.Value;
+											row.Stake = o.S.Value;
+											row.Matched = o.Sm.Value;
+											row.Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
+											Rows.Add(row);
+											Debug.WriteLine("partially matched");
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
+			}
+			catch(Exception xe)
+			{
+			}
 		}
 		private void PopulateDataGrid()
 		{
@@ -294,7 +313,7 @@ namespace SpreadTrader
 					return;
 				}
 				Status = "Connected";
-			}).Wait(2000);
+			}).Wait(1000);
 		}
 		private void Disconnect()
 		{
@@ -377,6 +396,24 @@ namespace SpreadTrader
 		private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
 		{
 			CheckBox_Checked(sender, e);
+		}
+		private string[] lines = null;
+		private void Button_Click_1(object sender, RoutedEventArgs e)
+		{
+			lines = File.ReadAllLines("json.csv");
+			DebugID = 0;
+			Rows.Clear();
+			NotifyPropertyChanged("");
+		}
+		private void Button_Click_2(object sender, RoutedEventArgs e)
+		{
+			if (lines == null)
+				Button_Click_1(sender, e);
+
+			if (DebugID < lines.Length)
+				OnOrderChanged(lines[DebugID++]);
+
+			NotifyPropertyChanged("");
 		}
 	}
 	public class OrderMarketSnap

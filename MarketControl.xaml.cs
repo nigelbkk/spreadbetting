@@ -10,7 +10,7 @@ namespace SpreadTrader
 	{
 		public NodeSelectionDelegate NodeChangeEventSink = null;
 		public NodeViewModel _MarketNode { get; set; }
-		public double TotalMatched { get; set; }
+//		public double TotalMatched { get { return MarketNode == null ? 0 :  MarketNode.TotalMatched; } }
 		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; NotifyPropertyChanged(""); } }
 		public bool IsSelected { set 
 			{
@@ -46,7 +46,6 @@ namespace SpreadTrader
 			};
 			StreamingAPI.Callback += (liveRunners, tradedVolume, inplay) =>
 			{
-				TotalMatched = tradedVolume;
 				this.Dispatcher.Invoke(() =>
 				{
 					NotifyPropertyChanged("");
@@ -109,6 +108,9 @@ namespace SpreadTrader
 		{
 			props.VerticalSplitter2 = RunnersAndSlidersGrid.ColumnDefinitions[0].Width.Value;
 			props.Save();
+		}
+		private void LowerGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
 		}
 	}
 }
