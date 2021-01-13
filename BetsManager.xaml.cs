@@ -124,9 +124,6 @@ namespace SpreadTrader
 		}
 		public BetsManager()
 		{
-			//string url = "http://88.202.183.202:8088";
-			//			url = "http://192.168.1.6:8088";
-			//			url = "http://127.0.0.1:8088";
 			hubConnection = new HubConnection("http://"+props.StreamUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
@@ -166,7 +163,6 @@ namespace SpreadTrader
 		private void OnOrderChanged(String json1)
 		{
 			OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json1);
-//			Betfair.ESAClient.Cache.OrderMarket market = JsonConvert.DeserializeObject<Betfair.ESAClient.Cache.OrderMarket>(json2);
 			try
 			{
 				if (change.Closed == true)
@@ -184,7 +180,17 @@ namespace SpreadTrader
 							{
 								if (o.Status == Order.StatusEnum.E) // new order
 								{
-									Row row = new Row();
+									Row row = FindRow(o.Id);
+									if (row == null)
+									{
+										row = new Row();
+										Debug.WriteLine("new unmatched");
+										Rows.Add(row);
+									}
+									else
+									{
+										Debug.WriteLine("existing unmatched");
+									}
 									row.SelectionID = orc.Id.Value;
 									row.Runner = MarketNode.GetRunnerName(row.SelectionID);
 									row.BetID = Convert.ToUInt64(o.Id);
@@ -192,8 +198,6 @@ namespace SpreadTrader
 									row.Odds = o.P.Value;
 									row.Stake = o.S.Value;
 									row.Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
-									Rows.Add(row);
-									Debug.WriteLine("new unmatched");
 								}
 								if (o.Status == Order.StatusEnum.Ec) // order changed
 								{
@@ -314,7 +318,7 @@ namespace SpreadTrader
 		}
 		private void Disconnect()
 		{
-			hubConnection.Stop(new TimeSpan(1000));
+			hubConnection.Stop(new TimeSpan(2000));
 			Status = "Disconnected";
 		}
 		private bool OnFail(Task task)

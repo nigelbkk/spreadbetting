@@ -5,7 +5,7 @@
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:p="clr-namespace:SpreadTrader.Properties"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="373.427" Width="369.332" Topmost="True">
+        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="392.353" Width="369.332" Topmost="True">
 	<Window.Resources>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
@@ -46,6 +46,7 @@
 					<Label Content="Show Cross Matched" />
 					<Label Content="Apply Cross Match Formula" />
 					<Label Content="Hilite Unselected When matched" />
+					<Label Content="Safe Bets" Height="21" />
 					<Label Content="Use Streaming API" Height="21" />
 					<Label Content="Order Stream URL" Height="21" />
 				</StackPanel>
@@ -76,11 +77,12 @@
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=CrossMatched, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=CrossMatchingFormula, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=HiliteUnselected, Mode=TwoWay}" />
+					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=SafeBets, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=UseStreaming, Mode=TwoWay}" />
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=StreamUrl, Mode=TwoWay}" />
 				</StackPanel>
 			</Grid>
 		</DockPanel>
-		<Button Content="OK" IsDefault="True" FontSize="10" Click="Button_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="51" Margin="0,0,10,8"/>
+		<Button Content="OK" IsDefault="True" FontSize="10" Click="Button_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="51" Height="16" Margin="0,0,10,8" Padding="0,0,3,0"/>
 	</Grid>
 </Window>

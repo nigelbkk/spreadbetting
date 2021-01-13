@@ -36,23 +36,20 @@ namespace SpreadTrader
 		public ConfirmationDialog(Visual visual, Button b, String MarketId, LiveRunner runner, String side, double odds)
 		{
 			runnersControl = visual as RunnersControl;
-			if (props.ConfirmationX > 0 && props.ConfirmationY > 0)
-			{
-				Top = props.ConfirmationY;
-				Left = props.ConfirmationX;
-			}
-			else
-			{
-				ParentObject = visual as DependencyObject;
-				Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(b.ActualWidth, b.ActualHeight)));
-				Top = coords.Y;
-				Left = coords.X;
-			}
-			Stake = 2.00;
+			ParentObject = visual as DependencyObject;
+			Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(b.ActualWidth, b.ActualHeight)));
+			Top = coords.Y;
+			Left = coords.X;
 			Runner = runner.Name;
 			SelectionId = runner.SelectionId;
 			Side = side;
 			Odds = odds;
+			if (props.SafeBets)
+			{
+				Stake = 2.00;
+				Odds = 1.01;
+				Side = "Lay";
+			}
 			this.MarketId = MarketId;
 			InitializeComponent();
 			UpDown.Value = Odds;
@@ -99,13 +96,6 @@ namespace SpreadTrader
 			UpDownControl control = sender as UpDownControl;
 			Odds = Convert.ToDouble(control.Value);
 			NotifyPropertyChanged("");
-		}
-
-		private void Window_Closing(object sender, CancelEventArgs e)
-		{
-			props.ConfirmationX = this.Left;
-			props.ConfirmationY = this.Top;
-			props.Save();
 		}
 	}
 	public class UpDownControl : Xceed.Wpf.Toolkit.DoubleUpDown

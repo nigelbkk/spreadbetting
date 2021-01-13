@@ -80,17 +80,14 @@
     <Setting Name="UseStreaming" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="ConfirmationX" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="ConfirmationY" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
     <Setting Name="VerticalSplitter2" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="StreamUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">127.0.0.1:8088</Value>
+    </Setting>
+    <Setting Name="SafeBets" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>
