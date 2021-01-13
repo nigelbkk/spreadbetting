@@ -53,18 +53,18 @@ namespace SpreadTrader
 		{
 			Time = DateTime.Now;
 		}
-		public Row(KeyValuePair<string, Order> kvp)
-		{
-			Order o = kvp.Value;
-			BetID = Convert.ToUInt64(o.Id);
-//			SelectionID = o.Md.HasValue ? o.Md.Value : 0; 
-			Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
-			Stake = o.Sr.HasValue ? o.Sr.Value : 0;
-			Odds = o.P.HasValue ? o.P.Value : 0;
-			//Profit = o.Side == Order.SideEnum.L ? o.S.Value * (o.P.Value - 1) : o.S.Value;
-			//Profit = Math.Round(Profit, 2);
-			Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
-		}
+//		public Row(KeyValuePair<string, Order> kvp)
+//		{
+//			Order o = kvp.Value;
+//			BetID = Convert.ToUInt64(o.Id);
+////			SelectionID = o.Md.HasValue ? o.Md.Value : 0; 
+//			Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
+//			Stake = o.Sr.HasValue ? o.Sr.Value : 0;
+//			Odds = o.P.HasValue ? o.P.Value : 0;
+//			//Profit = o.Side == Order.SideEnum.L ? o.S.Value * (o.P.Value - 1) : o.S.Value;
+//			//Profit = Math.Round(Profit, 2);
+//			Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
+//		}
 		public Row(CurrentOrderSummaryReport.CurrentOrderSummary o)
 		{
 			Time = o.placedDate;
@@ -73,8 +73,6 @@ namespace SpreadTrader
 			Side = o.side;
 			Stake = o.priceSize.size;
 			Odds = o.priceSize.price;
-			//Profit = o.side == "LAY" ? o.priceSize.size * (o.priceSize.price - 1) : o.priceSize.size;
-			//Profit = Math.Round(Profit, 2);
 			Matched = o.sizeMatched;
 		}
 		public override string ToString()
