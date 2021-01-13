@@ -89,5 +89,8 @@
     <Setting Name="VerticalSplitter2" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="StreamUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">127.0.0.1:8088</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

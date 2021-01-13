@@ -84,6 +84,7 @@ namespace SpreadTrader
 	}
 	public partial class BetsManager : UserControl, INotifyPropertyChanged
 	{
+		private Properties.Settings props = Properties.Settings.Default;
 		public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
 		public NodeSelectionDelegate NodeChangeEventSink = null;
 		public RunnersControl RunnersControl { get; set; }
@@ -125,12 +126,10 @@ namespace SpreadTrader
 		}
 		public BetsManager()
 		{
-			//PlaceAmount = 1.10;
-			MatchAmount = 1.25;
-			string url = "http://88.202.183.202:8088";
+			//string url = "http://88.202.183.202:8088";
 			//			url = "http://192.168.1.6:8088";
-						url = "http://127.0.0.1:8088";
-			hubConnection = new HubConnection(url);
+			//			url = "http://127.0.0.1:8088";
+			hubConnection = new HubConnection("http://"+props.StreamUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
 			hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>

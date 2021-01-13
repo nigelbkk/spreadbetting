@@ -370,5 +370,17 @@ namespace SpreadTrader.Properties {
                 this["VerticalSplitter2"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1:8088")]
+        public string StreamUrl {
+            get {
+                return ((string)(this["StreamUrl"]));
+            }
+            set {
+                this["StreamUrl"] = value;
+            }
+        }
     }
 }

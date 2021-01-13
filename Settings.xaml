@@ -5,7 +5,7 @@
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:p="clr-namespace:SpreadTrader.Properties"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="357.333" Width="369.332" Topmost="True">
+        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="373.427" Width="369.332" Topmost="True">
 	<Window.Resources>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
@@ -46,7 +46,8 @@
 					<Label Content="Show Cross Matched" />
 					<Label Content="Apply Cross Match Formula" />
 					<Label Content="Hilite Unselected When matched" />
-					<Label Content="Use Streaming API" />
+					<Label Content="Use Streaming API" Height="21" />
+					<Label Content="Order Stream URL" Height="21" />
 				</StackPanel>
 			</Grid>
 			<Grid DockPanel.Dock="Right" Width="auto">
@@ -76,6 +77,7 @@
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=CrossMatchingFormula, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=HiliteUnselected, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=UseStreaming, Mode=TwoWay}" />
+					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=StreamUrl, Mode=TwoWay}" />
 				</StackPanel>
 			</Grid>
 		</DockPanel>
