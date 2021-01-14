@@ -38,8 +38,10 @@ namespace SpreadTrader
 		public double Stake { get; set; }
 		public double Odds { get; set; }
 		public double Profit { get {
-				double p = Side.ToLower() == "back" ? Stake * (Odds - 1) : Stake;
-				p = Matched * (Odds - 1);
+				//				double p = Side.ToLower() == "back" ? Stake * (Odds - 1) : Stake;
+				double p = Matched * (Odds - 1);
+				if (Matched == 0)
+					p = Stake * (Odds - 1);
 				return Math.Round(p, 2);
 			}
 		}
@@ -53,18 +55,6 @@ namespace SpreadTrader
 		{
 			Time = DateTime.Now;
 		}
-//		public Row(KeyValuePair<string, Order> kvp)
-//		{
-//			Order o = kvp.Value;
-//			BetID = Convert.ToUInt64(o.Id);
-////			SelectionID = o.Md.HasValue ? o.Md.Value : 0; 
-//			Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
-//			Stake = o.Sr.HasValue ? o.Sr.Value : 0;
-//			Odds = o.P.HasValue ? o.P.Value : 0;
-//			//Profit = o.Side == Order.SideEnum.L ? o.S.Value * (o.P.Value - 1) : o.S.Value;
-//			//Profit = Math.Round(Profit, 2);
-//			Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
-//		}
 		public Row(CurrentOrderSummaryReport.CurrentOrderSummary o)
 		{
 			Time = o.placedDate;
