@@ -90,7 +90,7 @@ namespace SpreadTrader
 		public Int32 DebugID { get; set; }
 		public double MatchAmount { get; set; }
 		public bool UnmatchedOnly { get; set; }
-		public String LastUpdated { get { return String.Format("Bets last updated {0}", _LastUpdated.ToShortTimeString());	}  }
+		public String LastUpdated { get { return String.Format("Orders last updated {0}", _LastUpdated.ToString("HH:mm:ss"));	}  }
 		public event PropertyChangedEventHandler PropertyChanged;
 		private String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; NotifyPropertyChanged(""); } }
@@ -153,6 +153,8 @@ namespace SpreadTrader
 		private void OnOrderChanged(String json1)
 		{
 			OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json1);
+			_LastUpdated = DateTime.Now;
+			NotifyPropertyChanged("");
 			try
 			{
 				if (change.Closed == true)
