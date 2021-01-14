@@ -35,11 +35,18 @@ namespace SpreadTrader
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			double val = System.Convert.ToDouble(value);
+			value = -15021.99;
+			String sign = (double) value < 0 ? "-" : "";
+			UInt32 val = System.Convert.ToUInt32(Math.Abs((double) value));
 			if (val == 0)
 				return string.Empty;
-			String sign = val < 0 ? "-" : "";
-			return String.Format("{0}{1}{2:0.00}", sign, culture.NumberFormat.CurrencySymbol, Math.Abs(val));
+			//			return String.Format("{0}{1}{2:0.00}", sign, culture.NumberFormat.CurrencySymbol, Math.Abs(val));
+			String millions = System.Convert.ToString(val / 1000000);
+			String thousands = System.Convert.ToString(val / 1000);
+			String pounds = System.Convert.ToString(val%1000);
+			String cs = String.Format("{0}{1}{2},{3},{4}", sign, "£", millions, thousands, pounds);
+//			cs = String.Format("{0}{1}{2},{3},{4:00}", sign, "£", millions, thousands, pounds);
+			return String.Format("{0}{1}{2}", sign, "£", Math.Abs(val));
 		}
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{
