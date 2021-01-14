@@ -90,7 +90,42 @@ namespace SpreadTrader
 				}
 			}
 		}
-
+		private void Submit(object sender, RoutedEventArgs e)
+		{
+			BetfairAPI.BetfairAPI betfair = new BetfairAPI.BetfairAPI();
+			Button b = sender as Button;
+			String cs = b.Content as String;
+			if (cs != null)
+			{
+				if (cs == "Cancel")
+				{
+					Close();
+					return;
+				}
+				Int32 stake = (int)Stake;
+				if (cs != "Submit")
+				{
+					stake = Convert.ToInt32(b.Content);
+				}
+				using (StreamWriter w = File.AppendText("log.csv"))
+				{
+					String cs2 = String.Format("{1},{2},{3},{4:0},{5:0.00},{6}", "", "WIN", Side, Runner, stake, Odds, DateTime.UtcNow.Millisecond);
+					w.WriteLine(cs2);
+					Debug.WriteLine(cs2);
+				}
+				try
+				{
+					PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
+					OrdersStatic.BetID2SelectionID[report.instructionReports[0].betId] = SelectionId;
+				}
+				catch (Exception xe)
+				{
+					Debug.WriteLine(xe.Message);
+					MainWindow mw = Extensions.FindParentOfType<MainWindow>(this);
+					if (mw != null) mw.Status = xe.Message;
+				}
+			}
+		}
 		private void ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			UpDownControl control = sender as UpDownControl;
