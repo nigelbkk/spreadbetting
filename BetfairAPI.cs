@@ -432,16 +432,15 @@ namespace BetfairAPI
             p["netOfCommission"] = true;
             return RPCRequest<List<MarketProfitAndLoss>>("listMarketProfitAndLoss", p) as List<MarketProfitAndLoss>;
         }
-        public static double BetfairPrice(double v)
+        public static double BetfairPrice(double _v)
         {
-            double OriginalPrice = v;
-            v = Math.Round(v, 2);
-            if (v <= 1.01) return 1.01;
+            Decimal v = (Decimal) _v;
+            if (v <= 1.01M) return 1.01;
             if (v >= 1000) return 1000;
 
-            double[] MinValue = { 1.01, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
-            double[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
-            double[] Increment = { 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10 };
+            Decimal[] MinValue = { 1.01M, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
+            Decimal[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
+            Decimal[] Increment = { 0.01M, 0.02M, 0.05M, 0.1M, 0.2M, 0.5M, 1, 2, 5, 10 };
 
             Int32 idx = 0;
             for (; idx < MinValue.Length; idx++)
@@ -451,15 +450,15 @@ namespace BetfairAPI
                     break;
                 }
             }
-            double lo = (Int32)(v / Increment[idx]) * Increment[idx];
+            Decimal lo = (Int32)(v / Increment[idx]) * Increment[idx];
             lo = Math.Round(lo, 2);
 
             if (lo == v)
             {
-                return v;
+                return (double) v;
             }
-            double hi = lo + Increment[idx];
-            return Math.Abs(lo - OriginalPrice) < Math.Abs(hi - OriginalPrice) ? lo : hi;
+            Decimal hi = lo + Increment[idx];
+            return (double) (Math.Abs(lo - v) < Math.Abs(hi - v) ? lo : hi);
         }
     }
 }
