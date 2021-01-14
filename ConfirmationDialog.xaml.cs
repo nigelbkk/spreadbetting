@@ -83,7 +83,8 @@ namespace SpreadTrader
 				}
 				else
 				{
-					stake = Convert.ToInt32(b.Content);
+					Stake = Convert.ToInt32(b.Content);
+					NotifyPropertyChanged("");
 				}
 			}
 		}
