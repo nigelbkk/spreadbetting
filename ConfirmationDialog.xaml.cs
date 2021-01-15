@@ -38,6 +38,11 @@ namespace SpreadTrader
 			runnersControl = visual as RunnersControl;
 			ParentObject = visual as DependencyObject;
 			Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(b.ActualWidth, b.ActualHeight)));
+			
+			if (props.CDLeft > 0 && props.CDTop > 0)
+			{
+				coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(props.CDLeft, props.CDTop)));
+			}
 			Top = coords.Y;
 			Left = coords.X;
 			Runner = runner.Name;
@@ -96,6 +101,13 @@ namespace SpreadTrader
 			UpDownControl control = sender as UpDownControl;
 			Odds = Convert.ToDouble(control.Value);
 			NotifyPropertyChanged("");
+		}
+
+		private void Window_LocationChanged(object sender, EventArgs e)
+		{
+			props.CDTop = Top;
+			props.CDLeft = Left;
+			props.Save();
 		}
 	}
 	public class UpDownControl : Xceed.Wpf.Toolkit.DoubleUpDown

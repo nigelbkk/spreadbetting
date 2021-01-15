@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:SpreadTrader"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="{Binding Path=Header}" Height="239" Width="432" Topmost="True">
+        Title="{Binding Path=Header}" Height="239" Width="432" Topmost="True" LocationChanged="Window_LocationChanged">
 	<Window.Resources>
 		<local:CurrencyConverter x:Key="cconverter" />
 		<local:StakeConverter x:Key="sconverter" />
