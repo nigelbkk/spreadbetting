@@ -51,8 +51,9 @@ namespace SpreadTrader
 		private bool _Hidden = false;
 		public bool Hidden { get { return _Hidden; } set { _Hidden = value; NotifyPropertyChanged(""); } }
 		public bool Override { get; set; }
-		public Row()
+		public Row(String id)
 		{
+			BetID = Convert.ToUInt64(id);
 			Time = DateTime.Now;
 		}
 		public Row(CurrentOrderSummaryReport.CurrentOrderSummary o)
@@ -162,6 +163,10 @@ namespace SpreadTrader
 					Debug.WriteLine("market closed");
 					Rows.Clear();
 				}
+				if (change.Id != "1.177854952")
+				{
+					return;	///DEBUG ONLY
+				}
 				if (change.Orc != null)
 				{
 					foreach (OrderRunnerChange orc in change.Orc)
@@ -175,9 +180,9 @@ namespace SpreadTrader
 									Row row = FindRow(o.Id);
 									if (row == null)
 									{
-										row = new Row();
+										row = new Row(o.Id);
 										Debug.WriteLine("new unmatched");
-										Rows.Add(row);
+										Rows.Insert(0, row);
 									}
 									else
 									{
@@ -185,7 +190,7 @@ namespace SpreadTrader
 									}
 									row.SelectionID = orc.Id.Value;
 									row.Runner = MarketNode.GetRunnerName(row.SelectionID);
-									row.BetID = Convert.ToUInt64(o.Id);
+//									row.BetID = Convert.ToUInt64(o.Id);
 									row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
 									row.Odds = o.P.Value;
 									row.Stake = o.S.Value;
@@ -199,9 +204,14 @@ namespace SpreadTrader
 										Row row = FindRow(o.Id);
 										Rows.Remove(row);
 									}
-									else if (o.Sr == 0)	// fully matched
+									else if (o.Sr == 0) // fully matched
 									{
 										Row row = FindRow(o.Id);
+										if (row == null)
+										{
+											row = new Row(o.Id);
+											Rows.Insert(0, row);
+										}
 										row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Md.Value).ToLocalTime();
 										row.Odds = o.Avp.Value;
 										row.Stake = o.S.Value;
@@ -209,21 +219,49 @@ namespace SpreadTrader
 										row.NotifyPropertyChanged("");
 										Debug.WriteLine("fully matched");
 									}
-									else if (orc.Mb != null)
+									else
 									{
-										foreach (var mb in orc.Mb)
+										if (orc.Mb != null)
 										{
-											Row row = new Row();
-											row.SelectionID = orc.Id.Value;
-											row.Runner = MarketNode.GetRunnerName(row.SelectionID);
-											row.BetID = Convert.ToUInt64(o.Id);
-											row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Md.Value).ToLocalTime();
-											row.Odds = o.Avp.Value;
-											row.Stake = o.S.Value;
-											row.Matched = o.Sm.Value;
-											row.Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
-											Rows.Add(row);
-											Debug.WriteLine("partially matched");
+											foreach (var mb in orc.Mb)
+											{
+												Row row = FindRow(o.Id);
+												if (row == null)
+												{
+													row = new Row(o.Id);
+													Rows.Insert(0, row);
+												}
+												row.SelectionID = orc.Id.Value;
+												row.Runner = MarketNode.GetRunnerName(row.SelectionID);
+//												row.BetID = Convert.ToUInt64(o.Id);
+												row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Md.Value).ToLocalTime();
+												row.Odds = o.Avp.Value;
+												row.Stake = o.S.Value;
+												row.Matched = o.Sm.Value;
+												row.Side = "Back";
+												Debug.WriteLine("partially matched");
+											}
+										}
+										if (orc.Ml != null)
+										{
+											foreach (var ml in orc.Ml)
+											{
+												Row row = FindRow(o.Id);
+												if (row == null)
+												{
+													row = new Row(o.Id);
+													Rows.Insert(0, row);
+												}
+												row.SelectionID = orc.Id.Value;
+												row.Runner = MarketNode.GetRunnerName(row.SelectionID);
+//												row.BetID = Convert.ToUInt64(o.Id);
+												row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Md.Value).ToLocalTime();
+												row.Odds = o.Avp.Value;
+												row.Stake = o.S.Value;
+												row.Matched = o.Sm.Value;
+												row.Side = "Lay";
+												Debug.WriteLine("partially matched");
+											}
 										}
 									}
 								}
@@ -235,6 +273,7 @@ namespace SpreadTrader
 			}
 			catch(Exception xe)
 			{
+				Debug.WriteLine(xe.Message);
 			}
 		}
 		private void PopulateDataGrid()
@@ -400,7 +439,7 @@ namespace SpreadTrader
 		private void Button_Click_1(object sender, RoutedEventArgs e)
 		{
 			lines = File.ReadAllLines("json.csv");
-			DebugID = 0;
+			DebugID = 100;
 			Rows.Clear();
 			NotifyPropertyChanged("");
 		}

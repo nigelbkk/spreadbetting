@@ -38,13 +38,14 @@ namespace SpreadTrader
 			runnersControl = visual as RunnersControl;
 			ParentObject = visual as DependencyObject;
 			Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(b.ActualWidth, b.ActualHeight)));
-			
-			if (props.CDLeft > 0 && props.CDTop > 0)
-			{
-				coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(props.CDLeft, props.CDTop)));
-			}
+
 			Top = coords.Y;
 			Left = coords.X;
+			if (props.CDLeft > 0 && props.CDTop > 0)
+			{
+				Top = props.CDTop;
+				Left = props.CDLeft;
+			}
 			Runner = runner.Name;
 			SelectionId = runner.SelectionId;
 			Side = side;
