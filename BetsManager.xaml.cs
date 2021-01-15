@@ -292,7 +292,11 @@ namespace SpreadTrader
 			}
 			Status = "Bet canceled";
 			Debug.WriteLine("cancel {0} for {1} {2}", MarketNode.MarketID, row.BetID, row.Runner);
+
+
+			DateTime LastUpdate = DateTime.UtcNow;
 			Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
+			MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 			Rows.Remove(row);
 			NotifyPropertyChanged("");
 		}
@@ -371,7 +375,9 @@ namespace SpreadTrader
 						if (MarketNode != null)
 						{
 							Debug.WriteLine("cancel all for {0} {1}", MarketNode.MarketID, MarketNode.FullName);
+							DateTime LastUpdate = DateTime.UtcNow;
 							Betfair.cancelOrders(MarketNode.MarketID, instructions);
+							MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 							Status = "Canceled all unmatched";
 						}
 					}
