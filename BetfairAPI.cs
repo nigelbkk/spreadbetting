@@ -399,6 +399,25 @@ namespace BetfairAPI
             pis.Add(pi);
             return placeOrders(marketId, pis);
         }
+        public void placeOrderAsync(String marketId, Int64 selectionId, sideEnum side, Double size, Double price)
+        {
+            List<PlaceInstruction> pis = new List<PlaceInstruction>();
+            PlaceInstruction pi = new PlaceInstruction();
+            pi.selectionId = selectionId;
+            pi.sideEnum = side;
+            pi.orderTypeEnum = orderTypeEnum.LIMIT;
+            pi.limitOrder = new LimitOrder()
+            {
+                size = size,
+                price = price,
+                persistenceTypeEnum = persistenceTypeEnum.LAPSE,
+            };
+            pis.Add(pi);
+            Dictionary<String, Object> p = new Dictionary<string, object>();
+            p["marketId"] = marketId;
+            p["instructions"] = pis;
+            RPCRequest<PlaceExecutionReport>("placeOrders", p);
+        }
         public CancelExecutionReport cancelOrder(String marketId, UInt64 betId)
         {
             List<CancelInstruction> pis = new List<CancelInstruction>();

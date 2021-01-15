@@ -72,8 +72,9 @@ namespace SpreadTrader
 					try
 					{
 						DateTime LastUpdate = DateTime.UtcNow;
-						PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
-						OrdersStatic.BetID2SelectionID[report.instructionReports[0].betId] = SelectionId;
+						//PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
+						betfair.placeOrderAsync(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
+//						OrdersStatic.BetID2SelectionID[report.instructionReports[0].betId] = SelectionId;
 						runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 					}
 					catch (Exception xe)
