@@ -79,7 +79,7 @@
 						<ColumnDefinition Width="8*"/>
 					</Grid.ColumnDefinitions>
 					<TextBlock Grid.Column="0">Stake</TextBlock>
-					<TextBox Grid.Column="1" Text="{Binding Path=Stake, Converter={StaticResource sconverter}}" HorizontalAlignment="Right" Width="80" IsEnabled="False"/>
+					<TextBox Grid.Column="1" Text="{Binding Path=Stake, Converter={StaticResource sconverter}}" HorizontalAlignment="Right" Width="80" IsEnabled="True"/>
 				</Grid>
 			</Border>
 			<Button>Submit</Button>

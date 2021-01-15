@@ -5,7 +5,7 @@
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:p="clr-namespace:SpreadTrader.Properties"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="392.353" Width="369.332" Topmost="True">
+        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="418.003" Width="369.332" Topmost="True">
 	<Window.Resources>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
@@ -39,7 +39,8 @@
 					<Label Content="X509 Cert File"  />
 					<Label Content="Cert File Password"  />
 					<Label Content="Proxy"  />
-					<Label Content="Wait (ms)" />
+					<Label Content="Back Stake" />
+					<Label Content="Lay Stake" />
 					<Label Content="Matched Bet Alert" />
 					<Label Content="Default Action" />
 					<Label Content="Net of Commissions" />
@@ -59,7 +60,8 @@
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=CertFile, Mode=TwoWay}" />
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=CertPassword, Mode=TwoWay}" />
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=Proxy, Mode=TwoWay}" />
-					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=WaitBF, Mode=TwoWay}" />
+					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=BackStake, Mode=TwoWay}" />
+					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=LayStake, Mode=TwoWay}" />
 
 					<StackPanel Orientation="Horizontal">
 						<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=MatchedBetAlert, Mode=TwoWay}" Width="136" />

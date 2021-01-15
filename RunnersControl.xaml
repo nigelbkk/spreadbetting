@@ -107,11 +107,11 @@
 							<Button DataContext="{Binding LayValues[0]}" Background="{StaticResource Lay0Color}"/>
 							<Button DataContext="{Binding LayValues[1]}" Background="{StaticResource Lay1Color}"/>
 							<Button DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
-							<TextBox Text="{Binding BackStake}"  Width="32"/>
-							<TextBox Text="{Binding LayStake}" Width="32"/>
+							<!--<TextBox Text="{Binding BackStake}"  Width="32"/>
+							<TextBox Text="{Binding LayStake}" Width="32"/>-->
+							<Label Content="{Binding LastPriceTraded, Converter={StaticResource oconverter} }"  Width="32" FontSize="11"/>
 							<Label Content="{Binding ifWin, Converter={StaticResource cconverter} }"  Width="32" FontSize="11"/>
 							<Label Content="{Binding LevelProfit, Converter={StaticResource cconverter} }"  Width="32" FontSize="11"/>
-							<Label Content="{Binding LastPriceTraded, Converter={StaticResource oconverter} }"  Width="32" FontSize="11"/>
 						</StackPanel>
 					</Border>
 				</StackPanel>
@@ -139,18 +139,18 @@
 						<Label Content="{Binding Path=LayBook, Converter={StaticResource pconverter}}"  FontSize="11"/>
 						<Label/>
 						<Label/>
-						<Label Width="32">
+						<!--<Label Width="32">
 							<TextBlock>Back<LineBreak/>Stake</TextBlock>
 						</Label>
 						<Label Width="32">
 							<TextBlock>Lay<LineBreak/>Stake</TextBlock>
+						</Label>-->
+						<Label Width="32">
+							<TextBlock>Last<LineBreak/>Price</TextBlock>
 						</Label>
 						<Label Width="32" FontSize="11">Profit</Label>
 						<Label Width="32">
 							<TextBlock>Level<LineBreak/>Profit</TextBlock>
-						</Label>
-						<Label Width="32">
-							<TextBlock>Last<LineBreak/>Price</TextBlock>
 						</Label>
 					</StackPanel>
 				</Border>
