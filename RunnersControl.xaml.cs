@@ -37,7 +37,7 @@ namespace SpreadTrader
 		}
 		public RunnersControl()
 		{
-			MarketNode = new NodeViewModel(new BetfairAPI.BetfairAPI());
+			MarketNode = new NodeViewModel(MainWindow.Betfair);// new BetfairAPI.BetfairAPI());
 			LiveRunners = new List<LiveRunner>();
 			InitializeComponent();
 
@@ -157,7 +157,7 @@ namespace SpreadTrader
 		}
 		private PlaceExecutionReport placeOrder(String marketId, LiveRunner runner, sideEnum side,  PriceSize ps)
 		{
-			BetfairAPI.BetfairAPI Betfair = new BetfairAPI.BetfairAPI();
+			BetfairAPI.BetfairAPI Betfair = MainWindow.Betfair;//new BetfairAPI.BetfairAPI();
 
 			PlaceInstruction pi = new PlaceInstruction()
 			{
@@ -186,7 +186,7 @@ namespace SpreadTrader
 			if (MarketNode != null)
 			{
 				DateTime LastUpdate = DateTime.UtcNow;
-				BetfairAPI.BetfairAPI betfairAPI = new BetfairAPI.BetfairAPI();
+				BetfairAPI.BetfairAPI betfairAPI = MainWindow.Betfair;//new BetfairAPI.BetfairAPI();
 				bool auto_back_lay = SliderControl.AutoBackLay;
 				List<PriceSize> laybets = new List<PriceSize>();
 				List<PriceSize> backbets = new List<PriceSize>();

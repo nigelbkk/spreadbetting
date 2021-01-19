@@ -394,5 +394,17 @@ namespace SpreadTrader.Properties {
                 this["CDLeft"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool StreamActive {
+            get {
+                return ((bool)(this["StreamActive"]));
+            }
+            set {
+                this["StreamActive"] = value;
+            }
+        }
     }
 }

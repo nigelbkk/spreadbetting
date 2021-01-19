@@ -13,6 +13,8 @@ using Newtonsoft.Json;
 using Betfair.ESASwagger.Model;
 using System.Media;
 using System.IO;
+using System.Windows.Media;
+using System.Timers;
 
 namespace SpreadTrader
 {
@@ -81,6 +83,9 @@ namespace SpreadTrader
 		private NodeViewModel MarketNode { get; set; }
 		private DateTime _LastUpdated { get; set; }
 		private BetfairAPI.BetfairAPI Betfair { get; set; }
+		private bool _StreamActive { get; set; }
+		public bool StreamActive { get { return _StreamActive; } set { _StreamActive = value; NotifyPropertyChanged(""); } }
+		private Timer timer = new Timer();
 		public void NotifyPropertyChanged(String info)
 		{
 			if (PropertyChanged != null)
@@ -98,7 +103,7 @@ namespace SpreadTrader
 		private bool _SubscribedOrders = false;
 		private bool _Connected { get { return !String.IsNullOrEmpty(hubConnection.ConnectionId); } }
 		public bool IsConnected { get { return _Connected; } }
-		public Brush StreamingColor { get { return IsConnected ? Brushes.LightGreen : Brushes.Ivory; } }
+		public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
 		public String StreamingButtonText { get { return IsConnected ? "Streaming Connected" : "Streaming Disconnected"; } }
 		private IHubProxy hubProxy = null;
 		private HubConnection hubConnection = null;
@@ -138,7 +143,24 @@ namespace SpreadTrader
 					}
 				});
 			});
-			
+			timer.Elapsed += (o, e) =>
+			{
+//				StreamActive = false;
+			};
+			timer.Interval = 10000;
+			timer.Enabled = true;
+			timer.Start();
+
+			StreamingAPI.Callback += (liveRunners, tradedVolume, inplay) =>
+			{
+				StreamActive = true;
+
+				//this.Dispatcher.Invoke(() =>
+				//{
+				//	NotifyPropertyChanged("");
+				//});
+			};
+
 			Rows = new ObservableCollection<Row>();
 			InitializeComponent();
 			NodeChangeEventSink += (node) =>
@@ -163,10 +185,10 @@ namespace SpreadTrader
 					Debug.WriteLine("market closed");
 					Rows.Clear();
 				}
-				if (change.Id != "1.177854952")
-				{
-					return;	///DEBUG ONLY
-				}
+				//if (change.Id != "1.177854952")
+				//{
+				//	return;	///DEBUG ONLY
+				//}
 				if (change.Orc != null)
 				{
 					foreach (OrderRunnerChange orc in change.Orc)
@@ -212,6 +234,8 @@ namespace SpreadTrader
 											row = new Row(o.Id);
 											Rows.Insert(0, row);
 										}
+										row.SelectionID = orc.Id.Value;
+										row.Runner = MarketNode.GetRunnerName(row.SelectionID);
 										row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Md.Value).ToLocalTime();
 										row.Odds = o.Avp.Value;
 										row.Stake = o.S.Value;
@@ -283,7 +307,7 @@ namespace SpreadTrader
 			{
 				if (Betfair == null)
 				{
-					Betfair = new BetfairAPI.BetfairAPI();
+					Betfair = MainWindow.Betfair;// new BetfairAPI.BetfairAPI();
 				}
 				Rows = new ObservableCollection<Row>();
 
@@ -322,7 +346,7 @@ namespace SpreadTrader
 			Row row = b.DataContext as Row;
 			if (Betfair == null)
 			{
-				Betfair = new BetfairAPI.BetfairAPI();
+				Betfair = MainWindow.Betfair;//new BetfairAPI.BetfairAPI();
 			}
 			if (row.Matched >= row.Stake )
 			{
@@ -396,7 +420,7 @@ namespace SpreadTrader
 		{
 			if (Betfair == null)
 			{
-				Betfair = new BetfairAPI.BetfairAPI();
+				Betfair = MainWindow.Betfair;//new BetfairAPI.BetfairAPI();
 			}
 			Button b = sender as Button;
 			switch(b.Tag)

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace SpreadTrader
 {
@@ -10,13 +12,16 @@ namespace SpreadTrader
 	{
 		public NodeSelectionDelegate NodeChangeEventSink = null;
 		public NodeViewModel _MarketNode { get; set; }
-//		public double TotalMatched { get { return MarketNode == null ? 0 :  MarketNode.TotalMatched; } }
+		public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
 		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; NotifyPropertyChanged(""); } }
+		private bool _StreamActive { get; set; }
+		public bool StreamActive { get { return _StreamActive; } set { _StreamActive = value; NotifyPropertyChanged(""); } }
 		public bool IsSelected { set 
 			{
 				RunnersControl.IsSelected = value; 
 			} 
 		}
+		private Timer timer = new Timer();
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
 		public void NotifyPropertyChanged(String info)
@@ -44,8 +49,18 @@ namespace SpreadTrader
 					LiveRunner.Favorite = null;
 				}
 			};
+			timer.Elapsed += (o, e) =>
+			{
+				StreamActive = false;
+			};
+			timer.Interval = 2000;
+			timer.Enabled = true;
+			timer.AutoReset = true;
+			timer.Start();
 			StreamingAPI.Callback += (liveRunners, tradedVolume, inplay) =>
 			{
+				StreamActive = true;
+
 				this.Dispatcher.Invoke(() =>
 				{
 					NotifyPropertyChanged("");

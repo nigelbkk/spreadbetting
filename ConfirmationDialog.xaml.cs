@@ -12,6 +12,7 @@ namespace SpreadTrader
 {
 	public partial class ConfirmationDialog : Window, INotifyPropertyChanged
 	{
+		private BetfairAPI.BetfairAPI betfair = null;
 		private RunnersControl runnersControl = null;
 		public DependencyObject ParentObject { get; set; }
 		public String Side { get; set; }
@@ -62,7 +63,7 @@ namespace SpreadTrader
 		}
 		private void Submit(object sender, RoutedEventArgs e)
 		{
-			BetfairAPI.BetfairAPI betfair = new BetfairAPI.BetfairAPI();
+			BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;//new BetfairAPI.BetfairAPI();
 			Button b = sender as Button;
 			String cs = b.Content as String;
 			if (cs != null)

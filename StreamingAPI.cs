@@ -9,6 +9,7 @@ using Betfair.ESAClient.Auth;
 using Betfair.ESAClient.Cache;
 using Betfair.ESASwagger.Model;
 using System.Diagnostics;
+using System.Timers;
 
 namespace SpreadTrader
 {
@@ -66,7 +67,6 @@ namespace SpreadTrader
 			try
 			{
 				double tradedVolume = 0;
-
 				_LiveRunners = new List<LiveRunner>();
 				for (int i = 0; i < e.Snap.MarketRunners.Count; i++)
 				{

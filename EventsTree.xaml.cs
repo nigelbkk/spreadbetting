@@ -28,7 +28,7 @@ namespace SpreadTrader
 		}
 		public void Populate()
 		{
-			RootNode = new NodeViewModel(new BetfairAPI.BetfairAPI());
+			RootNode = new NodeViewModel(MainWindow.Betfair);// new BetfairAPI.BetfairAPI());
 			RootNode.NodeCallback += (node) =>
 			{
 				if (NodeCallback != null)

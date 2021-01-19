@@ -57,7 +57,7 @@ namespace SpreadTrader
 		}
 		private PlaceExecutionReport placeOrders(String marketId, List<PlaceInstruction> instructions)
 		{
-			BetfairAPI.BetfairAPI Betfair = new BetfairAPI.BetfairAPI();
+			BetfairAPI.BetfairAPI Betfair = MainWindow.Betfair;//new BetfairAPI.BetfairAPI();
 			try
 			{
 				using (StreamWriter w = File.AppendText("log.csv"))
