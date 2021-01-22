@@ -145,7 +145,8 @@ namespace SpreadTrader
 			});
 			timer.Elapsed += (o, e) =>
 			{
-//				StreamActive = false;
+				StreamActive = false;
+				timer.Stop();
 			};
 			timer.Interval = 10000;
 			timer.Enabled = true;
@@ -154,6 +155,7 @@ namespace SpreadTrader
 			StreamingAPI.Callback += (liveRunners, tradedVolume, inplay) =>
 			{
 				StreamActive = true;
+				timer.Start();
 
 				//this.Dispatcher.Invoke(() =>
 				//{
