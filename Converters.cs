@@ -31,6 +31,28 @@ namespace SpreadTrader
 			throw new NotImplementedException();
 		}
 	}
+	public class SideColorConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			SolidColorBrush back = Application.Current.FindResource("Back0Color") as SolidColorBrush;
+			SolidColorBrush lay = Application.Current.FindResource("Lay0Color") as SolidColorBrush;
+			bool input = bool.Parse(value.ToString());
+			switch (input)
+			{
+				case true:
+					return back;
+				case false:
+					return lay;
+				default:
+					return DependencyProperty.UnsetValue;
+			}
+		}
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 	public class CurrencyConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

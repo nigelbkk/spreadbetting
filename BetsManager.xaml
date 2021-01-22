@@ -9,6 +9,7 @@
 	<UserControl.Resources>
 		<local:RowToIndexConverter x:Key="RowToIndexConverter" />
 		<local:ColorConverter x:Key="ColorConverter" />
+		<local:SideColorConverter x:Key="SideColorConverter" />
 	</UserControl.Resources>
 	<Grid>
 		<Grid.ColumnDefinitions>
@@ -60,7 +61,13 @@
 					<DataGridTextColumn Width="130" Header="Time" Binding="{Binding Time}"/>
 					<DataGridTextColumn Width="*" Header="BetID" Binding="{Binding BetID}"/>
 					<DataGridTextColumn Width="1.5*" Header="Runner" Binding="{Binding Runner}" />
-					<DataGridTextColumn Width="0.9*" Header="Side" Binding="{Binding Side}" />
+					<DataGridTextColumn Width="0.9*" Header="Type" Binding="{Binding Side}" >
+						<DataGridTextColumn.ElementStyle>
+							<Style TargetType="{x:Type TextBlock}">
+								<Setter Property="Background" Value="{Binding IsBack, Converter={StaticResource SideColorConverter}}"/>
+							</Style>
+						</DataGridTextColumn.ElementStyle>
+					</DataGridTextColumn>
 					<DataGridTextColumn Width="*" Header="Stake" Binding="{Binding Stake}" />
 					<DataGridTextColumn Width="*" Header="Odds" Binding="{Binding Odds, StringFormat={}{0:N2}}" />
 					<DataGridTextColumn Width="1.09*" Header="Profit/Liability" Binding="{Binding Profit, StringFormat={}{0:N2}, Mode=OneWay}"/>
