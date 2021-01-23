@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -76,20 +77,23 @@ namespace SpreadTrader
 				Int32 stake = (int)Stake;
 				if (cs == "Submit")
 				{
-					try
+					Task.Run(() =>
 					{
-						DateTime LastUpdate = DateTime.UtcNow;
-						//PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
-						betfair.placeOrderAsync(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
-//						OrdersStatic.BetID2SelectionID[report.instructionReports[0].betId] = SelectionId;
-						runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-					}
-					catch (Exception xe)
-					{
-						Debug.WriteLine(xe.Message);
-						MainWindow mw = Extensions.FindParentOfType<MainWindow>(this);
-						if (mw != null) mw.Status = xe.Message;
-					}
+						try
+						{
+							DateTime LastUpdate = DateTime.UtcNow;
+							PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
+							//betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
+							OrdersStatic.BetID2SelectionID[report.instructionReports[0].betId] = SelectionId;
+							runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+						}
+						catch (Exception xe)
+						{
+							Debug.WriteLine(xe.Message);
+							MainWindow mw = Extensions.FindParentOfType<MainWindow>(this);
+							if (mw != null) mw.Status = xe.Message;
+						}
+					});
 				}
 				else
 				{
@@ -110,6 +114,15 @@ namespace SpreadTrader
 			props.CDTop = Top;
 			props.CDLeft = Left;
 			props.Save();
+		}
+
+		private void UpDown_GotKeyboardFocus(object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e)
+		{
+			UpDownControl tb = (sender as UpDownControl);
+			if (tb != null)
+			{
+//				tb.SelectAllOnGotFocus();
+			}
 		}
 	}
 	public class UpDownControl : Xceed.Wpf.Toolkit.DoubleUpDown

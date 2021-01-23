@@ -223,9 +223,15 @@ namespace SpreadTrader
 								}
 								if (o.Status == Order.StatusEnum.Ec) // order changed
 								{
-									if (o.Sc > 0) // order cancelled
+									if (o.Sc > 0) // order canceled
 									{
-										Debug.WriteLine("cancelled");
+										Debug.WriteLine("canceled");
+										Row row = FindRow(o.Id);
+										Rows.Remove(row);
+									}
+									else if (o.Sl > 0) // order lapsed
+									{
+										Debug.WriteLine("lapsed");
 										Row row = FindRow(o.Id);
 										Rows.Remove(row);
 									}

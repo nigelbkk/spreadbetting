@@ -35,7 +35,7 @@
 			<Button Content="C" Margin="0" Width="35" Click="Button_Click_4"/>-->
 		</StackPanel>
 		<ContentControl Grid.Row="1" >
-			<DataGrid AutoGenerateColumns="False" Name="dataGrid" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" AlternatingRowBackground="AliceBlue" Grid.ColumnSpan="2" IsReadOnly="True"
+			<DataGrid AutoGenerateColumns="False" Name="dataGrid" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" Grid.ColumnSpan="2" IsReadOnly="True"
 				ScrollViewer.CanContentScroll="True" 
 				ScrollViewer.VerticalScrollBarVisibility="Auto"
 				ScrollViewer.HorizontalScrollBarVisibility="Auto"
