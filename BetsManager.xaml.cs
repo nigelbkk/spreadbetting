@@ -153,7 +153,7 @@ namespace SpreadTrader
 			timer.Enabled = true;
 			timer.Start();
 
-			StreamingAPI.Callback += (liveRunners, tradedVolume, inplay) =>
+			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
 			{
 				StreamActive = true;
 				timer.Start();

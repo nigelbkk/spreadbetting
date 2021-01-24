@@ -22,12 +22,15 @@ namespace SpreadTrader
 					OurHeader.Label.Content = node.MarketName.Trim();
 				}
 			};
-			StreamingAPI.Callback += (liveRunners, tradedVolume, inplay) =>
+			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
 			{
-				this.Dispatcher.Invoke(() =>
+				if (marketid != "")			//TODO
 				{
-					OurHeader.Label.Foreground = inplay ? Brushes.LightGreen : Brushes.DarkGray;
-				});
+					this.Dispatcher.Invoke(() =>
+					{
+						OurHeader.Label.Foreground = inplay ? Brushes.LightGreen : Brushes.DarkGray;
+					});
+				}
 			};
 		}
 	}

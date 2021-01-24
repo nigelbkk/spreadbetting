@@ -13,7 +13,6 @@ namespace SpreadTrader
 {
 	public partial class ConfirmationDialog : Window, INotifyPropertyChanged
 	{
-		private BetfairAPI.BetfairAPI betfair = null;
 		private RunnersControl runnersControl = null;
 		public DependencyObject ParentObject { get; set; }
 		public String Side { get; set; }
@@ -86,6 +85,9 @@ namespace SpreadTrader
 							//betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
 							OrdersStatic.BetID2SelectionID[report.instructionReports[0].betId] = SelectionId;
 							runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+							Debug.Write(LastUpdate.Ticks/1000);
+							Debug.Write(" : ");
+							Debug.WriteLine((Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds));
 						}
 						catch (Exception xe)
 						{
@@ -108,21 +110,11 @@ namespace SpreadTrader
 			Odds = Convert.ToDouble(control.Value);
 			NotifyPropertyChanged("");
 		}
-
 		private void Window_LocationChanged(object sender, EventArgs e)
 		{
 			props.CDTop = Top;
 			props.CDLeft = Left;
 			props.Save();
-		}
-
-		private void UpDown_GotKeyboardFocus(object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e)
-		{
-			UpDownControl tb = (sender as UpDownControl);
-			if (tb != null)
-			{
-//				tb.SelectAllOnGotFocus();
-			}
 		}
 	}
 	public class UpDownControl : Xceed.Wpf.Toolkit.DoubleUpDown
