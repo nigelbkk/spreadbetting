@@ -83,16 +83,16 @@ namespace SpreadTrader
 							DateTime LastUpdate = DateTime.UtcNow;
 							PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
 							//betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
-							OrdersStatic.BetID2SelectionID[report.instructionReports[0].betId] = SelectionId;
-							runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+							//OrdersStatic.BetID2SelectionID[report.instructionReports[0].betId] = SelectionId;
+							runnersControl.MarketNode.TurnaroundTime = ((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 							Debug.Write(LastUpdate.Ticks/1000);
 							Debug.Write(" : ");
-							Debug.WriteLine((Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds));
+							Debug.WriteLine(runnersControl.MarketNode.TurnaroundTime);
 						}
 						catch (Exception xe)
 						{
 							Debug.WriteLine(xe.Message);
-							MainWindow mw = Extensions.FindParentOfType<MainWindow>(this);
+							MainWindow mw = null;//Extensions.FindParentOfType<MainWindow>(this);
 							if (mw != null) mw.Status = xe.Message;
 						}
 					});

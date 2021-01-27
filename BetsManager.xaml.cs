@@ -225,7 +225,6 @@ namespace SpreadTrader
 								{
 									if (o.Sc > 0) // order canceled
 									{
-										Debug.WriteLine("canceled");
 										Row row = FindRow(o.Id);
 										Rows.Remove(row);
 									}
@@ -449,7 +448,11 @@ namespace SpreadTrader
 							Debug.WriteLine("cancel all for {0} {1}", MarketNode.MarketID, MarketNode.FullName);
 							DateTime LastUpdate = DateTime.UtcNow;
 							Betfair.cancelOrders(MarketNode.MarketID, instructions);
-							MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+							MarketNode.TurnaroundTime = ((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+							Debug.Write(LastUpdate.Ticks / 1000);
+							Debug.Write(" : ");
+							Debug.WriteLine(MarketNode.TurnaroundTime);
+//							MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 							Status = "Canceled all unmatched";
 						}
 					}
