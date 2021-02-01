@@ -22,9 +22,9 @@ namespace SpreadTrader
 		public double LayBook { get { return _LayBook; } set { _LayBook = value; OnPropertyChanged(""); } }
 		public bool InPlay { get; set; }
 		private Int32 _UpdateRate { get; set; }
-		private Int32 _TurnaroundTime { get; set; }
+		private double _TurnaroundTime { get; set; }
 		public Int32 UpdateRate { get { return _UpdateRate; } set { _UpdateRate = value; OnPropertyChanged("UpdateRate"); } }
-		public Int32 TurnaroundTime { get { return _TurnaroundTime; } set { _TurnaroundTime = value; OnPropertyChanged("TurnaroundTime"); } }
+		public double TurnaroundTime { get { return Math.Round(_TurnaroundTime, 5); } set { _TurnaroundTime = value; OnPropertyChanged("TurnaroundTime"); } }
 		List<EventTypeResult> EventTypes { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }

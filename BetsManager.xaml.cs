@@ -225,7 +225,6 @@ namespace SpreadTrader
 								{
 									if (o.Sc > 0) // order canceled
 									{
-										Debug.WriteLine("canceled");
 										Row row = FindRow(o.Id);
 										Rows.Remove(row);
 									}

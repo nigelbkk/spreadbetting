@@ -87,7 +87,7 @@ namespace SpreadTrader
 							runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 							Debug.Write(LastUpdate.Ticks/1000);
 							Debug.Write(" : ");
-							Debug.WriteLine((Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds));
+							Debug.WriteLine(runnersControl.MarketNode.TurnaroundTime);
 						}
 						catch (Exception xe)
 						{

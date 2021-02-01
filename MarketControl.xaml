@@ -57,7 +57,7 @@
 				<StackPanel Orientation="Horizontal">
 					<TextBox Text="Streaming" Background="{Binding Path=StreamingColor}" Margin="10,0" Padding="6,0,7,2" Height="28"/>
 					<Label Grid.Column="4" Content="{Binding MarketNode.UpdateRate, Converter={StaticResource converter}}" Padding="6,0,6,0" HorizontalAlignment="Right"  BorderThickness="1"/>
-					<Label Grid.Column="5" Content="{Binding MarketNode.TurnaroundTime, Converter={StaticResource converter}}" Padding="6,0,6,0" HorizontalAlignment="Right" BorderThickness="1"/>
+					<Label Grid.Column="5" Content="{Binding MarketNode.TurnaroundTime}" Padding="6,0,6,0" HorizontalAlignment="Right" BorderThickness="1"/>
 				</StackPanel>
 			</Label>
 		</Grid>
