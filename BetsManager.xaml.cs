@@ -234,7 +234,25 @@ namespace SpreadTrader
 										Row row = FindRow(o.Id);
 										Rows.Remove(row);
 									}
-									else if (o.Sr == 0) // fully matched
+									else if (o.Sm > 0 && o.Sr > 0) // partial fill
+									{
+										Row row = FindRow(o.Id);
+										if (row == null)
+										{
+											row = new Row(o.Id);
+											Rows.Insert(0, row);
+										}
+										row.SelectionID = orc.Id.Value;
+										row.Runner = MarketNode.GetRunnerName(row.SelectionID);
+										row.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Md.Value).ToLocalTime();
+										row.Odds = o.Avp.Value;
+										row.Stake = o.S.Value;
+										row.Matched = o.Sm.Value;
+										row.NotifyPropertyChanged("");
+										Debug.WriteLine("partial fill");
+									}
+
+									else if (o.Sm > 0 && o.Sr == 0) // fully matched
 									{
 										Row row = FindRow(o.Id);
 										if (row == null)
@@ -444,6 +462,13 @@ namespace SpreadTrader
 							Betfair.cancelOrders(MarketNode.MarketID, null);
 							MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 							Status = "Canceled all unmatched";
+
+							System.Threading.Thread.Sleep(20);
+							Betfair.cancelOrders(MarketNode.MarketID, null);
+							System.Threading.Thread.Sleep(20);
+							Betfair.cancelOrders(MarketNode.MarketID, null);
+							System.Threading.Thread.Sleep(100);
+							Betfair.cancelOrders(MarketNode.MarketID, null);
 						}
 
 						//List<CancelInstruction> instructions = new List<CancelInstruction>();
