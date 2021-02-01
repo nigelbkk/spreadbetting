@@ -380,7 +380,8 @@ namespace BetfairAPI
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             p["marketId"] = marketId;
-            p["instructions"] = instructions;
+            if (instructions != null)
+                p["instructions"] = instructions;
             return RPCRequest<CancelExecutionReport>("cancelOrders", p) as CancelExecutionReport;
         }
         public PlaceExecutionReport placeOrder(String marketId, Int64 selectionId, sideEnum side, Double size, Double price)

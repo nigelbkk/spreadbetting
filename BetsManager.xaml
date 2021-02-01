@@ -27,12 +27,6 @@
 			<Button Margin="10,0,0,0" Tag="Stream" Click="Button_Click" Content="{Binding Path=StreamingButtonText}"/>
 			<TextBlock Margin="4,0,0,0" Text="Active" Padding="5,7,8,8" Background="{Binding Path=StreamingColor}"/>
 			<TextBlock Text	="Status: " Padding="7,8"/>
-			<TextBox TextWrapping="Wrap" Text="{Binding Path=DebugID}" Width="49" HorizontalContentAlignment="Center"/>
-			<Button Content="Reset" Margin="0" Width="75" Click="Button_Click_1"/>
-			<!--<TextBox TextWrapping="Wrap" Text="{Binding Path=MatchAmount}" Width="49" HorizontalContentAlignment="Center"/>-->
-			<Button Content="Next" Margin="0" Width="70" Click="Button_Click_2"/>
-			<!--<Button Content="M2" Margin="0" Width="35" Click="Button_Click_3"/>
-			<Button Content="C" Margin="0" Width="35" Click="Button_Click_4"/>-->
 		</StackPanel>
 		<ContentControl Grid.Row="1" >
 			<DataGrid AutoGenerateColumns="False" Name="dataGrid" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" Grid.ColumnSpan="2" IsReadOnly="True"

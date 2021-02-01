@@ -429,30 +429,42 @@ namespace SpreadTrader
 		{
 			if (Betfair == null)
 			{
-				Betfair = MainWindow.Betfair;//new BetfairAPI.BetfairAPI();
+				Betfair = MainWindow.Betfair;
 			}
 			Button b = sender as Button;
 			switch(b.Tag)
 			{
 				case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
 				case "CancelAll":
-					List<CancelInstruction> instructions = new List<CancelInstruction>();
-					foreach(Row row in Rows)
-					{
-						if (!row.Override && row.BetID > 0)
-							instructions.Add(new CancelInstruction(row.BetID));
-					}
-					if (instructions.Count > 0)
+					Task.Run(() =>
 					{
 						if (MarketNode != null)
 						{
 							Debug.WriteLine("cancel all for {0} {1}", MarketNode.MarketID, MarketNode.FullName);
 							DateTime LastUpdate = DateTime.UtcNow;
-							Betfair.cancelOrders(MarketNode.MarketID, instructions);
+							Betfair.cancelOrders(MarketNode.MarketID, null);
 							MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 							Status = "Canceled all unmatched";
 						}
-					}
+
+						//List<CancelInstruction> instructions = new List<CancelInstruction>();
+						//foreach (Row row in Rows)
+						//{
+						//	if (!row.Override && row.BetID > 0)
+						//		instructions.Add(new CancelInstruction(row.BetID));
+						//}
+						//if (instructions.Count > 0)
+						//{
+						//	if (MarketNode != null)
+						//	{
+						//		Debug.WriteLine("cancel all for {0} {1}", MarketNode.MarketID, MarketNode.FullName);
+						//		DateTime LastUpdate = DateTime.UtcNow;
+						//		Betfair.cancelOrders(MarketNode.MarketID, instructions);
+						//		MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+						//		Status = "Canceled all unmatched";
+						//	}
+						//}
+					});
 					break;
 			}
 		}
@@ -468,24 +480,24 @@ namespace SpreadTrader
 		{
 			CheckBox_Checked(sender, e);
 		}
-		private string[] lines = null;
-		private void Button_Click_1(object sender, RoutedEventArgs e)
-		{
-			lines = File.ReadAllLines("json.csv");
-			DebugID = 100;
-			Rows.Clear();
-			NotifyPropertyChanged("");
-		}
-		private void Button_Click_2(object sender, RoutedEventArgs e)
-		{
-			if (lines == null)
-				Button_Click_1(sender, e);
+		//private string[] lines = null;
+		//private void Button_Click_1(object sender, RoutedEventArgs e)
+		//{
+		//	lines = File.ReadAllLines("json.csv");
+		//	DebugID = 100;
+		//	Rows.Clear();
+		//	NotifyPropertyChanged("");
+		//}
+		//private void Button_Click_2(object sender, RoutedEventArgs e)
+		//{
+		//	if (lines == null)
+		//		Button_Click_1(sender, e);
 
-			if (DebugID < lines.Length)
-				OnOrderChanged(lines[DebugID++]);
+		//	if (DebugID < lines.Length)
+		//		OnOrderChanged(lines[DebugID++]);
 
-			NotifyPropertyChanged("");
-		}
+		//	NotifyPropertyChanged("");
+		//}
 	}
 	public class OrderMarketSnap
 	{
