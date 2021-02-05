@@ -210,6 +210,10 @@ namespace SpreadTrader
 								}
 								if (o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec) // new execution
 								{
+									if (o.Id == "223419617412")
+									{
+
+									}
 									Row urow = FindRow(o.Id, false);		// get our unmatched row
 									if (urow == null)
 									{
@@ -221,6 +225,15 @@ namespace SpreadTrader
 									}
 									if (o.Sm > 0 && o.Sr == 0)				// fully matched
 									{
+										if (o.Id == "223419617412")
+										{
+										}
+										Row mrow = FindRow(o.Id, true);     // do we have a partial match already?
+										if (mrow != null)
+										{
+											Rows.Remove(mrow);
+										}
+										urow.Stake = o.Sm.Value;
 										urow.Matched = o.Sm.Value;
 										urow.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Md.Value).ToLocalTime();
 										Debug.WriteLine(o.Id, "fully matched");
@@ -235,14 +248,14 @@ namespace SpreadTrader
 											mrow.Matched = o.Sm.Value;
 											mrow.SelectionID = orc.Id.Value;
 											mrow.Runner = MarketNode != null ? MarketNode.GetRunnerName(mrow.SelectionID) : mrow.SelectionID.ToString();
-											Rows.Insert(0, mrow);
+											Rows.Insert(Rows.IndexOf(urow)+1, mrow);
 										}
 										else
 										{
-											mrow.Stake += o.Sm.Value;
-											mrow.Matched += o.Sm.Value;
+											mrow.Stake = o.Sm.Value;
+											mrow.Matched = o.Sm.Value;
 										}
-										urow.Stake -= o.Sm.Value;
+										urow.Stake = o.Sr.Value;
 										Debug.WriteLine(o.Id, "partial fill");
 										NotifyPropertyChanged("");
 									}
