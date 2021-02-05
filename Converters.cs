@@ -20,8 +20,7 @@ namespace SpreadTrader
 				case true:
 					return matched;
 				case false:
-					return unmatched
-						;
+					return unmatched;
 				default:
 					return DependencyProperty.UnsetValue;
 			}
@@ -67,7 +66,7 @@ namespace SpreadTrader
 			{
 				cs = cs.Insert(cs.Length - 3, ",");
 			}
-			if (cs.Length > 6)
+			if (cs.Length > 7)
 			{
 				cs = cs.Insert(cs.Length - 7, ",");
 			}
