@@ -236,6 +236,7 @@ namespace SpreadTrader
 										urow.Stake = o.Sm.Value;
 										urow.Matched = o.Sm.Value;
 										urow.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Md.Value).ToLocalTime();
+										urow.Hidden = UnmatchedOnly;
 										Debug.WriteLine(o.Id, "fully matched");
 									}
 									else if (o.Sm > 0 && o.Sr > 0)			// partial fill
@@ -257,6 +258,7 @@ namespace SpreadTrader
 										}
 										urow.Stake = o.Sr.Value;
 										Debug.WriteLine(o.Id, "partial fill");
+										urow.Hidden = UnmatchedOnly;
 										NotifyPropertyChanged("");
 									}
 									else if (o.Sc > 0 || o.Sl > 0) // order lapsed or cancelled
