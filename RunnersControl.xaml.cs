@@ -35,6 +35,42 @@ namespace SpreadTrader
 				PropertyChanged(this, new PropertyChangedEventArgs(info));
 			}
 		}
+		private void CalculateProfitAndLoss(String marketId, List<LiveRunner> runners)
+		{
+			CurrentOrderSummaryReport Orders = MainWindow.Betfair.listCurrentOrders(marketId);
+			foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in Orders.currentOrders)
+			{
+#if DEBUG
+				//o.sizeMatched = o.priceSize.size;
+				//o.averagePriceMatched = o.priceSize.price;
+#endif
+				foreach (LiveRunner r in runners)
+				{
+					if (r.SelectionId == o.selectionId)
+					{
+						if (o.side == "BACK")
+						{
+							r.ifWin += Convert.ToDouble(o.sizeMatched * (o.averagePriceMatched - 1.0));
+						}
+						else
+						{
+							r.ifWin += Convert.ToDouble(o.sizeMatched);
+						}
+					}
+					else
+					{
+						if (o.side == "BACK")
+						{
+							r.ifWin -= Convert.ToDouble(o.sizeMatched);
+						}
+						else
+						{
+							r.ifWin -= Convert.ToDouble(o.sizeMatched * (o.averagePriceMatched - 1.0));
+						}
+					}
+				}
+			}
+		}
 		public RunnersControl()
 		{
 			MarketNode = new NodeViewModel(MainWindow.Betfair);// new BetfairAPI.BetfairAPI());
@@ -63,6 +99,7 @@ namespace SpreadTrader
 						LiveRunners[i].NotifyPropertyChanged("");
 						LiveRunners[i].Width = ItemsGrid.ColumnDefinitions[0].ActualWidth;
 					}
+					CalculateProfitAndLoss(marketid, liveRunners);
 					MarketNode.TotalMatched = tradedVolume;
 					BackBook = totalBack;
 					LayBook = totalLay;
