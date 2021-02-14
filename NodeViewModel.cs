@@ -101,6 +101,42 @@ namespace SpreadTrader
 				}
 			}
 		}
+		public void CalculateProfitAndLoss()
+		{
+			CurrentOrderSummaryReport Orders = MainWindow.Betfair.listCurrentOrders(MarketID);
+			foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in Orders.currentOrders)
+			{
+				foreach (LiveRunner r in LiveRunners)
+				{
+					r.ifWin = 0;
+				}
+				foreach (LiveRunner r in LiveRunners)
+				{
+					if (r.SelectionId == o.selectionId)
+					{
+						if (o.side == "BACK")
+						{
+							r.ifWin += Convert.ToDouble(o.sizeMatched * (o.averagePriceMatched - 1.0));
+						}
+						else
+						{
+							r.ifWin += Convert.ToDouble(o.sizeMatched);
+						}
+					}
+					else
+					{
+						if (o.side == "BACK")
+						{
+							r.ifWin -= Convert.ToDouble(o.sizeMatched);
+						}
+						else
+						{
+							r.ifWin -= Convert.ToDouble(o.sizeMatched * (o.averagePriceMatched - 1.0));
+						}
+					}
+				}
+			}
+		}
 		public String GetRunnerName(Int64 SelectionID)
 		{
 			foreach (LiveRunner r in LiveRunners)

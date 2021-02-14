@@ -204,16 +204,8 @@ namespace SpreadTrader
 						{
 							foreach (Order o in orc.Uo)
 							{
-								if (o.Id != "223100924226")
-								{
-//									continue;
-								}
 								if (o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec) // new execution
 								{
-									if (o.Id == "223419617412")
-									{
-
-									}
 									Row urow = FindRow(o.Id, false);		// get our unmatched row
 									if (urow == null)
 									{
@@ -278,6 +270,7 @@ namespace SpreadTrader
 						}
 					}
 				}
+				MarketNode?.CalculateProfitAndLoss();
 				NotifyPropertyChanged("");
 				MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
 			}

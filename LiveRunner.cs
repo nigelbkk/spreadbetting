@@ -45,7 +45,8 @@ namespace SpreadTrader
         }
         public double BackStake { get; set; }
         public double LayStake { get; set; }
-        public double ifWin { get; set; } 
+        private double _ifWin { get; set; }
+        public double ifWin { get { return _ifWin; } set { _ifWin = value; NotifyPropertyChanged(""); } }
         public double LevelProfit { get; set; }
         public double LastPriceTraded { get; set; }
         public List<PriceSize> BackValues { get; set; }
