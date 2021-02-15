@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
              mc:Ignorable="d" 
-	         DataContext="{Binding RelativeSource={RelativeSource Self}}" d:DesignWidth="606.667">
+	         DataContext="{Binding RelativeSource={RelativeSource Self}}" d:DesignWidth="606.667" Unloaded="UserControl_Unloaded">
 	<UserControl.Resources>
 		<local:RowToIndexConverter x:Key="RowToIndexConverter" />
 		<local:ColorConverter x:Key="ColorConverter" />

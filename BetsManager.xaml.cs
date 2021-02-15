@@ -270,7 +270,7 @@ namespace SpreadTrader
 						}
 					}
 				}
-				MarketNode?.CalculateProfitAndLoss();
+//				MarketNode?.CalculateProfitAndLoss();
 				NotifyPropertyChanged("");
 				MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
 			}
@@ -483,6 +483,10 @@ namespace SpreadTrader
 				OnOrderChanged(line);
 				DebugID++;
 			}
+		}
+		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+		{
+			Disconnect();
 		}
 	}
 	public class OrderMarketSnap
