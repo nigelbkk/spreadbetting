@@ -414,13 +414,13 @@ namespace SpreadTrader
 							DateTime LastUpdate = DateTime.UtcNow;
 							Betfair.cancelOrders(MarketNode.MarketID, null);
 							MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-							Status = "Canceled all unmatched";
+							Status = "Cancelled all unmatched";
 
-							System.Threading.Thread.Sleep(20);
-							Betfair.cancelOrders(MarketNode.MarketID, null);
-							System.Threading.Thread.Sleep(20);
-							Betfair.cancelOrders(MarketNode.MarketID, null);
-							System.Threading.Thread.Sleep(100);
+							//System.Threading.Thread.Sleep(20);
+							//Betfair.cancelOrders(MarketNode.MarketID, null);
+							//System.Threading.Thread.Sleep(20);
+							//Betfair.cancelOrders(MarketNode.MarketID, null);
+							//System.Threading.Thread.Sleep(100);
 							Betfair.cancelOrders(MarketNode.MarketID, null);
 						}
 
