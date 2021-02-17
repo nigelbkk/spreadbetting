@@ -270,7 +270,7 @@ namespace SpreadTrader
 						}
 					}
 				}
-//				MarketNode?.CalculateProfitAndLoss();
+				MarketNode?.CalculateProfitAndLoss();
 				NotifyPropertyChanged("");
 				MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
 			}
@@ -415,32 +415,8 @@ namespace SpreadTrader
 							Betfair.cancelOrders(MarketNode.MarketID, null);
 							MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 							Status = "Cancelled all unmatched";
-
-							//System.Threading.Thread.Sleep(20);
-							//Betfair.cancelOrders(MarketNode.MarketID, null);
-							//System.Threading.Thread.Sleep(20);
-							//Betfair.cancelOrders(MarketNode.MarketID, null);
-							//System.Threading.Thread.Sleep(100);
 							Betfair.cancelOrders(MarketNode.MarketID, null);
 						}
-
-						//List<CancelInstruction> instructions = new List<CancelInstruction>();
-						//foreach (Row row in Rows)
-						//{
-						//	if (!row.Override && row.BetID > 0)
-						//		instructions.Add(new CancelInstruction(row.BetID));
-						//}
-						//if (instructions.Count > 0)
-						//{
-						//	if (MarketNode != null)
-						//	{
-						//		Debug.WriteLine("cancel all for {0} {1}", MarketNode.MarketID, MarketNode.FullName);
-						//		DateTime LastUpdate = DateTime.UtcNow;
-						//		Betfair.cancelOrders(MarketNode.MarketID, instructions);
-						//		MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-						//		Status = "Canceled all unmatched";
-						//	}
-						//}
 					});
 					break;
 			}
@@ -483,10 +459,6 @@ namespace SpreadTrader
 				OnOrderChanged(line);
 				DebugID++;
 			}
-		}
-		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
-		{
-			Disconnect();
 		}
 	}
 	public class OrderMarketSnap

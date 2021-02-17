@@ -58,12 +58,10 @@ namespace SpreadTrader
 						LiveRunners[i].LayValues = liveRunners[i].LayValues;
 						LiveRunners[i].LastPriceTraded = liveRunners[i].LastPriceTraded;
 						LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
-						//					LiveRunners[i].ifWin = liveRunners[i].ifWin;
 						LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
 						LiveRunners[i].NotifyPropertyChanged("");
 						LiveRunners[i].Width = ItemsGrid.ColumnDefinitions[0].ActualWidth;
 					}
-//					CalculateProfitAndLoss(marketid, LiveRunners);
 					MarketNode.TotalMatched = tradedVolume;
 					BackBook = totalBack;
 					LayBook = totalLay;
@@ -253,7 +251,14 @@ namespace SpreadTrader
 					var sp = VisualTreeHelper.GetChild(grid, 0);
 					var t1 = VisualTreeHelper.GetChild(sp, 0) as TextBlock;
 
-					double odds = Convert.ToDouble(t1.Text);
+					String t1s = t1.Text;
+
+					if (String.IsNullOrEmpty(t1.Text))
+					{
+						t1s = "0";
+					}
+
+					double odds = Convert.ToDouble(t1s);
 
 					String side = "Back";
 					for (int i = 1; i < VisualTreeHelper.GetChildrenCount(parent); i++)
@@ -293,7 +298,6 @@ namespace SpreadTrader
 			{
 			}
 		}
-
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
 			MainWindow mw2 = Extensions.FindParentOfType<MainWindow>(SV1);
@@ -310,7 +314,6 @@ namespace SpreadTrader
 			{
 				v.Width = ItemsGrid.ColumnDefinitions[0].Width.Value;
 			}
-//			SV1.Width = diff;
 		}
 	}
 }

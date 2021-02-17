@@ -39,13 +39,14 @@ namespace SpreadTrader
 			runnersControl = visual as RunnersControl;
 			ParentObject = visual as DependencyObject;
 			Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(b.ActualWidth, b.ActualHeight)));
+			MainWindow mw = Extensions.FindParentOfType<MainWindow>(ParentObject);
 
-			Top = coords.Y;
-			Left = coords.X;
+			Top = coords.Y + mw.Top;
+			Left = coords.X + mw.Left;
 			if (props.CDLeft > 0 && props.CDTop > 0)
 			{
-				Top = props.CDTop;
-				Left = props.CDLeft;
+				Top = props.CDTop + mw.Top;
+				Left = props.CDLeft + mw.Left;
 			}
 			Runner = runner.Name;
 			SelectionId = runner.SelectionId;
@@ -112,8 +113,12 @@ namespace SpreadTrader
 		}
 		private void Window_LocationChanged(object sender, EventArgs e)
 		{
-			props.CDTop = Top;
-			props.CDLeft = Left;
+			MainWindow mw = Extensions.FindParentOfType<MainWindow>(ParentObject);
+			if (mw != null)
+			{
+			}
+			props.CDTop = Top - mw.Top;
+			props.CDLeft = Left - mw.Left;
 			props.Save();
 		}
 	}
