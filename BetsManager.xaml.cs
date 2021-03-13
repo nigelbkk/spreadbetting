@@ -210,7 +210,7 @@ namespace SpreadTrader
 									if (urow == null)
 									{
 										urow = new Row(o);
-										Debug.WriteLine(o.Id, "new order");
+										//Debug.WriteLine(o.Id, "new order");
 										urow.SelectionID = orc.Id.Value;
 										urow.Runner = MarketNode != null ? MarketNode.GetRunnerName(urow.SelectionID) : urow.SelectionID.ToString();
 										Rows.Insert(0, urow);
@@ -229,7 +229,7 @@ namespace SpreadTrader
 										urow.Matched = o.Sm.Value;
 										urow.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Md.Value).ToLocalTime();
 										urow.Hidden = UnmatchedOnly;
-										Debug.WriteLine(o.Id, "fully matched");
+										//Debug.WriteLine(o.Id, "fully matched");
 									}
 									else if (o.Sm > 0 && o.Sr > 0)			// partial fill
 									{
@@ -249,13 +249,13 @@ namespace SpreadTrader
 											mrow.Matched = o.Sm.Value;
 										}
 										urow.Stake = o.Sr.Value;
-										Debug.WriteLine(o.Id, "partial fill");
+										//Debug.WriteLine(o.Id, "partial fill");
 										urow.Hidden = UnmatchedOnly;
 										NotifyPropertyChanged("");
 									}
 									else if (o.Sc > 0 || o.Sl > 0) // order lapsed or cancelled
 									{
-										Debug.WriteLine(o.Id, "cancelled");
+										//Debug.WriteLine(o.Id, "cancelled");
 										foreach (Row r in Rows)
 										{
 											if (r.BetID.ToString() == o.Id && !r.IsMatched)

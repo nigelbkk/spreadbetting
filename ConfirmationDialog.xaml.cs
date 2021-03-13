@@ -36,6 +36,7 @@ namespace SpreadTrader
 		}
 		public ConfirmationDialog(Visual visual, Button b, String MarketId, LiveRunner runner, String side, double odds)
 		{
+			Debug.Write("Open dialog");
 			runnersControl = visual as RunnersControl;
 			ParentObject = visual as DependencyObject;
 			Point coords = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice.Transform(b.PointToScreen(new Point(b.ActualWidth, b.ActualHeight)));
@@ -61,10 +62,11 @@ namespace SpreadTrader
 			this.MarketId = MarketId;
 			InitializeComponent();
 			UpDown.Value = Odds;
+			Debug.WriteLine(" complete");
 		}
-		private void Submit(object sender, RoutedEventArgs e)
+		private void Submit(object sender, RoutedEventArgs _e)
 		{
-			BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;//new BetfairAPI.BetfairAPI();
+			BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
 			Button b = sender as Button;
 			String cs = b.Content as String;
 			if (cs != null)
@@ -77,32 +79,44 @@ namespace SpreadTrader
 				Int32 stake = (int)Stake;
 				if (cs == "Submit")
 				{
-					Task.Run(() =>
+					BackgroundWorker bw = new BackgroundWorker();
+					bw.DoWork += (o, e) =>
 					{
-						try
-						{
-							DateTime LastUpdate = DateTime.UtcNow;
-							PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
-							//betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
-//							OrdersStatic.BetID2SelectionID[report.instructionReports[0].betId] = SelectionId;
-							runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-							Debug.Write(LastUpdate.Ticks/1000);
-							Debug.Write(" : ");
-							Debug.WriteLine(runnersControl.MarketNode.TurnaroundTime);
-						}
-						catch (Exception xe)
-						{
-							Debug.WriteLine(xe.Message);
-							MainWindow mw = null;// Extensions.FindParentOfType<MainWindow>(this);
-							if (mw != null) mw.Status = xe.Message;
-						}
-					});
+						DateTime LastUpdate = DateTime.UtcNow;
+						PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
+						runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+						//Debug.Write(LastUpdate.Ticks / 1000);
+						//Debug.Write(" : ");
+						//Debug.WriteLine(runnersControl.MarketNode.TurnaroundTime);
+					};
+					bw.RunWorkerAsync();
 				}
 				else
 				{
 					Stake = Convert.ToInt32(b.Content);
 					NotifyPropertyChanged("");
 				}
+				//	Task.Run(() =>
+				//	{
+				//		try
+				//		{
+				//			DateTime LastUpdate = DateTime.UtcNow;
+				//			PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
+				//			betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
+				//			OrdersStatic.BetID2SelectionID[report.instructionReports[0].betId] = SelectionId;
+				//			runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+				//			Debug.Write(LastUpdate.Ticks / 1000);
+				//			Debug.Write(" : ");
+				//			Debug.WriteLine(runnersControl.MarketNode.TurnaroundTime);
+				//		}
+				//		catch (Exception xe)
+				//		{
+				//			Debug.WriteLine(xe.Message);
+				//			MainWindow mw = null;// Extensions.FindParentOfType<MainWindow>(this);
+				//			if (mw != null) mw.Status = xe.Message;
+				//		}
+				//	});
+				//}
 			}
 		}
 		private void ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
