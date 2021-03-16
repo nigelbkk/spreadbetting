@@ -71,7 +71,7 @@ namespace SpreadTrader
 			String cs = b.Content as String;
 			if (cs != null)
 			{
-				if (cs == "Cancel")
+				if (cs == "Close")
 				{
 					Close();
 					return;

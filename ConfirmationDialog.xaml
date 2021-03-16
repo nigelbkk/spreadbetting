@@ -58,7 +58,7 @@
 		<Button>20</Button>
 		<Button>10</Button>
 		<Button>5</Button>
-		<Button Background="LightCyan">Cancel</Button>
+		<Button Background="LightCyan">Close</Button>
 			<Border BorderThickness="0.5" BorderBrush="DarkGray">
 				<Grid Margin="3" Background="AliceBlue">
 					<Grid>
