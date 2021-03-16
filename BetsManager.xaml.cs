@@ -132,23 +132,34 @@ namespace SpreadTrader
 
 			hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
 			{
-				try
-				{
-					using (StreamWriter w = File.AppendText("json.csv"))
-					{
-						w.WriteLine(json1);
-					}
-				}
-				catch (Exception xe) { Debug.WriteLine(xe.Message); }
+				//try
+				//{
+				//	using (StreamWriter w = File.AppendText("json.csv"))
+				//	{
+				//		w.WriteLine(json1);
+				//	}
+				//}
+				//catch (Exception xe) { Debug.WriteLine(xe.Message); }
 
-				Task.Run(() =>
+				BackgroundWorker bw = new BackgroundWorker();
+				bw.DoWork += (o, e) =>
 				{
 					OrderMarketSnap snap = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
 					if (MarketNode != null && snap.MarketId == MarketNode.MarketID)
 					{
 						Dispatcher.BeginInvoke(new Action(() => OnOrderChanged(json1)));
 					}
-				});
+				};
+				bw.RunWorkerAsync();
+
+				//Task.Run(() =>
+				//{
+				//	OrderMarketSnap snap = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
+				//	if (MarketNode != null && snap.MarketId == MarketNode.MarketID)
+				//	{
+				//		Dispatcher.BeginInvoke(new Action(() => OnOrderChanged(json1)));
+				//	}
+				//});
 			});
 			timer.Elapsed += (o, e) =>
 			{
@@ -163,11 +174,6 @@ namespace SpreadTrader
 			{
 				StreamActive = true;
 				timer.Start();
-
-				//this.Dispatcher.Invoke(() =>
-				//{
-				//	NotifyPropertyChanged("");
-				//});
 			};
 
 			Rows = new ObservableCollection<Row>();
@@ -217,9 +223,6 @@ namespace SpreadTrader
 									}
 									if (o.Sm > 0 && o.Sr == 0)				// fully matched
 									{
-										if (o.Id == "223419617412")
-										{
-										}
 										Row mrow = FindRow(o.Id, true);     // do we have a partial match already?
 										if (mrow != null)
 										{

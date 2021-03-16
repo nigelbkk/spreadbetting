@@ -59,8 +59,10 @@ namespace SpreadTrader
 				Side = "Lay";
 			}
 			this.MarketId = MarketId;
+			Debug.WriteLine("1");
 			InitializeComponent();
 			UpDown.Value = Odds;
+			Debug.WriteLine("2");
 		}
 		private void Submit(object sender, RoutedEventArgs _e)
 		{
