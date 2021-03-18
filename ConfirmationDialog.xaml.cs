@@ -59,10 +59,8 @@ namespace SpreadTrader
 				Side = "Lay";
 			}
 			this.MarketId = MarketId;
-			Debug.WriteLine("1");
 			InitializeComponent();
 			UpDown.Value = Odds;
-			Debug.WriteLine("2");
 		}
 		private void Submit(object sender, RoutedEventArgs _e)
 		{
@@ -84,10 +82,10 @@ namespace SpreadTrader
 					{
 						DateTime LastUpdate = DateTime.UtcNow;
 						PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
-						runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-						Debug.Write(LastUpdate.Ticks / 1000);
-						Debug.Write(" : ");
-						Debug.WriteLine(runnersControl.MarketNode.TurnaroundTime);
+						//runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+						//Debug.Write(LastUpdate.Ticks / 1000);
+						//Debug.Write(" : ");
+						//Debug.WriteLine(runnersControl.MarketNode.TurnaroundTime);
 					};
 					bw.RunWorkerAsync();
 				}

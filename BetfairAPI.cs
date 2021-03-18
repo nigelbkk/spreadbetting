@@ -233,11 +233,6 @@ namespace BetfairAPI
             CurrentOrderSummaryReport Orders = listCurrentOrders(book.marketId);
             foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in Orders.currentOrders)
             {
-#if DEBUG
-                //o.sizeMatched = o.priceSize.size;
-                //o.averagePriceMatched = o.priceSize.price;
-#endif
-
                 foreach (Runner r in book.Runners)
                 {
                     if (r.selectionId == o.selectionId)
@@ -378,6 +373,7 @@ namespace BetfairAPI
         }
         public CancelExecutionReport cancelOrders(String marketId, List<CancelInstruction> instructions)
         {
+            Debug.WriteLine("cancel");
             Dictionary<String, Object> p = new Dictionary<string, object>();
             p["marketId"] = marketId;
             if (instructions != null)
@@ -386,6 +382,7 @@ namespace BetfairAPI
         }
         public PlaceExecutionReport placeOrder(String marketId, Int64 selectionId, sideEnum side, Double size, Double price)
         {
+            Debug.WriteLine("submit");
             List<PlaceInstruction> pis = new List<PlaceInstruction>();
             PlaceInstruction pi = new PlaceInstruction();
             pi.selectionId = selectionId;
