@@ -7,6 +7,7 @@ using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace BetfairAPI
 {
@@ -19,7 +20,109 @@ namespace BetfairAPI
         {
         }
         public DateTime sysTime = DateTime.UtcNow;
-        private Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
+        //public async Task<string> PostAsync(string postData)
+        //{
+        //    String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy;
+
+        //    byte[] dataBytes = Encoding.UTF8.GetBytes(postData);
+
+        //    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+        //    request.Method = WebRequestMethods.Http.Post;
+        //    request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+        //    request.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); request.Accept = "*/*";
+        //    request.ContentType = "application/json";
+        //    request.ContentLength = dataBytes.Length;
+
+        //    using (Stream requestBody = request.GetRequestStream())
+        //    {
+        //        await requestBody.WriteAsync(dataBytes, 0, dataBytes.Length);
+        //    }
+
+        //    using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
+        //    using (Stream stream = response.GetResponseStream())
+        //    using (StreamReader reader = new StreamReader(stream))
+        //    {
+        //        return await reader.ReadToEndAsync();
+        //    }
+        //}
+        static public async Task<string> PostAsync(string postData)
+        {
+            String url = "http://88.202.183.202:5055";
+            byte[] dataBytes = Encoding.UTF8.GetBytes(postData);
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Post;
+            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            request.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); request.Accept = "*/*";
+            request.ContentType = "application/json";
+            request.ContentLength = dataBytes.Length;
+
+            using (Stream requestBody = request.GetRequestStream())
+            {
+                await requestBody.WriteAsync(dataBytes, 0, dataBytes.Length);
+            }
+
+            using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
+            using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return await reader.ReadToEndAsync();
+            }
+        }
+        static public async Task<string> xPostAsync(string postData)
+        {
+            String url = "http://88.202.183.202:5055";
+            byte[] dataBytes = Encoding.UTF8.GetBytes(postData);
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = WebRequestMethods.Http.Post;
+            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            request.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); request.Accept = "*/*";
+            request.ContentType = "application/json";
+            request.ContentLength = dataBytes.Length;
+
+            using (Stream requestBody = request.GetRequestStream())
+            {
+                await requestBody.WriteAsync(dataBytes, 0, dataBytes.Length);
+            }
+
+            using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
+            using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return await reader.ReadToEndAsync();
+            }
+        }
+        public Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
+        {
+            String[] AccountCalls = new String[] { "getAccountFunds" };
+            Dictionary<String, Object> joe = new Dictionary<string, object>();
+            joe["jsonrpc"] = "2.0";
+            joe["id"] = "1";
+            joe["method"] = "SportsAPING/v1.0/" + Method;
+            joe["params"] = Params;
+
+            String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy; 
+
+            if (AccountCalls.Contains(Method))
+            {
+                joe["method"] = "AccountAPING/v1.0/" + Method;
+            }
+            String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
+
+            Task<String> t = Task.Run(() => PostAsync(postData));
+            t.Wait();
+            String jsonResponse = t.Result;
+            var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
+            if (err != null)
+            {
+                ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
+                throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
+            }
+            String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
+            return JsonConvert.DeserializeObject<T>(res);
+        }
+        private Object OldRPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
             String[] AccountCalls = new String[] { "getAccountFunds" };
             Dictionary<String, Object> joe = new Dictionary<string, object>();
@@ -35,6 +138,9 @@ namespace BetfairAPI
                 joe["method"] = "AccountAPING/v1.0/" + Method;
             }
             String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
+
+
+
             HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
             wr.Method = WebRequestMethods.Http.Post;
             wr.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;

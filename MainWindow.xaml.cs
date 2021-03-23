@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -51,6 +52,9 @@ namespace SpreadTrader
 			SetWindowPosition();
 
 			Betfair = new BetfairAPI.BetfairAPI();
+			//Task<String> t = BetfairAPI.BetfairAPI.PostAsync("[{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"AccountAPING/v1.0/getAccountFunds\", \"params\":{ }}]");
+			//t.Wait();
+			//Console.ReadKey();
 			UpdateAccountInformation();
 		}
 		public void UpdateAccountInformation()

@@ -410,6 +410,7 @@ namespace SpreadTrader
 				case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
 				case "CancelAll":
 					CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
+					Debug.WriteLine("cancel completed");
 					//BackgroundWorker bw = new BackgroundWorker();
 					//bw.DoWork += (o, e2) =>
 					//{
