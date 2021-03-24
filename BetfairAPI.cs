@@ -13,63 +13,14 @@ namespace BetfairAPI
 {
     public class BetfairAPI
     {
-        private String AppKey { get; set; }  //"uCmjo7RlVUJRCc0T";
+        private String AppKey { get; set; }  
         private String Token { get; set; }
         public String SessionToken { get { return Token; } }
         public BetfairAPI()
         {
         }
         public DateTime sysTime = DateTime.UtcNow;
-        //public async Task<string> PostAsync(string postData)
-        //{
-        //    String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy;
-
-        //    byte[] dataBytes = Encoding.UTF8.GetBytes(postData);
-
-        //    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-        //    request.Method = WebRequestMethods.Http.Post;
-        //    request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-        //    request.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); request.Accept = "*/*";
-        //    request.ContentType = "application/json";
-        //    request.ContentLength = dataBytes.Length;
-
-        //    using (Stream requestBody = request.GetRequestStream())
-        //    {
-        //        await requestBody.WriteAsync(dataBytes, 0, dataBytes.Length);
-        //    }
-
-        //    using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
-        //    using (Stream stream = response.GetResponseStream())
-        //    using (StreamReader reader = new StreamReader(stream))
-        //    {
-        //        return await reader.ReadToEndAsync();
-        //    }
-        //}
         static public async Task<string> PostAsync(string postData)
-        {
-            String url = "http://88.202.183.202:5055";
-            byte[] dataBytes = Encoding.UTF8.GetBytes(postData);
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Post;
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            request.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); request.Accept = "*/*";
-            request.ContentType = "application/json";
-            request.ContentLength = dataBytes.Length;
-
-            using (Stream requestBody = request.GetRequestStream())
-            {
-                await requestBody.WriteAsync(dataBytes, 0, dataBytes.Length);
-            }
-
-            using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                return await reader.ReadToEndAsync();
-            }
-        }
-        static public async Task<string> xPostAsync(string postData)
         {
             String url = "http://88.202.183.202:5055";
             byte[] dataBytes = Encoding.UTF8.GetBytes(postData);
@@ -121,55 +72,6 @@ namespace BetfairAPI
             }
             String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
             return JsonConvert.DeserializeObject<T>(res);
-        }
-        private Object OldRPCRequest<T>(String Method, Dictionary<String, Object> Params)
-        {
-            String[] AccountCalls = new String[] { "getAccountFunds" };
-            Dictionary<String, Object> joe = new Dictionary<string, object>();
-            joe["jsonrpc"] = "2.0";
-            joe["id"] = "1";
-            joe["method"] = "SportsAPING/v1.0/" + Method;
-            joe["params"] = Params;
-
-            String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy; // "http://127.0.0.1:5055"; 
-
-            if (AccountCalls.Contains(Method))
-            {
-                joe["method"] = "AccountAPING/v1.0/" + Method;
-            }
-            String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
-
-
-
-            HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
-            wr.Method = WebRequestMethods.Http.Post;
-            wr.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            wr.Headers.Add("X-Application", AppKey);
-            wr.Headers.Add("X-Authentication", Token);
-            wr.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); wr.Accept = "*/*";
-
-            var bytes = Encoding.GetEncoding("UTF-8").GetBytes(postData);
-            wr.ContentType = "application/json";
-            wr.ContentLength = bytes.Length;
-
-            using (Stream stream = wr.GetRequestStream())
-            {
-                stream.Write(bytes, 0, bytes.Length);
-            }
-            using (WebResponse response = wr.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
-            {
-                var jsonResponse = reader.ReadToEnd();
-                var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
-                if (err != null)
-                {
-                    ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
-                    throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
-                }
-                String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
-                return JsonConvert.DeserializeObject<T>(res);
-            }
         }
         public List<T> FromString<T>(String jsonResponse)
         {
@@ -229,9 +131,6 @@ namespace BetfairAPI
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             Dictionary<String, Object> filter = new Dictionary<string, object>();
-
-			//filter["marketStartTime"] = Today();
-			//filter["marketCountries"] = new String[] { "GB" };
 			p["filter"] = filter;
             return RPCRequest<List<EventTypeResult>>("listEventTypes", p) as List<EventTypeResult>;
         }
@@ -279,7 +178,6 @@ namespace BetfairAPI
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
             filter["eventTypeIds"] = new Int32[] { event_type };
-            //filter["marketCountries"] = new String[] { country_code };
             filter["venues"] = new String[] { country_or_venue };
             filter["marketStartTime"] = Today();
             p["filter"] = filter;
@@ -291,9 +189,6 @@ namespace BetfairAPI
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
             filter["eventIds"] = new Int32[] { event_type_id };
-            //filter["eventTypeIds"] = new Int32[] { event_type_id };
-            //filter["venues"] = new String[] { venue };
-            //filter["marketStartTime"] = Today();
             filter["marketBettingTypes"] = new String[] { "ODDS" };
             filter["marketTypeCodes"] = new String[] { "HALF_TIME_SCORE", "MATCH_ODDS", "WIN", };
             p["marketProjection"] = new String[] { "MARKET_DESCRIPTION", "RUNNER_DESCRIPTION" };
@@ -308,10 +203,6 @@ namespace BetfairAPI
             Dictionary<String, Object> filter = new Dictionary<string, object>();
 
             filter["eventIds"] = new Int32[] { event_id };
-            //filter["eventTypeIds"] = new Int32[] { event_type_id };
-            //filter["marketStartTime"] = Today();
-            //            filter["marketBettingTypes"] = new String[] { "ODDS" };
-            //            filter["marketTypeCodes"] = new String[] { "HALF_TIME_SCORE", "MATCH_ODDS", "WIN" };
             if (event_type == 7)
             {
                 filter["marketTypeCodes"] = new String[] { "MATCH_ODDS", "WIN" };
@@ -413,7 +304,6 @@ namespace BetfairAPI
             List<ClearedOrder> os2 = new List<ClearedOrder>();
             Dictionary<String, Object> p = new Dictionary<string, object>();
             p["marketIds"] = new String[] { mid };
-//            p["exchangeIds"] = new Int32[] { Int32.Parse(mid.Split('.')[0]) };
             p["betStatus"] = status.ToString();
             p["recordCount"] = 0;
             for (; ; )
@@ -533,9 +423,7 @@ namespace BetfairAPI
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             p["marketIds"] = new String[] { marketId }; ;
-            //p["betIds"] = new HashSet<UInt64>();
             p["orderProjection"] = orderProjectionEnum.ALL.ToString();
-            //p["dateRange"] = TimeRange(DateTime.UtcNow.Date, 0, 24);
             return RPCRequest<CurrentOrderSummaryReport>("listCurrentOrders", p) as CurrentOrderSummaryReport;
         }
         public AccountFundsResponse getAccountFunds(Int32 ExchangeId)

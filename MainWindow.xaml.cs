@@ -50,11 +50,7 @@ namespace SpreadTrader
 			System.Net.ServicePointManager.Expect100Continue = false;
 			InitializeComponent();
 			SetWindowPosition();
-
 			Betfair = new BetfairAPI.BetfairAPI();
-			//Task<String> t = BetfairAPI.BetfairAPI.PostAsync("[{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"AccountAPING/v1.0/getAccountFunds\", \"params\":{ }}]");
-			//t.Wait();
-			//Console.ReadKey();
 			UpdateAccountInformation();
 		}
 		public void UpdateAccountInformation()
@@ -204,7 +200,6 @@ namespace SpreadTrader
 			UpdateAccountInformation();
 			NotifyPropertyChanged("");
 		}
-
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
 			if (OnShutdown != null)
