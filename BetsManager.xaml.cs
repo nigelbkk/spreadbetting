@@ -260,7 +260,7 @@ namespace SpreadTrader
 									}
 									else if (o.Sc > 0 || o.Sl > 0) // order lapsed or cancelled
 									{
-										Debug.WriteLine(o.Id, "cancelled");
+										//Debug.WriteLine(o.Id, "cancelled");
 										foreach (Row r in Rows)
 										{
 											if (r.BetID.ToString() == o.Id && !r.IsMatched)
@@ -409,22 +409,24 @@ namespace SpreadTrader
 			{
 				case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
 				case "CancelAll":
-					CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
-					Debug.WriteLine("cancel completed");
-					//BackgroundWorker bw = new BackgroundWorker();
-					//bw.DoWork += (o, e2) =>
-					//{
-					//	if (MarketNode != null)
-					//	{
-					//		//Debug.WriteLine("cancel all for {0} {1}", MarketNode.MarketID, MarketNode.FullName);
-					//		//DateTime LastUpdate = DateTime.UtcNow;
-					//		CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
-					//		//MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-					//		//Status = "Cancelled all unmatched";
-					//		Debug.WriteLine("status: {0}", report.status);
-					//	}
-					//};
-					//bw.RunWorkerAsync();
+					if (MarketNode != null)
+					{
+						//CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
+					}
+					BackgroundWorker bw = new BackgroundWorker();
+					bw.DoWork += (o, e2) =>
+					{
+						if (MarketNode != null)
+						{
+							//Debug.WriteLine("cancel all for {0} {1}", MarketNode.MarketID, MarketNode.FullName);
+							//DateTime LastUpdate = DateTime.UtcNow;
+							CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
+							//MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+							//Status = "Cancelled all unmatched";
+							Debug.WriteLine("status: {0}", report.status);
+						}
+					};
+					bw.RunWorkerAsync();
 
 					//Task.Run(() =>
 					//{
