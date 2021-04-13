@@ -157,7 +157,7 @@ namespace SpreadTrader
 			};
 			Worker.RunWorkerAsync();
 		}
-		private PlaceExecutionReport placeOrder(String marketId, LiveRunner runner, sideEnum side,  PriceSize ps)
+		private PlaceExecutionReport placeOrder(String marketId, LiveRunner runner, sideEnum side, PriceSize ps)
 		{
 			BetfairAPI.BetfairAPI Betfair = MainWindow.Betfair;//new BetfairAPI.BetfairAPI();
 
@@ -177,11 +177,16 @@ namespace SpreadTrader
 			};
 			using (StreamWriter w = File.AppendText(props.LogFile))
 			{
-					w.WriteLine(MarketNode.FullName + "," + pi);
-					Debug.WriteLine(pi);
+				w.WriteLine(MarketNode.FullName + "," + pi);
+				Debug.WriteLine(pi);
 			}
-			//PlaceExecutionReport report = Betfair.placeOrders(bet.MarketId, instructions);
 			return new PlaceExecutionReport();
+		}
+		private PlaceExecutionReport placeOrders(String marketId, List<PlaceInstruction> pis)
+		{
+			BetfairAPI.BetfairAPI Betfair = MainWindow.Betfair;
+			PlaceExecutionReport report = Betfair.placeOrders(marketId, pis);
+			return report; 
 		}
 		public void SubmitBets(PriceSize[] LayValues, PriceSize[] BackValues)
 		{
@@ -204,20 +209,49 @@ namespace SpreadTrader
 					MessageBox.Show("Please Select the Favourite", "Submit Bets", MessageBoxButton.OK, MessageBoxImage.Exclamation);
 					return;
 				}
+				List<PlaceInstruction> layorders = new List<PlaceInstruction>();
+				List<PlaceInstruction> backorders = new List<PlaceInstruction>();
 				for (Int32 i = 0; i < 9; i++)
 				{
 					if (laybets[i].IsChecked && laybets[i].ParentChecked)
 					{
-						placeOrder(MarketNode.Market.marketId, LiveRunner.Favorite, sideEnum.LAY, laybets[i]);
+						PlaceInstruction pi = new PlaceInstruction()
+						{
+							orderTypeEnum = orderTypeEnum.LIMIT,
+							sideEnum = sideEnum.LAY,
+							Runner = LiveRunner.Favorite.Name,
+							marketTypeEnum = marketTypeEnum.WIN,
+							selectionId = LiveRunner.Favorite.SelectionId,
+							limitOrder = new LimitOrder()
+							{
+								persistenceTypeEnum = persistenceTypeEnum.LAPSE,
+								price = LayValues[i].price,
+								size = LayValues[i].size,
+							}
+						};
+						layorders.Add(pi);
 					}
 				}
 				for (Int32 i = 0; i < 9; i++)
 				{
-					if (backbets[i].IsChecked && backbets[i].ParentChecked)
+					PlaceInstruction pi = new PlaceInstruction()
 					{
-						placeOrder(MarketNode.Market.marketId, LiveRunner.Favorite, sideEnum.BACK, backbets[i]);
-					}
+						orderTypeEnum = orderTypeEnum.LIMIT,
+						sideEnum = sideEnum.BACK,
+						Runner = LiveRunner.Favorite.Name,
+						marketTypeEnum = marketTypeEnum.WIN,
+						selectionId = LiveRunner.Favorite.SelectionId,
+						limitOrder = new LimitOrder()
+						{
+							persistenceTypeEnum = persistenceTypeEnum.LAPSE,
+							price = BackValues[i].price,
+							size = BackValues[i].size,
+						}
+					};
+					backorders.Add(pi);
 				}
+				placeOrders(MarketNode.Market.marketId, layorders);
+				placeOrders(MarketNode.Market.marketId, backorders);
 				MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 			}
 		}

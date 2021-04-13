@@ -20,9 +20,9 @@ namespace BetfairAPI
         {
         }
         public DateTime sysTime = DateTime.UtcNow;
-        static public async Task<string> PostAsync(string postData)
+        static public async Task<string> PostAsync(String url, String postData)
         {
-            String url = "http://88.202.183.202:5055";
+//            String url = "http://88.202.183.202:5055";
             byte[] dataBytes = Encoding.UTF8.GetBytes(postData);
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
@@ -61,7 +61,7 @@ namespace BetfairAPI
             }
             String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
 
-            Task<String> t = Task.Run(() => PostAsync(postData));
+            Task<String> t = Task.Run(() => PostAsync(url, postData));
             t.Wait();
             String jsonResponse = t.Result;
             var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
