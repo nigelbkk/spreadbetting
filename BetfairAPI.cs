@@ -4,46 +4,22 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace BetfairAPI
 {
     public class BetfairAPI
     {
-        private String AppKey { get; set; }  
-        private String Token { get; set; }
+        static private String AppKey { get; set; }  
+        static private String Token { get; set; }
         public String SessionToken { get { return Token; } }
         public BetfairAPI()
         {
         }
         public DateTime sysTime = DateTime.UtcNow;
-        static public async Task<string> PostAsync(String url, String postData)
-        {
-//            String url = "http://88.202.183.202:5055";
-            byte[] dataBytes = Encoding.UTF8.GetBytes(postData);
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = WebRequestMethods.Http.Post;
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            request.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); request.Accept = "*/*";
-            request.ContentType = "application/json";
-            request.ContentLength = dataBytes.Length;
-
-            using (Stream requestBody = request.GetRequestStream())
-            {
-                await requestBody.WriteAsync(dataBytes, 0, dataBytes.Length);
-            }
-
-            using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                return await reader.ReadToEndAsync();
-            }
-        }
         public Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
             String[] AccountCalls = new String[] { "getAccountFunds" };
@@ -53,25 +29,87 @@ namespace BetfairAPI
             joe["method"] = "SportsAPING/v1.0/" + Method;
             joe["params"] = Params;
 
-            String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy; 
-
+            String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy;
+            if (!SpreadTrader.Properties.Settings.Default.UseProxy || String.IsNullOrEmpty(SpreadTrader.Properties.Settings.Default.Proxy))
+            {
+                if (!String.IsNullOrEmpty(Token))
+                {
+                    url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";
+                    if (Method.Contains(AccountCalls[0]))
+                        url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
+                }
+            }
             if (AccountCalls.Contains(Method))
             {
                 joe["method"] = "AccountAPING/v1.0/" + Method;
             }
             String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
-
-            Task<String> t = Task.Run(() => PostAsync(url, postData));
-            t.Wait();
-            String jsonResponse = t.Result;
-            var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
-            if (err != null)
+            var bytes = Encoding.GetEncoding("UTF-8").GetBytes(postData);
+            HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
+            wr.Method = WebRequestMethods.Http.Post;
+            wr.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            wr.Headers.Add("X-Application", AppKey);
+            wr.Headers.Add("X-Authentication", Token);
+            wr.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); wr.Accept = "*/*";
+            wr.ContentType = "application/json";
+            wr.ContentLength = bytes.Length;
+            
+            using (Stream stream = wr.GetRequestStream())
             {
-                ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
-                throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
+                stream.Write(bytes, 0, bytes.Length);
             }
-            String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
-            return JsonConvert.DeserializeObject<T>(res);
+            using (WebResponse response = wr.GetResponse())
+            using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+            {
+                var jsonResponse = reader.ReadToEnd();
+                var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
+                if (err != null)
+                {
+                    ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
+                    throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
+                }
+                String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
+                return JsonConvert.DeserializeObject<T>(res);
+            }
+        }
+        public void login(String CertFile, String CertPassword, String appKey, String username, String password)
+        {
+            AppKey = appKey;
+            Token = String.Empty;
+            byte[] args = Encoding.UTF8.GetBytes(String.Format("username={0}&password={1}", username, password));
+
+            HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(" https://identitysso-cert.betfair.com/api/certlogin");
+            wr.Method = WebRequestMethods.Http.Post;
+            wr.Headers.Add("X-Application", AppKey);
+            wr.ContentType = "application/x-www-form-urlencoded";
+            wr.ContentLength = args.Length;
+
+            var cert = new X509Certificate2(CertFile, CertPassword);
+            wr.ClientCertificates.Add(cert);
+
+            using (Stream newStream = wr.GetRequestStream())
+            {
+                newStream.Write(args, 0, args.Length);
+                newStream.Close();
+            }
+            using (WebResponse response = wr.GetResponse())
+            {
+                sysTime = DateTime.Parse(response.Headers["Date"]).ToUniversalTime();
+                using (Stream ds = response.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(ds);
+                    String rs = reader.ReadToEnd();
+
+                    LoginResponse o = JsonConvert.DeserializeObject<LoginResponse>(rs);
+                    if (!o.Status)
+                    {
+                        Console.WriteLine("Login failed. Are you running Fiddler?");
+                        throw new Exception(o.ToString());
+                    }
+                    Token = o.sessionToken;
+                }
+            }
         }
         public List<T> FromString<T>(String jsonResponse)
         {
@@ -111,9 +149,9 @@ namespace BetfairAPI
             }
             return set;
         }
-        public void SetToken(String Token)
+        public void SetToken(String token)
         {
-            this.Token = Token;
+            Token = token;
         }
         public List<VenueResult> ListVenues()
         {
@@ -369,7 +407,6 @@ namespace BetfairAPI
         }
         public CancelExecutionReport cancelOrders(String marketId, List<CancelInstruction> instructions)
         {
-            Debug.WriteLine("cancel");
             Dictionary<String, Object> p = new Dictionary<string, object>();
             p["marketId"] = marketId;
             if (instructions != null)
@@ -378,7 +415,6 @@ namespace BetfairAPI
         }
         public PlaceExecutionReport placeOrder(String marketId, Int64 selectionId, sideEnum side, Double size, Double price)
         {
-            Debug.WriteLine("submit");
             List<PlaceInstruction> pis = new List<PlaceInstruction>();
             PlaceInstruction pi = new PlaceInstruction();
             pi.selectionId = selectionId;
@@ -392,25 +428,6 @@ namespace BetfairAPI
             };
             pis.Add(pi);
             return placeOrders(marketId, pis);
-        }
-        public void placeOrderAsync(String marketId, Int64 selectionId, sideEnum side, Double size, Double price)
-        {
-            List<PlaceInstruction> pis = new List<PlaceInstruction>();
-            PlaceInstruction pi = new PlaceInstruction();
-            pi.selectionId = selectionId;
-            pi.sideEnum = side;
-            pi.orderTypeEnum = orderTypeEnum.LIMIT;
-            pi.limitOrder = new LimitOrder()
-            {
-                size = size,
-                price = price,
-                persistenceTypeEnum = persistenceTypeEnum.LAPSE,
-            };
-            pis.Add(pi);
-            Dictionary<String, Object> p = new Dictionary<string, object>();
-            p["marketId"] = marketId;
-            p["instructions"] = pis;
-            RPCRequest<PlaceExecutionReport>("placeOrders", p);
         }
         public CancelExecutionReport cancelOrder(String marketId, UInt64 betId)
         {

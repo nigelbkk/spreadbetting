@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -47,10 +48,15 @@ namespace SpreadTrader
 		}
 		public MainWindow()
 		{
+			ServicePointManager.DefaultConnectionLimit = 800;
 			System.Net.ServicePointManager.Expect100Continue = false;
 			InitializeComponent();
 			SetWindowPosition();
 			Betfair = new BetfairAPI.BetfairAPI();
+			if (!props.UseProxy)
+			{
+				Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
+			}
 			UpdateAccountInformation();
 		}
 		public void UpdateAccountInformation()
