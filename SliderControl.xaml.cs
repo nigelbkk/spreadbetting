@@ -58,13 +58,18 @@ namespace SpreadTrader
 				PriceSize vl = LayValues[i];
 				if (newvalue > oldvalue)
 				{
-					vb.size /= 9; vb.size *= 10; vl.size /= 9; vl.size *= 10;
+					vb.size /= 9; vb.size *= 10; 
+					vl.size /= 9; vl.size *= 10;
+					vl.size = Math.Round(vl.size, 2);
+					vb.size = Math.Round(vb.size, 2);
 					BackValues[i] = vb; 
 					LayValues[i] = vl;
 				}
 				else if (oldvalue > newvalue)
 				{
 					vl.size /= 10; vl.size *= 9; vb.size /= 10; vb.size *= 9;
+					vl.size = Math.Round(vl.size, 2);
+					vb.size = Math.Round(vb.size, 2);
 					BackValues[i] = vb; 
 					LayValues[i] = vl;
 				}

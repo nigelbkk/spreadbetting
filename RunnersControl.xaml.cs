@@ -230,6 +230,8 @@ namespace SpreadTrader
 							}
 						};
 						layorders.Add(pi);
+						if (props.SafeBets)
+							break;
 					}
 				}
 				for (Int32 i = 0; i < 9; i++)
@@ -249,6 +251,8 @@ namespace SpreadTrader
 						}
 					};
 					backorders.Add(pi);
+					if (props.SafeBets)
+						break;
 				}
 				placeOrders(MarketNode.Market.marketId, layorders);
 				placeOrders(MarketNode.Market.marketId, backorders);
