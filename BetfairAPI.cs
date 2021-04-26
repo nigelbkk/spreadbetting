@@ -263,50 +263,50 @@ namespace BetfairAPI
 
             return RPCRequest<List<CountryCodeResult>>("listCountries", p) as List<CountryCodeResult>;
         }
-        private void CalculateProfitAndLoss(MarketBook book)
-        {
-            CurrentOrderSummaryReport Orders = listCurrentOrders(book.marketId);
-            foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in Orders.currentOrders)
-            {
-                foreach (Runner r in book.Runners)
-                {
-                    if (r.selectionId == o.selectionId)
-                    {
-                        if (o.side == "BACK")
-                        {
-                            r.ifWin += Convert.ToDouble(o.sizeMatched * (o.averagePriceMatched - 1.0));
-                        }
-                        else
-                        {
-                            r.ifWin += Convert.ToDouble(o.sizeMatched);
-                        }
-                    }
-                    else
-                    {
-                        if (o.side == "BACK")
-                        {
-                            r.ifWin -= Convert.ToDouble(o.sizeMatched);
-                        }
-                        else
-                        {
-                            r.ifWin -= Convert.ToDouble(o.sizeMatched * (o.averagePriceMatched - 1.0));
-                        }
-                    }
-                }
-            }
-        }
+        //private void CalculateProfitAndLoss(MarketBook book)
+        //{
+        //    CurrentOrderSummaryReport Orders = listCurrentOrders(book.marketId);
+        //    foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in Orders.currentOrders)
+        //    {
+        //        foreach (Runner r in book.Runners)
+        //        {
+        //            if (r.selectionId == o.selectionId)
+        //            {
+        //                if (o.side == "BACK")
+        //                {
+        //                    r.ifWin += Convert.ToDouble(o.sizeMatched * (o.averagePriceMatched - 1.0));
+        //                }
+        //                else
+        //                {
+        //                    r.ifWin += Convert.ToDouble(o.sizeMatched);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                if (o.side == "BACK")
+        //                {
+        //                    r.ifWin -= Convert.ToDouble(o.sizeMatched);
+        //                }
+        //                else
+        //                {
+        //                    r.ifWin -= Convert.ToDouble(o.sizeMatched * (o.averagePriceMatched - 1.0));
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
         public MarketBook GetMarketBook(Market m)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             p["marketIds"] = new String[] { m.marketId };
             p["priceProjection"] = new priceProjection()
             {
-                priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.EX_BEST_OFFERS))
+                priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.EX_TRADED))
             };
             p["orderProjection"] = orderProjectionEnum.ALL.ToString();
             List<MarketBook> books = RPCRequest<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
-            if (books.Count>0)
-                CalculateProfitAndLoss(books.First());
+            //if (books.Count>0)
+            //    CalculateProfitAndLoss(books.First());
             MarketBook book = books.First();
 
             if (m.runners == null)

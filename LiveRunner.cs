@@ -99,7 +99,7 @@ namespace SpreadTrader
             //            ifWin = r.;
             LastPriceTraded = r.Prices.LastTradedPrice;
 
-            // LevelProfit = r.Prices.
+            LevelProfit = 123.4;// r.Prices.
             //BackLayRatio = r.BackLayRatio;
 
             NotifyPropertyChanged("");
