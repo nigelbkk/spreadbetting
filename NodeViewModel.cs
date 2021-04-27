@@ -70,19 +70,6 @@ namespace SpreadTrader
 			if (Market != null)
 			{
 				List<MarketProfitAndLoss> pl = Betfair.listMarketProfitAndLoss(MarketID);
-				//if (pl.Count > 0)
-				//{
-				//	foreach (RunnerLive v in runners)
-				//	{
-				//		foreach (var o in pl[0].profitAndLosses)
-				//		{
-				//			if (v.ngrunner.selectionId == o.selectionId)
-				//			{
-				//				v._prices[0][6].size = o.ifWin;
-				//			}
-				//		}
-				//	}
-				//}
 				Market.MarketBook = Betfair.GetMarketBook(Market);
 				TotalMatched = Market.MarketBook.totalMatched;
 				foreach (Runner r in Market.MarketBook.Runners)

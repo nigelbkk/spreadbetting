@@ -95,13 +95,7 @@ namespace SpreadTrader
                 LayValues[i].price = ps.Price;
                 LayValues[i++].size = ps.Size;
             }
-            //            Name = String.Format("Not available");
-            //            ifWin = r.;
             LastPriceTraded = r.Prices.LastTradedPrice;
-
-            LevelProfit = 123.4;// r.Prices.
-            //BackLayRatio = r.BackLayRatio;
-
             NotifyPropertyChanged("");
         }
         public void SetPrices(Runner r)
