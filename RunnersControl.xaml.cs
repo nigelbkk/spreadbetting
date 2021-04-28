@@ -37,7 +37,7 @@ namespace SpreadTrader
 		}
 		public RunnersControl()
 		{
-			MarketNode = new NodeViewModel(MainWindow.Betfair);// new BetfairAPI.BetfairAPI());
+			MarketNode = new NodeViewModel(MainWindow.Betfair);
 			LiveRunners = new List<LiveRunner>();
 			InitializeComponent();
 
@@ -71,6 +71,8 @@ namespace SpreadTrader
 							}
 						}
 					}
+					MarketNode.LiveRunners = LiveRunners;
+					MarketNode.CalculateLevelProfit();
 					MarketNode.TotalMatched = tradedVolume;
 					BackBook = totalBack;
 					LayBook = totalLay;

@@ -232,8 +232,6 @@ namespace SpreadTrader
 										urow.Matched = o.Sm.Value;
 										urow.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Md.Value).ToLocalTime();
 										urow.Hidden = UnmatchedOnly;
-										MarketNode?.CalculateProfitAndLoss();
-										//Debug.WriteLine(o.Id, "fully matched");
 									}
 									else if (o.Sm > 0 && o.Sr > 0)			// partial fill
 									{
@@ -253,14 +251,10 @@ namespace SpreadTrader
 											mrow.Matched = o.Sm.Value;
 										}
 										urow.Stake = o.Sr.Value;
-										//Debug.WriteLine(o.Id, "partial fill");
 										urow.Hidden = UnmatchedOnly;
-										MarketNode?.CalculateProfitAndLoss();
-										//NotifyPropertyChanged("");
 									}
 									else if (o.Sc > 0 || o.Sl > 0) // order lapsed or cancelled
 									{
-										//Debug.WriteLine(o.Id, "cancelled");
 										foreach (Row r in Rows)
 										{
 											if (r.BetID.ToString() == o.Id && !r.IsMatched)
@@ -275,7 +269,6 @@ namespace SpreadTrader
 						}
 					}
 				}
-//				NotifyPropertyChanged("");
 				MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
 			}
 			catch(Exception xe)

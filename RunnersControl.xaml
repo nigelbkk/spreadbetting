@@ -110,8 +110,8 @@
 							<!--<TextBox Text="{Binding BackStake}"  Width="32"/>
 							<TextBox Text="{Binding LayStake}" Width="32"/>-->
 							<Label Content="{Binding LastPriceTraded, Converter={StaticResource oconverter} }"  Width="32" FontSize="11"/>
-							<Label Content="{Binding ifWin, Converter={StaticResource cconverter} }"  Width="32" FontSize="11"/>
-							<Label Content="{Binding LevelProfit, Converter={StaticResource sconverter} }"  Width="32" FontSize="11"/>
+							<Label Content="{Binding ifWin, Converter={StaticResource oconverter} }"  Width="32" FontSize="11"/>
+							<Label Content="{Binding LevelProfit, Converter={StaticResource oconverter} }"  Width="32" FontSize="11"/>
 						</StackPanel>
 					</Border>
 				</StackPanel>

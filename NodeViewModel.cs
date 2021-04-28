@@ -62,7 +62,7 @@ namespace SpreadTrader
 			Name = name;
 			Nodes = new ObservableCollection<NodeViewModel>();
 		}
-		List<LiveRunner> LiveRunners = null;// new List<LiveRunner>();
+		public List<LiveRunner> LiveRunners = null;// new List<LiveRunner>();
 
 		public List<LiveRunner> GetLiveRunners()
 		{
@@ -109,40 +109,62 @@ namespace SpreadTrader
 				}
 			}
 		}
-		public void CalculateProfitAndLoss()
+		private static Tuple<Double, Double> LevelProfit(LiveRunner runner1, LiveRunner runner2)
 		{
-			CurrentOrderSummaryReport Orders = MainWindow.Betfair.listCurrentOrders(MarketID);
-			foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in Orders.currentOrders)
+			Double G3 = runner1.ifWin;
+			Double J3 = runner2.ifWin;
+
+			Double G5 = G3 > 0 ? runner1.LayValues[0].price : runner1.BackValues[0].price;
+			Double J5 = J3 > 0 ? runner2.LayValues[0].price : runner2.BackValues[0].price;
+
+			Double D8 = (G3 - J3) / G5;
+			Double J8 = (G3 - J3) / J5;
+
+			Double G10 = G3 - (D8 * (G5 - 1));
+			Double G13 = (G3 - J3) / J5;
+
+			Double G18 = G3 - (D8 * (G5 - 1));
+			Double J18 = J3 + (J8 * (J5 - 1));
+
+			return new Tuple<double, double>(Math.Round(G18, 2), Math.Round(J18,2));
+		}
+		private static Tuple<Double, Double, Double> LevelProfit(LiveRunner runner1, LiveRunner runner2, LiveRunner draw)
+		{
+			Double D5 = runner1.ifWin;
+			Double E5 = runner2.ifWin;
+			Double F5 = draw.ifWin;
+
+			Double D8 = D5 > 0 ? runner1.LayValues[0].price : runner1.BackValues[0].price;
+			Double E8 = E5 > 0 ? runner2.LayValues[0].price : runner2.BackValues[0].price;
+			Double F8 = F5 > 0 ? draw.LayValues[0].price : draw.BackValues[0].price;
+
+			Double F11 = (F5 - D5) / D8;
+			Double F12 = (F5 - E5) / E8;
+
+			Double D15 = F11 > 0 ? F11 * (D8 - 1) + D5 : F11 * (D8 - 1) + D5;
+			Double E15 = F11 > 0 ? E5 - F11 : -F11 + E5;
+			Double F15 = F11 > 0 ? -F11 + F5 : -F11 + F5;
+
+			Double D16 = F12 > 0 ? D15 - F12 : -F12 + D15;
+			Double E16 = F12 > 0 ? F12 * (E8 - 1) + E15 : F12 * (E8 - 1) + E15;
+			Double F16 = F12 > 0 ? F15 - F12 : -F12 + F15;
+
+			return new Tuple<double, double, double>(D16, E16, F16);
+		}
+		public void CalculateLevelProfit()
+		{
+			if (LiveRunners.Count == 2)
 			{
-				foreach (LiveRunner r in LiveRunners)
-				{
-					r.ifWin = 0;
-				}
-				foreach (LiveRunner r in LiveRunners)
-				{
-					if (r.SelectionId == o.selectionId)
-					{
-						if (o.side == "BACK")
-						{
-							r.ifWin += Convert.ToDouble(o.sizeMatched * (o.averagePriceMatched - 1.0));
-						}
-						else
-						{
-							r.ifWin += Convert.ToDouble(o.sizeMatched);
-						}
-					}
-					else
-					{
-						if (o.side == "BACK")
-						{
-							r.ifWin -= Convert.ToDouble(o.sizeMatched);
-						}
-						else
-						{
-							r.ifWin -= Convert.ToDouble(o.sizeMatched * (o.averagePriceMatched - 1.0));
-						}
-					}
-				}
+				Tuple<double, double> s2 = LevelProfit(LiveRunners[0], LiveRunners[1]);
+				LiveRunners[0].LevelProfit = s2.Item1;
+				LiveRunners[1].LevelProfit = s2.Item2;
+			}
+			else if (LiveRunners.Count == 3)
+			{
+				Tuple<double, double, double> s2 = LevelProfit(LiveRunners[0], LiveRunners[1], LiveRunners[2]);
+				LiveRunners[0].LevelProfit = s2.Item1;
+				LiveRunners[1].LevelProfit = s2.Item2;
+				LiveRunners[2].LevelProfit = s2.Item3;
 			}
 		}
 		public String GetRunnerName(Int64 SelectionID)
@@ -245,7 +267,6 @@ namespace SpreadTrader
 			foreach (Market m in markets)
 			{
 				NodeViewModel nvm = new NodeViewModel(m.ToString()) { Market = m};
-				//nvm.Populate = nvm.PopulateMarketBook;
 				Add(nvm);
 			}
 		}

@@ -47,7 +47,8 @@ namespace SpreadTrader
         public double LayStake { get; set; }
         private double _ifWin { get; set; }
         public double ifWin { get { return _ifWin; } set { _ifWin = value; NotifyPropertyChanged(""); } }
-        public double LevelProfit { get; set; }
+        private double _LevelProfit { get; set; }
+        public double LevelProfit { get { return _LevelProfit; } set { _LevelProfit = value; } }
         public double LastPriceTraded { get; set; }
         public List<PriceSize> BackValues { get; set; }
         public ObservableCollection<PriceSize> LayValues { get; set; }
