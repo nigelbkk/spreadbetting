@@ -149,6 +149,9 @@
       <DependentUpon>SliderControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="StreamingAPI.cs" />
+    <Compile Include="UpdateBet.xaml.cs">
+      <DependentUpon>UpdateBet.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModel.cs" />
     <Compile Include="WaitCursor.cs" />
     <Page Include="BetsManager.xaml">
@@ -209,6 +212,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UpdateBet.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

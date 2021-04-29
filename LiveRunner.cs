@@ -43,6 +43,16 @@ namespace SpreadTrader
                 return Brushes.Ivory;
             }
         }
+        public Brush LevelProfiColor
+        {
+            get
+            {
+                if (LevelProfit >= 0)
+                    return Brushes.LightGreen;
+
+                return Brushes.Red;
+            }
+        }
         public double BackStake { get; set; }
         public double LayStake { get; set; }
         private double _ifWin { get; set; }

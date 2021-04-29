@@ -69,7 +69,14 @@
 						</DataGridTextColumn.ElementStyle>
 					</DataGridTextColumn>
 					<DataGridTextColumn Width="*" Header="Stake" Binding="{Binding Stake}" />
-					<DataGridTextColumn Width="*" Header="Odds" Binding="{Binding Odds, StringFormat={}{0:N2}}" />
+					<DataGridTemplateColumn Header="Odds" >
+						<DataGridTemplateColumn.CellTemplate>
+							<DataTemplate >
+								<Label Tag="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={local:RowToIndexConverter}}"  Content="{Binding Odds, StringFormat={}{0:N2}}" MouseUp="Label_MouseUp" />
+							</DataTemplate>
+						</DataGridTemplateColumn.CellTemplate>
+					</DataGridTemplateColumn>
+					<!--<DataGridTextColumn Width="*" Header="Odds" Binding="{Binding Odds, StringFormat={}{0:N2}}" />-->
 					<DataGridTextColumn Width="1.09*" Header="Profit/Liability" Binding="{Binding Profit, StringFormat={}{0:N2}, Mode=OneWay}"/>
 					<DataGridTextColumn Width="*" Header="Matched" Binding="{Binding Matched, StringFormat={}{0:N2}}">
 						<DataGridTextColumn.ElementStyle>
