@@ -1,0 +1,18 @@
+﻿<Window x:Class="SpreadTrader.UpdateBet"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SpreadTrader"
+        mc:Ignorable="d"
+        Title="Update Bet" Height="139.334" Width="374.666" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+	<Grid>
+		<Label Content="Bet Reference:" HorizontalAlignment="Left" Margin="10,25,0,0" VerticalAlignment="Top" Width="125"/>
+		<Label Content="Odds:" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top" Width="125"/>
+		<Label Content="Stake:" HorizontalAlignment="Left" Margin="10,65,0,0" VerticalAlignment="Top" Width="125"/>
+		<Label Content="Profit/Liablity:" HorizontalAlignment="Left" Margin="10,65,0,0" VerticalAlignment="Top" Width="125"/>
+		<Button Content="Update" HorizontalAlignment="Left" Margin="263,25,0,0" VerticalAlignment="Top" Width="75"/>
+		<Button Content="Cancel" HorizontalAlignment="Left" Margin="266,65,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+
+	</Grid>
+</Window>
