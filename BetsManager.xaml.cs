@@ -30,6 +30,7 @@ namespace SpreadTrader
 			}
 		}
 		public DateTime Time { get; set; }
+		public String MarketID { get; set; }
 		public long SelectionID { get; set; }
 		public UInt64 BetID { get; set; }
 		public bool IP { get; set; }
@@ -73,6 +74,7 @@ namespace SpreadTrader
 			Stake = o.priceSize.size;
 			Odds = o.priceSize.price;
 			Matched = o.sizeMatched;
+			MarketID = o.marketId;
 		}
 		public override string ToString()
 		{
@@ -217,6 +219,7 @@ namespace SpreadTrader
 									{
 										urow = new Row(o);
 										//Debug.WriteLine(o.Id, "new order");
+										urow.MarketID = MarketNode.MarketID;
 										urow.SelectionID = orc.Id.Value;
 										urow.Runner = MarketNode != null ? MarketNode.GetRunnerName(urow.SelectionID) : urow.SelectionID.ToString();
 										Rows.Insert(0, urow);
@@ -461,8 +464,9 @@ namespace SpreadTrader
 		private void Label_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
 			Label lb = sender as Label;
-			Int32 row = (Int32) lb.Tag;
-			UpdateBet ub = new UpdateBet(Rows[row]);
+			Row row = lb.DataContext as Row;
+
+			UpdateBet ub = new UpdateBet(row);
 			ub.ShowDialog();
 		}
 	}

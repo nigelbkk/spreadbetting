@@ -64,28 +64,6 @@ namespace SpreadTrader
 			InitializeComponent();
 			UpDown.Value = Odds;
 		}
-		static public async Task<string> PostAsync(string uri, string data)
-		{
-			byte[] dataBytes = Encoding.UTF8.GetBytes(data);
-
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-			request.Method = WebRequestMethods.Http.Post;
-			request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-			request.ContentType = "text/html";
-			request.ContentLength = dataBytes.Length;
-
-			using (Stream requestBody = request.GetRequestStream())
-			{
-				await requestBody.WriteAsync(dataBytes, 0, dataBytes.Length);
-			}
-
-			using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
-			using (Stream stream = response.GetResponseStream())
-			using (StreamReader reader = new StreamReader(stream))
-			{
-				return await reader.ReadToEndAsync();
-			}
-		}
 		private void Submit(object sender, RoutedEventArgs _e)
 		{
 			BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
@@ -113,18 +91,6 @@ namespace SpreadTrader
 						Debug.WriteLine(runnersControl.MarketNode.TurnaroundTime);
 					});
 					t.Start();
-
-					//BackgroundWorker bw = new BackgroundWorker();
-					//bw.DoWork += (o, e) =>
-					//{
-					//	DateTime LastUpdate = DateTime.UtcNow;
-					//	PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
-					//	//runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-					//	Debug.Write(LastUpdate.Ticks / 1000);
-					//	Debug.Write(" : ");
-					//	Debug.WriteLine(runnersControl.MarketNode.TurnaroundTime);
-					//};
-					//bw.RunWorkerAsync();
 				}
 				else
 				{

@@ -44,6 +44,9 @@ namespace BetfairAPI
                 joe["method"] = "AccountAPING/v1.0/" + Method;
             }
             String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
+            if (Method == "replaceOrders")
+            {
+            }
             var bytes = Encoding.GetEncoding("UTF-8").GetBytes(postData);
             HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
             wr.Method = WebRequestMethods.Http.Post;
@@ -263,50 +266,16 @@ namespace BetfairAPI
 
             return RPCRequest<List<CountryCodeResult>>("listCountries", p) as List<CountryCodeResult>;
         }
-        //private void CalculateProfitAndLoss(MarketBook book)
-        //{
-        //    CurrentOrderSummaryReport Orders = listCurrentOrders(book.marketId);
-        //    foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in Orders.currentOrders)
-        //    {
-        //        foreach (Runner r in book.Runners)
-        //        {
-        //            if (r.selectionId == o.selectionId)
-        //            {
-        //                if (o.side == "BACK")
-        //                {
-        //                    r.ifWin += Convert.ToDouble(o.sizeMatched * (o.averagePriceMatched - 1.0));
-        //                }
-        //                else
-        //                {
-        //                    r.ifWin += Convert.ToDouble(o.sizeMatched);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                if (o.side == "BACK")
-        //                {
-        //                    r.ifWin -= Convert.ToDouble(o.sizeMatched);
-        //                }
-        //                else
-        //                {
-        //                    r.ifWin -= Convert.ToDouble(o.sizeMatched * (o.averagePriceMatched - 1.0));
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
         public MarketBook GetMarketBook(Market m)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             p["marketIds"] = new String[] { m.marketId };
             p["priceProjection"] = new priceProjection()
             {
-                priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.EX_TRADED))
+                priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.EX_BEST_OFFERS))
             };
             p["orderProjection"] = orderProjectionEnum.ALL.ToString();
             List<MarketBook> books = RPCRequest<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
-            //if (books.Count>0)
-            //    CalculateProfitAndLoss(books.First());
             MarketBook book = books.First();
 
             if (m.runners == null)
@@ -409,9 +378,25 @@ namespace BetfairAPI
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             p["marketId"] = marketId;
-            if (instructions != null)
-                p["instructions"] = instructions;
+            p["instructions"] = instructions;
             return RPCRequest<CancelExecutionReport>("cancelOrders", p) as CancelExecutionReport;
+        }
+        public ReplaceExecutionReport replaceOrders(String marketId , List<ReplaceInstruction> instructions)
+        {
+            Dictionary<String, Object> p = new Dictionary<string, object>();
+            p["marketId"] = marketId;
+            p["instructions"] = instructions;
+            return RPCRequest<ReplaceExecutionReport>("replaceOrders", p) as ReplaceExecutionReport;
+        }
+        public ReplaceExecutionReport replaceOrder(String marketID, String betID, Double price, Double size)
+        {
+            List<ReplaceInstruction> ris = new List<ReplaceInstruction>();
+            ReplaceInstruction ri = new ReplaceInstruction();
+            ri.betId = betID;
+            ri.newPrice = price;
+            ri.newSize  = size;
+            ris.Add(ri);
+            return replaceOrders(marketID, ris);
         }
         public PlaceExecutionReport placeOrder(String marketId, Int64 selectionId, sideEnum side, Double size, Double price)
         {

@@ -3,16 +3,84 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:wpftk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         xmlns:local="clr-namespace:SpreadTrader"
         mc:Ignorable="d"
-        Title="Update Bet" Height="139.334" Width="374.666" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="Update Bet" Height="200" Width="406" Topmost="True" ResizeMode="NoResize" WindowStartupLocation="Manual">
+	<Window.Resources>
+		<local:CurrencyConverter x:Key="cconverter" />
+		<local:StakeConverter x:Key="sconverter" />
+		<local:OddsConverter x:Key="oconverter" />
+		<Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="HorizontalAlignment" Value="Right"/>
+			<Setter Property="VerticalAlignment" Value="Top"/>
+			<Setter Property="Width" Value="75"/>
+			<Setter Property="Height" Value="25"/>
+			<EventSetter Event="Click" Handler="Button_Click"/>
+		</Style>
+		<Style BasedOn="{StaticResource {x:Type Label}}" 
+            TargetType="{x:Type Label}">
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="Width" Value="145"/>
+			<Setter Property="Height" Value="30"/>
+			<Setter Property="BorderThickness" Value="1.0"/>
+			<Setter Property="Background" Value="#0000"/>
+			<Setter Property="VerticalAlignment" Value="Top"/>
+			<Setter Property="HorizontalAlignment" Value="Left"/>
+			<Setter Property="HorizontalContentAlignment"  Value="Left"/>
+			<Setter Property="Padding" Value="5,0"/>
+		</Style>
+		<Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="{x:Type TextBox}">
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="HorizontalAlignment" Value="Left"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+			<Setter Property="Width" Value="80"/>
+			<Setter Property="IsEnabled" Value="True"/>
+			<Setter Property="Background" Value="Ivory"/>
+			<Setter Property="Foreground" Value="DarkSlateGray"/>
+		</Style>
+		<Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="Width" Value="36"/>
+			<Setter Property="Background" Value="#00000000"/>
+			<Setter Property="Foreground" Value="DarkSlateGray"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+		<Style TargetType="{x:Type wpftk:SingleUpDown}">
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="HorizontalAlignment" Value="Left"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Background" Value="Ivory"/>
+			<Setter Property="Foreground" Value="DarkSlateGray"/>
+		</Style>
+	</Window.Resources>
 	<Grid>
-		<Label Content="Bet Reference:" HorizontalAlignment="Left" Margin="10,25,0,0" VerticalAlignment="Top" Width="125"/>
-		<Label Content="Odds:" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top" Width="125"/>
-		<Label Content="Stake:" HorizontalAlignment="Left" Margin="10,65,0,0" VerticalAlignment="Top" Width="125"/>
-		<Label Content="Profit/Liablity:" HorizontalAlignment="Left" Margin="10,65,0,0" VerticalAlignment="Top" Width="125"/>
-		<Button Content="Update" HorizontalAlignment="Left" Margin="263,25,0,0" VerticalAlignment="Top" Width="75"/>
-		<Button Content="Cancel" HorizontalAlignment="Left" Margin="266,65,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+		<Label Content= "{Binding Path=BetReference}" Margin="20,14,0,0" Width="260"/>
+		<Label Content= "{Binding Path= Profit}" Margin="20,120,0,0"  Width="260"/>
 
+		<Grid Height="36" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="20,47,0,0" Width="270">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="50"/>
+				<ColumnDefinition Width="8*"/>
+			</Grid.ColumnDefinitions>
+			<Label Grid.Column="0" Grid.ColumnSpan="2" Width="65" >Odds:</Label>
+			<local:UpDownControl x:Name="UpDown" Margin="20,0" Grid.Column="1" HorizontalAlignment="Left" Width="80" Height="24" ValueChanged="ValueChanged"/>
+		</Grid>
+
+		<Grid Height="36" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="20,81,0,0"  Width="270">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="50"/>
+				<ColumnDefinition Width="8*"/>
+			</Grid.ColumnDefinitions>
+			<Label Grid.Column="0" Grid.ColumnSpan="2" Width="65">Stake:</Label>
+			<TextBox Grid.Column="1" Text="{Binding Path=Stake, Converter={StaticResource sconverter}}" Margin="20,0,3,0" />
+		</Grid>
+		<Button Content="Update" Margin="0,12,20,0" Grid.Column="1" Click="Button_Click_1"/>
+		<Button Content="Cancel" Margin="0,122,20,0" Grid.Column="1"/>
 	</Grid>
 </Window>
