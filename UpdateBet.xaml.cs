@@ -10,7 +10,8 @@ namespace SpreadTrader
 	{
 		private Row Row { get; set; }
 		public String BetReference { get; set; }
-		public double Profit{ get; set; }
+		public double Profit { get; set; }
+		public String ProfitLiability{ get {return String.Format("Profit/Liability: {0:0.00}", Profit); }}
 		public double Stake { get; set; }
 		public double Odds { get; set; }
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -27,6 +28,7 @@ namespace SpreadTrader
 			BetReference = "Bet Reference: " + row.BetID;
 			Stake = row.Stake;
 			Odds = row.Odds;
+			Profit = 5.1;
 			InitializeComponent();
 			UpDown.Value = Odds;
 		}

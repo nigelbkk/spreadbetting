@@ -78,7 +78,7 @@ namespace SpreadTrader
 		}
 		public override string ToString()
 		{
-			return BetID.ToString();// Runner;
+			return BetID.ToString();
 		}
 	}
 	public partial class BetsManager : UserControl, INotifyPropertyChanged
@@ -300,7 +300,7 @@ namespace SpreadTrader
 						{
 							OrdersStatic.BetID2SelectionID[o.betId] = o.selectionId;
 							Row.RunnerNames[o.selectionId] = RunnersControl.GetRunnerName(o.selectionId);
-							Rows.Add(new Row(o)
+							Rows.Insert(0, new Row(o)
 							{
 								Runner = RunnersControl.GetRunnerName(o.selectionId),
 							});
@@ -332,7 +332,7 @@ namespace SpreadTrader
 				Status = "Bet is already fully matched";
 				return;
 			}
-			Status = "Bet canceled";
+			Status = "Bet cancelled";
 			Debug.WriteLine("cancel {0} for {1} {2}", MarketNode.MarketID, row.BetID, row.Runner);
 
 			DateTime LastUpdate = DateTime.UtcNow;
@@ -465,8 +465,11 @@ namespace SpreadTrader
 		{
 			Label lb = sender as Label;
 			Row row = lb.DataContext as Row;
-
+			MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
+			var pos = e.GetPosition(mw);
 			UpdateBet ub = new UpdateBet(row);
+			ub.Left = pos.X;
+			ub.Top = pos.Y;
 			ub.ShowDialog();
 		}
 	}
