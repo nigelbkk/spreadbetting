@@ -79,8 +79,6 @@ namespace SpreadTrader
 				Int32 stake = (int)Stake;
 				if (cs == "Submit")
 				{
-					//Task<String> t = Task.Run(() => betfair.placeOrderAsync(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds));
-
 					System.Threading.Thread t = new System.Threading.Thread(() =>
 					{
 						DateTime LastUpdate = DateTime.UtcNow;

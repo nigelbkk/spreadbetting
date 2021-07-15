@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
 using Betfair.ESAClient.Cache;
+using System.Diagnostics;
 
 namespace SpreadTrader
 {
@@ -43,7 +44,7 @@ namespace SpreadTrader
                 return Brushes.Ivory;
             }
         }
-        public Brush LevelProfiColor
+        public Brush LevelProfitColor
         {
             get
             {
@@ -58,8 +59,17 @@ namespace SpreadTrader
         private double _ifWin { get; set; }
         public double ifWin { get { return _ifWin; } set { _ifWin = value; NotifyPropertyChanged(""); } }
         private double _LevelProfit { get; set; }
-        public double LevelProfit { get { return _LevelProfit; } set { _LevelProfit = value; } }
-        public double LastPriceTraded { get; set; }
+		public double LevelProfit
+		{
+			get { return _LevelProfit; }
+			set
+			{
+				_LevelProfit = value;
+				NotifyPropertyChanged("");
+			}
+		}
+		//public double LevelProfit { get; set; }
+		public double LastPriceTraded { get; set; }
         public List<PriceSize> BackValues { get; set; }
         public ObservableCollection<PriceSize> LayValues { get; set; }
         public double BackLayRatio { get; set; }
@@ -85,7 +95,7 @@ namespace SpreadTrader
 			LayValues.Add(new PriceSize());
 			LayValues.Add(new PriceSize());
             _Width = 160;
-		}
+        }
         public LiveRunner(Runner r) : this()
         {
             ngrunner = r;

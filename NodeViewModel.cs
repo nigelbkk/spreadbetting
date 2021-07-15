@@ -91,6 +91,7 @@ namespace SpreadTrader
 				}
 			}
 			LiveRunners = Runners;
+			CalculateLevelProfit();
 			return Runners;
 		}
 		private void OnItemSelected()
@@ -153,18 +154,29 @@ namespace SpreadTrader
 		}
 		public void CalculateLevelProfit()
 		{
-			if (LiveRunners.Count == 2)
+			if (LiveRunners.Count > 1)
 			{
-				Tuple<double, double> s2 = LevelProfit(LiveRunners[0], LiveRunners[1]);
-				LiveRunners[0].LevelProfit = s2.Item1;
-				LiveRunners[1].LevelProfit = s2.Item2;
-			}
-			else if (LiveRunners.Count == 3)
-			{
-				Tuple<double, double, double> s2 = LevelProfit(LiveRunners[0], LiveRunners[1], LiveRunners[2]);
-				LiveRunners[0].LevelProfit = s2.Item1;
-				LiveRunners[1].LevelProfit = s2.Item2;
-				LiveRunners[2].LevelProfit = s2.Item3;
+				List<LiveRunner> runners = new List<LiveRunner>();
+				foreach (LiveRunner lr in LiveRunners)
+				{
+					if (lr.ifWin != 0)
+						runners.Add(lr);
+				}
+				if (LiveRunners.Count == 2)
+				{
+					Tuple<double, double> s2 = LevelProfit(LiveRunners[0], LiveRunners[1]);
+					LiveRunners[0].LevelProfit = s2.Item1;
+					LiveRunners[1].LevelProfit = s2.Item2;
+					LiveRunners[1].LastPriceTraded = 199;
+
+				}
+				else if (LiveRunners.Count == 3)
+				{
+					Tuple<double, double, double> s2 = LevelProfit(LiveRunners[0], LiveRunners[1], LiveRunners[2]);
+					LiveRunners[0].LevelProfit = s2.Item1;
+					LiveRunners[1].LevelProfit = s2.Item2;
+					LiveRunners[2].LevelProfit = s2.Item3;
+				}
 			}
 		}
 		public String GetRunnerName(Int64 SelectionID)

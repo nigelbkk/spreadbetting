@@ -267,6 +267,7 @@ namespace SpreadTrader
 											}
 										}
 									}
+							//		MarketNode.CalculateLevelProfit();
 								}
 							}
 						}

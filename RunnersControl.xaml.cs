@@ -130,6 +130,7 @@ namespace SpreadTrader
 						if (NewRunners[i].ngrunner != null)
 						{
 							LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
+							LiveRunners[i].LevelProfit = NewRunners[i].LevelProfit;
 						}
 					}
 					MarketNode.UpdateRate = e.ProgressPercentage;
