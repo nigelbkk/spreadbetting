@@ -72,16 +72,19 @@ namespace SpreadTrader
 				List<MarketProfitAndLoss> pl = Betfair.listMarketProfitAndLoss(MarketID);
 				Market.MarketBook = Betfair.GetMarketBook(Market);
 				TotalMatched = Market.MarketBook.totalMatched;
-				foreach (Runner r in Market.MarketBook.Runners)
-				{ 
-					foreach(var p in pl[0].profitAndLosses)
+					foreach (Runner r in Market.MarketBook.Runners)
 					{
-						if (p.selectionId == r.selectionId)
+					if (pl.Count > 0)
+					{
+						foreach (var p in pl[0].profitAndLosses)
 						{
-							r.ifWin = p.ifWin;
+							if (p.selectionId == r.selectionId)
+							{
+								r.ifWin = p.ifWin;
+							}
 						}
+						Runners.Add(new LiveRunner(r));
 					}
-					Runners.Add(new LiveRunner(r));
 				}
 				if (Parent != null)
 				{
@@ -167,8 +170,6 @@ namespace SpreadTrader
 					Tuple<double, double> s2 = LevelProfit(LiveRunners[0], LiveRunners[1]);
 					LiveRunners[0].LevelProfit = s2.Item1;
 					LiveRunners[1].LevelProfit = s2.Item2;
-					LiveRunners[1].LastPriceTraded = 199;
-
 				}
 				else if (LiveRunners.Count == 3)
 				{

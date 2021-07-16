@@ -44,6 +44,16 @@ namespace SpreadTrader
                 return Brushes.Ivory;
             }
         }
+        public Brush ProfitColor
+        {
+            get
+            {
+                if (ifWin >= 0)
+                    return Brushes.Black;
+
+                return Brushes.Red;
+            }
+        }
         public Brush LevelProfitColor
         {
             get
