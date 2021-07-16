@@ -59,7 +59,7 @@ namespace SpreadTrader
             get
             {
                 if (LevelProfit >= 0)
-                    return Brushes.LightGreen;
+                    return Brushes.Black;
 
                 return Brushes.Red;
             }
