@@ -279,7 +279,7 @@ namespace SpreadTrader
 			List<Market> markets = Betfair.GetMarkets(event_type, ID).OrderBy(o => o.marketStartTime).ToList();
 			foreach (Market m in markets)
 			{
-				NodeViewModel nvm = new NodeViewModel(m.ToString()) { Market = m};
+				NodeViewModel nvm = new NodeViewModel(String.Format("{0:HH:mm} {1}", m.description.marketTime.AddHours(props.TimeOffset), m.marketName)) { Market = m};
 				Add(nvm);
 			}
 		}

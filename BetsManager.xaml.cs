@@ -19,6 +19,7 @@ namespace SpreadTrader
 {
 	public class Row : INotifyPropertyChanged
 	{
+		private Properties.Settings props = Properties.Settings.Default;
 		public static Dictionary<long, String> RunnerNames = new Dictionary<long, string>();
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -29,7 +30,8 @@ namespace SpreadTrader
 				PropertyChanged(this, new PropertyChangedEventArgs(info));
 			}
 		}
-		public DateTime Time { get; set; }
+		private DateTime _Time { get; set; }
+		public DateTime Time { get { return _Time.AddHours(props.TimeOffset); } set { _Time = value;  } }
 		public String MarketID { get; set; }
 		public long SelectionID { get; set; }
 		public UInt64 BetID { get; set; }
@@ -104,7 +106,7 @@ namespace SpreadTrader
 		public Int32 DebugID { get; set; }
 		public double MatchAmount { get; set; }
 		public bool UnmatchedOnly { get; set; }
-		public String LastUpdated { get { return String.Format("Orders last updated {0}", _LastUpdated.ToString("HH:mm:ss"));	}  }
+		public String LastUpdated { get { return String.Format("Orders last updated {0}", _LastUpdated.AddHours(props.TimeOffset).ToString("HH:mm:ss"));	}  }
 		public event PropertyChangedEventHandler PropertyChanged;
 		private String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; NotifyPropertyChanged(""); } }
@@ -196,7 +198,7 @@ namespace SpreadTrader
 				return;
 			
 			OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
-			_LastUpdated = DateTime.Now;
+			_LastUpdated = DateTime.UtcNow;
 			try
 			{
 				if (change.Closed == true)
@@ -282,12 +284,12 @@ namespace SpreadTrader
 		}
 		private void PopulateDataGrid()
 		{
-			_LastUpdated = DateTime.Now;
+			_LastUpdated = DateTime.UtcNow;
 			if (MarketNode != null)
 			{
 				if (Betfair == null)
 				{
-					Betfair = MainWindow.Betfair;// new BetfairAPI.BetfairAPI();
+					Betfair = MainWindow.Betfair;
 				}
 				Rows = new ObservableCollection<Row>();
 
