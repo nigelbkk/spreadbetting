@@ -111,7 +111,7 @@ namespace SpreadTrader
 		{
 			double val = System.Convert.ToDouble(value);
 			if (val == 0)
-				return string.Empty;
+				return "0.00";// string.Empty;
 
 			String valString = val.ToString();
 			String[] cs = valString.Split('.');
