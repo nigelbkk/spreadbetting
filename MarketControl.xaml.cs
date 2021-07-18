@@ -22,6 +22,7 @@ namespace SpreadTrader
 			} 
 		}
 		private Timer timer = new Timer();
+		private Timer ttg_timer = new Timer();
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
 		public void NotifyPropertyChanged(String info)
@@ -58,6 +59,13 @@ namespace SpreadTrader
 			timer.Enabled = true;
 			timer.AutoReset = true;
 			timer.Start();
+			ttg_timer.Elapsed += (o, e) =>
+			{
+				NotifyPropertyChanged("TimeToGo");
+			};
+			ttg_timer.Interval = 1000;
+			ttg_timer.Enabled = true;
+			ttg_timer.Start();
 			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
 			{
 				StreamActive = true;
@@ -65,7 +73,7 @@ namespace SpreadTrader
 
 				this.Dispatcher.Invoke(() =>
 				{
-					NotifyPropertyChanged("");
+					NotifyPropertyChanged("TimeToGo");
 				});
 			};
 			SliderControl.SubmitBets += RunnersControl.SubmitBets;
