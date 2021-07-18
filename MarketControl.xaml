@@ -53,7 +53,7 @@
 					<TextBlock Text="{Binding MarketNode.TotalMatched, Mode=OneWay, Converter={StaticResource cconverter}}"/>
 				</StackPanel>
 			</Label>
-			<Label Grid.Column="4" Background="Yellow" Width="140" Content="{Binding Path=MarketNode.TimeToGo}"></Label>
+			<Label Grid.Column="4" Width="140" Content="{Binding Path=MarketNode.TimeToGo}" Foreground="{Binding Path=MarketNode.TimeToGoColor}" FontWeight="Bold" FontSize="18"></Label>
 			<Label Grid.Column="5" Padding="6,0,10,0"  HorizontalAlignment="Right">
 				<StackPanel Orientation="Horizontal">
 					<TextBox Text="Streaming" Background="{Binding Path=StreamingColor}" Margin="10,0" Padding="6,0,7,2" Height="28"/>

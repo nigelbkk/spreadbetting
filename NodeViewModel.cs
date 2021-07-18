@@ -27,7 +27,7 @@ namespace SpreadTrader
 		public Int32 UpdateRate { get { return _UpdateRate; } set { _UpdateRate = value; OnPropertyChanged("UpdateRate"); } }
 		public double TurnaroundTime { get { return Math.Round(_TurnaroundTime, 5); } set { _TurnaroundTime = value; OnPropertyChanged("TurnaroundTime"); } }
 		public SolidColorBrush TimeToGoColor { get { return (Market.marketStartTime - DateTime.UtcNow).TotalSeconds > 0 ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.Red; } }
-		public String TimeToGo { get { return (DateTime.UtcNow - DateTime.UtcNow.Date).ToString(@"hh\:mm\:ss"); } }
+		public String TimeToGo { get { return String.Format("{0}{1}", (Market.marketStartTime - DateTime.UtcNow).TotalSeconds > 0 ? "" : "-", (Market.description.marketTime - DateTime.UtcNow).ToString(@"hh\:mm\:ss")); } }
 		List<EventTypeResult> EventTypes { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }

@@ -9,6 +9,7 @@
              d:DesignHeight="250" d:DesignWidth="600" Loaded="UserControl_Loaded" >
 	<UserControl.Resources>
 		<local:OddsConverter x:Key="oconverter" />
+		<local:OddsConverterBlank x:Key="obconverter" />
 		<local:StakeConverter x:Key="sconverter" />
 		<local:PercentConverter x:Key="pconverter" />
 		<local:CurrencyConverter x:Key="cconverter" />
@@ -83,7 +84,7 @@
 						<Grid>
 							<Grid>
 								<StackPanel Orientation="Vertical" Background="{TemplateBinding Background}" Height="35" VerticalAlignment="Center">
-									<TextBlock Text="{Binding Path=price, Converter={StaticResource oconverter}}" FontSize="13" Margin="0,4,0,0"/>
+									<TextBlock Text="{Binding Path=price, Converter={StaticResource obconverter}}" FontSize="13" Margin="0,4,0,0"/>
 									<TextBlock Text="{Binding Path=size, Converter={StaticResource sconverter}}" FontSize="11" FontWeight="Normal"/>
 								</StackPanel>
 							</Grid>
@@ -109,9 +110,8 @@
 							<Button DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
 							<!--<TextBox Text="{Binding BackStake}"  Width="32"/>
 							<TextBox Text="{Binding LayStake}" Width="32"/>-->
-							<Label Content="{Binding LastPriceTraded, Converter={StaticResource oconverter} }"  Width="32" FontSize="11"/>
-							<!--<Label Content="{Binding ifWin, Converter={StaticResource oconverter} }" Foreground="{Binding Path=ProfitColor}"  Width="32" FontSize="11"/>
-							<Label Content="{Binding LevelProfit, Converter={StaticResource oconverter} }" Foreground="{Binding Path=ProfitColor}"  Background="{Binding Path=LevelProfitColor}" Width="32" FontSize="11"/>-->
+							<Label Content="{Binding LastPriceTraded, Converter={StaticResource obconverter} }"  Width="32" FontSize="11"/>
+							<Label Content="{Binding LevelProfit, Converter={StaticResource oconverter} }" Foreground="{Binding Path=ProfitColor}"  Background="{Binding Path=LevelProfitColor}" Width="32" FontSize="11"/>
 							<Label Content="{Binding ifWin, Converter={StaticResource oconverter} }" Foreground="{Binding Path=ProfitColor}" FontWeight="Regular" Width="32" FontSize="11"/>
 							<Label Content="{Binding LevelProfit, Converter={StaticResource oconverter} }" Foreground="{Binding Path=LevelProfitColor}" Background="LightGreen" Width="32" FontWeight="Regular" FontSize="11"/>
 						</StackPanel>
