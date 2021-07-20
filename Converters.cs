@@ -119,9 +119,10 @@ namespace SpreadTrader
 			Int32 dps = cs.Length < 2 ? 0 : cs[1].Length;
 			switch (dps)
 			{
-				case 0: return String.Format("{0:0}", val);
-				case 1: return String.Format("{0:0.0}", val);
-				case 2: return String.Format("{0:0.00}", val);
+				//case 0: return String.Format("{0:0}", val);
+				//case 1: return String.Format("{0:0.0}", val);
+				//case 2: return String.Format("{0:0.00}", val);
+				default: return String.Format("{0:0.00}", val);
 			}
 			return valString;
 		}
