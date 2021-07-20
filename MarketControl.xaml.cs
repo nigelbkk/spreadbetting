@@ -61,7 +61,7 @@ namespace SpreadTrader
 			timer.Start();
 			ttg_timer.Elapsed += (o, e) =>
 			{
-				NotifyPropertyChanged("TimeToGo");
+				NotifyPropertyChanged("");
 			};
 			ttg_timer.Interval = 1000;
 			ttg_timer.Enabled = true;
