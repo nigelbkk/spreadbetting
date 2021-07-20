@@ -124,7 +124,7 @@ namespace SpreadTrader
 				//case 2: return String.Format("{0:0.00}", val);
 				default: return String.Format("{0:0.00}", val);
 			}
-			return valString;
+			//return valString;
 		}
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{
