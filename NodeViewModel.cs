@@ -22,6 +22,7 @@ namespace SpreadTrader
 		public double BackBook { get { return _BackBook; } set { _BackBook = value; OnPropertyChanged(""); } }
 		public double LayBook { get { return _LayBook; } set { _LayBook = value; OnPropertyChanged(""); } }
 		public bool InPlay { get; set; }
+		public marketStatusEnum Status { get; set; }
 		private Int32 _UpdateRate { get; set; }
 		private double _TurnaroundTime { get; set; }
 		public Int32 UpdateRate { get { return _UpdateRate; } set { _UpdateRate = value; OnPropertyChanged("UpdateRate"); } }
@@ -75,8 +76,9 @@ namespace SpreadTrader
 				List<MarketProfitAndLoss> pl = Betfair.listMarketProfitAndLoss(MarketID);
 				Market.MarketBook = Betfair.GetMarketBook(Market);
 				TotalMatched = Market.MarketBook.totalMatched;
-					foreach (Runner r in Market.MarketBook.Runners)
-					{
+				Status = Market.MarketBook.status;
+				foreach (Runner r in Market.MarketBook.Runners)
+				{
 					if (pl.Count > 0)
 					{
 						foreach (var p in pl[0].profitAndLosses)

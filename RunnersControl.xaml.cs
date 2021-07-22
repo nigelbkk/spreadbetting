@@ -89,6 +89,7 @@ namespace SpreadTrader
 					try
 					{
 						LiveRunners = MarketNode.GetLiveRunners();
+						Debug.WriteLine(MarketNode.Status);
 						if (props.UseStreaming)
 						{
 							BackgroundWorker bw = new BackgroundWorker();
@@ -149,6 +150,7 @@ namespace SpreadTrader
 							var runners = streamingAPI.LiveRunners;
 							DateTime LastUpdate = DateTime.UtcNow;
 							var lr = MarketNode.GetLiveRunners();
+							Debug.WriteLine(MarketNode.Status);
 							Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 							sender.ReportProgress(rate, lr);
 							if (stop_async)

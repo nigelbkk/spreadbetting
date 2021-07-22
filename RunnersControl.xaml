@@ -138,12 +138,6 @@
 						<Label Content="{Binding Path=LayBook, Converter={StaticResource pconverter}}"  FontSize="11"/>
 						<Label/>
 						<Label/>
-						<!--<Label Width="32">
-							<TextBlock>Back<LineBreak/>Stake</TextBlock>
-						</Label>
-						<Label Width="32">
-							<TextBlock>Lay<LineBreak/>Stake</TextBlock>
-						</Label>-->
 						<Label Width="32">
 							<TextBlock>Last<LineBreak/>Price</TextBlock>
 						</Label>
@@ -165,5 +159,8 @@
 				</ItemsControl.Template>
 			</ItemsControl>
 		</StackPanel>
+		<Border Name="Overlay" Background="#00000000" BorderThickness="2" BorderBrush="DarkGray" IsHitTestVisible="False" Visibility="Visible" Width="600" Height="150" Margin="20,20">
+			<Label Foreground="DarkGray" HorizontalAlignment="Stretch" Background="#00000000" Width="600" FontSize="100" FontWeight="Medium">Suspended</Label>
+		</Border>
 	</Grid>
 </UserControl>
