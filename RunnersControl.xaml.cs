@@ -35,6 +35,14 @@ namespace SpreadTrader
 				PropertyChanged(this, new PropertyChangedEventArgs(info));
 			}
 		}
+		public void UpdateMarketStatus()
+		{
+			Dispatcher.BeginInvoke(new Action(() =>
+			{
+				Overlay.Visibility = MarketNode.Status == marketStatusEnum.OPEN ? Visibility.Hidden : Visibility.Visible;
+				OverlayText.Text = MarketNode.Status.ToString();
+			}));
+		}
 		public RunnersControl()
 		{
 			MarketNode = new NodeViewModel(MainWindow.Betfair);
@@ -76,6 +84,7 @@ namespace SpreadTrader
 					MarketNode.TotalMatched = tradedVolume;
 					BackBook = totalBack;
 					LayBook = totalLay;
+					UpdateMarketStatus();
 					NotifyPropertyChanged("");
 					if (Worker.IsBusy)
 						Worker.CancelAsync();
@@ -150,7 +159,7 @@ namespace SpreadTrader
 							var runners = streamingAPI.LiveRunners;
 							DateTime LastUpdate = DateTime.UtcNow;
 							var lr = MarketNode.GetLiveRunners();
-							Debug.WriteLine(MarketNode.Status);
+							UpdateMarketStatus();
 							Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 							sender.ReportProgress(rate, lr);
 							if (stop_async)

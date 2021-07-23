@@ -22,59 +22,67 @@ namespace BetfairAPI
         public DateTime sysTime = DateTime.UtcNow;
         public Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
-            String[] AccountCalls = new String[] { "getAccountFunds" };
-            Dictionary<String, Object> joe = new Dictionary<string, object>();
-            joe["jsonrpc"] = "2.0";
-            joe["id"] = "1";
-            joe["method"] = "SportsAPING/v1.0/" + Method;
-            joe["params"] = Params;
+            try
+            {
+                String[] AccountCalls = new String[] { "getAccountFunds" };
+                Dictionary<String, Object> joe = new Dictionary<string, object>();
+                joe["jsonrpc"] = "2.0";
+                joe["id"] = "1";
+                joe["method"] = "SportsAPING/v1.0/" + Method;
+                joe["params"] = Params;
 
-            String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy;
-            if (!SpreadTrader.Properties.Settings.Default.UseProxy || String.IsNullOrEmpty(SpreadTrader.Properties.Settings.Default.Proxy))
-            {
-                if (!String.IsNullOrEmpty(Token))
+                String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy;
+                if (!SpreadTrader.Properties.Settings.Default.UseProxy || String.IsNullOrEmpty(SpreadTrader.Properties.Settings.Default.Proxy))
                 {
-                    url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";
-                    if (Method.Contains(AccountCalls[0]))
-                        url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
+                    if (!String.IsNullOrEmpty(Token))
+                    {
+                        url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";
+                        if (Method.Contains(AccountCalls[0]))
+                            url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
+                    }
+                }
+                if (AccountCalls.Contains(Method))
+                {
+                    joe["method"] = "AccountAPING/v1.0/" + Method;
+                }
+                String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
+                if (Method == "replaceOrders")
+                {
+                }
+                var bytes = Encoding.GetEncoding("UTF-8").GetBytes(postData);
+                HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
+                wr.Method = WebRequestMethods.Http.Post;
+                wr.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                wr.Headers.Add("X-Application", AppKey);
+                wr.Headers.Add("X-Authentication", Token);
+                wr.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); wr.Accept = "*/*";
+                wr.ContentType = "application/json";
+                wr.ContentLength = bytes.Length;
+
+                using (Stream stream = wr.GetRequestStream())
+                {
+                    stream.Write(bytes, 0, bytes.Length);
+                }
+                using (WebResponse response = wr.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    var jsonResponse = reader.ReadToEnd();
+                    var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
+                    if (err != null)
+                    {
+                        ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
+                        throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
+                    }
+                    String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
+                    return JsonConvert.DeserializeObject<T>(res);
                 }
             }
-            if (AccountCalls.Contains(Method))
-            {
-                joe["method"] = "AccountAPING/v1.0/" + Method;
-            }
-            String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
-            if (Method == "replaceOrders")
-            {
-            }
-            var bytes = Encoding.GetEncoding("UTF-8").GetBytes(postData);
-            HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
-            wr.Method = WebRequestMethods.Http.Post;
-            wr.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            wr.Headers.Add("X-Application", AppKey);
-            wr.Headers.Add("X-Authentication", Token);
-            wr.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); wr.Accept = "*/*";
-            wr.ContentType = "application/json";
-            wr.ContentLength = bytes.Length;
-            
-            using (Stream stream = wr.GetRequestStream())
-            {
-                stream.Write(bytes, 0, bytes.Length);
-            }
-            using (WebResponse response = wr.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
-            {
-                var jsonResponse = reader.ReadToEnd();
-                var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
-                if (err != null)
-                {
-                    ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
-                    throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
-                }
-                String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
-                return JsonConvert.DeserializeObject<T>(res);
-            }
+            catch(Exception xe)
+			{
+                Debug.WriteLine(xe.Message);
+                return null;
+			}
         }
         public void login(String CertFile, String CertPassword, String appKey, String username, String password)
         {

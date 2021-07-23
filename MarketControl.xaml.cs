@@ -61,16 +61,15 @@ namespace SpreadTrader
 			timer.Start();
 			ttg_timer.Elapsed += (o, e) =>
 			{
+				StreamActive = true;
+				timer.Start();
 				NotifyPropertyChanged("");
 			};
-			ttg_timer.Interval = 1000;
+			ttg_timer.Interval = 500;
 			ttg_timer.Enabled = true;
 			ttg_timer.Start();
 			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
 			{
-				StreamActive = true;
-				timer.Start();
-
 				this.Dispatcher.Invoke(() =>
 				{
 					NotifyPropertyChanged("TimeToGo");
