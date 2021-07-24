@@ -468,7 +468,7 @@ namespace SpreadTrader
 		{
 			Label lb = sender as Label;
 			Row row = lb.DataContext as Row;
-			UpdateBet ub = new UpdateBet(this, row);
+			UpdateBet ub = new UpdateBet(row);
 			ub.ShowDialog();
 		}
 	}

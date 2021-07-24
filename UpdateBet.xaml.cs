@@ -25,22 +25,20 @@ namespace SpreadTrader
 				PropertyChanged(this, new PropertyChangedEventArgs(info));
 			}
 		}
-		public UpdateBet(Visual visual, Row row)
+		public UpdateBet(Row row)
 		{
-			ParentObject = visual as DependencyObject;
-			MainWindow mw = Extensions.FindParentOfType<MainWindow>(ParentObject);
-
 			InitializeComponent();
+
 			if (props.BRLeft >= 0 && props.BRTop >= 0)
 			{
-				Top = props.BRTop + mw.Top;
-				Left = props.BRLeft + mw.Left;
+				Top = props.BRTop + Application.Current.MainWindow.Top;
+				Left = props.BRLeft + Application.Current.MainWindow.Left;
 			}
 			this.Row = row;
 			BetReference = "Bet Reference: " + row.BetID;
 			Stake = row.Stake;
 			Odds = row.Odds;
-			Profit = 5.1;				///NH
+//			Profit = 5.1;				///NH
 			UpDown.Value = Odds;
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
@@ -66,12 +64,10 @@ namespace SpreadTrader
 		}
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
-			MainWindow mw = Extensions.FindParentOfType<MainWindow>(ParentObject);
-			if (mw != null)
-			{
-			}
-			props.BRTop = Top - mw.Top;
-			props.BRLeft = Left - mw.Left;
+			props.BRTop = Top - Application.Current.MainWindow.Top;
+			props.BRLeft = Left - Application.Current.MainWindow.Left;
+			//props.BRTop = RestoreBounds.Y;
+			//props.BRLeft = RestoreBounds.X;
 			props.Save();
 		}
 	}
