@@ -442,5 +442,29 @@ namespace SpreadTrader.Properties {
                 this["DefaultStake"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double BRTop {
+            get {
+                return ((double)(this["BRTop"]));
+            }
+            set {
+                this["BRTop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double BRLeft {
+            get {
+                return ((double)(this["BRLeft"]));
+            }
+            set {
+                this["BRLeft"] = value;
+            }
+        }
     }
 }

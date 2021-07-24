@@ -1,11 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -50,6 +45,8 @@ namespace SpreadTrader
 				Top = props.CDTop + mw.Top;
 				Left = props.CDLeft + mw.Left;
 			}
+			Top = 0;
+			Left = 0;
 			Runner = runner.Name;
 			SelectionId = runner.SelectionId;
 			Side = side;

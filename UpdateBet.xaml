@@ -7,7 +7,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         xmlns:local="clr-namespace:SpreadTrader"
         mc:Ignorable="d"
-        Title="Update Bet" Height="200" Width="320" Topmost="True" ResizeMode="NoResize" WindowStartupLocation="Manual">
+        Title="Update Bet" Height="200" Width="320" Topmost="True" Closing="Window_Closing">
 	<Window.Resources>
 		<local:CurrencyConverter x:Key="cconverter" />
 		<local:StakeConverter x:Key="sconverter" />
@@ -63,8 +63,6 @@
 	</Window.Resources>
 	<Grid>
 		<Label Content= "{Binding Path=BetReference}" Margin="20,5,0,0" Width="260"/>
-		<!--<Label Content= "{Binding Path= ProfitLiability}" Margin="20,120,0,0"  Width="260"/>-->
-
 		<Grid Height="36" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="20,47,0,0" Width="260">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="50"/>

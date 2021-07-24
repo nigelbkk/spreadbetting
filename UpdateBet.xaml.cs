@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Media;
 using BetfairAPI;
 
 namespace SpreadTrader
@@ -14,6 +15,8 @@ namespace SpreadTrader
 		public String ProfitLiability{ get {return String.Format("Profit/Liability: {0:0.00}", Profit); }}
 		public double Stake { get; set; }
 		public double Odds { get; set; }
+		public DependencyObject ParentObject { get; set; }
+		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
 		public void NotifyPropertyChanged(String info)
 		{
@@ -22,14 +25,22 @@ namespace SpreadTrader
 				PropertyChanged(this, new PropertyChangedEventArgs(info));
 			}
 		}
-		public UpdateBet(Row row)
+		public UpdateBet(Visual visual, Row row)
 		{
+			ParentObject = visual as DependencyObject;
+			MainWindow mw = Extensions.FindParentOfType<MainWindow>(ParentObject);
+
+			InitializeComponent();
+			if (props.BRLeft >= 0 && props.BRTop >= 0)
+			{
+				Top = props.BRTop + mw.Top;
+				Left = props.BRLeft + mw.Left;
+			}
 			this.Row = row;
 			BetReference = "Bet Reference: " + row.BetID;
 			Stake = row.Stake;
 			Odds = row.Odds;
-			Profit = 5.1;
-			InitializeComponent();
+			Profit = 5.1;				///NH
 			UpDown.Value = Odds;
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
@@ -52,6 +63,16 @@ namespace SpreadTrader
 				Debug.WriteLine(report.instructionReports[0].errorCode.ToString());
 			});
 			t.Start();
+		}
+		private void Window_Closing(object sender, CancelEventArgs e)
+		{
+			MainWindow mw = Extensions.FindParentOfType<MainWindow>(ParentObject);
+			if (mw != null)
+			{
+			}
+			props.BRTop = Top - mw.Top;
+			props.BRLeft = Left - mw.Left;
+			props.Save();
 		}
 	}
 }

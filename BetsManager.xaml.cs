@@ -468,11 +468,7 @@ namespace SpreadTrader
 		{
 			Label lb = sender as Label;
 			Row row = lb.DataContext as Row;
-			MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
-			var pos = e.GetPosition(mw);
-			UpdateBet ub = new UpdateBet(row);
-			ub.Left = pos.X;
-			ub.Top = pos.Y;
+			UpdateBet ub = new UpdateBet(this, row);
 			ub.ShowDialog();
 		}
 	}
