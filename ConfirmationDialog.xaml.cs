@@ -54,6 +54,7 @@ namespace SpreadTrader
 			SelectionId = runner.SelectionId;
 			Side = side;
 			Odds = odds;
+			Stake = props.DefaultStake;
 			if (props.SafeBets)
 			{
 				Stake = 2.00;

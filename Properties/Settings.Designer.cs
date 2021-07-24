@@ -430,5 +430,17 @@ namespace SpreadTrader.Properties {
                 this["TimeOffset"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public double DefaultStake {
+            get {
+                return ((double)(this["DefaultStake"]));
+            }
+            set {
+                this["DefaultStake"] = value;
+            }
+        }
     }
 }
