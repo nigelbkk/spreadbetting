@@ -57,8 +57,12 @@ namespace SpreadTrader
 			System.Threading.Thread t = new System.Threading.Thread(() =>
 			{
 				ReplaceExecutionReport report = betfair.replaceOrder(Row.MarketID, Row.BetID.ToString(), Odds, Stake);
-				Debug.Write(report.ErrorCode.ToString() + " : ");
-				Debug.WriteLine(report.instructionReports[0].errorCode.ToString());
+				if (report.status != ExecutionReportStatusEnum.SUCCESS)
+				{
+					Debug.Write(report.ErrorCode.ToString() + " : ");
+					Debug.WriteLine(report.instructionReports[0].errorCode.ToString());
+					MessageBox.Show(report.instructionReports[0].errorCode.ToString(), "Update Bet", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+				}
 			});
 			t.Start();
 		}
@@ -66,8 +70,6 @@ namespace SpreadTrader
 		{
 			props.BRTop = Top - Application.Current.MainWindow.Top;
 			props.BRLeft = Left - Application.Current.MainWindow.Left;
-			//props.BRTop = RestoreBounds.Y;
-			//props.BRLeft = RestoreBounds.X;
 			props.Save();
 		}
 	}

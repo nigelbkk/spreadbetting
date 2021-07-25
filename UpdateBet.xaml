@@ -79,7 +79,7 @@
 			</Grid.ColumnDefinitions>
 			<Label Grid.Column="0" Grid.ColumnSpan="2" Width="65">Stake:</Label>
 			<Border Grid.Column="1" BorderThickness="1.0"  Margin="20,5" Width="80" BorderBrush="DarkGray" HorizontalAlignment="Left">
-				<TextBox Text="{Binding Path=Stake, Converter={StaticResource sconverter}}"/>
+				<TextBox IsReadOnly="True" Text="{Binding Path=Stake, Converter={StaticResource sconverter}}"/>
 			</Border>
 		</Grid>
 		<Button Content="Update" Margin="0,48,19.667,0" Click="Button_Click_1" RenderTransformOrigin="0.496,1.111"/>

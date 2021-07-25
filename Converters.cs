@@ -171,6 +171,18 @@ namespace SpreadTrader
 			return value.ToString();
 		}
 	}
+	public class StakeConverter2DP : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			double val = System.Convert.ToDouble(value);
+			return String.Format("{0:0.00}", val);
+		}
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			return value.ToString();
+		}
+	}
 	public class RowToIndexConverter : MarkupExtension, IValueConverter
 	{
 		static RowToIndexConverter convertor;
