@@ -23,6 +23,7 @@ namespace BetfairAPI
 			{"DSC-0037", "SubscriptionRequired"},
 			{"DSC-0038", "OperationForbidden"},
 			{"ANGX-0003", "Invalid Session Information"}
+			{"ANGX-0006", "Exchange Error"}
 		};
 		static public String FaultCode(String code)
 		{
