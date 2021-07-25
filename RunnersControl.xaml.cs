@@ -118,8 +118,9 @@ namespace SpreadTrader
 					catch (Exception xe)
 					{
 						Debug.WriteLine(xe.Message);
-						MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
-						if (mw != null) mw.Status = xe.Message;
+						//MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
+						//if (mw != null) 
+						Extensions.MainWindow.Status = xe.Message;
 					}
 				}
 			};
@@ -171,8 +172,9 @@ namespace SpreadTrader
 						Debug.WriteLine(xe.Message);
 						Dispatcher.BeginInvoke(new Action(() =>
 						{
-							MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
-							if (mw != null) mw.Status = xe.Message;
+							//MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
+							//if (mw != null) 
+							Extensions.MainWindow.Status = xe.Message;
 						}));
 					}
 					System.Threading.Thread.Sleep(props.WaitBF);
@@ -337,8 +339,7 @@ namespace SpreadTrader
 			catch (Exception xe)
 			{
 				Debug.WriteLine(xe.Message);
-				MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
-				if (mw != null) mw.Status = xe.Message;
+				Extensions.MainWindow.Status = xe.Message;
 			}
 		}
 		private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -357,16 +358,15 @@ namespace SpreadTrader
 			}
 			catch (Exception xe)
 			{
+				Debug.WriteLine(xe.Message);
 			}
 		}
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
-			MainWindow mw2 = Extensions.FindParentOfType<MainWindow>(SV1);
-			if (mw2 != null)
-				mw2.OnShutdown += () =>
-				{
-					streamingAPI.Stop();
-				};
+			Extensions.MainWindow.OnShutdown += () =>
+			{
+				streamingAPI.Stop();
+			};
 		}
 		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
 		{

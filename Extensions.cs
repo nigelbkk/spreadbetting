@@ -6,6 +6,7 @@ namespace SpreadTrader
 {
 	public static class Extensions
 	{
+		public static MainWindow MainWindow { get { return Application.Current.MainWindow as MainWindow; } }
 		public static T FindParentOfType<T>(this DependencyObject o) where T : DependencyObject
 		{
 			DependencyObject parent = o;

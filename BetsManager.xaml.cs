@@ -269,13 +269,11 @@ namespace SpreadTrader
 											}
 										}
 									}
-							//		MarketNode.CalculateLevelProfit();
 								}
 							}
 						}
 					}
 				}
-				MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
 			}
 			catch(Exception xe)
 			{
@@ -315,8 +313,9 @@ namespace SpreadTrader
 						Debug.WriteLine(xe.Message);
 						Dispatcher.BeginInvoke(new Action(() =>
 						{
-							MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
-							if (mw != null) mw.Status = xe.Message;
+							//MainWindow mw = Application.Current.MainWindow as MainWindow;// Extensions.FindParentOfType<MainWindow>(Parent);
+							//if (mw != null) 
+							Extensions.MainWindow.Status = xe.Message;
 						}));
 					}
 				}

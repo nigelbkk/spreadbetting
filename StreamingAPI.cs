@@ -79,16 +79,11 @@ namespace SpreadTrader
 			}
 			catch (Exception xe)
 			{
+				Debug.WriteLine(xe.Message);
 			}
 		}
 		private static void OnOrderChanged(object sender, OrderMarketChangedEventArgs e)
 		{
-			try
-			{
-			}
-			catch (Exception xe)
-			{
-			}
 		}
 		public void Start(String marketID)
 		{

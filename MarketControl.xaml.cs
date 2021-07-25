@@ -106,8 +106,9 @@ namespace SpreadTrader
 			catch (Exception xe)
 			{
 				Debug.WriteLine(xe.Message);
-				MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
-				if (mw != null) mw.Status = xe.Message;
+				//MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
+				//if (mw != null) 
+				Extensions.MainWindow.Status = xe.Message;
 			}
 		}
 		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
