@@ -313,8 +313,6 @@ namespace SpreadTrader
 						Debug.WriteLine(xe.Message);
 						Dispatcher.BeginInvoke(new Action(() =>
 						{
-							//MainWindow mw = Application.Current.MainWindow as MainWindow;// Extensions.FindParentOfType<MainWindow>(Parent);
-							//if (mw != null) 
 							Extensions.MainWindow.Status = xe.Message;
 						}));
 					}

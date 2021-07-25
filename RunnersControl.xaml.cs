@@ -118,8 +118,6 @@ namespace SpreadTrader
 					catch (Exception xe)
 					{
 						Debug.WriteLine(xe.Message);
-						//MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
-						//if (mw != null) 
 						Extensions.MainWindow.Status = xe.Message;
 					}
 				}
@@ -172,8 +170,6 @@ namespace SpreadTrader
 						Debug.WriteLine(xe.Message);
 						Dispatcher.BeginInvoke(new Action(() =>
 						{
-							//MainWindow mw = Extensions.FindParentOfType<MainWindow>(Parent);
-							//if (mw != null) 
 							Extensions.MainWindow.Status = xe.Message;
 						}));
 					}
