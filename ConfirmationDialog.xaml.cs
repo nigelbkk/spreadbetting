@@ -31,8 +31,9 @@ namespace SpreadTrader
 				PropertyChanged(this, new PropertyChangedEventArgs(info));
 			}
 		}
-		public ConfirmationDialog(String MarketId, LiveRunner runner, String side, double odds)
+		public ConfirmationDialog(RunnersControl runnersControl, String MarketId, LiveRunner runner, String side, double odds)
 		{
+			this.runnersControl = runnersControl;
 			if (props.CDLeft > 0 && props.CDTop > 0)
 			{
 				Top = props.CDTop + Application.Current.MainWindow.Top;

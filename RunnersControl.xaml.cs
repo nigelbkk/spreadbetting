@@ -332,7 +332,7 @@ namespace SpreadTrader
 							break;
 						}
 					}
-					ConfirmationDialog dlg = new ConfirmationDialog(MarketNode.MarketID, live_runner, side, odds);
+					ConfirmationDialog dlg = new ConfirmationDialog(this, MarketNode.MarketID, live_runner, side, odds);
 					dlg.ShowDialog();
 				}
 			}
