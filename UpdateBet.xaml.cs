@@ -56,10 +56,8 @@ namespace SpreadTrader
 		//}
 		private void Button_Click_1(object sender, RoutedEventArgs e)
 		{
-			UpDownControl ocontrol = sender as UpDownControl;
-			UpDownControlStake scontrol = sender as UpDownControlStake;
-			Odds = ocontrol.Value.Value;
-			Stake = scontrol.Value.Value;
+			Odds = UpDownOdds.Value.Value;
+			Stake = UpDownStake.Value.Value;
 
 			BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
 			System.Threading.Thread t = new System.Threading.Thread(() =>
@@ -69,12 +67,15 @@ namespace SpreadTrader
 					CancelExecutionReport report1 = betfair.cancelOrder(Row.MarketID, Row.BetID);
 					PlaceExecutionReport report2 = betfair.placeOrder(Row.MarketID, Row.SelectionID, Row.Side == "BACK" ? sideEnum.BACK : sideEnum.LAY, Stake, Row.Odds);
 				}
-				ReplaceExecutionReport report = betfair.replaceOrder(Row.MarketID, Row.BetID.ToString(), Odds, Stake);
-				if (report.status != ExecutionReportStatusEnum.SUCCESS)
+				else
 				{
-					Debug.Write(report.ErrorCode.ToString() + " : ");
-					Debug.WriteLine(report.instructionReports[0].errorCode.ToString());
-					MessageBox.Show(report.instructionReports[0].errorCode.ToString(), "Update Bet", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+					ReplaceExecutionReport report = betfair.replaceOrder(Row.MarketID, Row.BetID.ToString(), Odds, Stake);
+					if (report.status != ExecutionReportStatusEnum.SUCCESS)
+					{
+						Debug.Write(report.ErrorCode.ToString() + " : ");
+						Debug.WriteLine(report.instructionReports[0].errorCode.ToString());
+						MessageBox.Show(report.instructionReports[0].errorCode.ToString(), "Update Bet", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+					}
 				}
 				NotifyPropertyChanged("");
 			});
