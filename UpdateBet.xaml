@@ -7,7 +7,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         xmlns:local="clr-namespace:SpreadTrader"
         mc:Ignorable="d"
-        Title="Update Bet" Height="200" Width="320" Topmost="True" Closing="Window_Closing">
+        Title="Update Bet" Height="173.333" Width="320" Topmost="True" Closing="Window_Closing">
 	<Window.Resources>
 		<local:CurrencyConverter x:Key="cconverter" />
 		<local:StakeConverter x:Key="sconverter" />
@@ -62,14 +62,14 @@
 		</Style>
 	</Window.Resources>
 	<Grid>
-		<Label Content= "{Binding Path=BetReference}" Margin="20,5,0,0" Width="260"/>
-		<Grid Height="36" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="20,47,0,0" Width="260">
+		<Label Content= "{Binding Path=BetReference}" Margin="20,1,0,0" Width="260"/>
+		<Grid Height="36" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="20,37,0,0" Width="260">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="50"/>
 				<ColumnDefinition Width="8*"/>
 			</Grid.ColumnDefinitions>
 			<Label Grid.Column="0" Grid.ColumnSpan="2" Width="65" >Odds:</Label>
-			<local:UpDownControl x:Name="UpDown" Margin="20,0" Grid.Column="1" HorizontalAlignment="Left" ValueChanged="ValueChanged" Height="30"/>
+			<local:UpDownControl x:Name="UpDownOdds" Margin="20,0" Grid.Column="1" HorizontalAlignment="Left" Height="30" Width="80"/>
 		</Grid>
 
 		<Grid Height="36" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="20,81,0,0"  Width="270">
@@ -78,11 +78,9 @@
 				<ColumnDefinition Width="8*"/>
 			</Grid.ColumnDefinitions>
 			<Label Grid.Column="0" Grid.ColumnSpan="2" Width="65">Stake:</Label>
-			<Border Grid.Column="1" BorderThickness="1.0"  Margin="20,5" Width="80" BorderBrush="DarkGray" HorizontalAlignment="Left">
-				<TextBox IsReadOnly="False" Text="{Binding Path=Stake, Mode=TwoWay, Converter={StaticResource sconverter}}"/>
-			</Border>
+			<local:UpDownControlStake x:Name="UpDownStake" Margin="20,0" Grid.Column="1" HorizontalAlignment="Left" Height="30" Width="80"/>
 		</Grid>
-		<Button Content="Update" Margin="0,48,19.667,0" Click="Button_Click_1" RenderTransformOrigin="0.496,1.111"/>
-		<Button Content="Cancel" Margin="0,119,19.667,0"/>
+		<Button Content="Update" Margin="0,38,19.667,0" Click="Button_Click_1"/>
+		<Button Content="Cancel" Margin="0,83,19.333,0"/>
 	</Grid>
 </Window>

@@ -39,8 +39,8 @@ namespace SpreadTrader
 		public bool SP { get; set; }
 		public String Runner { get; set; }
 		public String Side { get; set; }
-		public double _Stake { get; set; }
-		public double Stake { get { return _Stake; } set { _Stake = value; NotifyPropertyChanged(""); } }
+		public Int32 _Stake { get; set; }
+		public Int32 Stake { get { return _Stake; } set { _Stake = value; NotifyPropertyChanged(""); } }
 		public double Odds { get; set; }
 		public double Profit { get {
 				double p = Stake * (Odds - 1);
@@ -63,7 +63,7 @@ namespace SpreadTrader
 		{
 			Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
 			Odds = o.P.Value;
-			Stake = o.S.Value;
+			Stake = (Int32) o.S.Value;
 			Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
 			BetID = Convert.ToUInt64(o.Id);
 		}
@@ -73,7 +73,7 @@ namespace SpreadTrader
 			BetID = o.betId;
 			SelectionID = o.selectionId;
 			Side = o.side;
-			Stake = o.priceSize.size;
+			Stake = (Int32) o.priceSize.size;
 			Odds = o.priceSize.price;
 			Matched = o.sizeMatched;
 			MarketID = o.marketId;
@@ -233,7 +233,7 @@ namespace SpreadTrader
 										{
 											Rows.Remove(mrow);
 										}
-										urow.Stake = o.Sm.Value;
+										urow.Stake = (Int32) o.Sm.Value;
 										urow.Matched = o.Sm.Value;
 										urow.Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Md.Value).ToLocalTime();
 										urow.Hidden = UnmatchedOnly;
@@ -244,7 +244,7 @@ namespace SpreadTrader
 										if (mrow == null)
 										{
 											mrow = new Row(o);
-											mrow.Stake = o.Sm.Value;
+											mrow.Stake = (Int32) o.Sm.Value;
 											mrow.Matched = o.Sm.Value;
 											mrow.SelectionID = orc.Id.Value;
 											mrow.Runner = MarketNode != null ? MarketNode.GetRunnerName(mrow.SelectionID) : mrow.SelectionID.ToString();
@@ -252,10 +252,10 @@ namespace SpreadTrader
 										}
 										else
 										{
-											mrow.Stake = o.Sm.Value;
+											mrow.Stake = (Int32) o.Sm.Value;
 											mrow.Matched = o.Sm.Value;
 										}
-										urow.Stake = o.Sr.Value;
+										urow.Stake = (Int32) o.Sr.Value;
 										urow.Hidden = UnmatchedOnly;
 									}
 									else if (o.Sc > 0 || o.Sl > 0) // order lapsed or cancelled

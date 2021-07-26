@@ -29,4 +29,23 @@ namespace SpreadTrader
 			return (bool)element.GetValue(InPlay);
 		}
 	}
+	public class UpDownControlStake : Xceed.Wpf.Toolkit.IntegerUpDown
+	{
+		protected override int DecrementValue(int value, int increment)
+		{
+			if (value <= 2)
+				return value;
+			if (value <= 10)
+				return value - 1;
+
+			return (value - 10) - (value % 10);
+		}
+		protected override int IncrementValue(int value, int increment)
+		{
+			if (value < 10)
+				return value + 1;
+
+			return (value + 10) - (value) % 10;
+		}
+	}
 }

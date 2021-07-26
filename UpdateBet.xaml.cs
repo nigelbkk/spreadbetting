@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
-using System.Windows.Media;
 using BetfairAPI;
 
 namespace SpreadTrader
@@ -13,9 +12,9 @@ namespace SpreadTrader
 		public String BetReference { get; set; }
 		public double Profit { get; set; }
 		public String ProfitLiability{ get {return String.Format("Profit/Liability: {0:0.00}", Profit); }}
-		public double Stake { get; set; }
+		public Int32 OriginalStake { get; set; }
+		public Int32 Stake { get; set; }
 		public double Odds { get; set; }
-		public DependencyObject ParentObject { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
 		public void NotifyPropertyChanged(String info)
@@ -36,26 +35,40 @@ namespace SpreadTrader
 			}
 			this.Row = row;
 			BetReference = "Bet Reference: " + row.BetID;
-			Stake = row.Stake;
+			OriginalStake = Stake = row.Stake;
 			Odds = row.Odds;
-//			Profit = 5.1;				///NH
-			UpDown.Value = Odds;
+			UpDownOdds.Value = Odds;
+			UpDownStake.Value = (short) Stake;
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			Close();
 		}
-		private void ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-		{
-			UpDownControl control = sender as UpDownControl;
-			Odds = Convert.ToDouble(control.Value);
-			NotifyPropertyChanged("");
-		}
+		//private void ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		//{
+		//	UpDownControl control = sender as UpDownControl;
+		//	switch (control.Name)
+		//	{
+		//		case "UpDownOdds"  : Odds = Convert.ToDouble(control.Value);	break;
+		//		case "UpDownStake" : Stake = Convert.ToInt32(control.Value);	break;
+		//	}
+		//	NotifyPropertyChanged("");
+		//}
 		private void Button_Click_1(object sender, RoutedEventArgs e)
 		{
+			UpDownControl ocontrol = sender as UpDownControl;
+			UpDownControlStake scontrol = sender as UpDownControlStake;
+			Odds = ocontrol.Value.Value;
+			Stake = scontrol.Value.Value;
+
 			BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
 			System.Threading.Thread t = new System.Threading.Thread(() =>
 			{
+				if (OriginalStake != Stake)
+				{
+					CancelExecutionReport report1 = betfair.cancelOrder(Row.MarketID, Row.BetID);
+					PlaceExecutionReport report2 = betfair.placeOrder(Row.MarketID, Row.SelectionID, Row.Side == "BACK" ? sideEnum.BACK : sideEnum.LAY, Stake, Row.Odds);
+				}
 				ReplaceExecutionReport report = betfair.replaceOrder(Row.MarketID, Row.BetID.ToString(), Odds, Stake);
 				if (report.status != ExecutionReportStatusEnum.SUCCESS)
 				{
@@ -63,6 +76,7 @@ namespace SpreadTrader
 					Debug.WriteLine(report.instructionReports[0].errorCode.ToString());
 					MessageBox.Show(report.instructionReports[0].errorCode.ToString(), "Update Bet", MessageBoxButton.OK, MessageBoxImage.Exclamation);
 				}
+				NotifyPropertyChanged("");
 			});
 			t.Start();
 		}
