@@ -44,16 +44,6 @@ namespace SpreadTrader
 		{
 			Close();
 		}
-		//private void ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-		//{
-		//	UpDownControl control = sender as UpDownControl;
-		//	switch (control.Name)
-		//	{
-		//		case "UpDownOdds"  : Odds = Convert.ToDouble(control.Value);	break;
-		//		case "UpDownStake" : Stake = Convert.ToInt32(control.Value);	break;
-		//	}
-		//	NotifyPropertyChanged("");
-		//}
 		private void Button_Click_1(object sender, RoutedEventArgs e)
 		{
 			Odds = UpDownOdds.Value.Value;

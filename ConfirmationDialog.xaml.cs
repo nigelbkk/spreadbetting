@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using BetfairAPI;
 
@@ -53,6 +54,8 @@ namespace SpreadTrader
 			this.MarketId = MarketId;
 			InitializeComponent();
 			UpDown.Value = Odds;
+			FocusManager.SetFocusedElement(DockPanel, Submit_button);
+			IInputElement focusedElement = FocusManager.GetFocusedElement(DockPanel);
 		}
 		private void Submit(object sender, RoutedEventArgs _e)
 		{
