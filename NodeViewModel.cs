@@ -187,10 +187,13 @@ namespace SpreadTrader
 		}
 		public String GetRunnerName(Int64 SelectionID)
 		{
-			foreach (LiveRunner r in LiveRunners)
+			if (LiveRunners != null)
 			{
-				if (r.SelectionId == SelectionID)
-					return r.Name;
+				foreach (LiveRunner r in LiveRunners)
+				{
+					if (r.SelectionId == SelectionID)
+						return r.Name;
+				}
 			}
 			return SelectionID.ToString();
 		}

@@ -35,7 +35,7 @@ namespace SpreadTrader
 			}
 			this.Row = row;
 			BetReference = "Bet Reference: " + row.BetID;
-			OriginalStake = Stake = row.Stake;
+			OriginalStake = Stake = (Int32) row.Stake;
 			Odds = row.Odds;
 			UpDownOdds.Value = Odds;
 			UpDownStake.Value = (short) Stake;
