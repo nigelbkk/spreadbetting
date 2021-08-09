@@ -385,7 +385,7 @@ namespace SpreadTrader
 						if (MarketNode != null)
 						{
 							CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
-							Debug.WriteLine("status: {0}", report.status);
+							//Debug.WriteLine("status: {0}", report.status);
 						}
 					};
 					bw.RunWorkerAsync();
