@@ -77,6 +77,7 @@ namespace SpreadTrader
 			};
 			SliderControl.SubmitBets += RunnersControl.SubmitBets;
 			RunnersAndSlidersGrid.ColumnDefinitions[0].Width = new GridLength(props.VerticalSplitter);
+			RunnersControl.OnFavoriteChanged += SliderControl.OnFavoriteChanged;
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{

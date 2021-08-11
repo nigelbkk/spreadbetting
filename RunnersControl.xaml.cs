@@ -18,6 +18,7 @@ namespace SpreadTrader
 		public BetsManager betsManager = null;
 		public NodeSelectionDelegate NodeChangeEventSink = null;
 		public StreamUpdateDelegate StreamUpdateEventSink = null;
+		public FavoriteChangedDelegate OnFavoriteChanged = null;
 		private StreamingAPI streamingAPI = new StreamingAPI();
 		private BackgroundWorker Worker = null;
 		public NodeViewModel _MarketNode { get; set; }
@@ -178,31 +179,6 @@ namespace SpreadTrader
 			};
 			Worker.RunWorkerAsync();
 		}
-		private PlaceExecutionReport placeOrder(String marketId, LiveRunner runner, sideEnum side, PriceSize ps)
-		{
-			BetfairAPI.BetfairAPI Betfair = MainWindow.Betfair;//new BetfairAPI.BetfairAPI();
-
-			PlaceInstruction pi = new PlaceInstruction()
-			{
-				orderTypeEnum = orderTypeEnum.LIMIT,
-				sideEnum = side,
-				Runner = runner.Name,
-				marketTypeEnum = marketTypeEnum.WIN,
-				selectionId = runner.SelectionId,
-				limitOrder = new LimitOrder()
-				{
-					persistenceTypeEnum = persistenceTypeEnum.LAPSE,
-					price = ps.price,
-					size = ps.size,
-				}
-			};
-			using (StreamWriter w = File.AppendText(props.LogFile))
-			{
-				w.WriteLine(MarketNode.FullName + "," + pi);
-				Debug.WriteLine(pi);
-			}
-			return new PlaceExecutionReport();
-		}
 		private PlaceExecutionReport placeOrders(String marketId, List<PlaceInstruction> pis)
 		{
 			BetfairAPI.BetfairAPI Betfair = MainWindow.Betfair;
@@ -351,6 +327,10 @@ namespace SpreadTrader
 				if (LiveRunner.Favorite != null) LiveRunner.Favorite.IsFavorite = false;
 				LiveRunner.Favorite = cp.Content as LiveRunner;
 				LiveRunner.Favorite.IsFavorite = true;
+				if (OnFavoriteChanged != null)
+				{
+					OnFavoriteChanged(LiveRunner.Favorite);
+				}
 			}
 			catch (Exception xe)
 			{

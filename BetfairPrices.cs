@@ -50,7 +50,7 @@ namespace SpreadTrader
 		}
 		public double this[int i]
 		{
-			get => AllPrices[Math.Max(0, Math.Min(100, i))];
+			get => AllPrices[Math.Max(0, Math.Min(AllPrices.Count, i))];
 		}
 	}
 }

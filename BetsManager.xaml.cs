@@ -404,6 +404,7 @@ namespace SpreadTrader
 		{
 			CheckBox_Checked(sender, e);
 		}
+#region Debugging aids
 		private string[] lines = null;
 		private void Button_Click_1(object sender, RoutedEventArgs e)
 		{
@@ -436,6 +437,7 @@ namespace SpreadTrader
 			String cancel = lines[1];
 			String newbet = lines[2];
 		}
+#endregion
 		private void Label_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
 			Label lb = sender as Label;

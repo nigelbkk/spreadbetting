@@ -9,9 +9,11 @@ using BetfairAPI;
 
 namespace SpreadTrader
 {
+	public delegate void FavoriteChangedDelegate(LiveRunner runner);
 	public partial class SliderControl : UserControl, INotifyPropertyChanged
 	{
 		public SubmitBetsDelegate SubmitBets = null;
+
 		private BetfairPrices betfairPrices = new BetfairPrices();
 		private Int32 base_index{ get {
 				Int32 b = betfairPrices.Index(BasePrice);
@@ -124,6 +126,14 @@ namespace SpreadTrader
 				}
 				SyncPrices();
 			}
+		}
+		public void OnFavoriteChanged(LiveRunner runner)
+		{
+			// set best back & lay to the grid and recenter the sliders		
+			BasePrice = runner.BackValues[0].price;
+			MoveBack = 10;
+			MoveLay = 22;
+			SyncPrices();
 		}
 		private void Slider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
