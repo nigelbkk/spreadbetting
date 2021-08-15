@@ -114,6 +114,7 @@ namespace SpreadTrader
 		{
 			GridSplitter gs = sender as GridSplitter;
 			props.HorizontalSplitter = RunnersGrid.ActualHeight;
+//			BetsManagerContentControl.Height = Math.Max(25, 100);// e.NewSize.Height - Header.Height);
 			props.Save();
 		}
 		private void UpperGrid_Loaded(object sender, RoutedEventArgs e)
@@ -135,6 +136,7 @@ namespace SpreadTrader
 		}
 		private void LowerGrid_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
+//			Debug.WriteLine("MarketControl.LowerGrid_SizeChanged");
 		}
 	}
 }

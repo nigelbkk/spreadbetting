@@ -28,14 +28,8 @@
 			<TextBlock Margin="4,0,0,0" Text="Active" Padding="5,7,8,8" Background="{Binding Path=StreamingColor}"/>
 			<TextBlock Text	="Status: " Padding="7,8"/>
 			<TextBox TextWrapping="Wrap" Text="{Binding Path=DebugID}" Width="49" HorizontalContentAlignment="Center"/>
-			<!--<Button Content="Reset" Margin="0" Width="75" Click="Button_Click_1"/>
-			<Button Content="Step" Margin="0" Width="70" Click="Button_Click_2"/>-->
-			<!--<Button Content="Populate" Margin="0" Width="75" Click="Button_Click_1"/>
-			<Button Content="Fill" Margin="0" Width="75" Click="Button_Click_2"/>
-			<Button Content="Cancel" Margin="0" Width="75" Click="Button_Click_3"/>
-			<Button Content="New Bet" Margin="0" Width="75" Click="Button_Click_4"/>-->		
 		</StackPanel>
-		<ContentControl Grid.Row="1" >
+		<ContentControl Name ="BetsManagerContentControl" Grid.Row="1" >
 			<DataGrid AutoGenerateColumns="False" Name="dataGrid" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" Grid.ColumnSpan="2" IsReadOnly="True"
 				ScrollViewer.CanContentScroll="True" 
 				ScrollViewer.VerticalScrollBarVisibility="Auto"

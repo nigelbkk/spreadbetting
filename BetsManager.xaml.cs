@@ -50,7 +50,7 @@ namespace SpreadTrader
 		public double Matched { get { return _Matched; } set { _Matched = value; NotifyPropertyChanged(""); } }
 		public bool IsMatched { get { return _Matched > 0; } }
 		public String IsMatchedString { get { return IsMatched ? "F" : "U"; } }
-		public bool IsBack { get { return Side == "BACK"; } }
+		public bool IsBack { get { return Side.ToUpper() == "BACK"; } }
 		private bool _Hidden = false;
 		public bool Hidden { get { return _Hidden; } set { _Hidden = value; NotifyPropertyChanged(""); } }
 		public bool Override { get; set; }
