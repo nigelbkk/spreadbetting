@@ -22,8 +22,7 @@
 			<Setter Property="HorizontalAlignment" Value="Left"/>
 		</Style>
 	</UserControl.Resources>
-	<!--DataContext="{Binding RelativeSource={RelativeSource Self}}"-->
-	<Grid Name="MarketControlGrid" Background="Gray"  DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" >
+	<Grid Name="MarketControlGrid" Background="Gray"  DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" SizeChanged="MarketControlGrid_SizeChanged" >
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto"/>
 			<RowDefinition Height="*"/>
@@ -88,16 +87,16 @@
 					</Grid>
 					<Grid Grid.Row="1">
 						<DockPanel>
-							<Grid Name ="LowerGrid" SizeChanged="LowerGrid_SizeChanged">
+							<Grid Name ="LowerGrid">
 								<Grid.RowDefinitions>
 									<RowDefinition Height="3*"/>
-									<RowDefinition Height="*"/>
+									<RowDefinition Height="auto"/>
 								</Grid.RowDefinitions>
 								<Border Grid.Row="0" Background="Ivory" BorderBrush="DarkGray" BorderThickness="0,0,2,2">
 									<local:BettingGrid x:Name="BettingGridControl"/>
 								</Border>
 								<Border Name="BetsManager" Grid.Row="1" BorderBrush="DarkGray" BorderThickness="0,0,2,2">
-									<local:BetsManager x:Name="BetsManagerControl" />
+									<local:BetsManager x:Name="BetsManagerControl"/>
 								</Border>
 							</Grid>
 						</DockPanel>

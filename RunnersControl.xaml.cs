@@ -330,7 +330,6 @@ namespace SpreadTrader
 		private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			SV1.Height = Math.Max(25, e.NewSize.Height - Header.Height);
-//			Debug.WriteLine("RunnersControl.Grid_SizeChanged");
 		}
 		private void Label_PreviewMouseDown(object sender, MouseButtonEventArgs e)
 		{

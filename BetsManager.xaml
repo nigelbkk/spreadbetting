@@ -29,12 +29,11 @@
 			<TextBlock Text	="Status: " Padding="7,8"/>
 			<TextBox TextWrapping="Wrap" Text="{Binding Path=DebugID}" Width="49" HorizontalContentAlignment="Center"/>
 		</StackPanel>
-		<ContentControl Name ="BetsManagerContentControl" Grid.Row="1" >
+		<ContentControl Name ="BetsManagerContentControl" Grid.Row="1">
 			<DataGrid AutoGenerateColumns="False" Name="dataGrid" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" Grid.ColumnSpan="2" IsReadOnly="True"
 				ScrollViewer.CanContentScroll="True" 
 				ScrollViewer.VerticalScrollBarVisibility="Auto"
-				ScrollViewer.HorizontalScrollBarVisibility="Auto"
-					  MaxHeight="300">
+				ScrollViewer.HorizontalScrollBarVisibility="Auto">
 				<DataGrid.ItemContainerStyle>
 					<Style TargetType="DataGridRow">
 						<Style.Triggers>

@@ -445,7 +445,6 @@ namespace SpreadTrader
 			UpdateBet ub = new UpdateBet(row);
 			ub.ShowDialog();
 		}
-
 	}
 	public class OrderMarketSnap
 	{

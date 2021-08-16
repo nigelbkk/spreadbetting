@@ -58,7 +58,7 @@
 			<StatusBar DockPanel.Dock="Bottom" Height="23" VerticalAlignment="Bottom" >
 				<TextBlock Text="{Binding Path=Status}"></TextBlock>
 			</StatusBar>
-			<Grid  Name="OuterGrid" DockPanel.Dock="Top" >
+			<Grid  Name="OuterGrid" DockPanel.Dock="Top">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="auto"></ColumnDefinition>
 					<ColumnDefinition Width="*"></ColumnDefinition>
@@ -68,7 +68,7 @@
 				</Grid>
 				<Border Grid.Column="1" DockPanel.Dock="Right" BorderBrush="Silver" BorderThickness="1" >
 					<Grid>
-						<TabControl Name ="TabControl" SelectionChanged="TabControl_SelectionChanged">
+						<TabControl Name ="TabControl" SelectionChanged="TabControl_SelectionChanged" >
 							<TabItem Header="+" PreviewMouseDown="TabItem_PreviewMouseDown" />
 						</TabControl>
 					</Grid>
