@@ -199,16 +199,16 @@ namespace SpreadTrader
 					laybets.Add(LayValues[i]);
 					backbets.Add(BackValues[i]);
 				}
-				laybets.Sort((a, b) => Math.Sign(b.price - a.price));
-				backbets.Sort((a, b) => Math.Sign(a.price - b.price));
+				//laybets.Sort((a, b) => Math.Sign(b.price - a.price));
+				//backbets.Sort((a, b) => Math.Sign(a.price - b.price));
 				if (LiveRunner.Favorite == null)
 				{
 					MessageBox.Show("Please Select the Favourite", "Submit Bets", MessageBoxButton.OK, MessageBoxImage.Exclamation);
 					return;
 				}
-				List<PlaceInstruction> orders = new List<PlaceInstruction>();
 				for (int j = 0; j < 2; j++)
 				{
+					List<PlaceInstruction> orders = new List<PlaceInstruction>();
 					List<PriceSize> bets = j == 0 ? laybets : backbets;
 					PriceSize[] values = j == 0 ? LayValues : BackValues;
 					sideEnum side = j == 0 ? sideEnum.LAY : sideEnum.BACK;
@@ -232,6 +232,18 @@ namespace SpreadTrader
 							}
 						};
 						orders.Add(pi);
+					}
+					if (props.SafeBets)
+					{
+						foreach (PlaceInstruction pi in orders)
+						{
+							pi.limitOrder.size = 2.00;
+							pi.limitOrder.price = pi.sideEnum == sideEnum.LAY ? 1.01 : 1000;
+						}
+					}
+					if (orders.Count > 0)
+					{
+						placeOrders(MarketNode.Market.marketId, orders);
 					}
 				}
 				//for (Int32 i = 0; i < 9; i++)
@@ -257,15 +269,6 @@ namespace SpreadTrader
 				//			break;
 				//	}
 				//}
-				if (props.SafeBets)
-				{
-					foreach(PlaceInstruction pi in orders)
-					{
-						pi.limitOrder.size = 2.00;
-						pi.limitOrder.price = pi.sideEnum == sideEnum.LAY ? 1.01 : 1000;
-					}
-				}
-				placeOrders(MarketNode.Market.marketId, orders);
 				MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 			}
 		}
