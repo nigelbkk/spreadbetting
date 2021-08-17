@@ -66,7 +66,7 @@ namespace SpreadTrader
 				AccountFundsResponse response = Betfair.getAccountFunds(1);
 				Balance = response.availableToBetBalance;
 				Exposure = response.exposure;
-				Commission = response.retainedCommission;
+				Commission = response.retainedCommission - response.discountRate;
 				NotifyPropertyChanged("");
 			}
 			catch (Exception xe)

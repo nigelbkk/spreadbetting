@@ -243,32 +243,10 @@ namespace SpreadTrader
 					}
 					if (orders.Count > 0)
 					{
-						placeOrders(MarketNode.Market.marketId, orders);
+						System.Threading.Thread t = new System.Threading.Thread(() => placeOrders(MarketNode.Market.marketId, orders));
+						t.Start();
 					}
 				}
-				//for (Int32 i = 0; i < 9; i++)
-				//{
-				//	if (backbets[i].IsChecked && backbets[i].ParentChecked)
-				//	{
-				//		PlaceInstruction pi = new PlaceInstruction()
-				//		{
-				//			orderTypeEnum = orderTypeEnum.LIMIT,
-				//			sideEnum = sideEnum.BACK,
-				//			Runner = LiveRunner.Favorite.Name,
-				//			marketTypeEnum = marketTypeEnum.WIN,
-				//			selectionId = LiveRunner.Favorite.SelectionId,
-				//			limitOrder = new LimitOrder()
-				//			{
-				//				persistenceTypeEnum = persistenceTypeEnum.LAPSE,
-				//				price = BackValues[i].price,
-				//				size = BackValues[i].size,
-				//			}
-				//		};
-				//		backorders.Add(pi);
-				//		if (props.SafeBets)
-				//			break;
-				//	}
-				//}
 				MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 			}
 		}

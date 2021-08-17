@@ -11,7 +11,8 @@
 				<ResourceDictionary Source="styles.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 			<local:CurrencyConverter x:Key="cconverter" />
-		
+			<local:PercentConverter x:Key="pcconverter"/>
+
 			<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
 				<Setter Property="BorderBrush" Value="DarkGray"/>
 				<Setter Property="BorderThickness" Value="0.0"/>
@@ -51,7 +52,7 @@
 				<Label PreviewMouseDown="StackPanel_PreviewMouseDown" BorderThickness="0.5" >
 					<StackPanel Orientation="Horizontal">
 						<TextBlock Text="Commission: "/>
-						<TextBlock Text="{Binding Path=Commission, Converter={StaticResource cconverter }}"/>
+						<TextBlock Text="{Binding Path=Commission, Converter={StaticResource pcconverter }}"/>
 					</StackPanel>
 				</Label>
 			</StackPanel>
