@@ -56,9 +56,9 @@
 			<Grid Background="{Binding Color}">
 				<StackPanel>
 					<StackPanel Orientation="Vertical">
-						<CheckBox IsChecked="{Binding Path=IsChecked}" IsEnabled="{Binding Path=ParentChecked}"/>
-						<TextBox Text="{Binding Path=price, Converter={StaticResource oconverter}}" IsEnabled="{Binding Path=IsChecked}"/>
-						<TextBox Text="{Binding Path=size, Converter={StaticResource sconverter}}" IsEnabled="{Binding Path=IsChecked}"/>
+						<CheckBox IsChecked="{Binding Path=IsChecked}" IsEnabled="true"/>
+						<TextBox Text="{Binding Path=price, Converter={StaticResource oconverter}}" IsEnabled="true"/>
+						<TextBox Text="{Binding Path=size, Converter={StaticResource sconverter}}" IsEnabled="true"/>
 					</StackPanel>
 				</StackPanel>
 			</Grid>
