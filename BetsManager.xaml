@@ -30,7 +30,7 @@
 			<TextBox TextWrapping="Wrap" Text="{Binding Path=DebugID}" Width="49" HorizontalContentAlignment="Center"/>
 		</StackPanel>
 		<ContentControl Name ="BetsManagerContentControl" Grid.Row="1">
-			<DataGrid AutoGenerateColumns="False" Name="dataGrid" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" Grid.ColumnSpan="2" IsReadOnly="True"
+			<DataGrid AutoGenerateColumns="False" Name="dataGrid" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" Grid.ColumnSpan="2" IsReadOnly="True" CanUserSortColumns="True"
 				ScrollViewer.CanContentScroll="True" 
 				ScrollViewer.VerticalScrollBarVisibility="Auto"
 				ScrollViewer.HorizontalScrollBarVisibility="Auto">
@@ -63,9 +63,9 @@
 						</DataGridTextColumn.ElementStyle>
 					</DataGridTextColumn>
 					<DataGridTextColumn Width="0.8*" Header="Stake" Binding="{Binding DisplayStake, StringFormat={}{0:N2}}" />
-					<DataGridTemplateColumn Header="Odds" >
+					<DataGridTemplateColumn Header="Odds" CanUserSort="True" SortDirection="Ascending" SortMemberPath="DisplayOdds" >
 						<DataGridTemplateColumn.CellTemplate>
-							<DataTemplate >
+							<DataTemplate>
 								<Label Tag="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={local:RowToIndexConverter}}"  Content="{Binding DisplayOdds, StringFormat={}{0:N2}}" MouseUp="Label_MouseUp" />
 							</DataTemplate>
 						</DataGridTemplateColumn.CellTemplate>
