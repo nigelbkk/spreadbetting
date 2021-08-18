@@ -46,9 +46,6 @@ namespace BetfairAPI
                     joe["method"] = "AccountAPING/v1.0/" + Method;
                 }
                 String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
-                if (Method == "replaceOrders")
-                {
-                }
                 var bytes = Encoding.GetEncoding("UTF-8").GetBytes(postData);
                 HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
                 wr.Method = WebRequestMethods.Http.Post;
@@ -280,9 +277,9 @@ namespace BetfairAPI
             p["marketIds"] = new String[] { m.marketId };
             p["priceProjection"] = new priceProjection()
             {
-                priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.EX_BEST_OFFERS))
+                virtualise = true,
+                priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.EX_BEST_OFFERS)),
             };
-            p["orderProjection"] = orderProjectionEnum.ALL.ToString();
             List<MarketBook> books = RPCRequest<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
             MarketBook book = books.First();
 

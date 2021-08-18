@@ -47,6 +47,7 @@ namespace SpreadTrader
 					MarketNode = node;
 					BettingGridControl.MarketNode = node;
 					RunnersControl.MarketNode = MarketNode;
+					Extensions.MainWindow.Commission = MarketNode.Commission;
 					LiveRunner.Favorite = null;
 				}
 			};

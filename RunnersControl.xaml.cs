@@ -135,12 +135,21 @@ namespace SpreadTrader
 					{
 						LiveRunners = NewRunners;
 					}
+					foreach(LiveRunner lr in LiveRunners)
+					{
+						for (int i=0;i<3;i++)
+						{
+							lr.BackValues[i] = new PriceSize();
+							lr.LayValues[i] = new PriceSize();
+						}
+					}
 					for (int i = 0; i < LiveRunners.Count; i++)
 					{
 						if (NewRunners[i].ngrunner != null)
 						{
 							LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
 							LiveRunners[i].LevelProfit = NewRunners[i].LevelProfit;
+							LiveRunners[i].NotifyPropertyChanged("");
 						}
 					}
 					MarketNode.UpdateRate = e.ProgressPercentage;
@@ -160,6 +169,7 @@ namespace SpreadTrader
 							DateTime LastUpdate = DateTime.UtcNow;
 							var lr = MarketNode.GetLiveRunners();
 							UpdateMarketStatus();
+							NotifyPropertyChanged("");
 							Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
 							sender.ReportProgress(rate, lr);
 							if (stop_async)
