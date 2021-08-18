@@ -109,6 +109,8 @@ namespace SpreadTrader
 			mdf.LadderLevels = 3;
 			mdf.Fields = new List<MarketDataFilter.FieldsEnum?>();
 			mdf.Fields.Add(MarketDataFilter.FieldsEnum.ExBestOffers);
+			mdf.Fields.Add(MarketDataFilter.FieldsEnum.ExBestOffersDisp);
+			mdf.Fields.Add(MarketDataFilter.FieldsEnum.ExAllOffers);
 			mdf.Fields.Add(MarketDataFilter.FieldsEnum.ExTradedVol);
 			mdf.Fields.Add(MarketDataFilter.FieldsEnum.ExLtp);
 			mdf.Fields.Add(MarketDataFilter.FieldsEnum.ExMarketDef);
