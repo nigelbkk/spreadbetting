@@ -52,7 +52,7 @@
 				<Label PreviewMouseDown="StackPanel_PreviewMouseDown" BorderThickness="0.5" >
 					<StackPanel Orientation="Horizontal">
 						<TextBlock Text="Commission: "/>
-						<TextBlock Text="{Binding Path=Commission, Converter={StaticResource pcconverter }}"/>
+						<TextBlock Text="{Binding Path=NetCommission, Converter={StaticResource pcconverter }}"/>
 					</StackPanel>
 				</Label>
 			</StackPanel>

@@ -134,6 +134,11 @@ namespace SpreadTrader
             int i = 0;
             if (r.ex != null)
             {
+                for(int j=0; j<3;j++)
+				{
+                    BackValues[j] = new PriceSize();
+                    LayValues[j] = new PriceSize();
+                }
                 foreach (var ps in r.ex.availableToBack)
                 {
                     BackValues[i].price = ps.price;

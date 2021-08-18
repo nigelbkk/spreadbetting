@@ -24,6 +24,7 @@ namespace SpreadTrader
 		public bool InPlay { get; set; }
 		public marketStatusEnum Status { get; set; }
 		private Int32 _UpdateRate { get; set; }
+		public double Commission { get; set; }
 		private double _TurnaroundTime { get; set; }
 		public Int32 UpdateRate { get { return _UpdateRate; } set { _UpdateRate = value; OnPropertyChanged("UpdateRate"); } }
 		public double TurnaroundTime { get { return Math.Round(_TurnaroundTime, 5); } set { _TurnaroundTime = value; OnPropertyChanged("TurnaroundTime"); } }
@@ -88,8 +89,8 @@ namespace SpreadTrader
 								r.ifWin = p.ifWin;
 							}
 						}
-						Runners.Add(new LiveRunner(r));
 					}
+					Runners.Add(new LiveRunner(r));
 				}
 				if (Parent != null)
 				{
@@ -288,6 +289,7 @@ namespace SpreadTrader
 			foreach (Market m in markets)
 			{
 				NodeViewModel nvm = new NodeViewModel(String.Format("{0:HH:mm} {1}", m.description.marketTime.AddHours(props.TimeOffset), m.marketName)) { Market = m};
+				nvm.Commission = m.description.marketBaseRate;
 				Add(nvm);
 			}
 		}

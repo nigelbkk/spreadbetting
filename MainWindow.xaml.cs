@@ -23,7 +23,11 @@ namespace SpreadTrader
 		public String Status { get { return _Status; } set { _Status = value; Debug.WriteLine(value); NotifyPropertyChanged("");} }
 		public double Balance { get; set; }
 		public double Exposure { get; set; }
-		public double Commission { get; set; }
+		private double _DiscountRate { get; set; }
+		public double DiscountRate { get { return _DiscountRate; } set { _DiscountRate = value; NotifyPropertyChanged("NetCommission"); } }
+		private double _Commission { get; set; }
+		public double Commission { get { return _Commission; } set { _Commission = value; NotifyPropertyChanged("NetCommission"); } }
+		public double NetCommission { get { return _Commission - DiscountRate; } }
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }
 		EventsTree EventsTree = null;
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -66,7 +70,7 @@ namespace SpreadTrader
 				AccountFundsResponse response = Betfair.getAccountFunds(1);
 				Balance = response.availableToBetBalance;
 				Exposure = response.exposure;
-				Commission = response.retainedCommission - response.discountRate;
+				//Commission = response.retainedCommission - response.discountRate;
 				NotifyPropertyChanged("");
 			}
 			catch (Exception xe)
