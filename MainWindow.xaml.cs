@@ -26,7 +26,7 @@ namespace SpreadTrader
 		private double _DiscountRate { get; set; }
 		public double DiscountRate { get { return _DiscountRate; } set { _DiscountRate = value; NotifyPropertyChanged("NetCommission"); } }
 		private double _Commission { get; set; }
-		public double Commission { get { return _Commission; } set { _Commission = value; NotifyPropertyChanged("NetCommission"); } }
+		public double Commission { get { return _Commission; } set { _Commission = value; NotifyPropertyChanged("Commission"); } }
 		public double NetCommission { get { return _Commission - DiscountRate; } }
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }
 		EventsTree EventsTree = null;
