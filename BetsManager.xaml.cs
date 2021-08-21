@@ -205,10 +205,9 @@ namespace SpreadTrader
 						Row row = FindRow(o.Id, false);
 						if (row == null)
 						{
-							row = new Row(o) { Hidden = UnmatchedOnly, MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
+							row = new Row(o) { Hidden = !UnmatchedOnly, MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
 							Rows.Insert(0, row);
 						}
-//						row.Runner = MarketNode != null ? MarketNode.GetRunnerName(row.SelectionID) : row.SelectionID.ToString();
 						row.Runner = MarketNode.GetRunnerName(row.SelectionID);
 
 						if (o.Sm == 0 && o.Sr > 0)                          // unmatched
@@ -236,13 +235,6 @@ namespace SpreadTrader
 						}
 					}
 				}
-				//List<Row> sortableList = new List<Row>(Rows);
-				//sortableList.Sort((a, b) => a._Time < b._Time ? 1 : 0);
-
-				//for (int i = 0; i < sortableList.Count; i++)
-				//{
-				//	Rows.Move(Rows.IndexOf(sortableList[i]), i);
-				//}
 				NotifyPropertyChanged("");
 			}
 			catch (Exception xe)
