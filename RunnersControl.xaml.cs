@@ -328,12 +328,22 @@ namespace SpreadTrader
 			try
 			{
 				ContentPresenter cp = Extensions.FindParentOfType<ContentPresenter>(lb);
-				if (LiveRunner.Favorite != null) LiveRunner.Favorite.IsFavorite = false;
-				LiveRunner.Favorite = cp.Content as LiveRunner;
-				LiveRunner.Favorite.IsFavorite = true;
-				if (OnFavoriteChanged != null)
+				if (lb.Name == "LevelProfit")
 				{
-					OnFavoriteChanged(LiveRunner.Favorite);
+					LiveRunner live_runner = cp.Content as LiveRunner;
+					double odds = Convert.ToDouble(lb.Content);
+					ConfirmationDialog dlg = new ConfirmationDialog(this, MarketNode.MarketID, live_runner, "LAY", odds);
+					dlg.ShowDialog();
+				}
+				else
+				{
+					if (LiveRunner.Favorite != null) LiveRunner.Favorite.IsFavorite = false;
+					LiveRunner.Favorite = cp.Content as LiveRunner;
+					LiveRunner.Favorite.IsFavorite = true;
+					if (OnFavoriteChanged != null)
+					{
+						OnFavoriteChanged(LiveRunner.Favorite);
+					}
 				}
 			}
 			catch (Exception xe)

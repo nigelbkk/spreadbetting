@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using BetfairAPI;
 
 namespace SpreadTrader
 {
@@ -129,7 +126,7 @@ namespace SpreadTrader
 		}
 		public void OnFavoriteChanged(LiveRunner runner)
 		{
-			// set las trded price to the grid and recenter the sliders		
+			// set las traded price to the grid and recenter the sliders		
 			BasePrice = runner.LastPriceTraded;
 			MoveBack = 10;
 			MoveLay = 22;

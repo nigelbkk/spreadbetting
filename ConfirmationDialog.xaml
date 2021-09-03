@@ -45,7 +45,7 @@
 
 	</Window.Resources>
 
-	<DockPanel Name="DockPanel">
+	<DockPanel Name="DockPanel" PreviewKeyDown="DockPanel_PreviewKeyDown">
 		<UniformGrid DockPanel.Dock="Top" Columns="3" Margin="4" FocusManager.FocusedElement="{Binding ElementName=UpDown}">
 		<Button>2000</Button>
 		<Button>1500</Button>

@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using BetfairAPI;
 
 namespace SpreadTrader
@@ -101,6 +100,22 @@ namespace SpreadTrader
 			props.CDTop = Top - Application.Current.MainWindow.Top;
 			props.CDLeft = Left - Application.Current.MainWindow.Left;
 			props.Save();
+		}
+
+		private void DockPanel_PreviewKeyDown(object sender, KeyEventArgs e)
+		{
+			BetfairPrices betfairPrices = new BetfairPrices();
+			switch (e.Key)
+			{
+				case Key.Up:   Odds = betfairPrices.Next(Odds); break;
+				case Key.Down: Odds = betfairPrices.Previous(Odds); break;
+				case Key.Return: Submit(Submit_button, null);  break;
+				case Key.Escape: Close();  break;
+			}
+			UpDown.Value = Odds;
+			e.Handled = true;
+			NotifyPropertyChanged("");
+			Debug.WriteLine(e.Key, Odds.ToString());
 		}
 	}
 	public class UpDownControl : Xceed.Wpf.Toolkit.DoubleUpDown
