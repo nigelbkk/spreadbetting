@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetfairProxy", "..\betfairp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WSServer", "..\wsserver\WSServer.csproj", "{5020BD75-CA46-4C80-95DE-AF14FB612BF4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AptLook", "..\..\XP11\AptLook\AptLook.csproj", "{35C80193-14CE-4F72-B3DB-83D91C64DB2D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,14 @@ Global
 		{5020BD75-CA46-4C80-95DE-AF14FB612BF4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5020BD75-CA46-4C80-95DE-AF14FB612BF4}.Release|x64.ActiveCfg = Release|Any CPU
 		{5020BD75-CA46-4C80-95DE-AF14FB612BF4}.Release|x64.Build.0 = Release|Any CPU
+		{35C80193-14CE-4F72-B3DB-83D91C64DB2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35C80193-14CE-4F72-B3DB-83D91C64DB2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35C80193-14CE-4F72-B3DB-83D91C64DB2D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{35C80193-14CE-4F72-B3DB-83D91C64DB2D}.Debug|x64.Build.0 = Debug|Any CPU
+		{35C80193-14CE-4F72-B3DB-83D91C64DB2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35C80193-14CE-4F72-B3DB-83D91C64DB2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35C80193-14CE-4F72-B3DB-83D91C64DB2D}.Release|x64.ActiveCfg = Release|Any CPU
+		{35C80193-14CE-4F72-B3DB-83D91C64DB2D}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

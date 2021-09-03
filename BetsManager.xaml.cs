@@ -205,7 +205,7 @@ namespace SpreadTrader
 						Row row = FindRow(o.Id, false);
 						if (row == null)
 						{
-							row = new Row(o) { Hidden = !UnmatchedOnly, MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
+							row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
 							Rows.Insert(0, row);
 						}
 						row.Runner = MarketNode.GetRunnerName(row.SelectionID);
@@ -229,6 +229,7 @@ namespace SpreadTrader
 							Rows.Insert(0, mrow);
 							row.Stake = o.Sr.Value;
 						}
+						row.Hidden = UnmatchedOnly && row.Matched > 0;
 						if (o.Sc > 0)										// cancelled
 						{
 							Rows.Remove(row);
