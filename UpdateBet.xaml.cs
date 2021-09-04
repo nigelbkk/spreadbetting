@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Input;
 using BetfairAPI;
 
 namespace SpreadTrader
@@ -76,6 +77,45 @@ namespace SpreadTrader
 			props.BRTop = Top - Application.Current.MainWindow.Top;
 			props.BRLeft = Left - Application.Current.MainWindow.Left;
 			props.Save();
+		}
+		private Int32 IncrementStake(Int32 value)
+		{
+			if (value < 10)
+				return value + 1;
+
+			return (value + 10) - (value) % 10;
+		}
+		private Int32 DecrementStake(Int32 value)
+		{
+			if (value <= 2)
+				return value;
+			if (value <= 10)
+				return value - 1;
+
+			return (value - 10) - (value % 10);
+		}
+		private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+		{
+			BetfairPrices betfairPrices = new BetfairPrices();
+			switch (e.Key)
+			{
+				case Key.Up:
+					if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+						Stake = IncrementStake(Stake); 
+					else 
+						Odds = betfairPrices.Next(Odds); break;
+				case Key.Down:
+					if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+						Stake = DecrementStake(Stake);
+					else
+						Odds = betfairPrices.Previous(Odds); break;
+				case Key.Return: Button_Click_1(Update, null); break;
+				case Key.Escape: Close(); break;
+			}
+			UpDownOdds.Value = Odds;
+			UpDownStake.Value = Stake;
+			e.Handled = true;
+			NotifyPropertyChanged("");
 		}
 	}
 }

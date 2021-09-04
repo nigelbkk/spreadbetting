@@ -126,7 +126,7 @@ namespace SpreadTrader
 		}
 		public void OnFavoriteChanged(LiveRunner runner)
 		{
-			// set las traded price to the grid and recenter the sliders		
+			// set last traded price to the grid and recenter the sliders		
 			BasePrice = runner.LastPriceTraded;
 			MoveBack = 10;
 			MoveLay = 22;

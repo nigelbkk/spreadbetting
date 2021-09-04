@@ -101,7 +101,6 @@ namespace SpreadTrader
 			props.CDLeft = Left - Application.Current.MainWindow.Left;
 			props.Save();
 		}
-
 		private void DockPanel_PreviewKeyDown(object sender, KeyEventArgs e)
 		{
 			BetfairPrices betfairPrices = new BetfairPrices();
@@ -115,7 +114,6 @@ namespace SpreadTrader
 			UpDown.Value = Odds;
 			e.Handled = true;
 			NotifyPropertyChanged("");
-			Debug.WriteLine(e.Key, Odds.ToString());
 		}
 	}
 	public class UpDownControl : Xceed.Wpf.Toolkit.DoubleUpDown

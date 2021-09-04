@@ -7,7 +7,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         xmlns:local="clr-namespace:SpreadTrader"
         mc:Ignorable="d"
-        Title="Update Bet" Height="173.333" Width="320" Topmost="True" Closing="Window_Closing">
+        Title="Update Bet" Height="173.333" Width="320" Topmost="True" Closing="Window_Closing" PreviewKeyDown="Window_PreviewKeyDown">
 	<Window.Resources>
 		<local:CurrencyConverter x:Key="cconverter" />
 		<local:StakeConverter x:Key="sconverter" />
@@ -69,7 +69,7 @@
 				<ColumnDefinition Width="8*"/>
 			</Grid.ColumnDefinitions>
 			<Label Grid.Column="0" Grid.ColumnSpan="2" Width="65" >Odds:</Label>
-			<local:UpDownControl x:Name="UpDownOdds" Margin="20,0" Grid.Column="1" HorizontalAlignment="Left" Height="30" Width="80"/>
+			<local:UpDownControl x:Name="UpDownOdds" Margin="20,0" Grid.Column="1" HorizontalAlignment="Left" Height="30" Width="80" />
 		</Grid>
 
 		<Grid Height="36" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="20,81,0,0"  Width="270">
@@ -78,9 +78,9 @@
 				<ColumnDefinition Width="8*"/>
 			</Grid.ColumnDefinitions>
 			<Label Grid.Column="0" Grid.ColumnSpan="2" Width="65">Stake:</Label>
-			<local:UpDownControlStake x:Name="UpDownStake" Margin="20,0" Grid.Column="1" HorizontalAlignment="Left" Height="30" Width="80"/>
+			<local:UpDownControlStake x:Name="UpDownStake" Margin="20,0" Grid.Column="1" HorizontalAlignment="Left" Height="30" Width="80" />
 		</Grid>
-		<Button Content="Update" Margin="0,38,19.667,0" Click="Button_Click_1"/>
+		<Button Name="Update" Content="Update" Margin="0,38,19.667,0" Click="Button_Click_1"/>
 		<Button Content="Cancel" Margin="0,83,19.333,0"/>
 	</Grid>
 </Window>
