@@ -100,12 +100,12 @@ namespace SpreadTrader
 			switch (e.Key)
 			{
 				case Key.Up:
-					if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+					if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
 						Stake = IncrementStake(Stake); 
 					else 
 						Odds = betfairPrices.Next(Odds); break;
 				case Key.Down:
-					if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+					if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
 						Stake = DecrementStake(Stake);
 					else
 						Odds = betfairPrices.Previous(Odds); break;
