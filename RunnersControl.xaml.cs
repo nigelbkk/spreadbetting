@@ -72,7 +72,7 @@ namespace SpreadTrader
 						LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
 						LiveRunners[i].NotifyPropertyChanged("");
 						LiveRunners[i].Width = ItemsGrid.ColumnDefinitions[0].ActualWidth;
-						foreach (var p in pl[0].profitAndLosses)
+						if (pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
 						{
 							if (p.selectionId == LiveRunners[i].SelectionId)
 							{
@@ -135,7 +135,7 @@ namespace SpreadTrader
 					{
 						LiveRunners = NewRunners;
 					}
-					foreach(LiveRunner lr in LiveRunners)
+					if (LiveRunners.Count > 0) foreach (LiveRunner lr in LiveRunners)
 					{
 						for (int i=0;i<3;i++)
 						{
@@ -245,7 +245,7 @@ namespace SpreadTrader
 					}
 					if (props.SafeBets)
 					{
-						foreach (PlaceInstruction pi in orders)
+						if (orders.Count > 0) foreach (PlaceInstruction pi in orders)
 						{
 							pi.limitOrder.size = 2.00;
 							pi.limitOrder.price = pi.sideEnum == sideEnum.LAY ? 1.01 : 1000;
@@ -262,7 +262,7 @@ namespace SpreadTrader
 		}
 		public String GetRunnerName(Int64 SelectionID)
 		{
-			foreach(LiveRunner r in LiveRunners)
+			if (LiveRunners.Count > 0) foreach (LiveRunner r in LiveRunners)
 			{
 				if (r.SelectionId == SelectionID)
 					return r.Name;
@@ -361,7 +361,7 @@ namespace SpreadTrader
 		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
 		{
 			double diff = ItemsGrid.ColumnDefinitions[0].Width.Value - SV1.ActualWidth;
-			foreach (LiveRunner v in SV1.Items)
+			if (SV1.Items.Count > 0) foreach (LiveRunner v in SV1.Items)
 			{
 				v.Width = ItemsGrid.ColumnDefinitions[0].Width.Value;
 			}

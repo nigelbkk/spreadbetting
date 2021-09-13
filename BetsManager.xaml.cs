@@ -120,7 +120,7 @@ namespace SpreadTrader
 		private HubConnection hubConnection = null;
 		private Row FindRow(String id, bool matched)
 		{
-			foreach (Row r in Rows)
+			if (Rows.Count > 0) foreach (Row r in Rows)
 			{
 				if (r.BetID == Convert.ToUInt64(id))
 				{
@@ -194,12 +194,12 @@ namespace SpreadTrader
 					Rows.Clear();
 				}
 
-				foreach (OrderRunnerChange orc in change.Orc)
+				if (change.Orc.Count > 0) foreach (OrderRunnerChange orc in change.Orc)
 				{
 					if (orc.Uo == null)
 						continue;
 
-					foreach (Order o in orc.Uo)
+					if (orc.Uo.Count > 0) foreach (Order o in orc.Uo)
 					{
 						Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
 						Row row = FindRow(o.Id, false);
@@ -260,7 +260,7 @@ namespace SpreadTrader
 					{
 						CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.185904913"
 
-						foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
+						if (report.currentOrders.Count > 0) foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
 						{
 							OrdersStatic.BetID2SelectionID[o.betId] = o.selectionId;
 							Row.RunnerNames[o.selectionId] = RunnersControl.GetRunnerName(o.selectionId);
@@ -388,7 +388,7 @@ namespace SpreadTrader
 		private void CheckBox_Checked(object sender, RoutedEventArgs e)
 		{
 			CheckBox cb = sender as CheckBox;
-			foreach(Row row in Rows)
+			if (Rows.Count > 0) foreach (Row row in Rows)
 			{
 				row.Hidden = cb.IsChecked == true && row.Matched > 0;
 			}

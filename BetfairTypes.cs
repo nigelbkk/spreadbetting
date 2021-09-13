@@ -397,7 +397,7 @@ namespace BetfairAPI
 			get
 			{
 				double book = 0;
-				foreach (Runner r in Runners)
+				if (Runners.Count > 0) foreach (Runner r in Runners)
 				{
 					if (r.ex.availableToBack.Count > 0)
 						book += 1 / r.ex.availableToBack[0].price;
@@ -410,7 +410,7 @@ namespace BetfairAPI
 			get
 			{
 				double book = 0;
-				foreach (Runner r in Runners)
+				if (Runners.Count > 0) foreach (Runner r in Runners)
 				{
 					if (r.ex.availableToLay.Count > 0)
 						book += 1 / r.ex.availableToLay[0].price;

@@ -286,7 +286,7 @@ namespace BetfairAPI
             if (m.runners == null)
             {
                 m.runners = new List<Market.RunnerCatalog>();
-                foreach (Runner runner in book.Runners)
+                if (book.Runners.Count > 0) foreach(Runner runner in book.Runners)
                 {
                     m.runners.Add(new Market.RunnerCatalog()
                     {
@@ -294,9 +294,9 @@ namespace BetfairAPI
                     });
                 }
             }
-            foreach (Runner runner in book.Runners)
+            if (book.Runners.Count > 0) foreach (Runner runner in book.Runners)
             {
-                foreach (Market.RunnerCatalog cat in m.runners)
+                if (m.runners.Count > 0) foreach (Market.RunnerCatalog cat in m.runners)
                 {
                     if (cat.selectionId == runner.selectionId)
                     {

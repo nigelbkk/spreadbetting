@@ -78,11 +78,11 @@ namespace SpreadTrader
 				Market.MarketBook = Betfair.GetMarketBook(Market);
 				TotalMatched = Market.MarketBook.totalMatched;
 				Status = Market.MarketBook.status;
-				foreach (Runner r in Market.MarketBook.Runners)
+				if (Market.MarketBook.Runners.Count > 0) foreach (Runner r in Market.MarketBook.Runners)
 				{
 					if (pl.Count > 0)
 					{
-						foreach (var p in pl[0].profitAndLosses)
+						if (pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
 						{
 							if (p.selectionId == r.selectionId)
 							{
@@ -166,7 +166,7 @@ namespace SpreadTrader
 			if (LiveRunners.Count > 1)
 			{
 				List<LiveRunner> runners = new List<LiveRunner>();
-				foreach (LiveRunner lr in LiveRunners)
+				if (LiveRunners.Count > 0) foreach (LiveRunner lr in LiveRunners)
 				{
 					if (lr.ifWin != 0)
 						runners.Add(lr);
@@ -190,7 +190,7 @@ namespace SpreadTrader
 		{
 			if (LiveRunners != null)
 			{
-				foreach (LiveRunner r in LiveRunners)
+				if (LiveRunners.Count > 0) foreach (LiveRunner r in LiveRunners)
 				{
 					if (r.SelectionId == SelectionID)
 						return r.Name;

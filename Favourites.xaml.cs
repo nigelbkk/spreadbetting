@@ -21,13 +21,13 @@ namespace SpreadTrader
 			Left = coords.X;
 
 			AllEventTypes = new ObservableCollection<EventType>();
-			foreach (EventTypeResult er in eventTypes)
+			if (eventTypes.Count > 0) foreach (EventTypeResult er in eventTypes)
 			{
 				AllEventTypes.Add(er.eventType);
 			}
 			InitializeComponent();
 			String[] ids = props.Favourites.Split(',');
-			foreach(EventType e in AllEventTypes)
+			if (AllEventTypes.Count > 0) foreach (EventType e in AllEventTypes)
 			{
 				e.IsChecked = ids.Contains(e.id.ToString());
 			}
@@ -35,7 +35,7 @@ namespace SpreadTrader
 		public void Save()
 		{
 			props.Favourites = "";
-			foreach (EventType e in AllEventTypes)
+			if (AllEventTypes.Count > 0) foreach (EventType e in AllEventTypes)
 			{
 				if (e.IsChecked)
 				{

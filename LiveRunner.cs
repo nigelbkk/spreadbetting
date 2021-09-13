@@ -115,13 +115,13 @@ namespace SpreadTrader
         public void SetPrices(MarketRunnerSnap r)
 		{
             int i = 0;
-            foreach (var ps in r.Prices.BestDisplayAvailableToBack)
+            if (r.Prices.BestDisplayAvailableToBack.Count > 0) foreach (var ps in r.Prices.BestDisplayAvailableToBack)
             {
                 BackValues[i].price = ps.Price;
                 BackValues[i++].size = ps.Size;
             }
             i = 0;
-            foreach (var ps in r.Prices.BestDisplayAvailableToLay)
+            if (r.Prices.BestDisplayAvailableToLay.Count > 0) foreach (var ps in r.Prices.BestDisplayAvailableToLay)
             {
                 LayValues[i].price = ps.Price;
                 LayValues[i++].size = ps.Size;
@@ -139,13 +139,13 @@ namespace SpreadTrader
                     BackValues[j] = new PriceSize();
                     LayValues[j] = new PriceSize();
                 }
-                foreach (var ps in r.ex.availableToBack)
+                if (r.ex.availableToBack.Count > 0) foreach (var ps in r.ex.availableToBack)
                 {
                     BackValues[i].price = ps.price;
                     BackValues[i++].size = ps.size;
                 }
                 i = 0;
-                foreach (var ps in r.ex.availableToLay)
+                if (r.ex.availableToLay.Count > 0) foreach (var ps in r.ex.availableToLay)
                 {
                     LayValues[i].price = ps.price;
                     LayValues[i++].size = ps.size;

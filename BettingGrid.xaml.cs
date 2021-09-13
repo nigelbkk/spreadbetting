@@ -19,7 +19,7 @@ namespace SpreadTrader
 			set
 			{
 				_BackActive = value;
-				foreach (PriceSize o in BackValues)
+				if (BackValues.Length > 0) foreach (PriceSize o in BackValues)
 				{
 					o.IsChecked = o.ParentChecked = value;
 				}
@@ -32,7 +32,7 @@ namespace SpreadTrader
 			set
 			{
 				_LayActive = value;
-				foreach (PriceSize o in LayValues)
+				if (LayValues.Length > 0) foreach (PriceSize o in LayValues)
 				{
 					o.IsChecked = o.ParentChecked = value;
 				}
