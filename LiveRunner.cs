@@ -159,7 +159,7 @@ namespace SpreadTrader
         }
 		public override string ToString()
 		{
-			return String.Format("{0}", Name);
+			return String.Format("{0}, {1}", Name, SelectionId);
 		}
     }
 }

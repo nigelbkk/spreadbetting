@@ -72,7 +72,7 @@ namespace SpreadTrader
 						LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
 						LiveRunners[i].NotifyPropertyChanged("");
 						LiveRunners[i].Width = ItemsGrid.ColumnDefinitions[0].ActualWidth;
-						if (pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
+						if (pl.Count > 0 && pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
 						{
 							if (p.selectionId == LiveRunners[i].SelectionId)
 							{

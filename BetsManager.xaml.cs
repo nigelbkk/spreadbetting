@@ -81,7 +81,7 @@ namespace SpreadTrader
 		}
 		public override string ToString()
 		{
-			return BetID.ToString();
+			return String.Format("{0},{1},{2},{3},{4}", Runner, SelectionID, Odds, Matched, BetID.ToString());
 		}
 	}
 	public partial class BetsManager : UserControl, INotifyPropertyChanged
@@ -210,6 +210,11 @@ namespace SpreadTrader
 						}
 						row.Runner = MarketNode.GetRunnerName(row.SelectionID);
 
+						if (String.IsNullOrEmpty(row.Runner))
+						{
+							Debug.WriteLine(row.ToString(), "Invalid runner in BetsManager");
+						}
+
 						if (o.Sm == 0 && o.Sr > 0)                          // unmatched
 						{
 							row.Stake = o.S.Value;
@@ -217,7 +222,10 @@ namespace SpreadTrader
 						}
 						if (o.Sm == o.S && o.Sr == 0)                       // fully matched
 						{
-							//row.Stake = o.S.Value;
+							if (Math.Round(o.Avp.Value, 2) != o.Avp.Value)
+							{
+								Debug.WriteLine(row.ToString(), "Too many decimals in fully matched bet");
+							}
 							row.AvgPriceMatched = o.Avp.Value;
 							row.Matched = o.Sm.Value;
 						}
@@ -228,8 +236,13 @@ namespace SpreadTrader
 							mrow.AvgPriceMatched = o.Avp.Value;
 							Rows.Insert(0, mrow);
 							row.Stake = o.Sr.Value;
+							if (Math.Round(o.Avp.Value, 2) != o.Avp.Value)
+							{
+								Debug.WriteLine(row.ToString(), "Too many decimals in partially matched bet");
+							}
 						}
 						row.Hidden = UnmatchedOnly && row.Matched > 0;
+
 						if (o.Sc > 0)										// cancelled
 						{
 							Rows.Remove(row);

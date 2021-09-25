@@ -193,7 +193,9 @@ namespace SpreadTrader
 				if (LiveRunners.Count > 0) foreach (LiveRunner r in LiveRunners)
 				{
 					if (r.SelectionId == SelectionID)
+					{
 						return r.Name;
+					}
 				}
 			}
 			return SelectionID.ToString();
