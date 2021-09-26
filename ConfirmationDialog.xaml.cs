@@ -113,6 +113,8 @@ namespace SpreadTrader
 			}
 			UpDown.Value = Odds;
 			e.Handled = true;
+			if (e.Handled = (e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9))
+				e.Handled = false;
 			NotifyPropertyChanged("");
 		}
 	}

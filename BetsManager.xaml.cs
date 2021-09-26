@@ -233,7 +233,9 @@ namespace SpreadTrader
 						{
 							Row mrow = new Row(o);
 							mrow.Matched = o.Sm.Value;
-							mrow.AvgPriceMatched = o.Avp.Value;
+							mrow.AvgPriceMatched = Math.Round(o.Avp.Value, 2);
+							mrow.Hidden = UnmatchedOnly && mrow.Matched > 0;
+							mrow.Runner = MarketNode.GetRunnerName(mrow.SelectionID);
 							Rows.Insert(0, mrow);
 							row.Stake = o.Sr.Value;
 							if (Math.Round(o.Avp.Value, 2) != o.Avp.Value)
