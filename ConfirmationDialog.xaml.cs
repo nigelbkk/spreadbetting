@@ -17,10 +17,10 @@ namespace SpreadTrader
 		public String MarketName { get; set; }
 		public String Runner { get; set; }
 		public Int64 SelectionId { get; set; }
-		public double Stake   { get; set; }
-		public double Odds   { get; set; }
-		public  double Liability   { get; set; }
-		public double Payout  { get; set; }
+		public double Stake { get; set; }
+		public double Odds { get; set; }
+		public double Liability { get; set; }
+		public double Payout { get; set; }
 		public String Header { get { return String.Format("{0} {1} for {2}", Side, Runner, Odds); } }
 		private Properties.Settings props = Properties.Settings.Default;
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -54,10 +54,11 @@ namespace SpreadTrader
 			InitializeComponent();
 			UpDown.Value = Odds;
 			FocusManager.SetFocusedElement(DockPanel, Submit_button);
-			IInputElement focusedElement = FocusManager.GetFocusedElement(DockPanel);
+			IInputElement focusedElement = FocusManager.GetFocusedElement(OddsBorder); // DockPanel);
 		}
 		private void Submit(object sender, RoutedEventArgs _e)
 		{
+			
 			BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
 			Button b = sender as Button;
 			String cs = b.Content as String;
@@ -106,16 +107,26 @@ namespace SpreadTrader
 			BetfairPrices betfairPrices = new BetfairPrices();
 			switch (e.Key)
 			{
-				case Key.Up:   Odds = betfairPrices.Next(Odds); break;
-				case Key.Down: Odds = betfairPrices.Previous(Odds); break;
-				case Key.Return: Submit(Submit_button, null);  break;
-				case Key.Escape: Close();  break;
+				case Key k when ((k >= Key.D0 && k <= Key.D9) || (k >= Key.NumPad0 && k <= Key.NumPad9)):
+					return;
+				case Key k when (k >= Key.A && k <= Key.Z):
+					e.Handled = true;
+					return;
+				case Key.Up: UpDown.Value = betfairPrices.Next(Odds);
+					e.Handled = true;
+					break;
+				case Key.Down: UpDown.Value = betfairPrices.Previous(Odds);
+					e.Handled = true;
+					break;
+				case Key.Escape: Close(); break;
 			}
-			UpDown.Value = Odds;
-			e.Handled = true;
-			if (e.Handled = (e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9))
-				e.Handled = false;
 			NotifyPropertyChanged("");
+		}
+
+		private void StakeTextBox_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			TextBox tb = sender as TextBox;
+			Stake = Convert.ToDouble(tb.Text);
 		}
 	}
 	public class UpDownControl : Xceed.Wpf.Toolkit.DoubleUpDown

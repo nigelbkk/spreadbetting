@@ -42,7 +42,7 @@ namespace SpreadTrader
 		public double _Stake { get; set; }
 		public double Stake { get { return _Stake; } set { _Stake = value; NotifyPropertyChanged(""); } }
 		public double Odds { get; set; }
-		public double DisplayOdds { get { return IsMatched ? AvgPriceMatched : Odds; } }
+		public double DisplayOdds { get { return Math.Round(IsMatched ? AvgPriceMatched : Odds, 2); } }
 		public double DisplayStake { get { return IsMatched ? Matched : Stake-Matched; } }
 		public double AvgPriceMatched { get; set; }
 		public double Profit { get { return Math.Round(DisplayStake * (DisplayOdds - 1), 5); } }

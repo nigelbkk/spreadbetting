@@ -28,7 +28,6 @@ namespace SpreadTrader
 		public UpdateBet(Row row)
 		{
 			InitializeComponent();
-
 			if (props.BRLeft >= 0 && props.BRTop >= 0)
 			{
 				Top = props.BRTop + Application.Current.MainWindow.Top;
@@ -40,6 +39,7 @@ namespace SpreadTrader
 			Odds = row.Odds;
 			UpDownOdds.Value = Odds;
 			UpDownStake.Value = (short) Stake;
+			NotifyPropertyChanged("");
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -115,7 +115,7 @@ namespace SpreadTrader
 			UpDownOdds.Value = Odds;
 			UpDownStake.Value = Stake;
 			e.Handled = true;
-			if (e.Handled = (e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9))
+			if ((e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9) || e.Key == Key.Decimal)
 				e.Handled = false;
 			NotifyPropertyChanged("");
 		}
