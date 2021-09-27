@@ -54,7 +54,7 @@ namespace SpreadTrader
 			InitializeComponent();
 			UpDown.Value = Odds;
 			FocusManager.SetFocusedElement(DockPanel, Submit_button);
-			IInputElement focusedElement = FocusManager.GetFocusedElement(OddsBorder); // DockPanel);
+			IInputElement focusedElement = FocusManager.GetFocusedElement(DockPanel);
 		}
 		private void Submit(object sender, RoutedEventArgs _e)
 		{
@@ -119,6 +119,7 @@ namespace SpreadTrader
 					e.Handled = true;
 					break;
 				case Key.Escape: Close(); break;
+				case Key.Return: Submit(Submit_button, null); break;
 			}
 			NotifyPropertyChanged("");
 		}
@@ -126,7 +127,8 @@ namespace SpreadTrader
 		private void StakeTextBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			TextBox tb = sender as TextBox;
-			Stake = Convert.ToDouble(tb.Text);
+			if (!String.IsNullOrEmpty(tb.Text))
+				Stake = Convert.ToDouble(tb.Text);
 		}
 	}
 	public class UpDownControl : Xceed.Wpf.Toolkit.DoubleUpDown

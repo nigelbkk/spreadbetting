@@ -82,7 +82,7 @@
 					<TextBox Grid.Column="1" Name="StakeTextBox" Text="{Binding Path=Stake, Converter={StaticResource sconverter}, Mode=TwoWay}" HorizontalAlignment="Right" Width="80" IsEnabled="True" TextChanged="StakeTextBox_TextChanged"/>
 				</Grid>
 			</Border>
-			<Button IsDefault="True" Focusable="True" IsEnabled="True" Name="Submit_button" >Submit</Button>
+			<Button IsDefault="False" Focusable="False" IsEnabled="True" Name="Submit_button" >Submit</Button>
 		</UniformGrid>
 	</DockPanel>
 </Window>
