@@ -242,8 +242,10 @@ namespace SpreadTrader
 							{
 								Debug.WriteLine(row.ToString(), "Too many decimals in partially matched bet");
 							}
+							Debug.WriteLine(mrow.ToString(), "mrow");
 						}
 						row.Hidden = UnmatchedOnly && row.Matched > 0;
+						Debug.WriteLine(row.ToString(), "row");
 
 						if (o.Sc > 0)										// cancelled
 						{
