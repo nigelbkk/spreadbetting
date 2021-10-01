@@ -79,6 +79,10 @@ namespace SpreadTrader
 			Matched = o.sizeMatched;
 			MarketID = o.marketId;
 		}
+		public Row Clone()
+		{
+			return (Row)this.MemberwiseClone();
+		}
 		public override string ToString()
 		{
 			return String.Format("{0},{1},{2},{3},{4}", Runner, SelectionID, Odds, Matched, BetID.ToString());
@@ -231,7 +235,7 @@ namespace SpreadTrader
 						}
 						if (o.Sm > 0 && o.Sr > 0)                           // partially matched
 						{
-							Row mrow = new Row(o);
+							Row mrow = row.Clone();
 							mrow.Matched = o.Sm.Value;
 							mrow.AvgPriceMatched = Math.Round(o.Avp.Value, 2);
 							mrow.Hidden = UnmatchedOnly && mrow.Matched > 0;
