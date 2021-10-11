@@ -188,6 +188,7 @@ namespace SpreadTrader
 				return;
 			
 			OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
+			Debug.WriteLine(json, "json");
 
 			_LastUpdated = DateTime.UtcNow;
 			try
@@ -212,9 +213,11 @@ namespace SpreadTrader
 						Row row = FindRow(o.Id);
 						if (o.Sc > 0 && row != null)                                           // cancelled
 						{
+							Debug.WriteLine(row.ToString(), "mrow");
 							Rows.Remove(row);
 							foreach (Row r in Rows.Where(r => r.BetID.ToString() == o.Id && !r.IsMatched).ToList())
 							{
+								Debug.WriteLine(row.ToString(), "mrow");
 								Rows.Remove(r);
 							}
 							continue;
