@@ -186,6 +186,7 @@ namespace SpreadTrader
 			if (change.Orc == null)
 				return;
 
+			Debug.WriteLine(json);
 			_LastUpdated = DateTime.UtcNow;
 			try
 			{
@@ -195,66 +196,56 @@ namespace SpreadTrader
 					Rows.Clear();
 				}
 
-				if (change.Orc.Count > 0) foreach (OrderRunnerChange orc in change.Orc)
+				if (change.Orc.Count > 0)
 				{
-					if (orc.Uo == null)
-						continue;
-
-					if (orc.Uo.Count > 0) foreach (Order o in orc.Uo)
+					foreach (OrderRunnerChange orc in change.Orc)
 					{
-						Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
-						Row row = FindRow(o.Id, false);
-						if (row == null)
-						{
-							row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
-							Rows.Insert(0, row);
-						}
-						row.Runner = MarketNode.GetRunnerName(row.SelectionID);
+						if (orc.Uo == null)
+							continue;
 
-						if (String.IsNullOrEmpty(row.Runner))
+						if (orc.Uo.Count > 0) foreach (Order o in orc.Uo)
 						{
-							Debug.WriteLine(row.ToString(), "Invalid runner in BetsManager");
-						}
-
-						if (o.Sm == 0 && o.Sr > 0)                          // unmatched
-						{
-							row.Stake = o.S.Value;
-							row.Matched = o.Sm.Value;
-							row.Hidden = false;
-						}
-						if (o.Sm == o.S && o.Sr == 0)                       // fully matched
-						{
-							if (Math.Round(o.Avp.Value, 2) != o.Avp.Value)
+							Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
+							Row row = FindRow(o.Id, false);
+							if (row == null)
 							{
-								Debug.WriteLine(row.ToString(), "Too many decimals in fully matched bet");
+								row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
+								Rows.Insert(0, row);
 							}
-							row.AvgPriceMatched = o.Avp.Value;
-							row.Matched = o.Sm.Value;
-							row.Hidden = UnmatchedOnly;
-							SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
-							snd.Play();
-						}
-						if (o.Sm > 0 && o.Sr > 0)                           // partially matched
-						{
-							Row mrow = new Row(o);
-							mrow.Matched = o.Sm.Value;
-							mrow.AvgPriceMatched = Math.Round(o.Avp.Value, 2);
-							mrow.Hidden = UnmatchedOnly;
-							mrow.Runner = MarketNode.GetRunnerName(mrow.SelectionID);
-							Rows.Insert(0, mrow);
-							row.Stake = o.Sr.Value;
-							if (Math.Round(o.Avp.Value, 2) != o.Avp.Value)
-							{
-								Debug.WriteLine(row.ToString(), "Too many decimals in partially matched bet");
-							}
-							SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
-							snd.Play();
-						}
-						//row.Hidden = UnmatchedOnly && row.Matched > 0;
+							row.Runner = MarketNode.GetRunnerName(row.SelectionID);
 
-						if (o.Sc > 0)										// cancelled
-						{
-							Rows.Remove(row);
+							if (o.Sm == 0 && o.Sr > 0)                          // unmatched
+							{
+								row.Stake = o.S.Value;
+								row.Matched = o.Sm.Value;
+								row.Hidden = false;
+							}
+							if (o.Sm == o.S && o.Sr == 0)                       // fully matched
+							{
+								row.AvgPriceMatched = o.Avp.Value;
+								row.Matched = o.Sm.Value;
+								row.Hidden = UnmatchedOnly;
+								SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
+								snd.Play();
+							}
+							if (o.Sm > 0 && o.Sr > 0)                           // partially matched
+							{
+								Row mrow = new Row(o);
+								mrow.Matched = o.Sm.Value;
+								mrow.AvgPriceMatched = Math.Round(o.Avp.Value, 2);
+								mrow.Hidden = UnmatchedOnly;
+								mrow.Runner = MarketNode.GetRunnerName(mrow.SelectionID);
+								Rows.Remove(row);
+								Rows.Insert(0, mrow);
+								row.Stake = o.Sr.Value;
+								SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
+								snd.Play();
+							}
+
+							if (o.Sc > 0)                                       // cancelled
+							{
+								Rows.Remove(row);
+							}
 						}
 					}
 				}
