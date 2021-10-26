@@ -203,48 +203,69 @@ namespace SpreadTrader
 						if (orc.Uo == null)
 							continue;
 
-						if (orc.Uo.Count > 0) foreach (Order o in orc.Uo)
+						if (orc.Uo.Count > 0)
 						{
-							Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
-							Row row = FindRow(o.Id, false);
-							if (row == null)
+							List<Row> to_remove = new List<Row>();
+							foreach (Order o in orc.Uo)
 							{
-								row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
-								Rows.Insert(0, row);
-							}
-							row.Runner = MarketNode.GetRunnerName(row.SelectionID);
+								Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
+								Row row = FindRow(o.Id, false);
+								if (row == null)
+								{
+									row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
+									Rows.Insert(0, row);
+									Debug.WriteLine("new bet");
+								}
+								row.Runner = MarketNode.GetRunnerName(row.SelectionID);
 
-							if (o.Sm == 0 && o.Sr > 0)                          // unmatched
-							{
-								row.Stake = o.S.Value;
-								row.Matched = o.Sm.Value;
-								row.Hidden = false;
+								if (o.Sm == 0 && o.Sr > 0)                          // unmatched
+								{
+									row.Stake = o.S.Value;
+									row.Matched = o.Sm.Value;
+									row.Hidden = false;
+									Debug.WriteLine("unmatched");
+								}
+								if (o.Sm == o.S && o.Sr == 0)                       // fully matched
+								{
+									foreach (Row r in Rows)
+									{
+										if (r.BetID == Convert.ToUInt64(o.Id))
+										{
+											if (r.IsMatched)
+											{
+												to_remove.Add(r);
+											}
+										}
+									}
+									row.AvgPriceMatched = o.Avp.Value;
+									row.Matched = o.Sm.Value;
+									row.Hidden = UnmatchedOnly;
+									SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
+									snd.Play();
+									Debug.WriteLine("fully matched");
+								}
+								if (o.Sm > 0 && o.Sr > 0)                           // partially matched
+								{
+									Row mrow = new Row(o);
+									mrow.Matched = o.Sm.Value;
+									mrow.AvgPriceMatched = Math.Round(o.Avp.Value, 2);
+									mrow.Hidden = UnmatchedOnly;
+									mrow.Runner = MarketNode.GetRunnerName(mrow.SelectionID);
+									Rows.Insert(0, mrow);
+									row.Stake = o.Sr.Value;
+									SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
+									snd.Play();
+									Debug.WriteLine("partial match");
+								}
+								if (o.Sc > 0)                                       // cancelled
+								{
+									Rows.Remove(row);
+									Debug.WriteLine("cancelled");
+								}
 							}
-							if (o.Sm == o.S && o.Sr == 0)                       // fully matched
+							foreach(Row o in to_remove)
 							{
-								row.AvgPriceMatched = o.Avp.Value;
-								row.Matched = o.Sm.Value;
-								row.Hidden = UnmatchedOnly;
-								SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
-								snd.Play();
-							}
-							if (o.Sm > 0 && o.Sr > 0)                           // partially matched
-							{
-								Row mrow = new Row(o);
-								mrow.Matched = o.Sm.Value;
-								mrow.AvgPriceMatched = Math.Round(o.Avp.Value, 2);
-								mrow.Hidden = UnmatchedOnly;
-								mrow.Runner = MarketNode.GetRunnerName(mrow.SelectionID);
-								Rows.Remove(row);
-								Rows.Insert(0, mrow);
-								row.Stake = o.Sr.Value;
-								SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
-								snd.Play();
-							}
-
-							if (o.Sc > 0)                                       // cancelled
-							{
-								Rows.Remove(row);
+								Rows.Remove(o);
 							}
 						}
 					}
@@ -370,6 +391,7 @@ namespace SpreadTrader
 				Status = _SubscribedOrders ? "Subscribed" : "Unsubscribed";
 			}
 		}
+		private Int32 line_id = 0;
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			if (Betfair == null)
@@ -379,6 +401,20 @@ namespace SpreadTrader
 			Button b = sender as Button;
 			switch(b.Tag)
 			{
+				case "Reset":
+					{
+						MarketNode = new NodeViewModel(Betfair) { MarketID = "1.185904913" };
+						line_id = 0;
+						lines = File.ReadAllLines("lines.json");
+						Rows.Clear();
+					}
+					break;
+				case "Debug":
+					{
+						if (line_id < lines.Length)
+							OnOrderChanged(lines[line_id++]);
+					}
+					break;
 				case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
 				case "CancelAll":
 					if (MarketNode != null)
