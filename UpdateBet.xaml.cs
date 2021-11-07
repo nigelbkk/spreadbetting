@@ -56,7 +56,7 @@ namespace SpreadTrader
 				if (OriginalStake != Stake)
 				{
 					CancelExecutionReport report1 = betfair.cancelOrder(Row.MarketID, Row.BetID);
-					PlaceExecutionReport report2 = betfair.placeOrder(Row.MarketID, Row.SelectionID, Row.Side == "BACK" ? sideEnum.BACK : sideEnum.LAY, Stake, Row.Odds);
+					PlaceExecutionReport report2 = betfair.placeOrder(Row.MarketID, Row.SelectionID, Row.Side == "BACK" ? sideEnum.BACK : sideEnum.LAY, Stake, Odds);
 				}
 				else
 				{
