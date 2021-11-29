@@ -127,6 +127,12 @@ namespace SpreadTrader
 			if (!String.IsNullOrEmpty(tb.Text))
 				Stake = Convert.ToDouble(tb.Text);
 		}
+
+		private void UpDown_PreviewKeyUp(object sender, KeyEventArgs e)
+		{
+			UpDownControl control = sender as UpDownControl;
+			control.Focus();
+		}
 	}
 	public class UpDownControl : Xceed.Wpf.Toolkit.DoubleUpDown
 	{
