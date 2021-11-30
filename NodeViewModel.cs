@@ -224,7 +224,7 @@ namespace SpreadTrader
 			EventTypes = Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList();
 			foreach (EventTypeResult ev in EventTypes)
 			{
-				if (Favourites.IsFavourite(ev.eventType.id))
+				if (true || Favourites.IsFavourite(ev.eventType.id))
 				{
 					NodeViewModel nvm = new NodeViewModel(ev.eventType.name) { ID = ev.eventType.id };
 					nvm.Populate = nvm.PopulateCompetitionsOrCountries;

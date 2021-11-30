@@ -24,58 +24,43 @@
 			</Style>
 		</ResourceDictionary>
 	</Window.Resources>
-	<Grid>
+	<Grid Name="OuterGrid">
 		<DockPanel>
-			<StackPanel Orientation="Horizontal" VerticalAlignment="Top" DockPanel.Dock="Top" Height="28" ToolTip="Single click to update">
-				<Button Tag="Hide Tree" Grid.Column="0" Padding="0" HorizontalContentAlignment="Left" ToolTip="Hide The Events Tree" Width="18" Click="Button_Click">
-					<StackPanel Orientation="Vertical" Margin="2,0,2,0">
-						<Image Name="LeftArrow" Source="/SpreadTrader;component/Images/left_arrow.png"  Visibility="Visible"/>
-						<Image Name="RightArrow" Source="/SpreadTrader;component/Images/right_arrow.png" Visibility="Collapsed"/>
-					</StackPanel>
-				</Button>
-				<Button Content ="Refresh" Tag="Refresh" Grid.Column="1" ToolTip="Refresh Markets" Click="Button_Click"/>
-				<Button Content ="Favourites" Tag="Favourites" Name="FavouritesButton" Grid.Column="2" ToolTip="Favourites" Click="Button_Click"/>
-				<Button Content ="Settings" Tag="Settings" Grid.Column="3" ToolTip="Settings" Click="Button_Click"/>
-				<Label Width="58" />
-				<Label PreviewMouseDown="StackPanel_PreviewMouseDown" BorderThickness="0.5" >
-					<StackPanel Orientation="Horizontal" >
-						<TextBlock Text="Balance: "/>
-						<TextBlock Text="{Binding Path=Balance, Converter={StaticResource cconverter }}" />
-					</StackPanel>
-				</Label>
-				<Label PreviewMouseDown="StackPanel_PreviewMouseDown"  BorderThickness="0.5">
-					<StackPanel Orientation="Horizontal" PreviewMouseDown="StackPanel_PreviewMouseDown">
-						<TextBlock Text="Exposure: "/>
-						<TextBlock Text="{Binding Path=Exposure, Converter={StaticResource cconverter }}"/>
-					</StackPanel>
-				</Label>
-				<Label PreviewMouseDown="StackPanel_PreviewMouseDown" BorderThickness="0.5" >
-					<StackPanel Orientation="Horizontal">
-						<TextBlock Text="Commission: "/>
-						<TextBlock Text="{Binding Path=Commission, Converter={StaticResource pcconverter }}"/>
-					</StackPanel>
-				</Label>
-			</StackPanel>
-			<StatusBar DockPanel.Dock="Bottom" Height="23" VerticalAlignment="Bottom" >
-				<TextBlock Text="{Binding Path=Status}"></TextBlock>
-			</StatusBar>
-			<Grid  Name="OuterGrid" DockPanel.Dock="Top">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="auto"></ColumnDefinition>
-					<ColumnDefinition Width="*"></ColumnDefinition>
-				</Grid.ColumnDefinitions>
-				<Grid>
-					<ContentControl Name="EventsTreeGrid"/>
+			<Grid Name ="MainGrid">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="20"/>
+					<RowDefinition/>
+				</Grid.RowDefinitions>
+				<Grid Grid.Row ="0" Name="MainMenu">
+					<Border BorderBrush="DarkGray" BorderThickness="1">
+						<TextBlock Text="MainMenu"/>
+					</Border>
 				</Grid>
-				<Border Grid.Column="1" DockPanel.Dock="Right" BorderBrush="Silver" BorderThickness="1" >
-					<Grid>
-						<TabControl Name ="TabControl" SelectionChanged="TabControl_SelectionChanged" >
-							<TabItem Header="+" PreviewMouseDown="TabItem_PreviewMouseDown" />
+				<Grid Grid.Row="1" Name="InnerGrid" >
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="250"/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+					<Grid Grid.Column="0" Name ="EventsGrid">
+						<Border BorderBrush="DarkGray" BorderThickness="0" Name ="EventsTreeGrid">
+							<!--<TextBlock Text="EventsGrid"/>-->
+							<local:EventsTreeControl x:Name="EventsTree"/>
+						</Border>
+					</Grid>
+
+					<Grid Grid.Column="1" Name="RightGrid">
+						<TabControl Name ="TabControl"  >
+							<TabItem Header="MarketTab">
+								<local:TabContentControl x:Name="TabContentControl"/>
+							</TabItem>
 						</TabControl>
 					</Grid>
-				</Border>
-				<GridSplitter Name="VerticalSplitter" Width="5" Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Background="Gray" ResizeDirection="Columns" DragCompleted="GridSplitter_DragCompleted" />
+					<GridSplitter Grid.Column="1" Background="DarkGray" Width="2.5" HorizontalAlignment="Left"/>
+				</Grid>
 			</Grid>
 		</DockPanel>
+		<StatusBar DockPanel.Dock="Bottom" Height="23" VerticalAlignment="Bottom" >
+			<TextBlock Text="{Binding Path=Status}"></TextBlock>
+		</StatusBar>
 	</Grid>
 </Window>

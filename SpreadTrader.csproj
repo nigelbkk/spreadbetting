@@ -121,8 +121,8 @@
       <DependentUpon>ConfirmationDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters.cs" />
-    <Compile Include="EventsTree.xaml.cs">
-      <DependentUpon>EventsTree.xaml</DependentUpon>
+    <Compile Include="EventsTreeControl.xaml.cs">
+      <DependentUpon>EventsTreeControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Extensions.cs" />
     <Compile Include="Favourites.xaml.cs">
@@ -149,6 +149,9 @@
       <DependentUpon>SliderControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="StreamingAPI.cs" />
+    <Compile Include="TabContentControl.xaml.cs">
+      <DependentUpon>TabContentControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UpdateBet.xaml.cs">
       <DependentUpon>UpdateBet.xaml</DependentUpon>
     </Compile>
@@ -170,7 +173,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="EventsTree.xaml">
+    <Page Include="EventsTreeControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -214,6 +217,10 @@
     <Page Include="Styles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TabContentControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UpdateBet.xaml">
       <SubType>Designer</SubType>

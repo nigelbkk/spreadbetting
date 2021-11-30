@@ -29,7 +29,7 @@ namespace SpreadTrader
 		public double Commission { get { return _Commission; } set { _Commission = value; NotifyPropertyChanged("Commission"); } }
 		public double NetCommission { get { return _Commission - DiscountRate; } }
 		public static BetfairAPI.BetfairAPI Betfair { get; set; }
-		EventsTree EventsTree = null;
+//		EventsTree EventsTree = null;
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void NotifyPropertyChanged(String info)
 		{
@@ -91,8 +91,8 @@ namespace SpreadTrader
 			this.Height = props.Height;
 			this.Width = props.Width;
 
-			if (props.ColumnWidth > 0)
-				OuterGrid.ColumnDefinitions[0].Width = new GridLength(props.ColumnWidth, GridUnitType.Pixel);
+			//if (props.ColumnWidth > 0)
+			//	OuterGrid.ColumnDefinitions[0].Width = new GridLength(props.ColumnWidth, GridUnitType.Pixel);
 
 			if (props.Maximised)
 			{
@@ -115,10 +115,10 @@ namespace SpreadTrader
 							Int32 w = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
 							bool hidden = w == 0;
 							OuterGrid.ColumnDefinitions[0].Width = new GridLength(hidden ? props.ColumnWidth : 0, GridUnitType.Pixel);
-							EventsTree.Visibility = EventsTree.Visibility == Visibility.Collapsed ? EventsTree.Visibility = Visibility.Visible : EventsTree.Visibility = Visibility.Collapsed;
-							RightArrow.Visibility = hidden ? Visibility.Collapsed : Visibility.Visible;
-							LeftArrow.Visibility = hidden ? Visibility.Visible : Visibility.Collapsed;
-							VerticalSplitter.Visibility = LeftArrow.Visibility;
+							//EventsTree.Visibility = EventsTree.Visibility == Visibility.Collapsed ? EventsTree.Visibility = Visibility.Visible : EventsTree.Visibility = Visibility.Collapsed;
+							//RightArrow.Visibility = hidden ? Visibility.Collapsed : Visibility.Visible;
+							//LeftArrow.Visibility = hidden ? Visibility.Visible : Visibility.Collapsed;
+							//VerticalSplitter.Visibility = LeftArrow.Visibility;
 						}
 						break;
 					case "Settings":
@@ -142,10 +142,10 @@ namespace SpreadTrader
 		{
 			try
 			{
-				EventsTree = new EventsTree();
-				EventsTreeGrid.Content = EventsTree;
-				EventsTree.Populate();
-				AppendNewTab();
+//				EventsTree = new EventsTree();
+//				EventsTreeGrid.Content = EventsTree;
+//				EventsTree.Populate();
+//				AppendNewTab();
 			}
 			catch (Exception xe)
 			{
@@ -156,10 +156,11 @@ namespace SpreadTrader
 		{
 			// hook the new tab up to receive tree control events 
 			ClosableTab tab = new ClosableTab();
-			MarketControl mc = new MarketControl();
-			tab.Content = mc;
-			EventsTree.NodeCallback += mc.NodeChangeEventSink;
-			EventsTree.NodeCallback += tab.NodeChangeEventSink;
+
+			//MarketControl mc = new MarketControl();
+			//tab.Content = mc;
+			//EventsTree.NodeCallback += mc.NodeChangeEventSink;
+			//EventsTree.NodeCallback += tab.NodeChangeEventSink;
 
 			tab.Title = "";
 			TabControl.Items.Insert(0, tab);
