@@ -145,7 +145,7 @@ namespace SpreadTrader
 //				EventsTree = new EventsTree();
 //				EventsTreeGrid.Content = EventsTree;
 //				EventsTree.Populate();
-//				AppendNewTab();
+				AppendNewTab();
 			}
 			catch (Exception xe)
 			{
@@ -155,7 +155,7 @@ namespace SpreadTrader
 		private void AppendNewTab()
 		{
 			// hook the new tab up to receive tree control events 
-			ClosableTab tab = new ClosableTab();
+			ClosableTab tab = new ClosableTab();                    // TabContentControl needs to be a child of the tab
 
 			//MarketControl mc = new MarketControl();
 			//tab.Content = mc;
@@ -217,6 +217,13 @@ namespace SpreadTrader
 			{
 				OnShutdown();
 			};
+		}
+		private void ClosableTab_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			AppendNewTab();
+			//ClosableTab tab = sender as ClosableTab;
+			//TabControl tc = tab.Parent as TabControl;
+			//tc.Items.Remove(tab);
 		}
 	}
 }

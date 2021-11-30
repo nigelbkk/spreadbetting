@@ -8,6 +8,7 @@ namespace SpreadTrader
 {
 	class ClosableTab : TabItem
 	{
+		//TabContentControl control = null;
 		public NodeSelectionDelegate NodeChangeEventSink;
 		public StreamUpdateDelegate StreamUpdateEventSink = null;
 		public string Title { set { ((ClosableHeader)this.Header).Label.Content = value; } }
@@ -32,6 +33,7 @@ namespace SpreadTrader
 					});
 				}
 			};
+			Content = new TabContentControl();
 		}
 	}
 	public partial class ClosableHeader : UserControl
@@ -40,7 +42,7 @@ namespace SpreadTrader
 		{
 			InitializeComponent();
 		}
-		private void Image_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		private void CloseTab_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
 			ClosableTab parent = this.Parent as ClosableTab;
 			TabControl tabcontrol = parent.Parent as TabControl;
@@ -50,7 +52,20 @@ namespace SpreadTrader
 		{
 			ClosableTab parent = this.Parent as ClosableTab;
 			ClosableHeader header = parent.Header as ClosableHeader;
-			parent.Width = Math.Max(e.NewSize.Width + header.Image.Width, 20);
+			parent.Width = Math.Max(e.NewSize.Width + header.CloseButton.Width, 20);
+		}
+
+		private void Image_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			Image img = sender as Image;
+			TabControl tc = img.Parent as TabControl;
+			//TabItem ti = sender as TabItem;
+			//TabControl tc = ti.Parent as TabControl;
+		}
+
+		private void Image_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			//tc.Items.Remove(t);
 		}
 	}
 }
