@@ -10,7 +10,7 @@ namespace SpreadTrader
 {
 	public class NodeViewModel : ViewModelBase
 	{
-		public NodeSelectionDelegate NodeCallback = null;
+		public MarketSelectionDelegate OnMarketSelected;
 		public String FullName { get; set; }
 		public Market Market { get; set; }
 		public String MarketID { get; set; }
@@ -113,9 +113,9 @@ namespace SpreadTrader
 					MarketName = Parent.Name;
 					MarketID = Market.marketId;
 				}
-				if (NodeCallback != null)
+				if (OnMarketSelected != null)
 				{
-					NodeCallback(this);
+					OnMarketSelected(this);
 				}
 			}
 		}
@@ -215,7 +215,7 @@ namespace SpreadTrader
 		public void Add(NodeViewModel node, bool leaf = false)
 		{
 			node.Parent = this;
-			node.NodeCallback = NodeCallback;
+			node.OnMarketSelected = OnMarketSelected;
 			Nodes.Add(node);
 			if (node.Populate != null) node.Nodes.Add(new NodeViewModel("x"));
 		}

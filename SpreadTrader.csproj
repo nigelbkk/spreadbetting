@@ -136,6 +136,9 @@
     <Compile Include="MarketDescription.xaml.cs">
       <DependentUpon>MarketDescription.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MarketHeader.xaml.cs">
+      <DependentUpon>MarketHeader.xaml</DependentUpon>
+    </Compile>
     <Compile Include="NodeViewModel.cs" />
     <Compile Include="OrdersStatic.cs" />
     <Compile Include="PriceSize.cs" />
@@ -199,6 +202,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MarketDescription.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MarketHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

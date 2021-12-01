@@ -16,7 +16,7 @@ namespace SpreadTrader
 	public partial class RunnersControl : UserControl, INotifyPropertyChanged
 	{
 		public BetsManager betsManager = null;
-		public NodeSelectionDelegate NodeChangeEventSink = null;
+		public MarketSelectionDelegate OnMarketSelected;
 		public StreamUpdateDelegate StreamUpdateEventSink = null;
 		public FavoriteChangedDelegate OnFavoriteChanged = null;
 		private StreamingAPI streamingAPI = new StreamingAPI();
@@ -46,7 +46,7 @@ namespace SpreadTrader
 		}
 		public RunnersControl()
 		{
-			MarketNode = new NodeViewModel(MainWindow.Betfair);
+//			MarketNode = new NodeViewModel(MainWindow.Betfair);
 			LiveRunners = new List<LiveRunner>();
 			InitializeComponent();
 
@@ -91,7 +91,7 @@ namespace SpreadTrader
 						Worker.CancelAsync();
 				}
 			};
-			NodeChangeEventSink += (node) =>
+			OnMarketSelected += (node) =>
 			{
 				if (IsLoaded)
 				{
@@ -163,9 +163,9 @@ namespace SpreadTrader
 				{
 					try
 					{
-						if (MarketNode != null && MarketNode.MarketName != null && IsSelected)
+						if (MarketNode != null)// && MarketNode.MarketName != null && IsSelected)
 						{
-							var runners = streamingAPI.LiveRunners;
+							//var runners = streamingAPI.LiveRunners;
 							DateTime LastUpdate = DateTime.UtcNow;
 							var lr = MarketNode.GetLiveRunners();
 							UpdateMarketStatus();
@@ -318,10 +318,10 @@ namespace SpreadTrader
 				Extensions.MainWindow.Status = xe.Message;
 			}
 		}
-		private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
-		{
-			SV1.Height = Math.Max(25, e.NewSize.Height - Header.Height);
-		}
+		//private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
+		//{
+		//	SV1.Height = Math.Max(25, e.NewSize.Height - Header.Height);
+		//}
 		private void Label_PreviewMouseDown(object sender, MouseButtonEventArgs e)
 		{
 			Label lb = sender as Label;

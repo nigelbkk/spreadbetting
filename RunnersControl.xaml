@@ -19,6 +19,7 @@
 			<Setter Property="Width" Value="45"/>
 			<Setter Property="HorizontalAlignment" Value="Left"/>
 			<Setter Property="Padding" Value="0"/>
+			<Setter Property="Background" Value="#00000000"/>
 		</Style>
 		<Style TargetType="{x:Type TextBox}">
 			<Setter Property="FontSize" Value="13"/>
@@ -119,13 +120,12 @@
 			</UniformGrid>
 		</DataTemplate>
 	</UserControl.Resources>
-    <Grid SizeChanged="Grid_SizeChanged">
+    <Grid Background="Ivory">
 		<StackPanel>
 			<Grid Name="ItemsGrid">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="160"/>
 					<ColumnDefinition Width="auto" />
-					<ColumnDefinition/>
 				</Grid.ColumnDefinitions>
 				<Border Grid.Column ="0" BorderBrush="DarkGray" BorderThickness="0.5" >
 					<Label HorizontalAlignment="Left" Padding="8,0,0,0" BorderThickness="0" Width="auto" FontSize="15">Selection Name</Label>

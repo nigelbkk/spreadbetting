@@ -11,16 +11,17 @@
 		<local:ColorConverter x:Key="ColorConverter" />
 		<local:SideColorConverter x:Key="SideColorConverter" />
 	</UserControl.Resources>
-	<Grid>
-		<Grid.ColumnDefinitions>
+	<Grid  Background="Ivory">
+		<!--<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="57*"/>
-			<ColumnDefinition Width="23*"/>
-		</Grid.ColumnDefinitions>
+			<ColumnDefinition Width="auto"/>
+			<ColumnDefinition Width="auto"/>
+		</Grid.ColumnDefinitions>-->
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto"/>
 			<RowDefinition/>
 		</Grid.RowDefinitions>
-		<StackPanel Orientation="Horizontal" Grid.Row="0" Height="30" Grid.ColumnSpan="2">
+		<StackPanel Orientation="Horizontal" Grid.Row="0" Background="Ivory">
 			<TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="{Binding Path=LastUpdated}"/>
 			<!--<Button Margin="30,0,0,0" Tag="Reset"  Click="Button_Click">Reset</Button>
 			<Button Margin="30,0,0,0" Tag="Debug"  Click="Button_Click">Debug</Button>-->
@@ -28,11 +29,11 @@
 			<CheckBox Margin="16,0,0,0" IsChecked="{Binding Path=UnmatchedOnly}" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" >Unmatched only</CheckBox>
 			<Button Margin="10,0,0,0" Tag="Stream" Click="Button_Click" Content="{Binding Path=StreamingButtonText}"/>
 			<TextBlock Margin="4,0,0,0" Text="Active" Padding="5,7,8,8" Background="{Binding Path=StreamingColor}"/>
-			<TextBlock Text	="Status: " Padding="7,8"/>
-			<TextBox TextWrapping="Wrap" Text="{Binding Path=DebugID}" Width="49" HorizontalContentAlignment="Center"/>
+			<TextBlock Text	="Status: " Padding="7,8" />
+			<TextBox TextWrapping="Wrap" Text="{Binding Path=DebugID}" Visibility="Hidden" HorizontalContentAlignment="Center" />
 		</StackPanel>
-		<ContentControl Name ="BetsManagerContentControl" Grid.Row="1">
-			<DataGrid AutoGenerateColumns="False" Name="dataGrid"  Background="#00000000" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" Grid.ColumnSpan="2" IsReadOnly="True" CanUserSortColumns="True"
+		<ContentControl Grid.Row="1">
+			<DataGrid AutoGenerateColumns="False" Background="#00000000" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" Grid.ColumnSpan="2" IsReadOnly="True" CanUserSortColumns="True"
 				ScrollViewer.CanContentScroll="True" 
 				ScrollViewer.VerticalScrollBarVisibility="Auto"
 				ScrollViewer.HorizontalScrollBarVisibility="Auto">

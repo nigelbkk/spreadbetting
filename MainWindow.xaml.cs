@@ -12,7 +12,7 @@ using BetfairAPI;
 
 namespace SpreadTrader
 {
-	public delegate void NodeSelectionDelegate(NodeViewModel node);
+	public delegate void MarketSelectionDelegate(NodeViewModel node);
 	public delegate void OnShutdownDelegate();
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
@@ -112,9 +112,9 @@ namespace SpreadTrader
 				{
 					case "Hide Tree":
 						{
-							Int32 w = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
-							bool hidden = w == 0;
-							OuterGrid.ColumnDefinitions[0].Width = new GridLength(hidden ? props.ColumnWidth : 0, GridUnitType.Pixel);
+							//Int32 w = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
+							//bool hidden = w == 0;
+							//OuterGrid.ColumnDefinitions[0].Width = new GridLength(hidden ? props.ColumnWidth : 0, GridUnitType.Pixel);
 							//EventsTree.Visibility = EventsTree.Visibility == Visibility.Collapsed ? EventsTree.Visibility = Visibility.Visible : EventsTree.Visibility = Visibility.Collapsed;
 							//RightArrow.Visibility = hidden ? Visibility.Collapsed : Visibility.Visible;
 							//LeftArrow.Visibility = hidden ? Visibility.Visible : Visibility.Collapsed;
@@ -142,9 +142,6 @@ namespace SpreadTrader
 		{
 			try
 			{
-//				EventsTree = new EventsTree();
-//				EventsTreeGrid.Content = EventsTree;
-//				EventsTree.Populate();
 				AppendNewTab();
 			}
 			catch (Exception xe)
@@ -154,28 +151,27 @@ namespace SpreadTrader
 		}
 		private void AppendNewTab()
 		{
-			// hook the new tab up to receive tree control events 
-			ClosableTab tab = new ClosableTab();                    // TabContentControl needs to be a child of the tab
+			ClosableTab tab = new ClosableTab();
+			TabContentControl tc = tab.Content as TabContentControl;
+			//MarketControl mc = tab.Content as MarketControl;
 
 			//MarketControl mc = new MarketControl();
 			//tab.Content = mc;
-			//EventsTree.NodeCallback += mc.NodeChangeEventSink;
-			//EventsTree.NodeCallback += tab.NodeChangeEventSink;
+			EventsTree.OnMarketSelected += tc.OnMarketSelected;
+			EventsTree.OnMarketSelected += tab.OnMarketSelected;
 
-			tab.Title = "";
+			tab.Title = "New Market";
+
 			TabControl.Items.Insert(0, tab);
+			//tab.IsSelected = true;
 			tab.Focus();
+			NotifyPropertyChanged("");
 		}
-		private void TabItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-		{
-			AppendNewTab();
-			e.Handled = true;
-		}
-		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-		{
-			props.ColumnWidth = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
-			props.Save();
-		}
+		//private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+		//{
+		//	props.ColumnWidth = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
+		//	props.Save();
+		//}
 		private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			TabControl tabControl = sender as TabControl;
@@ -221,9 +217,7 @@ namespace SpreadTrader
 		private void ClosableTab_PreviewMouseDown(object sender, MouseButtonEventArgs e)
 		{
 			AppendNewTab();
-			//ClosableTab tab = sender as ClosableTab;
-			//TabControl tc = tab.Parent as TabControl;
-			//tc.Items.Remove(tab);
+			e.Handled = true;
 		}
 	}
 }

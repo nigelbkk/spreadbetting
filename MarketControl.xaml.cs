@@ -10,7 +10,7 @@ namespace SpreadTrader
 {
 	public partial class MarketControl : UserControl, INotifyPropertyChanged
 	{
-		public NodeSelectionDelegate NodeChangeEventSink = null;
+		public MarketSelectionDelegate OnMarketSelected;
 		public NodeViewModel _MarketNode { get; set; }
 		public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
 		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; NotifyPropertyChanged(""); } }
@@ -37,9 +37,9 @@ namespace SpreadTrader
 			InitializeComponent();
 			BetsManagerControl.RunnersControl = RunnersControl;
 			RunnersControl.betsManager = BetsManagerControl;
-			NodeChangeEventSink += RunnersControl.NodeChangeEventSink;
-			NodeChangeEventSink += BetsManagerControl.NodeChangeEventSink;
-			NodeChangeEventSink += (node) =>
+			OnMarketSelected += RunnersControl.OnMarketSelected;
+			OnMarketSelected += BetsManagerControl.OnMarketSelected;
+			OnMarketSelected += (node) =>
 			{
 				// new market selected from the tree control
 				if (IsLoaded)
@@ -83,33 +83,33 @@ namespace SpreadTrader
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			Button b = sender as Button;
-			try
-			{
-				switch (b.Tag)
-				{
-					case "Market Description": new MarketDescription(this, b, MarketNode).ShowDialog(); break;
-					case "Hide Grid":
-						StackPanel sp = b.Content as StackPanel;
-						if (LowerGrid.RowDefinitions[0].ActualHeight == 0)
-						{
-							LowerGrid.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Auto);
-							sp.Children[0].Visibility = Visibility.Visible;
-							sp.Children[1].Visibility = Visibility.Collapsed;
-						}
-						else
-						{
-							LowerGrid.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Pixel);
-							sp.Children[0].Visibility = Visibility.Collapsed;
-							sp.Children[1].Visibility = Visibility.Visible;
-						}
-						break;
-				}
-			}
-			catch (Exception xe)
-			{
-				Debug.WriteLine(xe.Message);
-				Extensions.MainWindow.Status = xe.Message;
-			}
+			//	try
+			//	{
+			//		switch (b.Tag)
+			//		{
+			//			case "Market Description": new MarketDescription(this, b, MarketNode).ShowDialog(); break;
+			//			case "Hide Grid":
+			//				StackPanel sp = b.Content as StackPanel;
+			//				if (LowerGrid.RowDefinitions[0].ActualHeight == 0)
+			//				{
+			//					LowerGrid.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Auto);
+			//					sp.Children[0].Visibility = Visibility.Visible;
+			//					sp.Children[1].Visibility = Visibility.Collapsed;
+			//				}
+			//				else
+			//				{
+			//					LowerGrid.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Pixel);
+			//					sp.Children[0].Visibility = Visibility.Collapsed;
+			//					sp.Children[1].Visibility = Visibility.Visible;
+			//				}
+			//				break;
+			//		}
+			//	}
+			//	catch (Exception xe)
+			//	{
+			//		Debug.WriteLine(xe.Message);
+			//		Extensions.MainWindow.Status = xe.Message;
+			//	}
 		}
 		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
 		{
@@ -118,27 +118,27 @@ namespace SpreadTrader
 			BetsManagerControl.Height = Math.Max(25, Extensions.MainWindow.ActualHeight - RunnersGrid.ActualHeight - 255);
 			props.Save();
 		}
-		private void UpperGrid_Loaded(object sender, RoutedEventArgs e)
-		{
-			Grid grid = sender as Grid;
-			if (props.HorizontalSplitter > 0 && grid.RowDefinitions.Count > 0)
-				grid.RowDefinitions[0].Height = new GridLength(props.HorizontalSplitter, GridUnitType.Pixel);
-			if (props.VerticalSplitter2 > 0)// && grid.RowDefinitions.Count > 0)
-				RunnersAndSlidersGrid.ColumnDefinitions[0].Width = new GridLength(props.VerticalSplitter2, GridUnitType.Pixel);
-		}
-		private void UserControl_Loaded(object sender, RoutedEventArgs e)
-		{
-			BetsManagerControl.RunnersControl = RunnersControl;
-		}
-		private void GridSplitter_DragCompleted_1(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-		{
-			props.VerticalSplitter2 = RunnersAndSlidersGrid.ColumnDefinitions[0].Width.Value;
-			props.Save();
-		}
-		private void MarketControlGrid_SizeChanged(object sender, SizeChangedEventArgs e)
-		{
-			BetsManagerControl.Height = Math.Max(25, Extensions.MainWindow.ActualHeight - RunnersGrid.ActualHeight - 255);
-			//Debug.WriteLine("{0} : {1} : {2}", Extensions.MainWindow.ActualHeight - RunnersGrid.ActualHeight, BetsManagerControl.ActualHeight, 0);
-		}
+		//private void UpperGrid_Loaded(object sender, RoutedEventArgs e)
+		//{
+		//	Grid grid = sender as Grid;
+		//	if (props.HorizontalSplitter > 0 && grid.RowDefinitions.Count > 0)
+		//		grid.RowDefinitions[0].Height = new GridLength(props.HorizontalSplitter, GridUnitType.Pixel);
+		//	if (props.VerticalSplitter2 > 0)// && grid.RowDefinitions.Count > 0)
+		//		RunnersAndSlidersGrid.ColumnDefinitions[0].Width = new GridLength(props.VerticalSplitter2, GridUnitType.Pixel);
+		//}
+		//private void UserControl_Loaded(object sender, RoutedEventArgs e)
+		//{
+		//	BetsManagerControl.RunnersControl = RunnersControl;
+		//}
+		//private void GridSplitter_DragCompleted_1(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+		//{
+		//	props.VerticalSplitter2 = RunnersAndSlidersGrid.ColumnDefinitions[0].Width.Value;
+		//	props.Save();
+		//}
+		//private void MarketControlGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+		//{
+		//	BetsManagerControl.Height = Math.Max(25, Extensions.MainWindow.ActualHeight - RunnersGrid.ActualHeight - 255);
+		//	//Debug.WriteLine("{0} : {1} : {2}", Extensions.MainWindow.ActualHeight - RunnersGrid.ActualHeight, BetsManagerControl.ActualHeight, 0);
+		//}
 	}
 }

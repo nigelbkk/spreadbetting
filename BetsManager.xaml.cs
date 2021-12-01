@@ -94,7 +94,7 @@ namespace SpreadTrader
 	{
 		private Properties.Settings props = Properties.Settings.Default;
 		public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
-		public NodeSelectionDelegate NodeChangeEventSink = null;
+		public MarketSelectionDelegate OnMarketSelected;
 		public RunnersControl RunnersControl { get; set; }
 		public ObservableCollection<Row> Rows { get; set; }
 		private NodeViewModel MarketNode { get; set; }
@@ -171,7 +171,7 @@ namespace SpreadTrader
 
 			Rows = new ObservableCollection<Row>();
 			InitializeComponent();
-			NodeChangeEventSink += (node) =>
+			OnMarketSelected += (node) =>
 			{
 				if (IsLoaded)
 				{
