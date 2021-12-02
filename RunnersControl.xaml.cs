@@ -71,7 +71,7 @@ namespace SpreadTrader
 						LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
 						LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
 						LiveRunners[i].NotifyPropertyChanged("");
-						LiveRunners[i].Width = ItemsGrid.ColumnDefinitions[0].ActualWidth;
+//						LiveRunners[i].Width = ItemsGrid.ColumnDefinitions[0].ActualWidth;
 						if (pl.Count > 0 && pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
 						{
 							if (p.selectionId == LiveRunners[i].SelectionId)
@@ -358,13 +358,13 @@ namespace SpreadTrader
 				streamingAPI.Stop();
 			};
 		}
-		private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-		{
-			double diff = ItemsGrid.ColumnDefinitions[0].Width.Value - SV1.ActualWidth;
-			if (SV1.Items.Count > 0) foreach (LiveRunner v in SV1.Items)
-			{
-				v.Width = ItemsGrid.ColumnDefinitions[0].Width.Value;
-			}
-		}
+		//private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+		//{
+		//	double diff = ItemsGrid.ColumnDefinitions[0].Width.Value - SV1.ActualWidth;
+		//	if (SV1.Items.Count > 0) foreach (LiveRunner v in SV1.Items)
+		//	{
+		//		v.Width = ItemsGrid.ColumnDefinitions[0].Width.Value;
+		//	}
+		//}
 	}
 }

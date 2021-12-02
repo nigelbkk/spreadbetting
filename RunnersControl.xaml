@@ -6,152 +6,129 @@
              xmlns:local="clr-namespace:SpreadTrader"
              mc:Ignorable="d" 
 	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-             d:DesignHeight="250" d:DesignWidth="600" Loaded="UserControl_Loaded" >
+             d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
-		<local:OddsConverter x:Key="oconverter" />
-		<local:OddsConverterBlank x:Key="obconverter" />
-		<local:StakeConverter x:Key="sconverter" />
-		<local:PercentConverter x:Key="pconverter" />
-		<local:CurrencyConverter x:Key="cconverter" />
-		<Style BasedOn="{StaticResource {x:Type Label}}" 
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="styles.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+			<local:OddsConverter x:Key="oconverter" />
+			<local:OddsConverterBlank x:Key="obconverter" />
+			<local:StakeConverter x:Key="sconverter" />
+			<local:PercentConverter x:Key="pconverter" />
+			<local:CurrencyConverter x:Key="cconverter" />
+			<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
-			<Setter Property="FontSize" Value="13"/>
-			<Setter Property="Width" Value="45"/>
-			<Setter Property="HorizontalAlignment" Value="Left"/>
-			<Setter Property="Padding" Value="0"/>
-			<Setter Property="Background" Value="#00000000"/>
-		</Style>
-		<Style TargetType="{x:Type TextBox}">
-			<Setter Property="FontSize" Value="13"/>
-			<Setter Property="HorizontalContentAlignment" Value="Center"/>
-			<Setter Property="VerticalContentAlignment" Value="Center"/>
-			<Setter Property="Width" Value="45"/>
-			<Setter Property="Background" Value="#00000000"/>
-			<Setter Property="BorderThickness" Value="0.2"/>
-		</Style>
-		<Style TargetType="{x:Type TextBlock}">
-			<Setter Property="FontSize" Value="10"/>
-		</Style>
-		<Style TargetType="{x:Type Button}">
-			<Style.Triggers>
-				<MultiTrigger>
-					<MultiTrigger.Conditions>
-						<Condition Property="IsPressed" Value="False" />
-						<Condition Property="IsMouseOver" Value="True" />
-					</MultiTrigger.Conditions>
-				</MultiTrigger>
-				<Trigger Property="IsPressed" Value="True">
-					<Setter Property="Button.Background" Value="Purple" />
-					<Setter Property="Button.Effect">
-						<Setter.Value>
-							<DropShadowEffect Color="DarkGray" Direction="320" ShadowDepth="0" BlurRadius="0" Opacity="0" />
-						</Setter.Value>
-					</Setter>
-				</Trigger>
-
-			</Style.Triggers>
-			<EventSetter Event="Click" Handler="Button_Click"/>
-			<Setter Property="VerticalContentAlignment" Value="Center"/>
-			<Setter Property="Background" Value="DarkGray"/>
-			<Setter Property="BorderBrush" Value="DarkGray"/>
-			<Setter Property="BorderThickness" Value="0.5"/>
-			<Setter Property="Width" Value="42"/>
-			<Setter Property="Margin" Value="0,0,3,3"/>
-			<Setter Property="HorizontalContentAlignment" Value="Center"/>
-			<Setter Property="Button.Effect">
-				<Setter.Value>
-					<DropShadowEffect Color="DarkGray" Direction="320" ShadowDepth="3" BlurRadius="5" Opacity="0.5" />
-				</Setter.Value>
-			</Setter>
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate>
-						<ControlTemplate.Resources>
-							<Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-								<Setter Property="TextAlignment" Value="Center"/>
-								<Setter Property="Margin" Value="1"/>
-								<Setter Property="FontSize" Value="12"/>
-								<Setter Property="FontWeight" Value="Bold"/>
-								<Setter Property="Background" Value="#00000000"/>
-							</Style>
-							<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
-								<Setter Property="Width" Value="140"/>
-								<Setter Property="HorizontalContentAlignment" Value="Left"/>
-								<Setter Property="Background" Value="#00000000"/>
-								<Setter Property="FontSize" Value="12"/>
-								<Setter Property="Background" Value="#00000000"/>
-							</Style>
-						</ControlTemplate.Resources>
-						<Grid>
+				<Setter Property="FontSize" Value="13"/>
+				<Setter Property="Width" Value="45"/>
+				<Setter Property="HorizontalAlignment" Value="Left"/>
+				<Setter Property="Padding" Value="0"/>
+				<Setter Property="Background" Value="#00000000"/>
+			</Style>
+			<Style TargetType="{x:Type TextBox}">
+				<Setter Property="FontSize" Value="13"/>
+				<Setter Property="HorizontalContentAlignment" Value="Center"/>
+				<Setter Property="VerticalContentAlignment" Value="Center"/>
+				<Setter Property="Width" Value="45"/>
+				<Setter Property="Background" Value="#00000000"/>
+				<Setter Property="BorderThickness" Value="0.2"/>
+			</Style>
+			<Style TargetType="{x:Type TextBlock}">
+				<Setter Property="FontSize" Value="10"/>
+			</Style>
+			<Style TargetType="{x:Type Button}">
+				<Style.Triggers>
+					<MultiTrigger>
+						<MultiTrigger.Conditions>
+							<Condition Property="IsPressed" Value="False" />
+							<Condition Property="IsMouseOver" Value="True" />
+						</MultiTrigger.Conditions>
+					</MultiTrigger>
+					<Trigger Property="IsPressed" Value="True">
+						<Setter Property="Button.Background" Value="Purple" />
+						<Setter Property="Button.Effect">
+							<Setter.Value>
+								<DropShadowEffect Color="DarkGray" Direction="320" ShadowDepth="0" BlurRadius="0" Opacity="0" />
+							</Setter.Value>
+						</Setter>
+					</Trigger>
+				</Style.Triggers>
+				<EventSetter Event="Click" Handler="Button_Click"/>
+				<Setter Property="VerticalContentAlignment" Value="Center"/>
+				<Setter Property="BorderThickness" Value="0.5"/>
+				<!--<Setter Property="Width" Value="42"/>-->
+				<Setter Property="Margin" Value="0,0,3,3"/>
+				<Setter Property="HorizontalContentAlignment" Value="Center"/>
+				<Setter Property="Button.Effect">
+					<Setter.Value>
+						<DropShadowEffect Color="DarkGray" Direction="320" ShadowDepth="3" BlurRadius="5" Opacity="0.5" />
+					</Setter.Value>
+				</Setter>
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate>
+							<ControlTemplate.Resources>
+								<Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+									<Setter Property="TextAlignment" Value="Center"/>
+									<Setter Property="Margin" Value="1"/>
+									<Setter Property="FontSize" Value="12"/>
+									<Setter Property="FontWeight" Value="Bold"/>
+									<Setter Property="Background" Value="#00000000"/>
+								</Style>
+								<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+									<Setter Property="Width" Value="140"/>
+									<Setter Property="HorizontalContentAlignment" Value="Left"/>
+									<Setter Property="Background" Value="#00000000"/>
+									<Setter Property="FontSize" Value="12"/>
+									<Setter Property="Background" Value="#00000000"/>
+								</Style>
+							</ControlTemplate.Resources>
 							<Grid>
-								<StackPanel Orientation="Vertical" Background="{TemplateBinding Background}" Height="35" VerticalAlignment="Center">
-									<TextBlock Text="{Binding Path=price, Converter={StaticResource obconverter}}" FontSize="13" Margin="0,4,0,0"/>
-									<TextBlock Text="{Binding Path=size, Converter={StaticResource sconverter}}" FontSize="11" FontWeight="Normal"/>
-									<!--<TextBlock Text="{Binding Path=price}" FontSize="13" Margin="0,4,0,0"/>
-									<TextBlock Text="{Binding Path=size}" FontSize="11" FontWeight="Normal"/>-->
-								</StackPanel>
+								<Grid>
+									<StackPanel Orientation="Vertical" Background="{TemplateBinding Background}" Height="35" VerticalAlignment="Center">
+										<TextBlock Text="{Binding Path=price, Converter={StaticResource obconverter}}" FontSize="13" Margin="0,4,0,0"/>
+										<TextBlock Text="{Binding Path=size, Converter={StaticResource sconverter}}" FontSize="11" FontWeight="Normal"/>
+									</StackPanel>
+								</Grid>
+								<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
 							</Grid>
-							<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-						</Grid>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-
-		<DataTemplate  x:Key="DataTemplate_Runner">
-			<UniformGrid Rows="1"  >
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+			</Style>
+			<DataTemplate x:Key="DataTemplate_Runner">
 				<StackPanel>
-					<Border BorderBrush="DarkGray" BorderThickness="0">
-						<StackPanel Orientation="Horizontal">
-							<Label Content="{Binding Path=Name}" Width="{Binding Path=Width}" Padding="8" Background="{Binding Path=FavoritesColor}" HorizontalContentAlignment="Left" PreviewMouseDown="Label_PreviewMouseDown"  FontSize="15"/>
-							<Button DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
-							<Button DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
-							<Button DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
-							<Border Width="10"/>
-							<Button DataContext="{Binding LayValues[0]}" Background="{StaticResource Lay0Color}"/>
-							<Button DataContext="{Binding LayValues[1]}" Background="{StaticResource Lay1Color}"/>
-							<Button DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
-							<Label Content="{Binding LastPriceTraded, Converter={StaticResource obconverter} }"  Width="32" FontSize="11"/>
-							<Label Content="{Binding ifWin, Converter={StaticResource oconverter} }" Foreground="{Binding Path=ProfitColor}" FontWeight="Regular" Width="32" FontSize="11"/>
-							<Label Name ="LevelProfit" Content="{Binding LevelProfit, Converter={StaticResource oconverter} }" Foreground="{Binding Path=LevelProfitColor}" PreviewMouseDown="Label_PreviewMouseDown" Background="LightGreen" Width="32" FontWeight="Regular" FontSize="11"/>
-						</StackPanel>
-					</Border>
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+							<ColumnDefinition Width="4"/>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+						</Grid.ColumnDefinitions>
+						<Button Grid.Column="0" DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
+						<Button Grid.Column="1"  DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
+						<Button Grid.Column="2" DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
+						<Label Grid.Column="3" />
+						<Button Grid.Column="4" DataContext="{Binding LayValues[0]}" Background="{StaticResource Lay0Color}"/>
+						<Button Grid.Column="5" DataContext="{Binding LayValues[1]}" Background="{StaticResource Lay1Color}"/>
+						<Button Grid.Column="6" DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
+						<TextBox Grid.Column="7" Text="Last Price"/>
+						<TextBox Grid.Column="8" Text="Profit"/>
+						<TextBox Grid.Column="9" Text="Level Profit" Background="LightGreen"/>
+					</Grid>
 				</StackPanel>
-			</UniformGrid>
-		</DataTemplate>
+			</DataTemplate>
+		</ResourceDictionary>
 	</UserControl.Resources>
-    <Grid Background="Ivory">
-		<StackPanel>
-			<Grid Name="ItemsGrid">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="160"/>
-					<ColumnDefinition Width="auto" />
-				</Grid.ColumnDefinitions>
-				<Border Grid.Column ="0" BorderBrush="DarkGray" BorderThickness="0.5" >
-					<Label HorizontalAlignment="Left" Padding="8,0,0,0" BorderThickness="0" Width="auto" FontSize="15">Selection Name</Label>
-				</Border>
-				<GridSplitter Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Stretch" Background="DarkGray" ShowsPreview="false" Width="3" ResizeDirection="Columns" DragCompleted="GridSplitter_DragCompleted" />
-				<Border Grid.Column ="1" BorderBrush="DarkGray" BorderThickness="0">
-					<StackPanel Name="Header" Orientation="Horizontal" VerticalAlignment="Top" Height="36">
-						<Label/>
-						<Label/>
-						<Label Content="{Binding Path=BackBook, Converter={StaticResource pconverter}}" FontSize="11"/>
-						<Label Width="10"/>
-						<Label Content="{Binding Path=LayBook, Converter={StaticResource pconverter}}"  FontSize="11"/>
-						<Label/>
-						<Label/>
-						<Label Width="32">
-							<TextBlock>Last<LineBreak/>Price</TextBlock>
-						</Label>
-						<Label Width="32" FontSize="11">Profit</Label>
-						<Label Width="32">
-							<TextBlock>Level<LineBreak/>Profit</TextBlock>
-						</Label>
-					</StackPanel>
-				</Border>
-			</Grid>
-
-			<ItemsControl Name="SV1" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}" HorizontalAlignment="Left" >
+	<Grid>
+		<Grid Name="RunnersGrid">
+			<ItemsControl Name="SV1" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}">
 				<ItemsControl.Template>
 					<ControlTemplate>
 						<ScrollViewer>
@@ -160,7 +137,7 @@
 					</ControlTemplate>
 				</ItemsControl.Template>
 			</ItemsControl>
-		</StackPanel>
+		</Grid>
 		<Border Name="Overlay" Background="#00000000" BorderThickness="2" BorderBrush="DarkGray" IsHitTestVisible="False" Visibility="Hidden" Width="600" Height="150">
 			<TextBlock Name="OverlayText" Foreground="DarkGray" Background="#00000000" Width="600" FontSize="100" TextAlignment="Center" FontWeight="Medium" Text="Open"></TextBlock>
 		</Border>
