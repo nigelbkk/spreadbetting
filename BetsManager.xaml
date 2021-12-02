@@ -12,11 +12,6 @@
 		<local:SideColorConverter x:Key="SideColorConverter" />
 	</UserControl.Resources>
 	<Grid  Background="Ivory">
-		<!--<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="57*"/>
-			<ColumnDefinition Width="auto"/>
-			<ColumnDefinition Width="auto"/>
-		</Grid.ColumnDefinitions>-->
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto"/>
 			<RowDefinition/>

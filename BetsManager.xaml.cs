@@ -213,9 +213,6 @@ namespace SpreadTrader
 							List<Row> to_remove = new List<Row>();
 							foreach (Order o in orc.Uo)
 							{
-								if (o.Id == "248881105443")
-								{
-								}
 								Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
 								Row row = FindUnmatchedRow(o.Id, false);
 								if (row == null)
@@ -309,7 +306,7 @@ namespace SpreadTrader
 							Rows.Insert(0, new Row(o)
 							{
 								Runner = RunnersControl.GetRunnerName(o.selectionId),
-						});
+							});
 						}
 						NotifyPropertyChanged("");
 					}

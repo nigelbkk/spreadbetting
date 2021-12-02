@@ -153,10 +153,6 @@ namespace SpreadTrader
 		{
 			ClosableTab tab = new ClosableTab();
 			TabContentControl tc = tab.Content as TabContentControl;
-			//MarketControl mc = tab.Content as MarketControl;
-
-			//MarketControl mc = new MarketControl();
-			//tab.Content = mc;
 			EventsTree.OnMarketSelected += tc.OnMarketSelected;
 			EventsTree.OnMarketSelected += tab.OnMarketSelected;
 
