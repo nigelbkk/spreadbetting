@@ -1,0 +1,78 @@
+﻿<UserControl x:Class="SpreadTrader.TabContentControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SpreadTrader"
+             DataContext="{Binding RelativeSource={RelativeSource Self}}"
+	         mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+	<UserControl.Resources>
+		<local:TimeConverter x:Key="converter" />
+		<local:OddsConverter x:Key="oconverter" />
+		<local:CurrencyConverter x:Key="cconverter" />
+		<Style BasedOn="{StaticResource {x:Type Button}}" 
+            TargetType="{x:Type Button}">
+			<Setter Property="FontSize" Value="12"/>
+			<EventSetter Event="Click" Handler="Button_Click"/>
+		</Style>
+		<Style BasedOn="{StaticResource {x:Type Label}}" 
+            TargetType="{x:Type Label}">
+			<Setter Property="FontSize" Value="11"/>
+			<Setter Property="Width" Value="auto"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="HorizontalAlignment" Value="Left"/>
+		</Style>	
+	</UserControl.Resources>
+	<Grid  Background="Ivory">
+		<Grid Grid.Row="1" Name="RightGridBody">
+			<DockPanel>
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto"/>
+						<RowDefinition/>
+						<RowDefinition/>
+					</Grid.RowDefinitions>
+					<Grid Grid.Row="0">
+						<local:MarketHeader x:Name="MarketHeader"/>
+					</Grid>
+					<Grid Grid.Row="1" Name ="RunnerandSlidersGrid">
+						<DockPanel>
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="600"/>
+									<ColumnDefinition/>
+								</Grid.ColumnDefinitions>
+								<Grid Grid.Column="0" Name="RunnersGrid">
+									<local:RunnersControl x:Name ="RunnersControl"/>
+								</Grid>
+
+								<Grid Grid.Column="1">
+									<local:SliderControl x:Name ="SliderControl"/>
+								</Grid>
+								<GridSplitter Background="DarkGray" Width="2.5" VerticalAlignment="Stretch" Grid.Column="0"/>
+							</Grid>
+						</DockPanel>
+					</Grid>
+					<GridSplitter Grid.Row="1" Background="DarkGray" Height="2.5" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Grid.Column="2"/>
+					<Grid Grid.Row="2" Name="LowerGrid">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="auto"/>
+							<RowDefinition />
+						</Grid.RowDefinitions>
+						<Grid Grid.Row="0">
+							<Border BorderBrush="DarkGray" BorderThickness="0.5">
+								<local:BettingGrid x:Name ="BettingGrid"/>
+							</Border>
+						</Grid>
+						<Grid Grid.Row="1">
+							<Border BorderBrush="DarkGray" BorderThickness="0.5">
+								<local:BetsManager x:Name ="BetsManager"/>
+							</Border>
+						</Grid>
+					</Grid>
+				</Grid>
+			</DockPanel>
+		</Grid>
+	</Grid>
+</UserControl>
