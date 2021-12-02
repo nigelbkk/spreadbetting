@@ -44,15 +44,6 @@
     <Setting Name="Proxy" Type="System.String" Scope="User">
       <Value Profile="(Default)">127.0.0.1:5055</Value>
     </Setting>
-    <Setting Name="ColumnWidth" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">80</Value>
-    </Setting>
-    <Setting Name="VerticalSplitter" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">120</Value>
-    </Setting>
-    <Setting Name="HorizontalSplitter" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">120</Value>
-    </Setting>
     <Setting Name="BasePrice" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
@@ -80,20 +71,11 @@
     <Setting Name="UseStreaming" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="VerticalSplitter2" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
     <Setting Name="StreamUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">127.0.0.1:8088</Value>
     </Setting>
     <Setting Name="SafeBets" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="CDTop" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="CDLeft" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="StreamActive" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -107,11 +89,20 @@
     <Setting Name="DefaultStake" Type="System.Double" Scope="User">
       <Value Profile="(Default)">2</Value>
     </Setting>
-    <Setting Name="BRTop" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="splitter0" Type="System.Windows.GridLength" Scope="User">
+      <Value Profile="(Default)">Auto</Value>
     </Setting>
-    <Setting Name="BRLeft" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="splitter1" Type="System.Windows.GridLength" Scope="User">
+      <Value Profile="(Default)">Auto</Value>
+    </Setting>
+    <Setting Name="splitter2" Type="System.Windows.GridLength" Scope="User">
+      <Value Profile="(Default)">Auto</Value>
+    </Setting>
+    <Setting Name="splitter3" Type="System.Windows.GridLength" Scope="User">
+      <Value Profile="(Default)">Auto</Value>
+    </Setting>
+    <Setting Name="splitter4" Type="System.Windows.GridLength" Scope="User">
+      <Value Profile="(Default)">Auto</Value>
     </Setting>
   </Settings>
 </SettingsFile>

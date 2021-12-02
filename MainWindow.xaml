@@ -4,7 +4,7 @@
 		xmlns:properties="clr-namespace:SpreadTrader.Properties"
         xmlns:local="clr-namespace:SpreadTrader"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="SpreadTrader" Height="598" Width="1089" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" Closing="Window_Closing" FontFamily="Tahoma" >
+        Title="SpreadTrader" Height="598" Width="1089" WindowStartupLocation="CenterScreen" Closing="Window_Closing" FontFamily="Tahoma" >
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
@@ -65,7 +65,8 @@
 				</Grid>
 				<Grid Grid.Row="1" Name="InnerGrid" >
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="320"/>
+						<ColumnDefinition Width="{Binding splitter2, Source={x:Static properties:Settings.Default}, Mode=TwoWay}" />
+						<!--<ColumnDefinition Width="320"/>-->
 						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
 					<Grid Grid.Column="0" Name ="EventsGrid">
@@ -77,7 +78,7 @@
 
 					<Grid Grid.Column="1" Name="RightGrid">
 						<TabControl Name ="TabControl"  >
-							<local:ClosableTab Header="+" PreviewMouseDown="ClosableTab_PreviewMouseDown"  />
+							<local:ClosableTab Header="+"/>
 						</TabControl>
 					</Grid>
 					<GridSplitter Grid.Column="1" Background="DarkGray" Width="2.5" HorizontalAlignment="Left"/>

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:properties="clr-namespace:SpreadTrader.Properties"
              xmlns:local="clr-namespace:SpreadTrader"
              DataContext="{Binding RelativeSource={RelativeSource Self}}"
 	         mc:Ignorable="d" 
@@ -30,7 +31,7 @@
 				<Grid>
 					<Grid.RowDefinitions>
 						<RowDefinition Height="auto"/>
-						<RowDefinition/>
+						<RowDefinition Height="{Binding splitter0, Source={x:Static properties:Settings.Default}, Mode=TwoWay}" />
 						<RowDefinition/>
 					</Grid.RowDefinitions>
 					<Grid Grid.Row="0">
@@ -40,7 +41,8 @@
 						<DockPanel>
 							<Grid>
 								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="600"/>
+									<ColumnDefinition Width="{Binding splitter1, Source={x:Static properties:Settings.Default}, Mode=TwoWay}" />
+									<!--<ColumnDefinition Width="600"/>-->
 									<ColumnDefinition/>
 								</Grid.ColumnDefinitions>
 								<Grid Grid.Column="0" Name="RunnersGrid">

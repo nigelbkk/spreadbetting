@@ -46,7 +46,6 @@ namespace SpreadTrader
 		}
 		public RunnersControl()
 		{
-//			MarketNode = new NodeViewModel(MainWindow.Betfair);
 			LiveRunners = new List<LiveRunner>();
 			InitializeComponent();
 

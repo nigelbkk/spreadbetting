@@ -193,42 +193,6 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("80")]
-        public double ColumnWidth {
-            get {
-                return ((double)(this["ColumnWidth"]));
-            }
-            set {
-                this["ColumnWidth"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("120")]
-        public double VerticalSplitter {
-            get {
-                return ((double)(this["VerticalSplitter"]));
-            }
-            set {
-                this["VerticalSplitter"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("120")]
-        public double HorizontalSplitter {
-            get {
-                return ((double)(this["HorizontalSplitter"]));
-            }
-            set {
-                this["HorizontalSplitter"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public double BasePrice {
             get {
@@ -337,18 +301,6 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double VerticalSplitter2 {
-            get {
-                return ((double)(this["VerticalSplitter2"]));
-            }
-            set {
-                this["VerticalSplitter2"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1:8088")]
         public string StreamUrl {
             get {
@@ -368,30 +320,6 @@ namespace SpreadTrader.Properties {
             }
             set {
                 this["SafeBets"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double CDTop {
-            get {
-                return ((double)(this["CDTop"]));
-            }
-            set {
-                this["CDTop"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double CDLeft {
-            get {
-                return ((double)(this["CDLeft"]));
-            }
-            set {
-                this["CDLeft"] = value;
             }
         }
         
@@ -445,25 +373,61 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double BRTop {
+        [global::System.Configuration.DefaultSettingValueAttribute("Auto")]
+        public global::System.Windows.GridLength splitter0 {
             get {
-                return ((double)(this["BRTop"]));
+                return ((global::System.Windows.GridLength)(this["splitter0"]));
             }
             set {
-                this["BRTop"] = value;
+                this["splitter0"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double BRLeft {
+        [global::System.Configuration.DefaultSettingValueAttribute("Auto")]
+        public global::System.Windows.GridLength splitter1 {
             get {
-                return ((double)(this["BRLeft"]));
+                return ((global::System.Windows.GridLength)(this["splitter1"]));
             }
             set {
-                this["BRLeft"] = value;
+                this["splitter1"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Auto")]
+        public global::System.Windows.GridLength splitter2 {
+            get {
+                return ((global::System.Windows.GridLength)(this["splitter2"]));
+            }
+            set {
+                this["splitter2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Auto")]
+        public global::System.Windows.GridLength splitter3 {
+            get {
+                return ((global::System.Windows.GridLength)(this["splitter3"]));
+            }
+            set {
+                this["splitter3"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Auto")]
+        public global::System.Windows.GridLength splitter4 {
+            get {
+                return ((global::System.Windows.GridLength)(this["splitter4"]));
+            }
+            set {
+                this["splitter4"] = value;
             }
         }
     }

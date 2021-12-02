@@ -34,11 +34,11 @@ namespace SpreadTrader
 		public ConfirmationDialog(RunnersControl runnersControl, String MarketId, LiveRunner runner, String side, double odds)
 		{
 			this.runnersControl = runnersControl;
-			if (props.CDLeft > 0 && props.CDTop > 0)
-			{
-				Top = props.CDTop + Application.Current.MainWindow.Top;
-				Left = props.CDLeft + Application.Current.MainWindow.Left;
-			}
+			//if (props.CDLeft > 0 && props.CDTop > 0)
+			//{
+			//	Top = props.CDTop + Application.Current.MainWindow.Top;
+			//	Left = props.CDLeft + Application.Current.MainWindow.Left;
+			//}
 			Runner = runner.Name;
 			SelectionId = runner.SelectionId;
 			Side = side;
@@ -93,12 +93,12 @@ namespace SpreadTrader
 			Odds = Convert.ToDouble(control.Value);
 			NotifyPropertyChanged("");
 		}
-		private void Window_LocationChanged(object sender, EventArgs e)
-		{
-			props.CDTop = Top - Application.Current.MainWindow.Top;
-			props.CDLeft = Left - Application.Current.MainWindow.Left;
-			props.Save();
-		}
+		//private void Window_LocationChanged(object sender, EventArgs e)
+		//{
+		//	props.CDTop = Top - Application.Current.MainWindow.Top;
+		//	props.CDLeft = Left - Application.Current.MainWindow.Left;
+		//	props.Save();
+		//}
 		private void DockPanel_PreviewKeyDown(object sender, KeyEventArgs e)
 		{
 			BetfairPrices betfairPrices = new BetfairPrices();

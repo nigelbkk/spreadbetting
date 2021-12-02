@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
-	         DataContext="{Binding RelativeSource={RelativeSource Self}}"
+			 xmlns:properties="clr-namespace:SpreadTrader.Properties"
+			 DataContext="{Binding RelativeSource={RelativeSource Self}}"
              mc:Ignorable="d" d:DesignWidth="600" >
 	<UserControl.Resources>
 		<local:TimeConverter x:Key="converter" />
@@ -13,7 +14,7 @@
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
             TargetType="{x:Type Button}">
 			<Setter Property="FontSize" Value="12"/>
-			<EventSetter Event="Click" Handler="Button_Click"/>
+			<!--<EventSetter Event="Click" Handler="Button_Click"/>-->
 		</Style>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
@@ -32,12 +33,14 @@
 			<DockPanel>
 				<Grid >
 					<Grid.RowDefinitions>
+						<!--<RowDefinition Height="auto"/>-->
 						<RowDefinition Height="auto"/>
-						<RowDefinition Height="auto"/>
+						<RowDefinition Height="{Binding splitter4, Source={x:Static properties:Settings.Default}, Mode=TwoWay}" />
 					</Grid.RowDefinitions>
 					<Grid Name="RunnersAndSlidersGrid" Grid.Row="0">
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="600"/>
+							<ColumnDefinition  Width="{Binding splitter3, Source={x:Static properties:Settings.Default}, Mode=TwoWay}" />
+							<!--<ColumnDefinition Width="600"/>-->
 							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
 						<Grid Name="RunnersGrid" Background="Ivory">
@@ -68,7 +71,7 @@
 							</Grid>
 						</DockPanel>
 					</Grid>
-					<GridSplitter Grid.Row="1" Height="4" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="Gray" ResizeDirection="Rows" DragCompleted="GridSplitter_DragCompleted"/>
+					<GridSplitter Grid.Row="1" Height="4" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="Gray" ResizeDirection="Rows"/>
 				</Grid>
 			</DockPanel>
 		</Grid>
