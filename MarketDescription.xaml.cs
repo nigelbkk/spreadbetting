@@ -3,6 +3,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.Web.WebView2.Core;
+using System;
+using System.Net;
 
 namespace SpreadTrader
 {
@@ -20,8 +22,9 @@ namespace SpreadTrader
 		}
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
+			String html = string.Format("<body style = \"font-family:Verdana\" \"background-color: coral\" >{0}</body>", node.Market.description.rules.Replace("`","'"));
 			if (node != null && node.Market != null && node.Market.description.rules != null)
-				wb.NavigateToString(string.Format("<body style = \"font-family:Arial\" >{0}</body>", node.Market.description.rules));
+				wb.NavigateToString(html);
 		}
 	}
 }

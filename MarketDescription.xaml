@@ -8,8 +8,8 @@
         mc:Ignorable="d"
 		FontFamily="Sego UI"
         Title="MarketDescription" Height="380" Width="670" Loaded="Window_Loaded">
-	<Grid>
+	<Grid >
 		<!--<wv2:WebView2 Name ="webView"/>-->
-    	<WebBrowser Name="wb"/>
+    	<WebBrowser Name="wb" />
 	</Grid>
 </Window>

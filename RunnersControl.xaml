@@ -17,13 +17,18 @@
 			<local:StakeConverter x:Key="sconverter" />
 			<local:PercentConverter x:Key="pconverter" />
 			<local:CurrencyConverter x:Key="cconverter" />
-			<Style BasedOn="{StaticResource {x:Type Label}}" 
-            TargetType="{x:Type Label}">
-				<Setter Property="FontSize" Value="13"/>
-				<Setter Property="Width" Value="45"/>
-				<Setter Property="HorizontalAlignment" Value="Left"/>
-				<Setter Property="Padding" Value="0"/>
+			<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}" >
+				<!--<Setter Property="Width" Value="240"/>-->
+				<Setter Property="HorizontalContentAlignment" Value="Left"/>
 				<Setter Property="Background" Value="#00000000"/>
+				<Setter Property="FontSize" Value="12"/>
+				<!--<Setter Property="Background" Value="AliceBlue"/>-->
+				<Setter Property="Background" Value="#00000000"/>
+				<Setter Property="HorizontalContentAlignment" Value="Center"/>
+				<Setter Property="VerticalContentAlignment" Value="Center"/>
+				<Setter Property="Margin" Value="1"/>
+				<Setter Property="BorderBrush" Value="DarkGray"/>
+				<Setter Property="BorderThickness" Value="0.5"/>
 			</Style>
 			<Style TargetType="{x:Type TextBox}">
 				<Setter Property="FontSize" Value="13"/>
@@ -57,7 +62,8 @@
 				<Setter Property="VerticalContentAlignment" Value="Center"/>
 				<Setter Property="BorderThickness" Value="0.5"/>
 				<!--<Setter Property="Width" Value="42"/>-->
-				<Setter Property="Margin" Value="0,0,3,3"/>
+				<Setter Property="Margin" Value="2"/>
+				<!--<Setter Property="Margin" Value="0,0,3,3"/>-->
 				<Setter Property="HorizontalContentAlignment" Value="Center"/>
 				<Setter Property="Button.Effect">
 					<Setter.Value>
@@ -97,47 +103,80 @@
 				</Setter>
 			</Style>
 			<DataTemplate x:Key="DataTemplate_Runner">
-				<StackPanel>
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition/>
-							<ColumnDefinition/>
-							<ColumnDefinition/>
-							<ColumnDefinition Width="4"/>
-							<ColumnDefinition/>
-							<ColumnDefinition/>
-							<ColumnDefinition/>
-							<ColumnDefinition/>
-							<ColumnDefinition/>
-							<ColumnDefinition/>
-						</Grid.ColumnDefinitions>
-						<Button Grid.Column="0" DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
-						<Button Grid.Column="1"  DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
-						<Button Grid.Column="2" DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
-						<Label Grid.Column="3" />
-						<Button Grid.Column="4" DataContext="{Binding LayValues[0]}" Background="{StaticResource Lay0Color}"/>
-						<Button Grid.Column="5" DataContext="{Binding LayValues[1]}" Background="{StaticResource Lay1Color}"/>
-						<Button Grid.Column="6" DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
-						<TextBox Grid.Column="7" Text="Last Price"/>
-						<TextBox Grid.Column="8" Text="Profit"/>
-						<TextBox Grid.Column="9" Text="Level Profit" Background="LightGreen"/>
-					</Grid>
-				</StackPanel>
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="146"/>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+						<ColumnDefinition Width="10"/>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" Content="{Binding Name}" FontSize="16" HorizontalContentAlignment="Left"/>
+					<Button Grid.Column="1" DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
+					<Button Grid.Column="2"  DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
+					<Button Grid.Column="3" DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
+					<Label Grid.Column="4"/>
+					<Button Grid.Column="5" DataContext="{Binding LayValues[0]}" Background="{StaticResource Lay0Color}"/>
+					<Button Grid.Column="6" DataContext="{Binding LayValues[1]}" Background="{StaticResource Lay1Color}"/>
+					<Button Grid.Column="7" DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
+					<Label Grid.Column="8" Content="{Binding LastPriceTraded, Converter={StaticResource obconverter} }"  FontSize="11"/>
+					<Label Grid.Column="9" Content="{Binding ifWin, Converter={StaticResource oconverter} }" Foreground="{Binding Path=ProfitColor}" FontWeight="Regular" FontSize="11"/>
+					<Label Grid.Column="10" Content="{Binding LevelProfit, Converter={StaticResource oconverter} }" Foreground="{Binding Path=LevelProfitColor}" PreviewMouseDown="Label_PreviewMouseDown" Background="LightGreen" FontSize="11"/>
+				</Grid>
 			</DataTemplate>
 		</ResourceDictionary>
 	</UserControl.Resources>
 	<Grid>
-		<Grid Name="RunnersGrid">
-			<ItemsControl Name="SV1" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}">
-				<ItemsControl.Template>
-					<ControlTemplate>
-						<ScrollViewer>
-							<ItemsPresenter />
-						</ScrollViewer>
-					</ControlTemplate>
-				</ItemsControl.Template>
-			</ItemsControl>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="38"/>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
+		<Grid Name="Header" Grid.Row="0" Margin="0,0,0,0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="132"/>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+				<ColumnDefinition Width="10"/>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+
+			<Label HorizontalAlignment="Left" Grid.Column="0" Content="Selection Name" FontSize="16"/>
+			<Label Grid.Column="1"/>
+			<Label Grid.Column="2"/>
+			<Label Content="{Binding Path=BackBook, Converter={StaticResource pconverter}}" FontSize="11" Grid.Column="3"/>
+			<Label Grid.Column="4"/>
+			<Label Content="{Binding Path=LayBook, Converter={StaticResource pconverter}}"  FontSize="11" Grid.Column="5"/>
+			<Label Grid.Column="6"/>
+			<Label Grid.Column="7" />
+			<Label Grid.Column="8" HorizontalAlignment="Left" Margin="2">
+				<TextBlock>Last<LineBreak/>Price</TextBlock>
+			</Label>
+			<Label FontSize="11" Grid.Column="9"  HorizontalAlignment="Left" Margin="-4">Profit</Label>
+			<Label Grid.Column="10"  HorizontalAlignment="Left" Margin="-8">
+				<TextBlock>Level<LineBreak/>Profit</TextBlock>
+			</Label>
 		</Grid>
+		<ItemsControl Grid.Row="1" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}">
+			<ItemsControl.Template>
+				<ControlTemplate>
+					<ScrollViewer>
+						<ItemsPresenter />
+					</ScrollViewer>
+				</ControlTemplate>
+			</ItemsControl.Template>
+		</ItemsControl>
 		<Border Name="Overlay" Background="#00000000" BorderThickness="2" BorderBrush="DarkGray" IsHitTestVisible="False" Visibility="Hidden" Width="600" Height="150">
 			<TextBlock Name="OverlayText" Foreground="DarkGray" Background="#00000000" Width="600" FontSize="100" TextAlignment="Center" FontWeight="Medium" Text="Open"></TextBlock>
 		</Border>
