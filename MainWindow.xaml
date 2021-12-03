@@ -26,7 +26,7 @@
 	</Window.Resources>
 	<Grid>
 		<DockPanel>
-			<Grid Name ="MainGrid">
+			<Grid Name ="MainGrid" Margin="4,0,4,24">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="28"/>
 					<RowDefinition/>

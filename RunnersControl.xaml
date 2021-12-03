@@ -22,8 +22,6 @@
 				<Setter Property="HorizontalContentAlignment" Value="Left"/>
 				<Setter Property="Background" Value="#00000000"/>
 				<Setter Property="FontSize" Value="12"/>
-				<!--<Setter Property="Background" Value="AliceBlue"/>-->
-				<Setter Property="Background" Value="#00000000"/>
 				<Setter Property="HorizontalContentAlignment" Value="Center"/>
 				<Setter Property="VerticalContentAlignment" Value="Center"/>
 				<Setter Property="Margin" Value="1"/>
@@ -160,11 +158,11 @@
 			<Label Content="{Binding Path=LayBook, Converter={StaticResource pconverter}}"  FontSize="11" Grid.Column="5"/>
 			<Label Grid.Column="6"/>
 			<Label Grid.Column="7" />
-			<Label Grid.Column="8" HorizontalAlignment="Left" Margin="2">
+			<Label Grid.Column="8" HorizontalAlignment="Left" Margin="2,0,0,0">
 				<TextBlock>Last<LineBreak/>Price</TextBlock>
 			</Label>
-			<Label FontSize="11" Grid.Column="9"  HorizontalAlignment="Left" Margin="-4">Profit</Label>
-			<Label Grid.Column="10"  HorizontalAlignment="Left" Margin="-8">
+			<Label FontSize="11" Grid.Column="9"  HorizontalAlignment="Left" Margin="-4,0,0,0">Profit</Label>
+			<Label Grid.Column="10"  HorizontalAlignment="Left" Margin="-8,0,0,0">
 				<TextBlock>Level<LineBreak/>Profit</TextBlock>
 			</Label>
 		</Grid>
