@@ -12,6 +12,8 @@ namespace SpreadTrader
 		public MarketSelectionDelegate OnMarketSelected;
 		public TabContentControl TabContent { get; set; }
 		public NodeViewModel MarketNode { get; set; }
+		public Visibility up_visible { get; set; }
+		public Visibility down_visible { get; set; }
 		public event PropertyChangedEventHandler PropertyChanged;
 		public SolidColorBrush StreamingColor { get { return System.Windows.Media.Brushes.LightGreen; } }
 //		public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
@@ -30,6 +32,9 @@ namespace SpreadTrader
 				MarketNode = node;
 				NotifyPropertyChanged("");
 			};
+			up_visible = Visibility.Visible;
+			down_visible = Visibility.Collapsed;
+			NotifyPropertyChanged("");
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -40,19 +45,9 @@ namespace SpreadTrader
 				{
 					case "Market Description": new MarketDescription(this, b, MarketNode).ShowDialog(); break;
 					case "Hide Grid":
-						StackPanel sp = b.Content as StackPanel;
-						if (TabContent.LowerGrid.RowDefinitions[0].ActualHeight == 0)
-						{
-							TabContent.LowerGrid.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Auto);
-							sp.Children[0].Visibility = Visibility.Visible;
-							sp.Children[1].Visibility = Visibility.Collapsed;
-						}
-						else
-						{
-							TabContent.LowerGrid.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Pixel);
-							sp.Children[0].Visibility = Visibility.Collapsed;
-							sp.Children[1].Visibility = Visibility.Visible;
-						}
+						down_visible = TabContent.BettingGrid.Visibility;
+						up_visible = TabContent.BettingGrid.Visibility = TabContent.BettingGrid.Visibility == Visibility.Collapsed ? Visibility.Visible : Visibility.Collapsed;
+						NotifyPropertyChanged("");
 						break;
 				}
 			}

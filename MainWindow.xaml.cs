@@ -17,7 +17,7 @@ namespace SpreadTrader
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
 		public OnShutdownDelegate OnShutdown = null;
-		public ICommand ExpandingCommand { get; set; }
+//		public ICommand ExpandingCommand { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
 		public String Status { get { return _Status; } set { _Status = value; Debug.WriteLine(value); NotifyPropertyChanged("");} }
@@ -42,13 +42,17 @@ namespace SpreadTrader
 			ServicePointManager.DefaultConnectionLimit = 800;
 			System.Net.ServicePointManager.Expect100Continue = false;
 			InitializeComponent();
-			//SetWindowPosition();
+			this.Language = System.Windows.Markup.XmlLanguage.GetLanguage(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
 			Betfair = new BetfairAPI.BetfairAPI();
 			if (!props.UseProxy)
 			{
 				Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
 			}
 			UpdateAccountInformation();
+			this.Top = props.Top;
+			this.Left = props.Left;
+			this.Height = props.Height;
+			this.Width = props.Width;
 		}
 		public void UpdateAccountInformation()
 		{
@@ -65,31 +69,6 @@ namespace SpreadTrader
 				Debug.WriteLine(xe.Message);
 			}
 		}
-		//private void SetWindowPosition()
-		//{
-		//	if (!props.Upgraded)
-		//	{
-		//		props.Upgrade();
-		//		props.Upgraded = true;
-		//		props.Save();
-		//		Trace.WriteLine("INFO: Settings upgraded from previous version");
-		//	}
-		//	this.Language = System.Windows.Markup.XmlLanguage.GetLanguage(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
-		//	this.Height = props.Height;
-		//	this.Width = props.Width;
-
-		//	//if (props.ColumnWidth > 0)
-		//	//	OuterGrid.ColumnDefinitions[0].Width = new GridLength(props.ColumnWidth, GridUnitType.Pixel);
-
-		//	if (props.Maximised)
-		//	{
-		//		WindowState = System.Windows.WindowState.Maximized;
-		//	}
-		//	using (StreamWriter sw = File.CreateText(props.LogFile))
-		//	{
-		//		sw.WriteLine("Market Name, Market, Side, Runner, Stake, Odds, Time");
-		//	}
-		//}
 		private void Button_Click(object sender, RoutedEventArgs e) // move to tab
 		{
 			Button b = sender as Button;
@@ -97,17 +76,6 @@ namespace SpreadTrader
 			{
 				switch (b.Tag)
 				{
-					case "Hide Tree":
-						{
-							//Int32 w = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
-							//bool hidden = w == 0;
-							//OuterGrid.ColumnDefinitions[0].Width = new GridLength(hidden ? props.ColumnWidth : 0, GridUnitType.Pixel);
-							//EventsTree.Visibility = EventsTree.Visibility == Visibility.Collapsed ? EventsTree.Visibility = Visibility.Visible : EventsTree.Visibility = Visibility.Collapsed;
-							//RightArrow.Visibility = hidden ? Visibility.Collapsed : Visibility.Visible;
-							//LeftArrow.Visibility = hidden ? Visibility.Visible : Visibility.Collapsed;
-							//VerticalSplitter.Visibility = LeftArrow.Visibility;
-						}
-						break;
 					case "Settings":
 						new Settings(this, b).ShowDialog();
 						break;
@@ -127,14 +95,7 @@ namespace SpreadTrader
 		}
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			try
-			{
-				AppendNewTab();
-			}
-			catch (Exception xe)
-			{
-				Status = xe.Message.ToString();
-			}
+			AppendNewTab();
 		}
 		private void AppendNewTab()
 		{
@@ -149,11 +110,6 @@ namespace SpreadTrader
 			tab.Focus();
 			NotifyPropertyChanged("");
 		}
-		//private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-		//{
-		//	props.ColumnWidth = Convert.ToInt32(OuterGrid.ColumnDefinitions[0].Width.Value);
-		//	props.Save();
-		//}
 		//private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		//{
 		//	TabControl tabControl = sender as TabControl;
@@ -178,17 +134,6 @@ namespace SpreadTrader
 		//		}
 		//	}
 		//}
-		//private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-		//{
-		//	props.Width = e.NewSize.Width;
-		//	props.Height = e.NewSize.Height;
-		//	props.Save();
-		//}
-		private void StackPanel_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-		{
-			UpdateAccountInformation();
-			NotifyPropertyChanged("");
-		}
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
 			props.Save();
@@ -197,10 +142,27 @@ namespace SpreadTrader
 				OnShutdown();
 			};
 		}
-		//private void ClosableTab_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-		//{
-		//	AppendNewTab();
-		//	e.Handled = true;
-		//}
+		private void OnNewTab(object sender, MouseButtonEventArgs e)
+		{
+			AppendNewTab();
+			e.Handled = true;
+		}
+		private void OnUpdateAccount(object sender, MouseButtonEventArgs e)
+		{
+			UpdateAccountInformation();
+			NotifyPropertyChanged("");
+		}
+		private void Window_LocationChanged(object sender, EventArgs e)
+		{
+			props.Top = this.Top;
+			props.Left = this.Left;
+			props.Save();
+		}
+		private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			props.Width = this.Width;
+			props.Height = this.Height;
+			props.Save();
+		}
 	}
 }

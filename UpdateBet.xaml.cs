@@ -28,11 +28,11 @@ namespace SpreadTrader
 		public UpdateBet(Row row)
 		{
 			InitializeComponent();
-			//if (props.BRLeft >= 0 && props.BRTop >= 0)
-			//{
-			//	Top = props.BRTop + Application.Current.MainWindow.Top;
-			//	Left = props.BRLeft + Application.Current.MainWindow.Left;
-			//}
+			if (props.BRLeft >= 0 && props.BRTop >= 0)
+			{
+				Top = props.BRTop + Application.Current.MainWindow.Top;
+				Left = props.BRLeft + Application.Current.MainWindow.Left;
+			}
 			this.Row = row;
 			BetReference = "Bet Reference: " + row.BetID;
 			OriginalStake = Stake = (Int32) row.Stake;
@@ -74,8 +74,8 @@ namespace SpreadTrader
 		}
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
-			//props.BRTop = Top - Application.Current.MainWindow.Top;
-			//props.BRLeft = Left - Application.Current.MainWindow.Left;
+			props.BRTop = Top - Application.Current.MainWindow.Top;
+			props.BRLeft = Left - Application.Current.MainWindow.Left;
 			props.Save();
 		}
 		private Int32 IncrementStake(Int32 value)

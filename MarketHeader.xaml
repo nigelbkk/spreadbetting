@@ -40,8 +40,8 @@
 				</Button>
 				<Button Tag="Hide Grid" Grid.Column="1" Padding="0" HorizontalContentAlignment="Left" ToolTip="Hide The Grid">
 					<StackPanel Orientation="Vertical" Margin="2,0,2,0">
-						<Image Source="/SpreadTrader;component/Images/up_arrow.png"  Visibility="Visible"/>
-						<Image Source="/SpreadTrader;component/Images/down_arrow.png" Visibility="Collapsed"/>
+						<Image Source="/SpreadTrader;component/Images/up_arrow.png"  Visibility="{Binding up_visible}"/>
+						<Image Source="/SpreadTrader;component/Images/down_arrow.png" Visibility="{Binding down_visible}"/>
 					</StackPanel>
 				</Button>
 				<Label Grid.Column="2" Content="{Binding MarketNode.FullName}" Padding="6,0,10,0" Width="auto"/>

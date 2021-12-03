@@ -9,13 +9,12 @@
 	         mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
-		<local:TimeConverter x:Key="converter" />
+		<!--<local:TimeConverter x:Key="converter" />
 		<local:OddsConverter x:Key="oconverter" />
 		<local:CurrencyConverter x:Key="cconverter" />
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
             TargetType="{x:Type Button}">
 			<Setter Property="FontSize" Value="12"/>
-			<EventSetter Event="Click" Handler="Button_Click"/>
 		</Style>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
@@ -23,7 +22,7 @@
 			<Setter Property="Width" Value="auto"/>
 			<Setter Property="BorderThickness" Value="0"/>
 			<Setter Property="HorizontalAlignment" Value="Left"/>
-		</Style>	
+		</Style>-->	
 	</UserControl.Resources>
 	<Grid  Background="Ivory">
 		<Grid Grid.Row="1" Name="RightGridBody">
@@ -62,12 +61,12 @@
 							<RowDefinition Height="auto"/>
 							<RowDefinition />
 						</Grid.RowDefinitions>
-						<Grid Grid.Row="0">
+						<Grid Grid.Row="0" Name="BettingGrid">
 							<Border BorderBrush="DarkGray" BorderThickness="0.5">
-								<local:BettingGrid x:Name ="BettingGrid"/>
+								<local:BettingGrid x:Name ="oBettingGrid"/>
 							</Border>
 						</Grid>
-						<Grid Grid.Row="1">
+						<Grid Grid.Row="1" Name="BetsManagerGrid">
 							<Border BorderBrush="DarkGray" BorderThickness="0.5">
 								<local:BetsManager x:Name ="BetsManager"/>
 							</Border>

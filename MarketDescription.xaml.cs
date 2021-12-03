@@ -22,9 +22,11 @@ namespace SpreadTrader
 		}
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			String html = string.Format("<body style = \"font-family:Verdana\" \"background-color: coral\" >{0}</body>", node.Market.description.rules.Replace("“", "\"").Replace("”", "\""));
 			if (node != null && node.Market != null && node.Market.description.rules != null)
+			{
+				String html = string.Format("<body style = \"font-family:Verdana\" \"background-color: coral\" >{0}</body>", node.Market.description.rules.Replace("“", "\"").Replace("”", "\""));
 				wb.NavigateToString(html);
+			}
 		}
 	}
 }
