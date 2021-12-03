@@ -1,12 +1,11 @@
-﻿using System;
+﻿using BetfairAPI;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using BetfairAPI;
 
 namespace SpreadTrader
 {
@@ -22,26 +21,26 @@ namespace SpreadTrader
 
 			AllEventTypes = new ObservableCollection<EventType>();
 			if (eventTypes.Count > 0) foreach (EventTypeResult er in eventTypes)
-			{
-				AllEventTypes.Add(er.eventType);
-			}
+				{
+					AllEventTypes.Add(er.eventType);
+				}
 			InitializeComponent();
 			String[] ids = props.Favourites.Split(',');
 			if (AllEventTypes.Count > 0) foreach (EventType e in AllEventTypes)
-			{
-				e.IsChecked = ids.Contains(e.id.ToString());
-			}
+				{
+					e.IsChecked = ids.Contains(e.id.ToString());
+				}
 		}
 		public void Save()
 		{
 			props.Favourites = "";
 			if (AllEventTypes.Count > 0) foreach (EventType e in AllEventTypes)
-			{
-				if (e.IsChecked)
 				{
-					props.Favourites += String.Format("{0},", e.id);
+					if (e.IsChecked)
+					{
+						props.Favourites += String.Format("{0},", e.id);
+					}
 				}
-			}
 			props.Save();
 		}
 		static public bool IsFavourite(Int32 id)

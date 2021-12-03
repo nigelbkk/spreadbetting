@@ -1,10 +1,7 @@
-﻿using BetfairAPI;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Microsoft.Web.WebView2.Core;
-using System;
-using System.Net;
 
 namespace SpreadTrader
 {

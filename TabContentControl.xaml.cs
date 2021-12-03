@@ -1,8 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace SpreadTrader
 {
@@ -13,7 +9,7 @@ namespace SpreadTrader
 		{
 			InitializeComponent();
 			BetsManager.RunnersControl = RunnersControl;
-//			RunnersControl.betsManager = BetsManager;
+			//			RunnersControl.betsManager = BetsManager;
 			OnMarketSelected += (node) =>
 			{
 				RunnersControl.OnMarketSelected(node);

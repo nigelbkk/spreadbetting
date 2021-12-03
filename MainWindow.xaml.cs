@@ -1,14 +1,12 @@
-﻿using System;
+﻿using BetfairAPI;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using BetfairAPI;
 
 namespace SpreadTrader
 {
@@ -17,10 +15,10 @@ namespace SpreadTrader
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
 		public OnShutdownDelegate OnShutdown = null;
-//		public ICommand ExpandingCommand { get; set; }
+		//		public ICommand ExpandingCommand { get; set; }
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
-		public String Status { get { return _Status; } set { _Status = value; Debug.WriteLine(value); NotifyPropertyChanged("");} }
+		public String Status { get { return _Status; } set { _Status = value; Debug.WriteLine(value); NotifyPropertyChanged(""); } }
 		public double Balance { get; set; }
 		public double Exposure { get; set; }
 		private double _DiscountRate { get; set; }
@@ -110,30 +108,6 @@ namespace SpreadTrader
 			tab.Focus();
 			NotifyPropertyChanged("");
 		}
-		//private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		//{
-		//	TabControl tabControl = sender as TabControl;
-		//	if (e.RemovedItems.Count > 0)
-		//	{
-		//		TabItem tr = e.RemovedItems[0] as TabItem;
-		//		if (tr != null)
-		//		{
-		//			MarketControl mcr = tr.Content as MarketControl;
-		//			if (mcr != null)
-		//				mcr.IsSelected = false;
-		//		}
-		//	}
-		//	if (e.AddedItems.Count > 0)
-		//	{
-		//		TabItem ta = e.AddedItems[0] as TabItem;
-		//		if (ta != null)
-		//		{
-		//			MarketControl mca = ta.Content as MarketControl;
-		//			if (mca != null)
-		//				mca.IsSelected = true;
-		//		}
-		//	}
-		//}
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
 			props.Save();

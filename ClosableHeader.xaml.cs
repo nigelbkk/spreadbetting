@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -24,7 +23,7 @@ namespace SpreadTrader
 			};
 			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
 			{
-				if (marketid != "")			//TODO
+				if (marketid != "")         //TODO
 				{
 					this.Dispatcher.Invoke(() =>
 					{

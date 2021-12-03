@@ -12,7 +12,10 @@ namespace SpreadTrader
 		public SubmitBetsDelegate SubmitBets = null;
 
 		private BetfairPrices betfairPrices = new BetfairPrices();
-		private Int32 base_index{ get {
+		private Int32 base_index
+		{
+			get
+			{
 				Int32 b = betfairPrices.Index(BasePrice);
 				b = Math.Max(b, 10);
 				return Math.Min(b, 338);
@@ -57,11 +60,11 @@ namespace SpreadTrader
 				PriceSize vl = LayValues[i];
 				if (newvalue > oldvalue)
 				{
-					vb.size /= 9; vb.size *= 10; 
+					vb.size /= 9; vb.size *= 10;
 					vl.size /= 9; vl.size *= 10;
 					vl.size = Math.Round(vl.size, 2);
 					vb.size = Math.Round(vb.size, 2);
-					BackValues[i] = vb; 
+					BackValues[i] = vb;
 					LayValues[i] = vl;
 				}
 				else if (oldvalue > newvalue)
@@ -69,7 +72,7 @@ namespace SpreadTrader
 					vl.size /= 10; vl.size *= 9; vb.size /= 10; vb.size *= 9;
 					vl.size = Math.Round(vl.size, 2);
 					vb.size = Math.Round(vb.size, 2);
-					BackValues[i] = vb; 
+					BackValues[i] = vb;
 					LayValues[i] = vl;
 				}
 			}
@@ -83,7 +86,7 @@ namespace SpreadTrader
 				{
 					BackValues[i].price = betfairPrices[base_index + offset + i];
 				}
-				offset = Convert.ToInt32(MoveLay)-31;
+				offset = Convert.ToInt32(MoveLay) - 31;
 				for (int i = 0; i < 9; i++)
 				{
 					LayValues[i].price = betfairPrices[base_index + offset + i];

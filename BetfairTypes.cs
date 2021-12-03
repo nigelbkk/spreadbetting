@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text;
 
 namespace BetfairAPI
 {
@@ -23,7 +23,7 @@ namespace BetfairAPI
 			{"DSC-0037", "SubscriptionRequired"},
 			{"DSC-0038", "OperationForbidden"},
 			{"ANGX-0003", "Invalid Session Information"},
-			{"ANGX-0006", "Exchange Error"} 
+			{"ANGX-0006", "Exchange Error"}
 		};
 		static public String FaultCode(String code)
 		{
@@ -68,8 +68,8 @@ namespace BetfairAPI
 		SERVICE_UNAVAILABLE,
 		REJECTED_BY_REGULATOR,
 		NO_CHASING,
-		REGULATOR_IS_NOT_AVAILABLE ,
-		TOO_MANY_INSTRUCTIONS ,
+		REGULATOR_IS_NOT_AVAILABLE,
+		TOO_MANY_INSTRUCTIONS,
 		INVALID_MARKET_VERSION,
 		INVALID_PROFIT_RATIO
 	}
@@ -398,10 +398,10 @@ namespace BetfairAPI
 			{
 				double book = 0;
 				if (Runners.Count > 0) foreach (Runner r in Runners)
-				{
-					if (r.ex.availableToBack.Count > 0)
-						book += 1 / r.ex.availableToBack[0].price;
-				}
+					{
+						if (r.ex.availableToBack.Count > 0)
+							book += 1 / r.ex.availableToBack[0].price;
+					}
 				return book * 100;
 			}
 		}
@@ -411,10 +411,10 @@ namespace BetfairAPI
 			{
 				double book = 0;
 				if (Runners.Count > 0) foreach (Runner r in Runners)
-				{
-					if (r.ex.availableToLay.Count > 0)
-						book += 1 / r.ex.availableToLay[0].price;
-				}
+					{
+						if (r.ex.availableToLay.Count > 0)
+							book += 1 / r.ex.availableToLay[0].price;
+					}
 				return book * 100;
 			}
 		}

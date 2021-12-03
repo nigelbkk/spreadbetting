@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -12,7 +11,6 @@ using System.Windows.Media;
 namespace SpreadTrader
 {
 	public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, bool inplay);
-
 	public partial class RunnersControl : UserControl, INotifyPropertyChanged
 	{
 		public BetsManager betsManager = null;
@@ -22,8 +20,7 @@ namespace SpreadTrader
 		private StreamingAPI streamingAPI = new StreamingAPI();
 		private BackgroundWorker Worker = null;
 		public NodeViewModel _MarketNode { get; set; }
-		public NodeViewModel MarketNode { get { return _MarketNode;  } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
-		public bool IsSelected { get; set; }
+		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
 		public double BackBook { get; set; }
 		public double LayBook { get; set; }
 		public List<LiveRunner> LiveRunners { get; set; }
@@ -70,14 +67,14 @@ namespace SpreadTrader
 						LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
 						LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
 						LiveRunners[i].NotifyPropertyChanged("");
-//						LiveRunners[i].Width = ItemsGrid.ColumnDefinitions[0].ActualWidth;
+						//						LiveRunners[i].Width = ItemsGrid.ColumnDefinitions[0].ActualWidth;
 						if (pl.Count > 0 && pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
-						{
-							if (p.selectionId == LiveRunners[i].SelectionId)
 							{
-								LiveRunners[i].ifWin = p.ifWin;
+								if (p.selectionId == LiveRunners[i].SelectionId)
+								{
+									LiveRunners[i].ifWin = p.ifWin;
+								}
 							}
-						}
 					}
 					MarketNode.LiveRunners = LiveRunners;
 					MarketNode.CalculateLevelProfit();
@@ -135,13 +132,13 @@ namespace SpreadTrader
 						LiveRunners = NewRunners;
 					}
 					if (LiveRunners.Count > 0) foreach (LiveRunner lr in LiveRunners)
-					{
-						for (int i=0;i<3;i++)
 						{
-							lr.BackValues[i] = new PriceSize();
-							lr.LayValues[i] = new PriceSize();
+							for (int i = 0; i < 3; i++)
+							{
+								lr.BackValues[i] = new PriceSize();
+								lr.LayValues[i] = new PriceSize();
+							}
 						}
-					}
 					for (int i = 0; i < LiveRunners.Count; i++)
 					{
 						if (NewRunners[i].ngrunner != null)
@@ -192,7 +189,7 @@ namespace SpreadTrader
 		{
 			BetfairAPI.BetfairAPI Betfair = MainWindow.Betfair;
 			PlaceExecutionReport report = Betfair.placeOrders(marketId, pis);
-			return report; 
+			return report;
 		}
 		public void SubmitBets(PriceSize[] LayValues, PriceSize[] BackValues)
 		{
@@ -208,8 +205,6 @@ namespace SpreadTrader
 					laybets.Add(LayValues[i]);
 					backbets.Add(BackValues[i]);
 				}
-				//laybets.Sort((a, b) => Math.Sign(b.price - a.price));
-				//backbets.Sort((a, b) => Math.Sign(a.price - b.price));
 				if (LiveRunner.Favorite == null)
 				{
 					MessageBox.Show("Please Select the Favourite", "Submit Bets", MessageBoxButton.OK, MessageBoxImage.Exclamation);
@@ -245,10 +240,10 @@ namespace SpreadTrader
 					if (props.SafeBets)
 					{
 						if (orders.Count > 0) foreach (PlaceInstruction pi in orders)
-						{
-							pi.limitOrder.size = 2.00;
-							pi.limitOrder.price = pi.sideEnum == sideEnum.LAY ? 1.01 : 1000;
-						}
+							{
+								pi.limitOrder.size = 2.00;
+								pi.limitOrder.price = pi.sideEnum == sideEnum.LAY ? 1.01 : 1000;
+							}
 					}
 					if (orders.Count > 0)
 					{
@@ -262,10 +257,10 @@ namespace SpreadTrader
 		public String GetRunnerName(Int64 SelectionID)
 		{
 			if (LiveRunners.Count > 0) foreach (LiveRunner r in LiveRunners)
-			{
-				if (r.SelectionId == SelectionID)
-					return r.Name;
-			}
+				{
+					if (r.SelectionId == SelectionID)
+						return r.Name;
+				}
 			return null;
 		}
 		bool stop_async = false;
@@ -317,10 +312,6 @@ namespace SpreadTrader
 				Extensions.MainWindow.Status = xe.Message;
 			}
 		}
-		//private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
-		//{
-		//	SV1.Height = Math.Max(25, e.NewSize.Height - Header.Height);
-		//}
 		private void Label_PreviewMouseDown(object sender, MouseButtonEventArgs e)
 		{
 			Label lb = sender as Label;
@@ -350,20 +341,5 @@ namespace SpreadTrader
 				Debug.WriteLine(xe.Message);
 			}
 		}
-		private void UserControl_Loaded(object sender, RoutedEventArgs e)
-		{
-			Extensions.MainWindow.OnShutdown += () =>
-			{
-				streamingAPI.Stop();
-			};
-		}
-		//private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-		//{
-		//	double diff = ItemsGrid.ColumnDefinitions[0].Width.Value - SV1.ActualWidth;
-		//	if (SV1.Items.Count > 0) foreach (LiveRunner v in SV1.Items)
-		//	{
-		//		v.Width = ItemsGrid.ColumnDefinitions[0].Width.Value;
-		//	}
-		//}
 	}
 }

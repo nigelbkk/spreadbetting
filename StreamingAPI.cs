@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Betfair.ESAClient;
+﻿using Betfair.ESAClient;
 using Betfair.ESAClient.Auth;
 using Betfair.ESAClient.Cache;
 using Betfair.ESASwagger.Model;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Timers;
 
 namespace SpreadTrader
 {
@@ -75,7 +70,7 @@ namespace SpreadTrader
 					_LiveRunners.Add(lr);
 					tradedVolume += e.Snap.MarketRunners[i].Prices.TradedVolume;
 				}
-				Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay==true);
+				Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
 			}
 			catch (Exception xe)
 			{

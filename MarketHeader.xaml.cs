@@ -16,7 +16,7 @@ namespace SpreadTrader
 		public Visibility down_visible { get; set; }
 		public event PropertyChangedEventHandler PropertyChanged;
 		public SolidColorBrush StreamingColor { get { return System.Windows.Media.Brushes.LightGreen; } }
-//		public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
+		//		public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
 		public void NotifyPropertyChanged(String info)
 		{
 			if (PropertyChanged != null)

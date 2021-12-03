@@ -56,11 +56,11 @@ namespace SpreadTrader
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			String sign = (double) value < 0 ? "-" : "";
-			if (double.IsNaN((double) value))
+			String sign = (double)value < 0 ? "-" : "";
+			if (double.IsNaN((double)value))
 				return string.Empty;
 
-			UInt32 val = System.Convert.ToUInt32(Math.Abs((double) value));
+			UInt32 val = System.Convert.ToUInt32(Math.Abs((double)value));
 			if (val == 0)
 				return string.Empty;
 

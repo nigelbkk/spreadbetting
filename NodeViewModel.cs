@@ -1,10 +1,9 @@
-﻿using System;
+﻿using BetfairAPI;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows.Media;
-using BetfairAPI;
 
 namespace SpreadTrader
 {
@@ -16,7 +15,7 @@ namespace SpreadTrader
 		public String MarketID { get; set; }
 		public String MarketName { get; set; }
 		private double _TotalMatched { get; set; }
-		private double _BackBook{ get; set; }
+		private double _BackBook { get; set; }
 		private double _LayBook { get; set; }
 		public double TotalMatched { get { return _TotalMatched; } set { _TotalMatched = value; OnPropertyChanged(""); } }
 		public double BackBook { get { return _BackBook; } set { _BackBook = value; OnPropertyChanged(""); } }
@@ -41,7 +40,7 @@ namespace SpreadTrader
 			get { return _isSelected; }
 			set
 			{
-				if (value && !_isSelected) 
+				if (value && !_isSelected)
 					OnItemSelected();
 				_isSelected = value;
 			}
@@ -79,19 +78,19 @@ namespace SpreadTrader
 				TotalMatched = Market.MarketBook.totalMatched;
 				Status = Market.MarketBook.status;
 				if (Market.MarketBook.Runners.Count > 0) foreach (Runner r in Market.MarketBook.Runners)
-				{
-					if (pl.Count > 0)
 					{
-						if (pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
+						if (pl.Count > 0)
 						{
-							if (p.selectionId == r.selectionId)
-							{
-								r.ifWin = p.ifWin;
-							}
+							if (pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
+								{
+									if (p.selectionId == r.selectionId)
+									{
+										r.ifWin = p.ifWin;
+									}
+								}
 						}
+						Runners.Add(new LiveRunner(r));
 					}
-					Runners.Add(new LiveRunner(r));
-				}
 				if (Parent != null)
 				{
 					FullName = String.Format("{0} - {1}", Parent.Name, Name);
@@ -136,7 +135,7 @@ namespace SpreadTrader
 			Double G18 = G3 - (D8 * (G5 - 1));
 			Double J18 = J3 + (J8 * (J5 - 1));
 
-			return new Tuple<double, double>(Math.Round(G18, 2), Math.Round(J18,2));
+			return new Tuple<double, double>(Math.Round(G18, 2), Math.Round(J18, 2));
 		}
 		private static Tuple<Double, Double, Double> LevelProfit(LiveRunner runner1, LiveRunner runner2, LiveRunner draw)
 		{
@@ -167,10 +166,10 @@ namespace SpreadTrader
 			{
 				List<LiveRunner> runners = new List<LiveRunner>();
 				if (LiveRunners.Count > 0) foreach (LiveRunner lr in LiveRunners)
-				{
-					if (lr.ifWin != 0)
-						runners.Add(lr);
-				}
+					{
+						if (lr.ifWin != 0)
+							runners.Add(lr);
+					}
 				if (LiveRunners.Count == 2)
 				{
 					Tuple<double, double> s2 = LevelProfit(LiveRunners[0], LiveRunners[1]);
@@ -191,12 +190,12 @@ namespace SpreadTrader
 			if (LiveRunners != null)
 			{
 				if (LiveRunners.Count > 0) foreach (LiveRunner r in LiveRunners)
-				{
-					if (r.SelectionId == SelectionID)
 					{
-						return r.Name;
+						if (r.SelectionId == SelectionID)
+						{
+							return r.Name;
+						}
 					}
-				}
 			}
 			return SelectionID.ToString();
 		}
@@ -290,7 +289,7 @@ namespace SpreadTrader
 			List<Market> markets = Betfair.GetMarkets(event_type, ID).OrderBy(o => o.marketStartTime).ToList();
 			foreach (Market m in markets)
 			{
-				NodeViewModel nvm = new NodeViewModel(String.Format("{0:HH:mm} {1}", m.description.marketTime.AddHours(props.TimeOffset), m.marketName)) { Market = m};
+				NodeViewModel nvm = new NodeViewModel(String.Format("{0:HH:mm} {1}", m.description.marketTime.AddHours(props.TimeOffset), m.marketName)) { Market = m };
 				nvm.Commission = m.description.marketBaseRate;
 				Add(nvm);
 			}

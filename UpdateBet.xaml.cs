@@ -1,9 +1,9 @@
-﻿using System;
+﻿using BetfairAPI;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
-using BetfairAPI;
 
 namespace SpreadTrader
 {
@@ -12,7 +12,7 @@ namespace SpreadTrader
 		private Row Row { get; set; }
 		public String BetReference { get; set; }
 		public double Profit { get; set; }
-		public String ProfitLiability{ get {return String.Format("Profit/Liability: {0:0.00}", Profit); }}
+		public String ProfitLiability { get { return String.Format("Profit/Liability: {0:0.00}", Profit); } }
 		public Int32 OriginalStake { get; set; }
 		public Int32 Stake { get; set; }
 		public double Odds { get; set; }
@@ -35,10 +35,10 @@ namespace SpreadTrader
 			}
 			this.Row = row;
 			BetReference = "Bet Reference: " + row.BetID;
-			OriginalStake = Stake = (Int32) row.Stake;
+			OriginalStake = Stake = (Int32)row.Stake;
 			Odds = row.Odds;
 			UpDownOdds.Value = Odds;
-			UpDownStake.Value = (short) Stake;
+			UpDownStake.Value = (short)Stake;
 			NotifyPropertyChanged("");
 		}
 		private void Button_Click(object sender, RoutedEventArgs e)
@@ -101,8 +101,8 @@ namespace SpreadTrader
 			{
 				case Key.Up:
 					if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
-						Stake = IncrementStake(Stake); 
-					else 
+						Stake = IncrementStake(Stake);
+					else
 						Odds = betfairPrices.Next(Odds); break;
 				case Key.Down:
 					if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))

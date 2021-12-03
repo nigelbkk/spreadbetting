@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using BetfairAPI;
 
 namespace SpreadTrader
 {
@@ -20,9 +15,9 @@ namespace SpreadTrader
 			{
 				_BackActive = value;
 				if (BackValues.Length > 0) foreach (PriceSize o in BackValues)
-				{
-					o.IsChecked = o.ParentChecked = value;
-				}
+					{
+						o.IsChecked = o.ParentChecked = value;
+					}
 			}
 		}
 		private bool _LayActive { get; set; }
@@ -33,9 +28,9 @@ namespace SpreadTrader
 			{
 				_LayActive = value;
 				if (LayValues.Length > 0) foreach (PriceSize o in LayValues)
-				{
-					o.IsChecked = o.ParentChecked = value;
-				}
+					{
+						o.IsChecked = o.ParentChecked = value;
+					}
 			}
 		}
 		public PriceSize[] BackValues { get; set; }

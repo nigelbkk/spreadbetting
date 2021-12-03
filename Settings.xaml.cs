@@ -34,11 +34,11 @@ namespace SpreadTrader
 		{
 			OpenFileDialog dlg = new OpenFileDialog();
 			dlg.DefaultExt = ".wav";
-			dlg.InitialDirectory = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.System)).FullName+"\\"+"Media";
+			dlg.InitialDirectory = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.System)).FullName + "\\" + "Media";
 			dlg.FileName = props.MatchedBetAlert;
 			dlg.Filter = "WAV Files (*.wav)|*.wav|OGG Files (*.ogg)|*.ogg|MP3 Files (*.mp3)|*.mp3|MP4 Files (*.mp4)|*.mp4";
 			if (dlg.ShowDialog() == true)
-			{ 
+			{
 				props.MatchedBetAlert = dlg.FileName;
 			}
 		}

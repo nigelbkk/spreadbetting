@@ -1,10 +1,9 @@
-﻿using System;
+﻿using BetfairAPI;
+using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using BetfairAPI;
 
 namespace SpreadTrader
 {
@@ -58,7 +57,7 @@ namespace SpreadTrader
 		}
 		private void Submit(object sender, RoutedEventArgs _e)
 		{
-			
+
 			BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
 			Button b = sender as Button;
 			String cs = b.Content as String;
@@ -109,10 +108,12 @@ namespace SpreadTrader
 				case Key k when (k >= Key.A && k <= Key.Z):
 					e.Handled = true;
 					return;
-				case Key.Up: UpDown.Value = betfairPrices.Next(Odds);
+				case Key.Up:
+					UpDown.Value = betfairPrices.Next(Odds);
 					e.Handled = true;
 					break;
-				case Key.Down: UpDown.Value = betfairPrices.Previous(Odds);
+				case Key.Down:
+					UpDown.Value = betfairPrices.Previous(Odds);
 					e.Handled = true;
 					break;
 				case Key.Escape: Close(); break;
