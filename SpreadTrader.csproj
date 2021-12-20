@@ -155,6 +155,9 @@
     <Compile Include="UpdateBet.xaml.cs">
       <DependentUpon>UpdateBet.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UpDownControl.xaml.cs">
+      <DependentUpon>UpDownControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModel.cs" />
     <Compile Include="WaitCursor.cs" />
     <Page Include="BetsManager.xaml">
@@ -226,6 +229,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UpDownControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -258,6 +265,7 @@
   <ItemGroup>
     <Resource Include="Images\bullet_toggle_minus.png" />
     <Resource Include="Images\up_arrow.png" />
+    <Resource Include="uparrow.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\bullet_toggle_plus.png" />
@@ -297,6 +305,15 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\down_arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Down.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Up.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="downarrow.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

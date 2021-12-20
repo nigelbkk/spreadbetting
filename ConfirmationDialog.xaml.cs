@@ -86,12 +86,6 @@ namespace SpreadTrader
 				}
 			}
 		}
-		private void ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-		{
-			UpDownControl control = sender as UpDownControl;
-			Odds = Convert.ToDouble(control.Value);
-			NotifyPropertyChanged("");
-		}
 		private void Window_LocationChanged(object sender, EventArgs e)
 		{
 			props.CDTop = Top - Application.Current.MainWindow.Top;
@@ -103,48 +97,16 @@ namespace SpreadTrader
 			BetfairPrices betfairPrices = new BetfairPrices();
 			switch (e.Key)
 			{
-				case Key k when ((k >= Key.D0 && k <= Key.D9) || (k >= Key.NumPad0 && k <= Key.NumPad9)):
-					return;
-				case Key k when (k >= Key.A && k <= Key.Z):
-					e.Handled = true;
-					return;
-				case Key.Up:
-					UpDown.Value = betfairPrices.Next(Odds);
-					e.Handled = true;
-					break;
-				case Key.Down:
-					UpDown.Value = betfairPrices.Previous(Odds);
-					e.Handled = true;
-					break;
 				case Key.Escape: Close(); break;
 				case Key.Return: Submit(Submit_button, null); break;
 			}
 			NotifyPropertyChanged("");
 		}
-
 		private void StakeTextBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			TextBox tb = sender as TextBox;
 			if (!String.IsNullOrEmpty(tb.Text))
 				Stake = Convert.ToDouble(tb.Text);
-		}
-
-		private void UpDown_PreviewKeyUp(object sender, KeyEventArgs e)
-		{
-			UpDownControl control = sender as UpDownControl;
-			control.Focus();
-		}
-	}
-	public class UpDownControl : Xceed.Wpf.Toolkit.DoubleUpDown
-	{
-		private BetfairPrices betfairPrices = new BetfairPrices();
-		protected override double IncrementValue(double value, double increment)
-		{
-			return betfairPrices.Next(value);
-		}
-		protected override double DecrementValue(double value, double increment)
-		{
-			return betfairPrices.Previous(value);
 		}
 	}
 }

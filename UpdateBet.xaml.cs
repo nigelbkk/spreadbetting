@@ -47,7 +47,7 @@ namespace SpreadTrader
 		}
 		private void Button_Click_1(object sender, RoutedEventArgs e)
 		{
-			Odds = UpDownOdds.Value.Value;
+			Odds = UpDownOdds.Value;
 			Stake = UpDownStake.Value.Value;
 
 			BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
