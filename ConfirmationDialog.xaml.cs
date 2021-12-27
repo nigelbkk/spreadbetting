@@ -61,6 +61,7 @@ namespace SpreadTrader
 			BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
 			Button b = sender as Button;
 			String cs = b.Content as String;
+			Odds = UpDown.Value;
 			if (cs != null)
 			{
 				if (cs == "Close")
