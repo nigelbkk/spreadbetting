@@ -334,6 +334,11 @@ namespace SpreadTrader
 
 			Debug.WriteLine("{0} {1} at {2} for {3}", lpbets.Item1.LevelSide, lpbets.Item1.Name, lpbets.Item1.LevelOdds, lpbets.Item1.LayStake);
 			Debug.WriteLine("{0} {1} at {2} for {3}", lpbets.Item2.LevelSide, lpbets.Item2.Name, lpbets.Item2.LevelOdds, lpbets.Item2.LayStake);
+
+			MessageBox.Show(String.Format("{0} {1} at {2} for {3}\n{4} {5} at {6} for {7}",
+				lpbets.Item1.LevelSide, lpbets.Item1.Name, lpbets.Item1.LevelOdds, lpbets.Item1.LayStake,
+				lpbets.Item2.LevelSide, lpbets.Item2.Name, lpbets.Item2.LevelOdds, lpbets.Item2.LayStake),
+				"Level Profit", MessageBoxButton.OK, MessageBoxImage.Information);
 		}
 	}
 }
