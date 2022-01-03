@@ -160,6 +160,31 @@ namespace SpreadTrader
 
 			return new Tuple<double, double, double>(D16, E16, F16);
 		}
+		public static Tuple<LiveRunner, LiveRunner> CalculateLevelProfitBets(List<LiveRunner> runners)
+		{
+			runners[0].LevelSide = "NOBET";
+			runners[1].LevelSide = "NOBET";
+			if (runners.Count == 3)
+			{
+				Double D5 = runners[0].ifWin;
+				Double E5 = runners[1].ifWin;
+				Double F5 = runners[2].ifWin;
+
+				Double D8 = D5 > 0 ? runners[0].LayValues[0].price : runners[0].BackValues[0].price;
+				Double E8 = E5 > 0 ? runners[1].LayValues[0].price : runners[1].BackValues[0].price;
+				Double F8 = F5 > 0 ? runners[2].LayValues[0].price : runners[2].BackValues[0].price;
+
+				runners[0].LevelStake = (F5 - D5) / D8;
+				runners[1].LevelStake = (F5 - E5) / E8;
+
+				runners[0].LevelOdds = D8;
+				runners[1].LevelOdds = E8;
+
+				runners[0].LevelSide = runners[0].LevelStake > 0 ? "BACK" : "LAY";
+				runners[1].LevelSide = runners[1].LevelStake > 0 ? "BACK" : "LAY";
+			}
+			return new Tuple<LiveRunner, LiveRunner>(runners[0], runners[1]);
+		}
 		public void CalculateLevelProfit()
 		{
 			if (LiveRunners.Count > 1)

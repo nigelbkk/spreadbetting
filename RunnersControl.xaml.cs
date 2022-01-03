@@ -312,34 +312,28 @@ namespace SpreadTrader
 				Extensions.MainWindow.Status = xe.Message;
 			}
 		}
-		private void Label_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		private void NameMouseDown(object sender, MouseButtonEventArgs e)
 		{
 			Label lb = sender as Label;
-			try
+			ContentPresenter cp = Extensions.FindParentOfType<ContentPresenter>(lb);
+			if (LiveRunner.Favorite != null) LiveRunner.Favorite.IsFavorite = false;
+			LiveRunner.Favorite = cp.Content as LiveRunner;
+			LiveRunner.Favorite.IsFavorite = true;
+			if (OnFavoriteChanged != null)
 			{
-				ContentPresenter cp = Extensions.FindParentOfType<ContentPresenter>(lb);
-				if (lb.Name == "LevelProfit")
-				{
-					LiveRunner live_runner = cp.Content as LiveRunner;
-					double odds = Convert.ToDouble(lb.Content);
-					ConfirmationDialog dlg = new ConfirmationDialog(this, MarketNode.MarketID, live_runner, "LAY", odds);
-					dlg.ShowDialog();
-				}
-				else
-				{
-					if (LiveRunner.Favorite != null) LiveRunner.Favorite.IsFavorite = false;
-					LiveRunner.Favorite = cp.Content as LiveRunner;
-					LiveRunner.Favorite.IsFavorite = true;
-					if (OnFavoriteChanged != null)
-					{
-						OnFavoriteChanged(LiveRunner.Favorite);
-					}
-				}
+				OnFavoriteChanged(LiveRunner.Favorite);
 			}
-			catch (Exception xe)
-			{
-				Debug.WriteLine(xe.Message);
-			}
+		}
+		private void LevelProfitMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			Label lb = sender as Label;
+			ContentPresenter cp = Extensions.FindParentOfType<ContentPresenter>(lb);
+			LiveRunner live_runner = cp.Content as LiveRunner;
+
+			Tuple<LiveRunner, LiveRunner> lpbets = NodeViewModel.CalculateLevelProfitBets(LiveRunners);
+
+			Debug.WriteLine("{0} {1} at {2} for {3}", lpbets.Item1.LevelSide, lpbets.Item1.Name, lpbets.Item1.LevelOdds, lpbets.Item1.LayStake);
+			Debug.WriteLine("{0} {1} at {2} for {3}", lpbets.Item2.LevelSide, lpbets.Item2.Name, lpbets.Item2.LevelOdds, lpbets.Item2.LayStake);
 		}
 	}
 }

@@ -115,7 +115,7 @@
 						<ColumnDefinition/>
 						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
-					<Label Grid.Column="0" Content="{Binding Name}" FontSize="16" HorizontalContentAlignment="Left"/>
+					<Label Grid.Column="0" Content="{Binding Name}" FontSize="16" Background="{Binding Path=FavoritesColor}"  PreviewMouseDown="NameMouseDown" HorizontalContentAlignment="Left"/>
 					<Button Grid.Column="1" DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
 					<Button Grid.Column="2"  DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
 					<Button Grid.Column="3" DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
@@ -125,7 +125,7 @@
 					<Button Grid.Column="7" DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
 					<Label Grid.Column="8" Content="{Binding LastPriceTraded, Converter={StaticResource obconverter} }"  FontSize="11"/>
 					<Label Grid.Column="9" Content="{Binding ifWin, Converter={StaticResource oconverter} }" Foreground="{Binding Path=ProfitColor}" FontWeight="Regular" FontSize="11"/>
-					<Label Grid.Column="10" Content="{Binding LevelProfit, Converter={StaticResource oconverter} }" Foreground="{Binding Path=LevelProfitColor}" PreviewMouseDown="Label_PreviewMouseDown" Background="LightGreen" FontSize="11"/>
+					<Label Grid.Column="10" Content="{Binding LevelProfit, Converter={StaticResource oconverter} }" Foreground="{Binding Path=LevelProfitColor}" PreviewMouseDown="LevelProfitMouseDown" Background="LightGreen" FontSize="11"/>
 				</Grid>
 			</DataTemplate>
 		</ResourceDictionary>
@@ -158,11 +158,11 @@
 			<Label Content="{Binding Path=LayBook, Converter={StaticResource pconverter}}"  FontSize="11" Grid.Column="5"/>
 			<Label Grid.Column="6"/>
 			<Label Grid.Column="7" />
-			<Label Grid.Column="8" HorizontalAlignment="Left" Margin="2,0,0,0">
+			<Label Grid.Column="8" HorizontalAlignment="Left" Margin="-8,0,0,0" Width="44">
 				<TextBlock>Last<LineBreak/>Price</TextBlock>
 			</Label>
-			<Label FontSize="11" Grid.Column="8"  HorizontalAlignment="Left" Margin="68,-9,0,9" Grid.ColumnSpan="2">Profit</Label>
-			<Label Grid.Column="10"  HorizontalAlignment="Left" Margin="-8,0,0,0">
+			<Label FontSize="11" Grid.Column="9"  HorizontalAlignment="Left" Margin="-10,0,0,0" Width="44">Profit</Label>
+			<Label Grid.Column="10"  HorizontalAlignment="Left" Margin="-12,0,0,0" Width="44">
 				<TextBlock>Level<LineBreak/>Profit</TextBlock>
 			</Label>
 		</Grid>

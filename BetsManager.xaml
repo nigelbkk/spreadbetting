@@ -39,6 +39,7 @@
 								<Setter Property="Visibility" Value="Collapsed"/>
 							</DataTrigger>
 						</Style.Triggers>
+						<Setter Property="HorizontalContentAlignment" Value="Center"/>
 					</Style>
 				</DataGrid.ItemContainerStyle>
 				<DataGrid.Columns>

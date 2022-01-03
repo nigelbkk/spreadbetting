@@ -57,7 +57,6 @@ namespace SpreadTrader
 		}
 		private void Submit(object sender, RoutedEventArgs _e)
 		{
-
 			BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
 			Button b = sender as Button;
 			String cs = b.Content as String;
