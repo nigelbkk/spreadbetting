@@ -307,12 +307,6 @@
     <Resource Include="Images\down_arrow.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Down.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Up.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="downarrow.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
