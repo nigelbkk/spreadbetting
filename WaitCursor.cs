@@ -3,17 +3,17 @@ using System.Windows.Input;
 
 namespace SpreadTrader
 {
-	public class WaitCursor : IDisposable
-	{
-		private Cursor _previousCursor;
-		public WaitCursor()
-		{
-			_previousCursor = Mouse.OverrideCursor;
-			Mouse.OverrideCursor = Cursors.Wait;
-		}
-		public void Dispose()
-		{
-			Mouse.OverrideCursor = _previousCursor;
-		}
-	}
+    public class WaitCursor : IDisposable
+    {
+        private Cursor _previousCursor;
+        public WaitCursor()
+        {
+            _previousCursor = Mouse.OverrideCursor;
+            Mouse.OverrideCursor = Cursors.Wait;
+        }
+        public void Dispose()
+        {
+            Mouse.OverrideCursor = _previousCursor;
+        }
+    }
 }
