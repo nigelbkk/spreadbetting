@@ -2,21 +2,21 @@
 
 namespace SpreadTrader
 {
-	public partial class TabContentControl : UserControl
-	{
-		public MarketSelectionDelegate OnMarketSelected;
-		public TabContentControl()
-		{
-			InitializeComponent();
-			BetsManager.RunnersControl = RunnersControl;
-			//			RunnersControl.betsManager = BetsManager;
-			OnMarketSelected += (node) =>
-			{
-				RunnersControl.OnMarketSelected(node);
-				MarketHeader.OnMarketSelected(node);
-				BetsManager.OnMarketSelected(node);
-			};
-			MarketHeader.TabContent = this;
-		}
-	}
+    public partial class TabContentControl : UserControl
+    {
+        public MarketSelectionDelegate OnMarketSelected;
+        public TabContentControl()
+        {
+            InitializeComponent();
+            BetsManager.RunnersControl = RunnersControl;
+            //			RunnersControl.betsManager = BetsManager;
+            OnMarketSelected += (node) =>
+            {
+                RunnersControl.OnMarketSelected(node);
+                MarketHeader.OnMarketSelected(node);
+                BetsManager.OnMarketSelected(node);
+            };
+            MarketHeader.TabContent = this;
+        }
+    }
 }
