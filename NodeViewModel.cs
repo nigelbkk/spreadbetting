@@ -121,13 +121,13 @@ namespace SpreadTrader
         private void LevelProfit(LiveRunner runner1, LiveRunner runner2)
         {
             ///NH
-            runner1.BackValues[0].price = 2.42;
-            runner1.LayValues[0].price = 3.05;
-            runner1.ifWin = 14.25;
+            //runner1.BackValues[0].price = 2.42;
+            //runner1.LayValues[0].price = 3.05;
+            //runner1.ifWin = 14.25;
 
-            runner2.BackValues[0].price = 1.49;
-            runner2.LayValues[0].price = 1.70;
-            runner2.ifWin = -6.90;
+            //runner2.BackValues[0].price = 1.49;
+            //runner2.LayValues[0].price = 1.70;
+            //runner2.ifWin = -6.90;
 
             Double G3 = runner1.ifWin;
             Double J3 = runner2.ifWin;
