@@ -117,16 +117,16 @@ namespace SpreadTrader
         {
             int i = 0;
             if (r.Prices.BestDisplayAvailableToBack.Count > 0) foreach (var ps in r.Prices.BestDisplayAvailableToBack)
-                {
-                    BackValues[i].price = ps.Price;
-                    BackValues[i++].size = ps.Size;
-                }
+            {
+                BackValues[i].price = ps.Price;
+                BackValues[i++].size = ps.Size;
+            }
             i = 0;
             if (r.Prices.BestDisplayAvailableToLay.Count > 0) foreach (var ps in r.Prices.BestDisplayAvailableToLay)
-                {
-                    LayValues[i].price = ps.Price;
-                    LayValues[i++].size = ps.Size;
-                }
+            {
+                LayValues[i].price = ps.Price;
+                LayValues[i++].size = ps.Size;
+            }
             LastPriceTraded = r.Prices.LastTradedPrice;
             NotifyPropertyChanged("");
         }
@@ -141,16 +141,16 @@ namespace SpreadTrader
                     LayValues[j] = new PriceSize();
                 }
                 if (r.ex.availableToBack.Count > 0) foreach (var ps in r.ex.availableToBack)
-                    {
-                        BackValues[i].price = ps.price;
-                        BackValues[i++].size = ps.size;
-                    }
+                {
+                    BackValues[i].price = ps.price;
+                    BackValues[i++].size = ps.size;
+                }
                 i = 0;
                 if (r.ex.availableToLay.Count > 0) foreach (var ps in r.ex.availableToLay)
-                    {
-                        LayValues[i].price = ps.price;
-                        LayValues[i++].size = ps.size;
-                    }
+                {
+                    LayValues[i].price = ps.price;
+                    LayValues[i++].size = ps.size;
+                }
             }
             Name = String.Format("{0}{1}", r.Catalog.name, r.handicap == 0 ? "" : " " + r.handicap.ToString());
             ifWin = r.ifWin;        ///NH

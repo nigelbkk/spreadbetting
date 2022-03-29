@@ -9,7 +9,6 @@ namespace SpreadTrader
         {
             InitializeComponent();
             BetsManager.RunnersControl = RunnersControl;
-            //			RunnersControl.betsManager = BetsManager;
             OnMarketSelected += (node) =>
             {
                 RunnersControl.OnMarketSelected(node);

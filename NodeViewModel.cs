@@ -78,19 +78,19 @@ namespace SpreadTrader
                 TotalMatched = Market.MarketBook.totalMatched;
                 Status = Market.MarketBook.status;
                 if (Market.MarketBook.Runners.Count > 0) foreach (Runner r in Market.MarketBook.Runners)
+                {
+                    if (pl.Count > 0)
                     {
-                        if (pl.Count > 0)
+                        if (pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
                         {
-                            if (pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
-                                {
-                                    if (p.selectionId == r.selectionId)
-                                    {
-                                        r.ifWin = p.ifWin;
-                                    }
-                                }
+                            if (p.selectionId == r.selectionId)
+                            {
+///NH                                r.ifWin = p.ifWin;
+                            }
                         }
-                        Runners.Add(new LiveRunner(r));
                     }
+                    Runners.Add(new LiveRunner(r));
+                }
                 if (Parent != null)
                 {
                     FullName = String.Format("{0} - {1}", Parent.Name, Name);
@@ -121,10 +121,13 @@ namespace SpreadTrader
         private void LevelProfit(LiveRunner runner1, LiveRunner runner2)
         {
             ///NH
-            //runner1.ifWin = -210;
-            //runner1.BackValues[0].price = 3.4;
-            //runner2.ifWin = 2000;
-            //runner2.LayValues[0].price = 1.42;
+            runner1.BackValues[0].price = 2.42;
+            runner1.LayValues[0].price = 3.05;
+            runner1.ifWin = 14.25;
+
+            runner2.BackValues[0].price = 1.49;
+            runner2.LayValues[0].price = 1.70;
+            runner2.ifWin = -6.90;
 
             Double G3 = runner1.ifWin;
             Double J3 = runner2.ifWin;
@@ -132,8 +135,8 @@ namespace SpreadTrader
             Double G5 = G3 > 0 ? runner1.LayValues[0].price : runner1.BackValues[0].price;
             Double J5 = J3 > 0 ? runner2.LayValues[0].price : runner2.BackValues[0].price;
 
-            Double D8 = (G3 - J3) / G5;
-            Double J8 = (G3 - J3) / J5;
+            Double D8 = (Math.Abs(G3) + Math.Abs(J3)) / G5;
+            Double J8 = (Math.Abs(G3) + Math.Abs(J3)) / J5;
 
             Double G10 = G3 - (D8 * (G5 - 1));
             Double G13 = (G3 - J3) / J5;
@@ -141,13 +144,17 @@ namespace SpreadTrader
             Double G18 = G3 - (D8 * (G5 - 1));
             Double J18 = J3 + (J8 * (J5 - 1));
 
+
+            G18 = G3 <= 0 ? (G3 + (D8 * (G5 - 1))) : (G3 - (D8 * (G5 - 1)));
+            J18 = J3 <= 0 ? (J3 + (J8 * (J5 - 1))) : (J3 - (J8 * (J5 - 1)));
+
             Double option1 = D8;
             Double option2 = J8;
 
-            runner1.LevelProfit = G18;
-            runner1.LevelStake = Math.Round(G3 > 0 ? (G3 - J3)/G5 : (G3 - J3) / J5, 0);
-            runner2.LevelProfit = Math.Round(J18, 0);
-            runner2.LevelStake = Math.Round(J3 > 0 ? (G3 - J3)/G5 : (G3 - J3) / J5, 0);
+            runner1.LevelProfit = Math.Round(G18, 2);
+            runner1.LevelStake = Math.Round(G3 > 0 ? (G3 - J3)/G5 : (G3 - J3) / J5, 2);
+            runner2.LevelProfit = Math.Round(J18, 2);
+            runner2.LevelStake = Math.Round(J3 > 0 ? (G3 - J3)/G5 : (G3 - J3) / J5, 2);
         }
         private void LevelProfit(LiveRunner runner1, LiveRunner runner2, LiveRunner draw)
         {
