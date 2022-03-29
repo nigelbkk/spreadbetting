@@ -67,14 +67,13 @@ namespace SpreadTrader
                         LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
                         LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
                         LiveRunners[i].NotifyPropertyChanged("");
-                        //						LiveRunners[i].Width = ItemsGrid.ColumnDefinitions[0].ActualWidth;
                         if (pl.Count > 0 && pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
+                        {
+                            if (p.selectionId == LiveRunners[i].SelectionId)
                             {
-                                if (p.selectionId == LiveRunners[i].SelectionId)
-                                {
-                                    LiveRunners[i].ifWin = p.ifWin;
-                                }
+                                LiveRunners[i].ifWin = p.ifWin;
                             }
+                        }
                     }
                     MarketNode.LiveRunners = LiveRunners;
                     MarketNode.CalculateLevelProfit();
