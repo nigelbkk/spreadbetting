@@ -85,7 +85,7 @@ namespace SpreadTrader
                         {
                             if (p.selectionId == r.selectionId)
                             {
-///NH                                r.ifWin = p.ifWin;
+                                r.ifWin = p.ifWin;  ///NH
                             }
                         }
                     }
@@ -118,19 +118,52 @@ namespace SpreadTrader
                 }
             }
         }
+        private void LevelProfitBothNegative(LiveRunner runner1, LiveRunner runner2)
+        {
+            Double G3 = Math.Abs(runner1.ifWin);
+            Double J3 = Math.Abs(runner2.ifWin);
+
+            Double G5 = runner1.LayValues[0].price;
+            Double J5 = runner2.BackValues[0].price;
+
+            Double D8 = (G3 - J3) / G5;
+            Double J8 = (G3 - J3) / J5;
+
+            Double G10 = G3 - (D8 * (G5 - 1));
+            Double G13 = (G3 - J3) / J5;
+
+            Double G18 = G3 - (D8 * (G5 - 1));
+            Double J18 = J3 + (J8 * (J5 - 1));
+
+            Double option1 = D8;
+            Double option2 = J8;
+
+            runner1.LevelSide = sideEnum.LAY;
+            runner1.LevelProfit = Math.Round(G18, 3);
+            runner1.LevelStake = Math.Round(D8, 2);
+            runner2.LevelSide = sideEnum.BACK;
+            runner2.LevelProfit = Math.Round(J18, 3);
+            runner2.LevelStake = Math.Round(J8, 2);
+        }
         private void LevelProfit(LiveRunner runner1, LiveRunner runner2)
         {
             ///NH
             //runner1.BackValues[0].price = 2.42;
             //runner1.LayValues[0].price = 3.05;
-            //runner1.ifWin = 14.25;
+            //runner1.ifWin = -1000;// 14.25;
 
             //runner2.BackValues[0].price = 1.49;
             //runner2.LayValues[0].price = 1.70;
-            //runner2.ifWin = -6.90;
+            //runner2.ifWin = -200;// -6.90;
 
             Double G3 = runner1.ifWin;
             Double J3 = runner2.ifWin;
+
+            if (G3 < 0 && J3 < 0)
+            {
+                LevelProfitBothNegative(runner1, runner2);
+                return;
+            }
 
             Double G5 = G3 > 0 ? runner1.LayValues[0].price : runner1.BackValues[0].price;
             Double J5 = J3 > 0 ? runner2.LayValues[0].price : runner2.BackValues[0].price;
@@ -144,17 +177,19 @@ namespace SpreadTrader
             Double G18 = G3 - (D8 * (G5 - 1));
             Double J18 = J3 + (J8 * (J5 - 1));
 
-
             G18 = G3 <= 0 ? (G3 + (D8 * (G5 - 1))) : (G3 - (D8 * (G5 - 1)));
             J18 = J3 <= 0 ? (J3 + (J8 * (J5 - 1))) : (J3 - (J8 * (J5 - 1)));
 
             Double option1 = D8;
             Double option2 = J8;
 
+            runner1.LevelSide = G3 < 0 ? sideEnum.BACK : sideEnum.LAY;
             runner1.LevelProfit = Math.Round(G18, 2);
-            runner1.LevelStake = Math.Round(G3 > 0 ? (G3 - J3)/G5 : (G3 - J3) / J5, 2);
+            runner1.LevelStake = Math.Round(G3 > 0 ? (G3 - J3) / G5 : (G3 - J3) / J5, 2);
+            
+            runner2.LevelSide = J3 > 0 ? sideEnum.LAY : sideEnum.BACK;
             runner2.LevelProfit = Math.Round(J18, 2);
-            runner2.LevelStake = Math.Round(J3 > 0 ? (G3 - J3)/G5 : (G3 - J3) / J5, 2);
+            runner2.LevelStake = Math.Round(J3 > 0 ? (G3 - J3) / G5 : (G3 - J3) / J5, 2);
         }
         private void LevelProfit(LiveRunner runner1, LiveRunner runner2, LiveRunner draw)
         {
