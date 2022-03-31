@@ -338,7 +338,7 @@ namespace SpreadTrader
             LiveRunner live_runner = cp.Content as LiveRunner;
 
             BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
-            if (live_runner.ifWin > 0)
+            if (live_runner.LevelSide == sideEnum.LAY)
             {
                 MessageBox.Show(String.Format("LAY {0} at {1} for {2}", live_runner.Name, live_runner.LayValues[0].price, Math.Abs(live_runner.LevelStake)));
                 //System.Threading.Thread t = new System.Threading.Thread(() =>
@@ -347,7 +347,7 @@ namespace SpreadTrader
                 //});
                 //t.Start();
             }
-            else if (live_runner.ifWin < 0)
+            if (live_runner.LevelSide == sideEnum.BACK)
             {
                 MessageBox.Show(String.Format("BACK {0} at {1} for {2}", live_runner.Name, live_runner.BackValues[0].price, Math.Abs(live_runner.LevelStake)));
 
