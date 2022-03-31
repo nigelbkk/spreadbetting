@@ -48,7 +48,7 @@ namespace SpreadTrader
 
             StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
             {
-                if (marketid == MarketNode.MarketID)
+                if (MarketNode != null &&  marketid == MarketNode.MarketID)
                 {
                     List<MarketProfitAndLoss> pl = MainWindow.Betfair.listMarketProfitAndLoss(MarketNode.MarketID);
 
