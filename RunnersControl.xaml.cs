@@ -151,7 +151,7 @@ namespace SpreadTrader
                         if (NewRunners[i].ngrunner != null)
                         {
                             LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
-                            LiveRunners[i].LevelProfit = NewRunners[i].LevelProfit;
+//                            LiveRunners[i].LevelProfit = NewRunners[i].LevelProfit;
                             LiveRunners[i].NotifyPropertyChanged("");
                         }
                     }
