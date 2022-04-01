@@ -18,9 +18,10 @@
 		</Grid.RowDefinitions>
 		<StackPanel Orientation="Horizontal" Grid.Row="0" Background="Ivory">
 			<TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="{Binding Path=LastUpdated}"/>
-			
-            <Button Margin="30,0,0,0" Tag="New"  Click="Button_Click">New</Button>
+
+            <Button Margin="30,0,0,0" Tag="New1"  Click="Button_Click">New</Button>
             <Button Margin="30,0,0,0" Tag="Match1"  Click="Button_Click">Match</Button>
+            <Button Margin="30,0,0,0" Tag="New2"  Click="Button_Click">New</Button>
             <Button Margin="30,0,0,0" Tag="Match2"  Click="Button_Click">Match</Button>
             <Button Margin="30,0,0,0" Tag="Cancel"  Click="Button_Click">Cancel</Button>
             

@@ -397,9 +397,10 @@ namespace SpreadTrader
         }
         private List<string> lines = new List<string>();
         private Int32 line_id = 0;
-
-        private String newbet(Double odds, Int32 stake, String side, Int32 selid, Int32 mid, Int32 betid)
+        private Int32 newbetid = 89898;
+        private String newbet(Double odds, Int32 stake, Order.SideEnum side, Int64 selid, Int32 betid)
         {
+            DateTimeOffset now = DateTimeOffset.UtcNow;
             OrderMarketChange change = new OrderMarketChange();
 
             change.Orc = new List<OrderRunnerChange>();
@@ -412,9 +413,12 @@ namespace SpreadTrader
             o.Status = Order.StatusEnum.E;
             o.Id = betid.ToString();
 
+            o.Pd = now.ToUnixTimeMilliseconds();
+            o.Side = side;
             o.Sm = 0;
             o.Sr = 0;
-            o.Sr = 0;
+            o.P = odds;
+            o.S = stake;
             o.Sc = 0;
             orc.Uo.Add(o);
 
@@ -441,9 +445,18 @@ namespace SpreadTrader
                         Rows.Clear();
                     }
                     break;
+                case "New1":
+                    {
+                        String json = newbet(MarketNode.LiveRunners[0].BackValues[0].price, 100, Order.SideEnum.B,MarketNode.LiveRunners[0].SelectionId, 185904913);
+                        OnOrderChanged(json);
+                    }
+                    break;
+                case "New2":
+                    {
+                    }
+                    break;
                 case "Match1":
                     {
-                        String cs = newbet(1.85, 100, "B", 4726862, 185904913, 88888888);
                     }
                     break;
                 case "Match2":
