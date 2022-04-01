@@ -397,6 +397,32 @@ namespace SpreadTrader
         }
         private List<string> lines = new List<string>();
         private Int32 line_id = 0;
+
+        private String newbet(Double odds, Int32 stake, String side, Int32 selid, Int32 mid, Int32 betid)
+        {
+            OrderMarketChange change = new OrderMarketChange();
+
+            change.Orc = new List<OrderRunnerChange>();
+            OrderRunnerChange orc = new OrderRunnerChange();
+            orc.Uo = new List<Order>();
+            orc.Id = selid;
+            change.Orc.Add(orc);
+
+            Order o = new Order();
+            o.Status = Order.StatusEnum.E;
+            o.Id = betid.ToString();
+
+            o.Sm = 0;
+            o.Sr = 0;
+            o.Sr = 0;
+            o.Sc = 0;
+            orc.Uo.Add(o);
+
+            String json = JsonConvert.SerializeObject(change);
+
+            return json;
+
+        }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (Betfair == null)
@@ -415,7 +441,18 @@ namespace SpreadTrader
                         Rows.Clear();
                     }
                     break;
-                case "Debug":
+                case "Match1":
+                    {
+                        String cs = newbet(1.85, 100, "B", 4726862, 185904913, 88888888);
+                    }
+                    break;
+                case "Match2":
+                    {
+                        if (line_id < lines.Count)
+                            OnOrderChanged(lines[line_id++]);
+                    }
+                    break;
+                case "Cancel":
                     {
                         if (line_id < lines.Count)
                             OnOrderChanged(lines[line_id++]);
