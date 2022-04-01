@@ -99,6 +99,16 @@ namespace SpreadTrader
                 }
             }
             LiveRunners = Runners;
+
+            for(int i=0;i< LiveRunners.Count;i++)
+            {
+                LiveRunner r = Runners[i];
+                LiveRunner lr = LiveRunners[i];
+
+                lr.BackValues = r.BackValues;
+                lr.LayValues = r.LayValues;
+                lr.ifWin = r.ifWin;    ///NH
+            }
             CalculateLevelProfit();
             return Runners;
         }
@@ -118,7 +128,7 @@ namespace SpreadTrader
                 }
             }
         }
-        private void LevelProfitBothNegative(LiveRunner runner1, LiveRunner runner2)
+        private void LevelProfitBothGreen(LiveRunner runner1, LiveRunner runner2)
         {
             Double G3 = Math.Abs(runner1.ifWin);
             Double J3 = Math.Abs(runner2.ifWin);
@@ -150,18 +160,18 @@ namespace SpreadTrader
             ///NH
             //runner1.BackValues[0].price = 2.42;
             //runner1.LayValues[0].price = 3.05;
-            //runner1.ifWin = -1000;// 14.25;
+            //runner1.ifWin = 1000;// 14.25;
 
             //runner2.BackValues[0].price = 1.49;
             //runner2.LayValues[0].price = 1.70;
-            //runner2.ifWin = -200;// -6.90;
+            //runner2.ifWin = 200;// -6.90;
 
             Double G3 = runner1.ifWin;
             Double J3 = runner2.ifWin;
 
-            if (G3 < 0 && J3 < 0)
+            if (G3 > 0 && J3 > 0)
             {
-                LevelProfitBothNegative(runner1, runner2);
+                LevelProfitBothGreen(runner1, runner2);
                 return;
             }
 
