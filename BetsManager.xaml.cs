@@ -395,37 +395,33 @@ namespace SpreadTrader
                 Status = _SubscribedOrders ? "Subscribed" : "Unsubscribed";
             }
         }
-        private List<string> lines = new List<string>();
-        private Int32 line_id = 0;
-        private Int32 newbetid = 89898;
-        private String newbet(Double odds, Int32 stake, Order.SideEnum side, Int64 selid, Int32 betid)
+        private Int32 newbetid = 44448880;
+        private String newbet(LiveRunner lr, Order.SideEnum side)
         {
+            Int32 stake = 100;
             DateTimeOffset now = DateTimeOffset.UtcNow;
             OrderMarketChange change = new OrderMarketChange();
 
             change.Orc = new List<OrderRunnerChange>();
             OrderRunnerChange orc = new OrderRunnerChange();
             orc.Uo = new List<Order>();
-            orc.Id = selid;
+            orc.Id = lr.SelectionId;
             change.Orc.Add(orc);
 
             Order o = new Order();
             o.Status = Order.StatusEnum.E;
-            o.Id = betid.ToString();
+            o.Id = newbetid++.ToString();
 
             o.Pd = now.ToUnixTimeMilliseconds();
             o.Side = side;
             o.Sm = 0;
             o.Sr = 0;
-            o.P = odds;
+            o.P = side == Order.SideEnum.B ? lr.BackValues[0].price : lr.LayValues[0].price;
             o.S = stake;
             o.Sc = 0;
             orc.Uo.Add(o);
 
-            String json = JsonConvert.SerializeObject(change);
-
-            return json;
-
+            return JsonConvert.SerializeObject(change);
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -436,39 +432,21 @@ namespace SpreadTrader
             Button b = sender as Button;
             switch (b.Tag)
             {
-                case "Reset":
-                    {
-                        MarketNode = new NodeViewModel(Betfair) { MarketID = "1.185904913" };
-                        line_id = 0;
-                        lines = new List<string>(File.ReadAllLines("lines.json"));
-                        lines.RemoveAll(p => !p.StartsWith("{\"orc\":"));
-                        Rows.Clear();
-                    }
-                    break;
-                case "New1":
-                    {
-                        String json = newbet(MarketNode.LiveRunners[0].BackValues[0].price, 100, Order.SideEnum.B,MarketNode.LiveRunners[0].SelectionId, 185904913);
-                        OnOrderChanged(json);
-                    }
-                    break;
-                case "New2":
-                    {
-                    }
-                    break;
+                case "Back1": 
+                    OnOrderChanged(newbet(MarketNode.LiveRunners[0], Order.SideEnum.B)); break;
+                case "Lay1":
+                    OnOrderChanged(newbet(MarketNode.LiveRunners[0], Order.SideEnum.L)); break;
                 case "Match1":
                     {
                     }
                     break;
+
+                case "Back2":
+                    OnOrderChanged(newbet(MarketNode.LiveRunners[1], Order.SideEnum.B)); break;
+                case "Lay2":
+                    OnOrderChanged(newbet(MarketNode.LiveRunners[1], Order.SideEnum.L)); break;
                 case "Match2":
                     {
-                        if (line_id < lines.Count)
-                            OnOrderChanged(lines[line_id++]);
-                    }
-                    break;
-                case "Cancel":
-                    {
-                        if (line_id < lines.Count)
-                            OnOrderChanged(lines[line_id++]);
                     }
                     break;
                 case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
