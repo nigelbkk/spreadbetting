@@ -44,7 +44,7 @@ namespace SpreadTrader
         public double Stake { get { return _Stake; } set { _Stake = value; NotifyPropertyChanged(""); } }
         public double Odds { get; set; }
         public double DisplayOdds { get { return IsFullyMatched || IsPartiallyMatched ? AvgPriceMatched : Odds; } }
-        public double DisplayStake { get { return IsFullyMatched || IsPartiallyMatched ? Matched : Stake - Matched; } }
+        public double DisplayStake { get { return IsFullyMatched || IsPartiallyMatched ? Matched : OriginalStake - Matched; } }
         public double AvgPriceMatched { get; set; }
         public double Profit { get { return Math.Round(DisplayStake * (DisplayOdds - 1), 5); } }
         public double _Matched { get; set; }
@@ -61,6 +61,17 @@ namespace SpreadTrader
         public Row(String id)
         {
             BetID = Convert.ToUInt64(id);
+            Time = DateTime.Now;
+        }
+        public Row(Row r)
+        {
+            BetID = r.BetID;
+            OriginalStake = r.OriginalStake;
+            SelectionID = r.SelectionID;
+            Matched = r.Matched;
+            MarketID = r.MarketID;
+            Side = r.Side;
+            Runner = r.Runner;
             Time = DateTime.Now;
         }
         public Row(Order o)
@@ -123,16 +134,28 @@ namespace SpreadTrader
         public String StreamingButtonText { get { return IsConnected ? "Streaming Connected" : "Streaming Disconnected"; } }
         private IHubProxy hubProxy = null;
         private HubConnection hubConnection = null;
-        private Row FindUnmatchedRow(String id, bool matched)
+        private Row FindUnmatchedRow(String id)
         {
             if (Rows.Count > 0) foreach (Row r in Rows)
+            {
+                if (r.BetID == Convert.ToUInt64(id))
                 {
-                    if (r.BetID == Convert.ToUInt64(id))
-                    {
-                        if (r.IsMatched == matched)
-                            return r;
-                    }
+                    if (!r.IsMatched)
+                        return r;
                 }
+            }
+            return null;
+        }
+        private Row FindUnmatchedRow(LiveRunner lr)
+        {
+            if (Rows.Count > 0) foreach (Row r in Rows)
+            {
+                if (r.SelectionID == lr.SelectionId)
+                {
+                    if (r.IsUnMatched)
+                        return r;
+                }
+            }
             return null;
         }
         public BetsManager()
@@ -213,7 +236,7 @@ namespace SpreadTrader
                             foreach (Order o in orc.Uo)
                             {
                                 Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
-                                Row row = FindUnmatchedRow(o.Id, false);
+                                Row row = FindUnmatchedRow(o.Id);
                                 if (row == null)
                                 {
                                     row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
@@ -244,21 +267,27 @@ namespace SpreadTrader
                                             }
                                         }
                                     }
-                                    SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
-                                    snd.Play();
+                                    if (!String.IsNullOrEmpty(props.MatchedBetAlert))
+                                    {
+                                        SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
+                                        snd.Play();
+                                    }
                                     Debug.WriteLine(o.Id, "fully matched");
                                 }
                                 if (o.Sm > 0 && o.Sr > 0)                           // partially matched
                                 {
-                                    Row mrow = new Row(o);
-                                    mrow.Matched = o.Sm.Value;
-                                    mrow.AvgPriceMatched = Math.Round(o.Avp.Value, 2);
+                                    Row mrow = new Row(FindUnmatchedRow(o.Id));
+                                    mrow.Matched += o.Sm.Value;
+                                    mrow.Odds = o.P.Value;
+                                    mrow.AvgPriceMatched = o.Avp.Value;
                                     mrow.Hidden = UnmatchedOnly;
-                                    mrow.Runner = row.Runner;// MarketNode.GetRunnerName(mrow.SelectionID);
                                     Rows.Insert(0, mrow);
-                                    row.Stake = o.Sr.Value;
-                                    SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
-                                    snd.Play();
+                                //    row.Stake = o.S.Value;
+                                    if (!String.IsNullOrEmpty(props.MatchedBetAlert))
+                                    {
+                                        SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
+                                        snd.Play();
+                                    }
                                     Debug.WriteLine(o.Id, "partial match");
                                 }
                                 if (o.Sc > 0)                                       // cancelled
@@ -299,14 +328,14 @@ namespace SpreadTrader
                         CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.185904913"
 
                         if (report.currentOrders.Count > 0) foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
+                        {
+                            OrdersStatic.BetID2SelectionID[o.betId] = o.selectionId;
+                            Row.RunnerNames[o.selectionId] = RunnersControl.GetRunnerName(o.selectionId);
+                            Rows.Insert(0, new Row(o)
                             {
-                                OrdersStatic.BetID2SelectionID[o.betId] = o.selectionId;
-                                Row.RunnerNames[o.selectionId] = RunnersControl.GetRunnerName(o.selectionId);
-                                Rows.Insert(0, new Row(o)
-                                {
-                                    Runner = RunnersControl.GetRunnerName(o.selectionId),
-                                });
-                            }
+                                Runner = RunnersControl.GetRunnerName(o.selectionId),
+                            });
+                        }
                         NotifyPropertyChanged("");
                     }
                     catch (Exception xe)
@@ -395,8 +424,70 @@ namespace SpreadTrader
                 Status = _SubscribedOrders ? "Subscribed" : "Unsubscribed";
             }
         }
-        private List<string> lines = new List<string>();
-        private Int32 line_id = 0;
+        private Int32 newbetid = 44448880;
+        private String newbet(LiveRunner lr, Order.SideEnum side)
+        {
+            Int32 new_stake = 100;
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            OrderMarketChange change = new OrderMarketChange();
+
+            change.Orc = new List<OrderRunnerChange>();
+            OrderRunnerChange orc = new OrderRunnerChange();
+            orc.Uo = new List<Order>();
+            orc.Id = lr.SelectionId;
+            change.Orc.Add(orc);
+
+            Order o = new Order();
+            o.Status = Order.StatusEnum.E;
+            o.Id = newbetid++.ToString();
+
+            o.Pd = now.ToUnixTimeMilliseconds();
+            o.Side = side;
+            o.Sm = 0;
+            o.Sr = new_stake;
+            o.P = side == Order.SideEnum.B ? lr.BackValues[0].price : lr.LayValues[0].price;
+            o.S = new_stake;
+            o.Sc = 0;
+            orc.Uo.Add(o);
+
+            return JsonConvert.SerializeObject(change);
+        }
+
+
+
+        private String matchbet(LiveRunner lr)
+        {
+            if (Rows.Count <= 0)
+                return "";
+
+            Int32 match_stake = 10;
+            Row r = FindUnmatchedRow(lr); 
+            UInt64 betid = r.BetID;
+
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            OrderMarketChange change = new OrderMarketChange();
+
+            change.Orc = new List<OrderRunnerChange>();
+            OrderRunnerChange orc = new OrderRunnerChange();
+            orc.Uo = new List<Order>();
+            orc.Id = lr.SelectionId;
+            change.Orc.Add(orc);
+
+            Order o = new Order();
+            o.Status = Order.StatusEnum.E;
+            o.Id = betid.ToString();
+
+            o.Pd = now.ToUnixTimeMilliseconds();
+            o.P = r.Odds;
+            o.Avp = r.Odds;
+            lr.ngrunner.totalMatched += match_stake;
+            o.Sm = match_stake;
+            o.Sr = r.OriginalStake - lr.ngrunner.totalMatched;
+            o.S = match_stake;
+            o.Sc = 0;
+            orc.Uo.Add(o);
+            return JsonConvert.SerializeObject(change);
+        }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (Betfair == null)
@@ -406,21 +497,18 @@ namespace SpreadTrader
             Button b = sender as Button;
             switch (b.Tag)
             {
-                case "Reset":
-                    {
-                        MarketNode = new NodeViewModel(Betfair) { MarketID = "1.185904913" };
-                        line_id = 0;
-                        lines = new List<string>(File.ReadAllLines("lines.json"));
-                        lines.RemoveAll(p => !p.StartsWith("{\"orc\":"));
-                        Rows.Clear();
-                    }
-                    break;
-                case "Debug":
-                    {
-                        if (line_id < lines.Count)
-                            OnOrderChanged(lines[line_id++]);
-                    }
-                    break;
+                case "Back1":
+                    OnOrderChanged(newbet(MarketNode.LiveRunners[0], Order.SideEnum.B)); break;
+                case "Lay1":
+                    OnOrderChanged(newbet(MarketNode.LiveRunners[0], Order.SideEnum.L)); break;
+                case "Match1":
+                    OnOrderChanged(matchbet(MarketNode.LiveRunners[0])); break;
+                case "Back2":
+                    OnOrderChanged(newbet(MarketNode.LiveRunners[1], Order.SideEnum.B)); break;
+                case "Lay2":
+                    OnOrderChanged(newbet(MarketNode.LiveRunners[1], Order.SideEnum.L)); break;
+                case "Match2":
+                    OnOrderChanged(matchbet(MarketNode.LiveRunners[1])); break;
                 case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
                 case "CancelAll":
                     //if (MarketNode != null)

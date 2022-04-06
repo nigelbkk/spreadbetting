@@ -69,7 +69,7 @@ namespace SpreadTrader
         public double ifWin { get { return _ifWin; } set { _ifWin = value; NotifyPropertyChanged(""); } }
         public Double LevelStake { get; set; }
         public sideEnum LevelSide { get; set; }
-        private double _LevelProfit { get; set; }
+        private double _LevelProfit = 1.23;
         public double LevelProfit
         {
             get { return _LevelProfit; }
@@ -116,16 +116,16 @@ namespace SpreadTrader
         {
             int i = 0;
             if (r.Prices.BestDisplayAvailableToBack.Count > 0) foreach (var ps in r.Prices.BestDisplayAvailableToBack)
-            {
-                BackValues[i].price = ps.Price;
-                BackValues[i++].size = ps.Size;
-            }
+                {
+                    BackValues[i].price = ps.Price;
+                    BackValues[i++].size = ps.Size;
+                }
             i = 0;
             if (r.Prices.BestDisplayAvailableToLay.Count > 0) foreach (var ps in r.Prices.BestDisplayAvailableToLay)
-            {
-                LayValues[i].price = ps.Price;
-                LayValues[i++].size = ps.Size;
-            }
+                {
+                    LayValues[i].price = ps.Price;
+                    LayValues[i++].size = ps.Size;
+                }
             LastPriceTraded = r.Prices.LastTradedPrice;
             NotifyPropertyChanged("");
         }

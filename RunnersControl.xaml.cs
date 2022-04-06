@@ -68,12 +68,12 @@ namespace SpreadTrader
                         LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
                         LiveRunners[i].NotifyPropertyChanged("");
                         if (pl.Count > 0 && pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
-                        {
-                            if (p.selectionId == LiveRunners[i].SelectionId)
                             {
-                                LiveRunners[i].ifWin = p.ifWin;
+                                if (p.selectionId == LiveRunners[i].SelectionId)
+                                {
+                                    LiveRunners[i].ifWin = p.ifWin;
+                                }
                             }
-                        }
                     }
                     MarketNode.LiveRunners = LiveRunners;
                     MarketNode.CalculateLevelProfit();
@@ -104,7 +104,7 @@ namespace SpreadTrader
                                 {
                                     streamingAPI.Start(MarketNode.MarketID);
                                 }
-                                catch(Exception xe)
+                                catch (Exception xe)
                                 {
                                     Debug.WriteLine(xe.Message);
                                     //Extensions.MainWindow.Status = xe.Message;
@@ -151,7 +151,7 @@ namespace SpreadTrader
                         if (NewRunners[i].ngrunner != null)
                         {
                             LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
-//                            LiveRunners[i].LevelProfit = NewRunners[i].LevelProfit;
+                            LiveRunners[i].LevelProfit = NewRunners[i].LevelProfit;
                             LiveRunners[i].NotifyPropertyChanged("");
                         }
                     }

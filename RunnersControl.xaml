@@ -113,8 +113,9 @@
 						<ColumnDefinition/>
 						<ColumnDefinition/>
 						<ColumnDefinition/>
-						<ColumnDefinition/>
-					</Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="{Binding Name}" FontSize="16" Background="{Binding Path=FavoritesColor}"  PreviewMouseDown="NameMouseDown" HorizontalContentAlignment="Left"/>
 					<Button Grid.Column="1" DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
 					<Button Grid.Column="2"  DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
@@ -125,7 +126,8 @@
 					<Button Grid.Column="7" DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
 					<Label Grid.Column="8" Content="{Binding LastPriceTraded, Converter={StaticResource obconverter} }"  FontSize="11"/>
 					<Label Grid.Column="9" Content="{Binding ifWin, Converter={StaticResource oconverter} }" Foreground="{Binding Path=ProfitColor}" FontWeight="Regular" FontSize="11"/>
-					<Label Grid.Column="10" Content="{Binding LevelProfit, Converter={StaticResource oconverter} }" Foreground="{Binding Path=LevelProfitColor}" PreviewMouseDown="LevelProfitMouseDown" Background="LightGreen" FontSize="11"/>
+                    <Label Grid.Column="10" Content="{Binding LevelProfit, Converter={StaticResource oconverter} }" Foreground="{Binding Path=LevelProfitColor}" PreviewMouseDown="LevelProfitMouseDown" Background="LightGreen" FontSize="11"/>
+                    <Label Grid.Column="11" Content="{Binding LevelStake, Converter={StaticResource oconverter} }" Background="Ivory" FontSize="11"/>
 				</Grid>
 			</DataTemplate>
 		</ResourceDictionary>
@@ -147,8 +149,9 @@
 				<ColumnDefinition/>
 				<ColumnDefinition/>
 				<ColumnDefinition/>
-				<ColumnDefinition/>
-			</Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
 
 			<Label HorizontalAlignment="Left" Grid.Column="0" Content="Selection Name" FontSize="16"/>
 			<Label Grid.Column="1"/>
@@ -162,10 +165,13 @@
 				<TextBlock>Last<LineBreak/>Price</TextBlock>
 			</Label>
 			<Label FontSize="11" Grid.Column="9"  HorizontalAlignment="Left" Margin="-10,0,0,0" Width="44">Profit</Label>
-			<Label Grid.Column="10"  HorizontalAlignment="Left" Margin="-12,0,0,0" Width="44">
-				<TextBlock>Level<LineBreak/>Profit</TextBlock>
-			</Label>
-		</Grid>
+            <Label Grid.Column="10"  HorizontalAlignment="Left" Margin="-12,0,0,0" Width="44">
+                <TextBlock>Level<LineBreak/>Profit</TextBlock>
+            </Label>
+            <Label Grid.Column="11"  HorizontalAlignment="Left" Margin="-12,0,0,0" Width="44">
+                <TextBlock>Level<LineBreak/>Stake</TextBlock>
+            </Label>
+        </Grid>
 		<ItemsControl Grid.Row="1" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}">
 			<ItemsControl.Template>
 				<ControlTemplate>

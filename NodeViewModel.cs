@@ -67,6 +67,8 @@ namespace SpreadTrader
             Nodes = new ObservableCollection<NodeViewModel>();
         }
         public List<LiveRunner> LiveRunners = null;// new List<LiveRunner>();
+        
+        Random rnd = new Random();
 
         public List<LiveRunner> GetLiveRunners()
         {
@@ -86,6 +88,7 @@ namespace SpreadTrader
                             if (p.selectionId == r.selectionId)
                             {
                                 r.ifWin = p.ifWin;  ///NH
+                                //r.ifWin = rnd.NextDouble() * 100.00;
                             }
                         }
                     }
@@ -100,7 +103,7 @@ namespace SpreadTrader
             }
             LiveRunners = Runners;
 
-            for(int i=0;i< LiveRunners.Count;i++)
+            for (int i = 0; i < LiveRunners.Count; i++)
             {
                 LiveRunner r = Runners[i];
                 LiveRunner lr = LiveRunners[i];
@@ -196,7 +199,7 @@ namespace SpreadTrader
             runner1.LevelSide = G3 < 0 ? sideEnum.BACK : sideEnum.LAY;
             runner1.LevelProfit = Math.Round(G18, 2);
             runner1.LevelStake = Math.Round(G3 > 0 ? (G3 - J3) / G5 : (G3 - J3) / J5, 2);
-            
+
             runner2.LevelSide = J3 > 0 ? sideEnum.LAY : sideEnum.BACK;
             runner2.LevelProfit = Math.Round(J18, 2);
             runner2.LevelStake = Math.Round(J3 > 0 ? (G3 - J3) / G5 : (G3 - J3) / J5, 2);
@@ -228,10 +231,10 @@ namespace SpreadTrader
             {
                 List<LiveRunner> runners = new List<LiveRunner>();
                 if (LiveRunners.Count > 0) foreach (LiveRunner lr in LiveRunners)
-                    {
-                        if (lr.ifWin != 0)
-                            runners.Add(lr);
-                    }
+                {
+                    if (lr.ifWin != 0)
+                        runners.Add(lr);
+                }
                 if (LiveRunners.Count == 2)
                 {
                     LevelProfit(LiveRunners[0], LiveRunners[1]);
