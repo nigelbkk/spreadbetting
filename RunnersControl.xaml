@@ -127,7 +127,7 @@
 					<Label Grid.Column="8" Content="{Binding LastPriceTraded, Converter={StaticResource obconverter} }"  FontSize="11"/>
 					<Label Grid.Column="9" Content="{Binding ifWin, Converter={StaticResource oconverter} }" Foreground="{Binding Path=ProfitColor}" FontWeight="Regular" FontSize="11"/>
                     <Label Grid.Column="10" Content="{Binding LevelProfit, Converter={StaticResource oconverter} }" Foreground="{Binding Path=LevelProfitColor}" PreviewMouseDown="LevelProfitMouseDown" Background="LightGreen" FontSize="11"/>
-                    <Label Grid.Column="11" Content="{Binding LevelStake, Converter={StaticResource oconverter} }" Background="Ivory" FontSize="11"/>
+                    <Label Grid.Column="11" Content="{Binding LevelStake}" Background="Ivory" FontSize="11"/>
 				</Grid>
 			</DataTemplate>
 		</ResourceDictionary>

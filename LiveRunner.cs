@@ -67,9 +67,10 @@ namespace SpreadTrader
         public double LayStake { get; set; }
         private double _ifWin { get; set; }
         public double ifWin { get { return _ifWin; } set { _ifWin = value; NotifyPropertyChanged(""); } }
-        public Double LevelStake { get; set; }
+        private Double _LevelStake = 0;
+        public Double LevelStake { get { return _LevelStake; } set { _LevelStake = value; NotifyPropertyChanged(""); } }
         public sideEnum LevelSide { get; set; }
-        private double _LevelProfit = 1.23;
+        private double _LevelProfit = 0;
         public double LevelProfit
         {
             get { return _LevelProfit; }
