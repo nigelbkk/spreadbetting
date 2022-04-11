@@ -161,13 +161,13 @@ namespace SpreadTrader
         private void LevelProfit(LiveRunner runner1, LiveRunner runner2)
         {
             ///NH
-            runner1.LayValues[0].price = 1.2;
-            runner1.BackValues[0].price = 1.23;
-            runner1.ifWin = -42.05;
+            //runner1.LayValues[0].price = 1.2;
+            //runner1.BackValues[0].price = 1.23;
+            //runner1.ifWin = -42.05;
 
-            runner2.LayValues[0].price = 5.3;
-            runner2.BackValues[0].price = 6.0;
-            runner2.ifWin = 224.86;
+            //runner2.LayValues[0].price = 5.3;
+            //runner2.BackValues[0].price = 6.0;
+            //runner2.ifWin = 224.86;
 
             Double G3 = runner1.ifWin;
             Double J3 = runner2.ifWin;
@@ -198,7 +198,7 @@ namespace SpreadTrader
 
             runner1.LevelSide = G3 < 0 ? sideEnum.BACK : sideEnum.LAY;
             runner1.LevelProfit = Math.Round(G18, 2);
-            runner1.LevelStake = Math.Abs(Math.Round(G3 < 0 ? G10 : G13, 2));
+            runner1.LevelStake = Math.Abs(Math.Round(runner1.LevelSide == sideEnum.BACK ? D8 : G10, 2));
 
             runner2.LevelSide = J3 < 0 ? sideEnum.BACK : sideEnum.LAY;
             runner2.LevelProfit = Math.Round(J18, 2);
