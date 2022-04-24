@@ -216,13 +216,13 @@ namespace SpreadTrader
             Double F8 = F5 > 0 ? draw.LayValues[0].price : draw.BackValues[0].price;
 
             ///NH
-            D5 = 3.82;
-            E5 = 42.14;
-            F5 = 104.86;
+            //D5 = 3.82;
+            //E5 = 42.14;
+            //F5 = 104.86;
 
-            D8 = 3;
-            E8 = 1.6;
-            F8 = 29;
+            //D8 = 3;
+            //E8 = 1.6;
+            //F8 = 29;
 
             Double F11 = (F5 - D5) / D8;
             Double F12 = (F5 - E5) / E8;
