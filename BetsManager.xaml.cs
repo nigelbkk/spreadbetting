@@ -452,9 +452,6 @@ namespace SpreadTrader
 
             return JsonConvert.SerializeObject(change);
         }
-
-
-
         private String matchbet(LiveRunner lr)
         {
             if (Rows.Count <= 0)
