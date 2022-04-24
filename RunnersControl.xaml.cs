@@ -344,9 +344,9 @@ namespace SpreadTrader
             if (LiveRunners.Count == 3)
             {
                 LiveRunner live_runner1 = LiveRunners[0];
-                double odds1 = live_runner1.LevelSide == sideEnum.LAY ? live_runner1.LayValues[0].price : live_runner1.LayValues[0].price;
+                double odds1 = live_runner1.LevelSide == sideEnum.LAY ? live_runner1.LayValues[0].price : live_runner1.BackValues[0].price;
                 LiveRunner live_runner2 = LiveRunners[1];
-                double odds2 = live_runner2.LevelSide == sideEnum.LAY ? live_runner2.LayValues[1].price : live_runner2.LayValues[1].price;
+                double odds2 = live_runner2.LevelSide == sideEnum.LAY ? live_runner2.LayValues[1].price : live_runner2.BackValues[1].price;
                 MessageBox.Show(
                     String.Format("{0} {1} at {2} for {3}\n{4} {5} at {6} for {7}", 
                     live_runner1.LevelSide, live_runner1.Name, odds1, Math.Abs(live_runner1.LevelStake),
