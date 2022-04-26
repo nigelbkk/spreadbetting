@@ -211,18 +211,18 @@ namespace SpreadTrader
             Double E5 = runner2.ifWin;
             Double F5 = draw.ifWin;
 
-            Double D8 = D5 > 0 ? runner1.LayValues[0].price : runner1.BackValues[0].price;
-            Double E8 = E5 > 0 ? runner2.LayValues[0].price : runner2.BackValues[0].price;
-            Double F8 = F5 > 0 ? draw.LayValues[0].price : draw.BackValues[0].price;
+            Double D8 = D5 < 0 ? runner1.LayValues[0].price : runner1.BackValues[0].price;
+            Double E8 = E5 < 0 ? runner2.LayValues[0].price : runner2.BackValues[0].price;
+            Double F8 = F5 < 0 ? draw.LayValues[0].price : draw.BackValues[0].price;
 
             ///NH
-            //D5 = 3.82;
-            //E5 = 42.14;
-            //F5 = 104.86;
+            //D5 = -14.9;
+            //E5 = 7.84;
+            //F5 = 7.84;
 
-            //D8 = 3;
-            //E8 = 1.6;
-            //F8 = 29;
+            //D8 = 2.92;
+            //E8 = 7.8;
+            //F8 = 1.89;
 
             Double F11 = (F5 - D5) / D8;
             Double F12 = (F5 - E5) / E8;
@@ -235,11 +235,11 @@ namespace SpreadTrader
             Double E16 = F12 > 0 ? F12 * (E8 - 1) + E15 : F12 * (E8 - 1) + E15;
             Double F16 = F12 > 0 ? F15 - F12 : -F12 + F15;
 
-            runner1.LevelSide = D5 > 0 ? sideEnum.BACK : sideEnum.LAY;
+            runner1.LevelSide = F11 >= 0 ? sideEnum.BACK : sideEnum.LAY;
             runner1.LevelProfit = Math.Round(D16, 2);
             runner1.LevelStake = Math.Abs(Math.Round(F11, 2));
 
-            runner2.LevelSide = E5 > 0 ? sideEnum.BACK : sideEnum.LAY;
+            runner2.LevelSide = F12 >= 0 ? sideEnum.BACK : sideEnum.LAY;
             runner2.LevelProfit = Math.Round(E16, 2);
             runner2.LevelStake = Math.Abs(Math.Round(F12, 2));
 
