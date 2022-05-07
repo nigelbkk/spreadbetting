@@ -15,10 +15,16 @@ namespace SpreadTrader
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         public OnShutdownDelegate OnShutdown = null;
-        //		public ICommand ExpandingCommand { get; set; }
         private Properties.Settings props = Properties.Settings.Default;
         private static String _Status = "Ready";
-        public String Status { get { return _Status; } set { _Status = value; Debug.WriteLine(value); NotifyPropertyChanged(""); } }
+        public String Status { get { return _Status; } set { 
+                
+                _Status = value; 
+                Debug.WriteLine(value);
+                Dispatcher.BeginInvoke(new Action(() => {
+                    NotifyPropertyChanged("");
+                }));
+            } }
         public double Balance { get; set; }
         public double Exposure { get; set; }
         private double _DiscountRate { get; set; }

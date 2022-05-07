@@ -44,7 +44,13 @@ namespace SpreadTrader
         public double Stake { get { return _Stake; } set { _Stake = value; NotifyPropertyChanged(""); } }
         public double Odds { get; set; }
         public double DisplayOdds { get { return IsFullyMatched || IsPartiallyMatched ? AvgPriceMatched : Odds; } }
-        public double DisplayStake { get { return IsFullyMatched || IsPartiallyMatched ? Matched : OriginalStake - Matched; } }
+        public double DisplayStake { get {
+                if (IsFullyMatched)
+                    return Stake;
+                if (IsPartiallyMatched)
+                    return OriginalStake - Matched;
+                return Stake;
+            } }
         public double AvgPriceMatched { get; set; }
         public double Profit { get { return Math.Round(DisplayStake * (DisplayOdds - 1), 5); } }
         public double _Matched { get; set; }
@@ -52,7 +58,7 @@ namespace SpreadTrader
         public bool IsMatched { get { return IsFullyMatched || IsPartiallyMatched; } }
         public bool IsUnMatched { get { return _Matched < Stake; } }
         public bool IsPartiallyMatched { get { return _Matched > 0 && _Matched < Stake; } }
-        public bool IsFullyMatched { get { return _Matched >= OriginalStake; } }
+        public bool IsFullyMatched { get { return _Matched > 0 && _Matched >= OriginalStake; } }
         public String IsMatchedString { get { return IsMatched ? "F" : "U"; } }
         public bool IsBack { get { return Side.ToUpper() == "BACK"; } }
         private bool _Hidden = false;
@@ -126,8 +132,10 @@ namespace SpreadTrader
         public String LastUpdated { get { return String.Format("Orders last updated {0}", _LastUpdated.AddHours(props.TimeOffset).ToString("HH:mm:ss")); } }
         public event PropertyChangedEventHandler PropertyChanged;
         private String _Status = "Ready";
-        public String Status { get { return _Status; } set { _Status = value; NotifyPropertyChanged(""); } }
-        private bool _SubscribedOrders = false;
+        public String Status { get { return _Status; } set { 
+                _Status = value;
+                Extensions.MainWindow.Status = value;
+            } }
         private bool _Connected { get { return !String.IsNullOrEmpty(hubConnection.ConnectionId); } }
         public bool IsConnected { get { return _Connected; } }
         public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
@@ -340,11 +348,8 @@ namespace SpreadTrader
                     }
                     catch (Exception xe)
                     {
-                        Debug.WriteLine(xe.Message);
-                        Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            Extensions.MainWindow.Status = xe.Message;
-                        }));
+                        Status = xe.Message;
+//                        Dispatcher.BeginInvoke(new Action(() => { Status = xe.Message; }));
                     }
                 }
             }
@@ -353,35 +358,36 @@ namespace SpreadTrader
         {
             Button b = sender as Button;
             Row row = b.DataContext as Row;
+            if (row.Matched >= row.Stake)
+            {
+                Status = "Bet already fully matched";
+                return;
+            }
             if (Betfair == null)
             {
                 Betfair = MainWindow.Betfair;
             }
-            if (row.Matched >= row.Stake)
-            {
-                Status = "Bet is already fully matched";
-                return;
-            }
-            Status = "Bet cancelled";
             Debug.WriteLine("cancel {0} for {1} {2}", MarketNode.MarketID, row.BetID, row.Runner);
-
             DateTime LastUpdate = DateTime.UtcNow;
-            Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
+            CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
+            Status = report.errorCode != null ? report.errorCode : report.status;
+            if (report.errorCode != null)
+                Rows.Remove(row);
             MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-            Rows.Remove(row);
-            NotifyPropertyChanged("");
         }
         private void Connect()
         {
+            String result = "";
             hubConnection.Start().ContinueWith(task =>
             {
                 if (OnFail(task))
                 {
-                    Status = "Failed to Connect";
+                    result = "Failed to Connect";
                     return;
                 }
-                Status = "Connected";
+                result = "Connected";
             }).Wait(1000);
+            Status = result;
         }
         private void Disconnect()
         {
@@ -395,34 +401,6 @@ namespace SpreadTrader
                 Debug.WriteLine("Exception:{0}", task.Exception.GetBaseException());
             }
             return task.IsFaulted;
-        }
-        private void SendMessage(String msg)
-        {
-            hubProxy.Invoke<String>("Send", msg).ContinueWith(task =>
-            {
-                Debug.Assert(!task.IsFaulted);
-            }).Wait();
-        }
-        private bool RemoteCall(String name)
-        {
-            bool retval = true;
-            hubProxy.Invoke<String>(name).ContinueWith(task => { retval = OnFail(task); }).Wait();
-            return retval;
-        }
-        private bool RemoteCall(String name, String arg)
-        {
-            bool retval = true;
-            hubProxy.Invoke<String>(name, arg).ContinueWith(task => { retval = OnFail(task); }).Wait();
-            return retval;
-        }
-        private void SubscribeOrders()
-        {
-            bool success = !RemoteCall(_SubscribedOrders ? "UnsubscribeOrders" : "SubscribeOrders");
-            if (success)
-            {
-                _SubscribedOrders = !_SubscribedOrders;
-                Status = _SubscribedOrders ? "Subscribed" : "Unsubscribed";
-            }
         }
         private Int32 newbetid = 44448880;
         private String newbet(LiveRunner lr, Order.SideEnum side)
@@ -508,17 +486,15 @@ namespace SpreadTrader
                     OnOrderChanged(matchbet(MarketNode.LiveRunners[1])); break;
                 case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
                 case "CancelAll":
-                    //if (MarketNode != null)
-                    //{
-                    //	//CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
-                    //}
                     BackgroundWorker bw = new BackgroundWorker();
+                    String result = "";
+                    bw.RunWorkerCompleted += (o, e2) => { Status = result; };
                     bw.DoWork += (o, e2) =>
                     {
                         if (MarketNode != null)
                         {
                             CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
-                            Debug.WriteLine(String.Format("status: {0}", report.status));
+                            result = report.errorCode != null ? report.errorCode : report.status;
                         }
                     };
                     bw.RunWorkerAsync();

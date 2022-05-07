@@ -37,7 +37,7 @@ namespace SpreadTrader
                 Value = d;
             }
             NotifyPropertyChanged("");
-            Debug.WriteLine(Value, "tb");
+            //Debug.WriteLine(Value, "tb");
         }
         private BetfairPrices betfairPrices = new BetfairPrices();
 

@@ -94,7 +94,7 @@ namespace SpreadTrader
                     try
                     {
                         LiveRunners = MarketNode.GetLiveRunners();
-                        Debug.WriteLine(MarketNode.Status);
+                        //Debug.WriteLine(MarketNode.Status);
                         if (props.UseStreaming)
                         {
                             BackgroundWorker bw = new BackgroundWorker();
@@ -194,75 +194,6 @@ namespace SpreadTrader
             };
             Worker.RunWorkerAsync();
         }
-        private PlaceExecutionReport placeOrders(String marketId, List<PlaceInstruction> pis)
-        {
-            BetfairAPI.BetfairAPI Betfair = MainWindow.Betfair;
-            PlaceExecutionReport report = Betfair.placeOrders(marketId, pis);
-            return report;
-        }
-        //public void SubmitBets(PriceSize[] LayValues, PriceSize[] BackValues)
-        //{
-        //    if (MarketNode != null)
-        //    {
-        //        DateTime LastUpdate = DateTime.UtcNow;
-        //        BetfairAPI.BetfairAPI betfairAPI = MainWindow.Betfair;
-        //        bool auto_back_lay = SliderControl.AutoBackLay;
-        //        List<PriceSize> laybets = new List<PriceSize>();
-        //        List<PriceSize> backbets = new List<PriceSize>();
-        //        for (Int32 i = 0; i < 9; i++)
-        //        {
-        //            laybets.Add(LayValues[i]);
-        //            backbets.Add(BackValues[i]);
-        //        }
-        //        if (LiveRunner.Favorite == null)
-        //        {
-        //            MessageBox.Show("Please Select the Favourite", "Submit Bets", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-        //            return;
-        //        }
-        //        for (int j = 0; j < 2; j++)
-        //        {
-        //            List<PlaceInstruction> orders = new List<PlaceInstruction>();
-        //            List<PriceSize> bets = j == 0 ? laybets : backbets;
-        //            PriceSize[] values = j == 0 ? LayValues : BackValues;
-        //            sideEnum side = j == 0 ? sideEnum.LAY : sideEnum.BACK;
-        //            for (Int32 i = 0; i < 9; i++)
-        //            {
-        //                if (!bets[i].IsChecked || !bets[i].ParentChecked)
-        //                    continue;
-
-        //                PlaceInstruction pi = new PlaceInstruction()
-        //                {
-        //                    orderTypeEnum = orderTypeEnum.LIMIT,
-        //                    sideEnum = side,
-        //                    Runner = LiveRunner.Favorite.Name,
-        //                    marketTypeEnum = marketTypeEnum.WIN,
-        //                    selectionId = LiveRunner.Favorite.SelectionId,
-        //                    limitOrder = new LimitOrder()
-        //                    {
-        //                        persistenceTypeEnum = persistenceTypeEnum.LAPSE,
-        //                        price = values[i].price,
-        //                        size = values[i].size,
-        //                    }
-        //                };
-        //                orders.Add(pi);
-        //            }
-        //            if (props.SafeBets)
-        //            {
-        //                if (orders.Count > 0) foreach (PlaceInstruction pi in orders)
-        //                    {
-        //                        pi.limitOrder.size = 2.00;
-        //                        pi.limitOrder.price = pi.sideEnum == sideEnum.LAY ? 1.01 : 1000;
-        //                    }
-        //            }
-        //            if (orders.Count > 0)
-        //            {
-        //                System.Threading.Thread t = new System.Threading.Thread(() => placeOrders(MarketNode.Market.marketId, orders));
-        //                t.Start();
-        //            }
-        //        }
-        //        MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-        //    }
-        //}
         public String GetRunnerName(Int64 SelectionID)
         {
             if (LiveRunners.Count > 0) foreach (LiveRunner r in LiveRunners)
@@ -347,10 +278,6 @@ namespace SpreadTrader
                 double odds1 = live_runner1.LevelSide == sideEnum.LAY ? live_runner1.LayValues[0].price : live_runner1.BackValues[0].price;
                 LiveRunner live_runner2 = LiveRunners[1];
                 double odds2 = live_runner2.LevelSide == sideEnum.LAY ? live_runner2.LayValues[0].price : live_runner2.BackValues[0].price;
-                //MessageBox.Show(
-                //    String.Format("{0} {1} at {2} for {3}\n{4} {5} at {6} for {7}", 
-                //    live_runner1.LevelSide, live_runner1.Name, odds1, Math.Abs(live_runner1.LevelStake),
-                //    live_runner2.LevelSide, live_runner2.Name, odds2, Math.Abs(live_runner2.LevelStake)));
 
                 List<PlaceInstruction> orders = new List<PlaceInstruction>();
                 orders.Add(new PlaceInstruction()
@@ -384,9 +311,7 @@ namespace SpreadTrader
                 System.Threading.Thread t = new System.Threading.Thread(() =>
                 {
                     PlaceExecutionReport report = betfair.placeOrders(MarketNode.MarketID, orders);
-                    Dispatcher.BeginInvoke(new Action(() => {
-                        Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status;
-                    }));
+                    Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status;
                 });
                 t.Start();
             }
@@ -394,26 +319,19 @@ namespace SpreadTrader
             {
                 if (live_runner.LevelSide == sideEnum.LAY)
                 {
-//                    MessageBox.Show(String.Format("LAY {0} at {1} for {2}", live_runner.Name, live_runner.LayValues[0].price, Math.Abs(live_runner.LevelStake)));
                     System.Threading.Thread t = new System.Threading.Thread(() =>
                     {
                         PlaceExecutionReport report = betfair.placeOrder(MarketNode.MarketID, live_runner.SelectionId, sideEnum.LAY, Math.Abs(live_runner.LevelStake), live_runner.LayValues[0].price);
-                        Dispatcher.BeginInvoke(new Action(() => {
-                            Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status;
-                        }));
+                        Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status;
                     });
                     t.Start();
                 }
                 if (live_runner.LevelSide == sideEnum.BACK)
                 {
-//                    MessageBox.Show(String.Format("BACK {0} at {1} for {2}", live_runner.Name, live_runner.BackValues[0].price, Math.Abs(live_runner.LevelStake)));
                     System.Threading.Thread t = new System.Threading.Thread(() =>
                     {
                         PlaceExecutionReport report = betfair.placeOrder(MarketNode.MarketID, live_runner.SelectionId, sideEnum.BACK, Math.Abs(live_runner.LevelStake), live_runner.BackValues[0].price);
-                        Debug.WriteLine(report.errorCode != null ? report.errorCode : report.status);
-                        Dispatcher.BeginInvoke(new Action(() => {
-                            Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status;
-                        }));
+                        Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status;
                     });
                     t.Start();
                 }

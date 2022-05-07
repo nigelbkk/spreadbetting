@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -45,32 +46,38 @@ namespace SpreadTrader
         {
             Close();
         }
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
             Odds = UpDownOdds.Value;
             Stake = UpDownStake.Value.Value;
 
             BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
-            System.Threading.Thread t = new System.Threading.Thread(() =>
+            String result = "";
+
+            if (OriginalStake != Stake)
             {
-                if (OriginalStake != Stake)
-                {
-                    CancelExecutionReport report1 = betfair.cancelOrder(Row.MarketID, Row.BetID);
-                    PlaceExecutionReport report2 = betfair.placeOrder(Row.MarketID, Row.SelectionID, Row.Side == "BACK" ? sideEnum.BACK : sideEnum.LAY, Stake, Odds);
-                }
-                else
-                {
-                    ReplaceExecutionReport report = betfair.replaceOrder(Row.MarketID, Row.BetID.ToString(), Odds, Stake);
-                    if (report.status != ExecutionReportStatusEnum.SUCCESS)
+                await Task.Run(() => {
+                    CancelExecutionReport report = betfair.cancelOrder(Row.MarketID, Row.BetID);
+                    if (report.errorCode != null)
                     {
-                        Debug.Write(report.ErrorCode.ToString() + " : ");
-                        Debug.WriteLine(report.instructionReports[0].errorCode.ToString());
-                        MessageBox.Show(report.instructionReports[0].errorCode.ToString(), "Update Bet", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        result = report.errorCode;
                     }
-                }
-                NotifyPropertyChanged("");
-            });
-            t.Start();
+                    else
+                    {
+                        PlaceExecutionReport report2 = betfair.placeOrder(Row.MarketID, Row.SelectionID, Row.Side == "BACK" ? sideEnum.BACK : sideEnum.LAY, Stake, Odds);
+                        result = report2.errorCode != null ? report2.errorCode : report2.status;
+                    }
+                });
+                Extensions.MainWindow.Status = result;
+            }
+            else
+            {
+                await Task.Run(() => {
+                    ReplaceExecutionReport report = betfair.replaceOrder(Row.MarketID, Row.BetID.ToString(), Odds, Stake);
+                    result = report.status != ExecutionReportStatusEnum.SUCCESS ? report.instructionReports[0].errorCode.ToString(): report.status.ToString();
+                });
+                Extensions.MainWindow.Status = result;
+            }
         }
         private void Window_Closing(object sender, CancelEventArgs e)
         {
