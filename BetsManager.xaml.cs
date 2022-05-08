@@ -43,23 +43,23 @@ namespace SpreadTrader
         public double OriginalStake { get; set; }
         public double Stake { get { return _Stake; } set { _Stake = value; NotifyPropertyChanged(""); } }
         public double Odds { get; set; }
-        public double DisplayOdds { get { return IsFullyMatched || IsPartiallyMatched ? AvgPriceMatched : Odds; } }
+        public double DisplayOdds { get { return Odds; } }// IsFullyMatched || IsPartiallyMatched ? AvgPriceMatched : Odds; } }
         public double DisplayStake { get {
-                if (IsFullyMatched)
-                    return Stake;
-                if (IsPartiallyMatched)
-                    return OriginalStake - Matched;
+                //if (IsFullyMatched)
+                //    return OriginalStake;
+                //if (IsPartiallyMatched)
+                //    return SizeMatched;
                 return Stake;
             } }
         public double AvgPriceMatched { get; set; }
         public double Profit { get { return Math.Round(DisplayStake * (DisplayOdds - 1), 5); } }
-        public double _Matched { get; set; }
-        public double Matched { get { return _Matched; } set { _Matched = value; NotifyPropertyChanged(""); } }
-        public bool IsMatched { get { return IsFullyMatched || IsPartiallyMatched; } }
-        public bool IsUnMatched { get { return _Matched < Stake; } }
-        public bool IsPartiallyMatched { get { return _Matched > 0 && _Matched < Stake; } }
-        public bool IsFullyMatched { get { return _Matched > 0 && _Matched >= OriginalStake; } }
-        public String IsMatchedString { get { return IsMatched ? "F" : "U"; } }
+        public double _SizeMatched { get; set; }
+        public double SizeMatched { get { return _SizeMatched; } set { _SizeMatched = value; NotifyPropertyChanged(""); } }
+        public bool IsMatched { get { return SizeMatched > 0; } }
+        //public bool IsUnMatched { get { return AvgPriceMatched == 0; } }
+        //public bool IsPartiallyMatched { get { return ; } }
+        //public bool IsFullyMatched { get { return AvgPriceMatched > 0; } }
+        public String IsMatchedString { get { return SizeMatched > 0 ? "F" : "U"; } }
         public bool IsBack { get { return Side.ToUpper() == "BACK"; } }
         private bool _Hidden = false;
         public bool Hidden { get { return _Hidden; } set { _Hidden = value; NotifyPropertyChanged(""); } }
@@ -74,18 +74,19 @@ namespace SpreadTrader
             BetID = r.BetID;
             OriginalStake = r.OriginalStake;
             SelectionID = r.SelectionID;
-            Matched = r.Matched;
+            SizeMatched = r.SizeMatched;
             MarketID = r.MarketID;
             Side = r.Side;
             Runner = r.Runner;
             Time = DateTime.Now;
         }
-        public Row(Order o)
+        public Row(Order o)         // new bet
         {
             Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
             Odds = o.P.Value;
             Stake = (Int32)o.S.Value;
             OriginalStake = Stake;
+            //AmountRemaining = Stake;
             Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
             BetID = Convert.ToUInt64(o.Id);
         }
@@ -98,12 +99,12 @@ namespace SpreadTrader
             Stake = (Int32)o.priceSize.size;
             Odds = o.priceSize.price;
             AvgPriceMatched = o.averagePriceMatched;
-            Matched = o.sizeMatched;
+            SizeMatched = o.sizeMatched;
             MarketID = o.marketId;
         }
         public override string ToString()
         {
-            return String.Format("{0},{1},{2},{3},{4}", Runner, SelectionID, Odds, Matched, BetID.ToString());
+            return String.Format("{0},{1},{2},{3},{4}", Runner, SelectionID, Odds, SizeMatched, BetID.ToString());
         }
     }
     public partial class BetsManager : UserControl, INotifyPropertyChanged
@@ -148,7 +149,7 @@ namespace SpreadTrader
             {
                 if (r.BetID == Convert.ToUInt64(id))
                 {
-                    if (!r.IsMatched)
+                    if (r.SizeMatched == 0)
                         return r;
                 }
             }
@@ -160,7 +161,7 @@ namespace SpreadTrader
             {
                 if (r.SelectionID == lr.SelectionId)
                 {
-                    if (r.IsUnMatched)
+                    if (r.SizeMatched == 0)
                         return r;
                 }
             }
@@ -256,25 +257,25 @@ namespace SpreadTrader
                                 if (o.Sm == 0 && o.Sr > 0)                          // unmatched
                                 {
                                     row.Stake = o.S.Value;
-                                    row.Matched = o.Sm.Value;
+                                    row.SizeMatched = o.Sm.Value;
                                     row.Hidden = false;
                                     Debug.WriteLine(o.Id, "unmatched");
                                 }
                                 if (o.Sm == o.S && o.Sr == 0)                       // fully matched
                                 {
-                                    row.AvgPriceMatched = o.Avp.Value;
-                                    row.Matched = o.Sm.Value;
-                                    row.Hidden = UnmatchedOnly;
                                     foreach (Row r in Rows)
                                     {
                                         if (r.BetID == Convert.ToUInt64(o.Id))
                                         {
-                                            if (r.IsPartiallyMatched)
+                                            if (r.SizeMatched > 0)
                                             {
                                                 to_remove.Add(r);
                                             }
                                         }
                                     }
+                                    row.AvgPriceMatched = o.Avp.Value;
+                                    row.SizeMatched = row.OriginalStake;// o.Sm.Value;
+                                    row.Hidden = UnmatchedOnly;
                                     if (!String.IsNullOrEmpty(props.MatchedBetAlert))
                                     {
                                         SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
@@ -284,13 +285,16 @@ namespace SpreadTrader
                                 }
                                 if (o.Sm > 0 && o.Sr > 0)                           // partially matched
                                 {
-                                    Row mrow = new Row(FindUnmatchedRow(o.Id));
-                                    mrow.Matched += o.Sm.Value;
+                                    Row mrow = new Row(row);
+                                    mrow.SizeMatched = o.Sm.Value;
                                     mrow.Odds = o.P.Value;
+                                    mrow.Stake = o.S.Value;
                                     mrow.AvgPriceMatched = o.Avp.Value;
                                     mrow.Hidden = UnmatchedOnly;
                                     Rows.Insert(0, mrow);
-                                //    row.Stake = o.S.Value;
+
+                                    row.Stake = o.Sr.Value;
+
                                     if (!String.IsNullOrEmpty(props.MatchedBetAlert))
                                     {
                                         SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
@@ -358,9 +362,9 @@ namespace SpreadTrader
         {
             Button b = sender as Button;
             Row row = b.DataContext as Row;
-            if (row.Matched >= row.Stake)
+            if (row.SizeMatched >= row.Stake)
             {
-                Status = "Bet already fully matched";
+                Status = "Bet already matched";
                 return;
             }
             if (Betfair == null)
@@ -403,9 +407,11 @@ namespace SpreadTrader
             return task.IsFaulted;
         }
         private Int32 newbetid = 44448880;
+        private double amount_remaining = 0;
         private String newbet(LiveRunner lr, Order.SideEnum side)
         {
             Int32 new_stake = 100;
+            amount_remaining = new_stake;
             DateTimeOffset now = DateTimeOffset.UtcNow;
             OrderMarketChange change = new OrderMarketChange();
 
@@ -436,6 +442,8 @@ namespace SpreadTrader
                 return "";
 
             Int32 match_stake = 10;
+            amount_remaining -= match_stake;
+
             Row r = FindUnmatchedRow(lr); 
             UInt64 betid = r.BetID;
 
@@ -455,9 +463,8 @@ namespace SpreadTrader
             o.Pd = now.ToUnixTimeMilliseconds();
             o.P = r.Odds;
             o.Avp = r.Odds;
-            lr.ngrunner.totalMatched += match_stake;
             o.Sm = match_stake;
-            o.Sr = r.OriginalStake - lr.ngrunner.totalMatched;
+            o.Sr = amount_remaining;
             o.S = match_stake;
             o.Sc = 0;
             orc.Uo.Add(o);
@@ -506,7 +513,7 @@ namespace SpreadTrader
             CheckBox cb = sender as CheckBox;
             if (Rows.Count > 0) foreach (Row row in Rows)
                 {
-                    row.Hidden = cb.IsChecked == true && row.Matched > 0;
+                    row.Hidden = cb.IsChecked == true && row.SizeMatched > 0;
                 }
         }
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
