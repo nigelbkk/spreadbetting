@@ -291,7 +291,8 @@ namespace SpreadTrader
                                     mrow.Stake = o.S.Value;
                                     mrow.AvgPriceMatched = o.Avp.Value;
                                     mrow.Hidden = UnmatchedOnly;
-                                    Rows.Insert(0, mrow);
+                                    Int32 idx = Rows.IndexOf(row);
+                                    Rows.Insert(idx+1, mrow);
 
                                     row.Stake = o.Sr.Value;
 
@@ -353,7 +354,6 @@ namespace SpreadTrader
                     catch (Exception xe)
                     {
                         Status = xe.Message;
-//                        Dispatcher.BeginInvoke(new Action(() => { Status = xe.Message; }));
                     }
                 }
             }
@@ -444,7 +444,10 @@ namespace SpreadTrader
             Int32 match_stake = 10;
             amount_remaining -= match_stake;
 
-            Row r = FindUnmatchedRow(lr); 
+            Row r = FindUnmatchedRow(lr);
+            if (r == null)
+                return null;
+
             UInt64 betid = r.BetID;
 
             DateTimeOffset now = DateTimeOffset.UtcNow;
