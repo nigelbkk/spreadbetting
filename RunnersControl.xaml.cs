@@ -311,7 +311,7 @@ namespace SpreadTrader
                 System.Threading.Thread t = new System.Threading.Thread(() =>
                 {
                     PlaceExecutionReport report = betfair.placeOrders(MarketNode.MarketID, orders);
-                    Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status;
+                    Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
                 });
                 t.Start();
             }
@@ -322,7 +322,7 @@ namespace SpreadTrader
                     System.Threading.Thread t = new System.Threading.Thread(() =>
                     {
                         PlaceExecutionReport report = betfair.placeOrder(MarketNode.MarketID, live_runner.SelectionId, sideEnum.LAY, Math.Abs(live_runner.LevelStake), live_runner.LayValues[0].price);
-                        Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status;
+                        Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
                     });
                     t.Start();
                 }
@@ -331,7 +331,7 @@ namespace SpreadTrader
                     System.Threading.Thread t = new System.Threading.Thread(() =>
                     {
                         PlaceExecutionReport report = betfair.placeOrder(MarketNode.MarketID, live_runner.SelectionId, sideEnum.BACK, Math.Abs(live_runner.LevelStake), live_runner.BackValues[0].price);
-                        Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status;
+                        Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
                     });
                     t.Start();
                 }
