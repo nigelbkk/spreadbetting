@@ -358,26 +358,40 @@ namespace SpreadTrader
                 }
             }
         }
+
+
         private void RowButton_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
             Row row = b.DataContext as Row;
-            if (row.SizeMatched >= row.Stake)
+            if (row != null)
             {
-                Status = "Bet already matched";
-                return;
+                if (row.SizeMatched >= row.Stake)
+                {
+                    Status = "Bet already matched";
+                    return;
+                }
+                if (Betfair == null)
+                {
+                    Betfair = MainWindow.Betfair;
+                }
+
+                System.Threading.Thread t = new System.Threading.Thread(() =>
+                {
+                    Debug.WriteLine("cancel {0} for {1} {2}", MarketNode.MarketID, row.BetID, row.Runner);
+                    DateTime LastUpdate = DateTime.UtcNow;
+                    CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
+                    //Status = report.errorCode != null ? report.errorCode : report.status;
+                    if (report.errorCode != null)
+                        Rows.Remove(row);
+                    MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+                });
+                t.Start();
             }
-            if (Betfair == null)
+            else
             {
-                Betfair = MainWindow.Betfair;
+                Debug.WriteLine("null context");
             }
-            Debug.WriteLine("cancel {0} for {1} {2}", MarketNode.MarketID, row.BetID, row.Runner);
-            DateTime LastUpdate = DateTime.UtcNow;
-            CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
-            Status = report.errorCode != null ? report.errorCode : report.status;
-            if (report.errorCode != null)
-                Rows.Remove(row);
-            MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
         }
         private void Connect()
         {
