@@ -160,14 +160,14 @@ namespace SpreadTrader
         }
         private void LevelProfit(LiveRunner runner1, LiveRunner runner2)
         {
-            ///NH
-            //runner1.LayValues[0].price = 1.2;
-            //runner1.BackValues[0].price = 1.23;
-            //runner1.ifWin = -42.05;
+            /////NH
+            //runner1.LayValues[0].price = 1.24;
+            //runner1.BackValues[0].price = 1.38;
+            //runner1.ifWin = -20.49;
 
-            //runner2.LayValues[0].price = 5.3;
-            //runner2.BackValues[0].price = 6.0;
-            //runner2.ifWin = 224.86;
+            //runner2.LayValues[0].price = 4.2;
+            //runner2.BackValues[0].price = 6.6;
+            //runner2.ifWin = 66.94;
 
             Double G3 = runner1.ifWin;
             Double J3 = runner2.ifWin;
@@ -207,6 +207,19 @@ namespace SpreadTrader
         }
         private void LevelProfit(LiveRunner runner1, LiveRunner runner2, LiveRunner draw)
         {
+            ///NH
+            //runner1.LayValues[0].price = 1.4;
+            //runner1.BackValues[0].price = 2.48;
+            //runner1.ifWin = -36.22;
+
+            //runner2.LayValues[0].price = 1.8;
+            //runner2.BackValues[0].price = 3.9;
+            //runner2.ifWin = 296.25;
+
+            //draw.LayValues[0].price = 26;
+            //draw.BackValues[0].price = 38;
+            //draw.ifWin = 296.25;
+
             Double D5 = runner1.ifWin;
             Double E5 = runner2.ifWin;
             Double F5 = draw.ifWin;
@@ -214,15 +227,6 @@ namespace SpreadTrader
             Double D8 = D5 < 0 ? runner1.LayValues[0].price : runner1.BackValues[0].price;
             Double E8 = E5 < 0 ? runner2.LayValues[0].price : runner2.BackValues[0].price;
             Double F8 = F5 < 0 ? draw.LayValues[0].price : draw.BackValues[0].price;
-
-            ///NH
-            //D5 = -14.9;
-            //E5 = 7.84;
-            //F5 = 7.84;
-
-            //D8 = 2.92;
-            //E8 = 7.8;
-            //F8 = 1.89;
 
             Double F11 = (F5 - D5) / D8;
             Double F12 = (F5 - E5) / E8;
