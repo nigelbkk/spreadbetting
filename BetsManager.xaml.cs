@@ -135,7 +135,8 @@ namespace SpreadTrader
         private String _Status = "Ready";
         public String Status { get { return _Status; } set { 
                 _Status = value;
-                Extensions.MainWindow.Status = value;
+                Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = value; }));
+                //Extensions.MainWindow.Status = value;
             } }
         private bool _Connected { get { return !String.IsNullOrEmpty(hubConnection.ConnectionId); } }
         public bool IsConnected { get { return _Connected; } }
@@ -320,7 +321,8 @@ namespace SpreadTrader
             }
             catch (Exception xe)
             {
-                Debug.WriteLine(xe.Message);
+                Status = xe.Message;
+                //Debug.WriteLine(xe.Message);
             }
         }
         private void PopulateDataGrid()
@@ -376,17 +378,33 @@ namespace SpreadTrader
                     Betfair = MainWindow.Betfair;
                 }
 
-                System.Threading.Thread t = new System.Threading.Thread(() =>
-                {
-                    Debug.WriteLine("cancel {0} for {1} {2}", MarketNode.MarketID, row.BetID, row.Runner);
-                    DateTime LastUpdate = DateTime.UtcNow;
-                    CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
-                    //Status = report.errorCode != null ? report.errorCode : report.status;
-                    if (report.errorCode != null)
-                        Rows.Remove(row);
-                    MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-                });
-                t.Start();
+                Debug.WriteLine("submit cancel {0} for {1} {2}", MarketNode.MarketID, row.BetID, row.Runner);
+                DateTime LastUpdate = DateTime.UtcNow;
+                CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
+                Status = report.errorCode != null ? report.errorCode : report.status;
+                if (report.errorCode != null)
+                    Rows.Remove(row);
+                MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+
+
+                //System.Threading.Thread t = new System.Threading.Thread(() =>
+                //{
+                //    try
+                //    {
+                //        Debug.WriteLine("submit cancel {0} for {1} {2}", MarketNode.MarketID, row.BetID, row.Runner);
+                //        DateTime LastUpdate = DateTime.UtcNow;
+                //        CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
+                //        Status = report.errorCode != null ? report.errorCode : report.status;
+                //        if (report.errorCode != null)
+                //            Rows.Remove(row);
+                //        MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+                //    }
+                //    catch(Exception xe)
+                //    {
+                //        Status = xe.Message;
+                //    }
+                //});
+                //t.Start();
             }
             else
             {
