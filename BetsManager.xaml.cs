@@ -378,6 +378,11 @@ namespace SpreadTrader
                     Betfair = MainWindow.Betfair;
                 }
 
+                if (row.IsMatched)
+                {
+                    Debug.WriteLine("bet already matched");
+                    return;
+                }
                 Debug.WriteLine("submit cancel {0} for {1} {2}", MarketNode.MarketID, row.BetID, row.Runner);
                 DateTime LastUpdate = DateTime.UtcNow;
                 CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
