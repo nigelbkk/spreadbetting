@@ -29,7 +29,7 @@
             
             <Button Margin="30,0,0,0" Tag="CancelAll"  Click="Button_Click">Cancel All Bets</Button>
 			<CheckBox Margin="16,0,0,0" IsChecked="{Binding Path=UnmatchedOnly}" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" >Unmatched only</CheckBox>
-			<Button Margin="10,0,0,0" Tag="Stream" Click="Button_Click" Content="{Binding Path=StreamingButtonText}"/>
+			<Button Margin="10,0,0,0" Tag="Stream" Visibility="Collapsed" Click="Button_Click" Content="{Binding Path=StreamingButtonText}"/>
 			<TextBlock Margin="4,0,0,0" Text="Active" Padding="5,7,8,8" Background="{Binding Path=StreamingColor}"/>
 			<TextBlock Text	="Status: " Padding="7,8" />
 			<TextBox TextWrapping="Wrap" Text="{Binding Path=DebugID}" Visibility="Hidden" HorizontalContentAlignment="Center" />

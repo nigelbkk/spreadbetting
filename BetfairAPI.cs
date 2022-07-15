@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Windows.Data.Json;
 
 namespace BetfairAPI
 {
@@ -65,11 +66,18 @@ namespace BetfairAPI
                 using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
                 {
                     var jsonResponse = reader.ReadToEnd();
-                    var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
-                    if (err != null)
+                    try
                     {
-                        ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
-                        throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
+                        var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
+                        if (err != null)
+                        {
+                            ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
+                            throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
+                        }
+                    }
+                    catch(Exception xe)
+                    {
+                        throw new Exception(jsonResponse);
                     }
                     String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
                     return JsonConvert.DeserializeObject<T>(res);
