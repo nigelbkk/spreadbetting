@@ -307,16 +307,19 @@ namespace SpreadTrader
         public void PopulateEventTypes()
         {
             EventTypes = Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList();
-            foreach (EventTypeResult ev in EventTypes)
+            if (EventTypes != null)
             {
-                if (Favourites.IsFavourite(ev.eventType.id))
+                foreach (EventTypeResult ev in EventTypes)
                 {
-                    NodeViewModel nvm = new NodeViewModel(ev.eventType.name) { ID = ev.eventType.id };
-                    nvm.Populate = nvm.PopulateCompetitionsOrCountries;
-                    Add(nvm);
+                    if (Favourites.IsFavourite(ev.eventType.id))
+                    {
+                        NodeViewModel nvm = new NodeViewModel(ev.eventType.name) { ID = ev.eventType.id };
+                        nvm.Populate = nvm.PopulateCompetitionsOrCountries;
+                        Add(nvm);
+                    }
                 }
+                Populate = PopulateCompetitionsOrCountries;
             }
-            Populate = PopulateCompetitionsOrCountries;
         }
         public void PopulateEvents()
         {

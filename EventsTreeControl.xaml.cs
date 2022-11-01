@@ -10,6 +10,16 @@ namespace SpreadTrader
         {
             InitializeComponent();
         }
+        public String Status
+        {
+//            get { return _Status; }
+            set
+            {
+//                _Status = value;
+                Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = value; }));
+                //Extensions.MainWindow.Status = value;
+            }
+        }
         public MarketSelectionDelegate OnMarketSelected;
         public NodeViewModel RootNode { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -39,8 +49,15 @@ namespace SpreadTrader
         }
         private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            Populate();
-            NotifyPropertyChanged("");
+            try
+            {
+                Populate();
+                NotifyPropertyChanged("");
+            }
+            catch(Exception xe)
+            {
+                Status = xe.Message;
+            }
         }
     }
 }
