@@ -7,9 +7,11 @@ using System.Windows.Controls;
 namespace SpreadTrader
 {
     public delegate void FavoriteChangedDelegate(LiveRunner runner);
+    
     public partial class SliderControl : UserControl, INotifyPropertyChanged
     {
-        public SubmitBetsDelegate SubmitBets = null;
+        public SubmitBetsDelegate OnSubmitBets = null;
+        public FavoriteChangedDelegate OnFavoriteChanged = null;
 
         private BetfairPrices betfairPrices = new BetfairPrices();
         private Int32 base_index
@@ -21,6 +23,8 @@ namespace SpreadTrader
                 return Math.Min(b, 338);
             }
         }
+        public LiveRunner Favorite { get; set; }
+        public bool FavoriteSelected { get { return Favorite != null;   } }
         public double CutStakes { get; set; }
         public double MoveBack { get; set; }
         public double MoveLay { get; set; }
@@ -49,6 +53,17 @@ namespace SpreadTrader
             }
             BasePrice = props.BasePrice;
             InitializeComponent();
+
+            OnFavoriteChanged += (runner) =>
+            {
+                // set last traded price to the grid and recenter the sliders	
+                Favorite = runner;
+                NotifyPropertyChanged("");
+                BasePrice = runner.LastPriceTraded;
+                MoveBack = 10;
+                MoveLay = 22;
+                SyncPrices();
+            };
         }
         private double _BasePrice;
         public double BasePrice { get { return _BasePrice; } set { _BasePrice = Math.Max(value, 1.10); } }
@@ -109,11 +124,14 @@ namespace SpreadTrader
                     case "-": BasePrice = betfairPrices.Previous(BasePrice); break;
                     case "+": BasePrice = betfairPrices.Next(BasePrice); break;
                     case "Execute":
-                        if (SubmitBets != null)
+                        if (OnSubmitBets != null)
                         {
                             try
                             {
-                                SubmitBets(LayValues, BackValues);
+                                if (Favorite != null)
+                                {
+                                   OnSubmitBets(Favorite, LayValues, BackValues);
+                                }
                             }
                             catch (Exception xe)
                             {
@@ -127,14 +145,17 @@ namespace SpreadTrader
                 SyncPrices();
             }
         }
-        public void OnFavoriteChanged(LiveRunner runner)
-        {
-            // set last traded price to the grid and recenter the sliders		
-            BasePrice = runner.LastPriceTraded;
-            MoveBack = 10;
-            MoveLay = 22;
-            SyncPrices();
-        }
+
+        //public void OnFavoriteChanged(LiveRunner runner)
+        //{
+        //    // set last traded price to the grid and recenter the sliders	
+        //    Favorite = runner;
+        //    NotifyPropertyChanged("");
+        //    BasePrice = runner.LastPriceTraded;
+        //    MoveBack = 10;
+        //    MoveLay = 22;
+        //    SyncPrices();
+        //}
         private void Slider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             MoveStakes((Int32)e.NewValue, (Int32)e.OldValue);

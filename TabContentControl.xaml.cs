@@ -9,6 +9,9 @@ namespace SpreadTrader
         {
             InitializeComponent();
             BetsManager.RunnersControl = RunnersControl;
+            SliderControl.OnSubmitBets += BetsManager.OnSubmitBets;
+            RunnersControl.OnFavoriteChanged += BetsManager.OnFavoriteChanged;
+            RunnersControl.OnFavoriteChanged += SliderControl.OnFavoriteChanged;
             OnMarketSelected += (node) =>
             {
                 RunnersControl.OnMarketSelected(node);

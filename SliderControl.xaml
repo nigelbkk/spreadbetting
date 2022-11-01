@@ -60,7 +60,7 @@
 						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
 					<CheckBox Grid.Column="0" Content="Auto Back/Lay" IsChecked="{Binding Path=AutoBackLay}" Margin="8,8,0,0"/>
-					<Button Grid.Column="1" Content="Execute Bets" Tag ="Execute" Background="OrangeRed" Foreground="White"/>
+                    <Button Grid.Column="1" Content="Execute Bets" Tag ="Execute" IsEnabled ="{Binding Path=FavoriteSelected}" Background="OrangeRed" Foreground="White"/>
 				</Grid>
 				
 				<Grid>

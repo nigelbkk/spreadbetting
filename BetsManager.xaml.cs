@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Media;
+using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -112,6 +113,8 @@ namespace SpreadTrader
         private Properties.Settings props = Properties.Settings.Default;
         public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
         public MarketSelectionDelegate OnMarketSelected;
+        public FavoriteChangedDelegate OnFavoriteChanged;
+        public SubmitBetsDelegate OnSubmitBets;
         public RunnersControl RunnersControl { get; set; }
         public ObservableCollection<Row> Rows { get; set; }
         private NodeViewModel MarketNode { get; set; }
@@ -203,6 +206,41 @@ namespace SpreadTrader
 
             Rows = new ObservableCollection<Row>();
             InitializeComponent();
+
+            OnSubmitBets += (runner, a, b) =>
+            {
+                String MarketID  = MarketNode.MarketID;
+                long Selection = runner.SelectionId;
+
+                StringBuilder sb = new StringBuilder(String.Format("Back: {0} for {1:c} at ", runner.Name, a[0].size));
+
+                foreach (PriceSize p in a)
+                {
+                    sb.AppendFormat("{0:0.00}, ", p.price);
+                }
+                Debug.WriteLine(sb.ToString().TrimEnd(' ').TrimEnd(','));
+
+                sb = new StringBuilder(String.Format("Lay : {0} for {1:c} at ", runner.Name, a[0].size));
+
+                foreach (PriceSize p in b)
+                {
+                    sb.AppendFormat("{0:0.00}, ", p.price);
+                }
+                Debug.WriteLine(sb.ToString().TrimEnd(' ').TrimEnd(','));
+
+                //System.Threading.Thread t = new System.Threading.Thread(() =>
+                //{
+                //  PlaceExecutionReport report = Betfair.placeOrder(MarketNode.MarketID, SelectionId, sideEnum.LAY, Stake, a[0].price);
+                //});
+                //t.Start();
+            };
+
+            OnFavoriteChanged += (runner) =>
+            {
+                //Debug.WriteLine("OnFavoriteChanged");
+               // Favorite = runner;
+            };
+            
             OnMarketSelected += (node) =>
             {
                 if (IsLoaded)
@@ -360,8 +398,6 @@ namespace SpreadTrader
                 }
             }
         }
-
-
         private void RowButton_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;

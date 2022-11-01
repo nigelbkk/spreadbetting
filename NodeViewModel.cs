@@ -81,7 +81,7 @@ namespace SpreadTrader
                 Status = Market.MarketBook.status;
                 if (Market.MarketBook.Runners.Count > 0) foreach (Runner r in Market.MarketBook.Runners)
                 {
-                    if (pl.Count > 0)
+                    if (pl != null && pl.Count > 0)
                     {
                         if (pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
                         {

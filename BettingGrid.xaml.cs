@@ -4,7 +4,8 @@ using System.Windows.Media;
 
 namespace SpreadTrader
 {
-    public delegate void SubmitBetsDelegate(PriceSize[] a, PriceSize[] b);
+    public delegate void SubmitBetsDelegate(LiveRunner runner, PriceSize[] a, PriceSize[] b);
+
     public partial class BettingGrid : UserControl
     {
         private bool _BackActive { get; set; }
