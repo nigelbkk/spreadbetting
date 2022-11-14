@@ -22,6 +22,7 @@ namespace BetfairAPI
             {"DSC-0036", "InvalidCredentials"},
             {"DSC-0037", "SubscriptionRequired"},
             {"DSC-0038", "OperationForbidden"},
+            {"AANGX-0002", "Invalid Session Information"},
             {"ANGX-0003", "Invalid Session Information"},
             {"ANGX-0006", "Exchange Error"}
         };

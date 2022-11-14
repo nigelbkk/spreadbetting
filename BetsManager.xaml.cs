@@ -207,22 +207,22 @@ namespace SpreadTrader
             Rows = new ObservableCollection<Row>();
             InitializeComponent();
 
-            OnSubmitBets += (runner, a, b) =>
+            OnSubmitBets += (runner, lay, back) =>
             {
                 String MarketID  = MarketNode.MarketID;
                 long Selection = runner.SelectionId;
 
-                StringBuilder sb = new StringBuilder(String.Format("Back: {0} for {1:c} at ", runner.Name, a[0].size));
+                StringBuilder sb = new StringBuilder(String.Format("Back: {0} for {1:c} at ", runner.Name, back[0].size));
 
-                foreach (PriceSize p in a)
+                foreach (PriceSize p in back)
                 {
                     sb.AppendFormat("{0:0.00}, ", p.price);
                 }
                 Debug.WriteLine(sb.ToString().TrimEnd(' ').TrimEnd(','));
 
-                sb = new StringBuilder(String.Format("Lay : {0} for {1:c} at ", runner.Name, a[0].size));
+                sb = new StringBuilder(String.Format("Lay : {0} for {1:c} at ", runner.Name, lay[0].size));
 
-                foreach (PriceSize p in b)
+                foreach (PriceSize p in lay)
                 {
                     sb.AppendFormat("{0:0.00}, ", p.price);
                 }
