@@ -51,7 +51,7 @@ namespace SpreadTrader
             }
             this.MarketId = MarketId;
             InitializeComponent();
-            UpDown.Value = Odds;
+            UpDown._Value = Odds;
             FocusManager.SetFocusedElement(DockPanel, Submit_button);
             IInputElement focusedElement = FocusManager.GetFocusedElement(DockPanel);
         }
@@ -60,7 +60,7 @@ namespace SpreadTrader
             BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
             Button b = sender as Button;
             String cs = b.Content as String;
-            Odds = UpDown.Value;
+            Odds = UpDown._Value;
             if (cs != null)
             {
                 if (cs == "Close")

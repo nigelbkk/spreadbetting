@@ -9,6 +9,8 @@
 	        d:DesignHeight="43.333" d:DesignWidth="127.333" Loaded="UserControl_Loaded">
 	<UserControl.Resources>
 
+        <!--, StringFormat={}{0:N2}-->
+
 	</UserControl.Resources>
 	<Grid>
 		<Grid.ColumnDefinitions>

@@ -12,8 +12,15 @@ namespace SpreadTrader
 {
     public partial class UpDownControl : UserControl, INotifyPropertyChanged
     {
+        private String SValue { get; set; }
         public double _Value { get; set; }
-        public double Value { get { return _Value; } set { _Value = value; NotifyPropertyChanged(""); } }
+        public String Value {
+            get {
+                return SValue; } 
+            set { SValue = value;
+                NotifyPropertyChanged("");             
+            } 
+        }
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(String info)
         {
@@ -31,46 +38,65 @@ namespace SpreadTrader
         {
             TextBox tb = sender as TextBox;
             double d = 0;
+            String cs = tb.Text;
 
-            if (Double.TryParse(tb.Text, out d))
+            if (cs.EndsWith("."))
+                cs += "0";
+
+            if (Double.TryParse(cs, out d))
             {
-                Value = d;
+                _Value = d;
             }
-            NotifyPropertyChanged("");
-            //Debug.WriteLine(Value, "tb");
         }
         private BetfairPrices betfairPrices = new BetfairPrices();
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            tb.SelectAll();
         }
         private void Up_Click(object sender, RoutedEventArgs e)
         {
-            Debug.Write(".");
             RepeatButton b = sender as RepeatButton;
             switch (b.Name)
             {
-                case "Up": Value = betfairPrices.Next(Value); break;
-                case "Down": Value = betfairPrices.Previous(Value); break;
+                case "Up": _Value = betfairPrices.Next(_Value); break;
+                case "Down": _Value = betfairPrices.Previous(_Value); break;
                 default: return;
             }
-            NotifyPropertyChanged("");
         }
         private void tb_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            BetfairPrices betfairPrices = new BetfairPrices();
             switch (e.Key)
             {
+                case Key.OemPeriod:
+                    String cs = tb.Text;
+
+                    if (!cs.Contains("."))
+                    {
+                        cs += ".0";
+                    }
+
+                    Int32 idx = cs.IndexOf('.');
+                    if (idx < 0)
+                    {
+                        idx = cs.Length;
+                    }
+                    tb.Text = cs;
+                    _Value = Convert.ToDouble(cs);
+                    tb.CaretIndex = idx + 1;
+
+                    e.Handled = true;
+                    break;
                 case Key.Up:
-                    Value = betfairPrices.Next(Value);
+                    _Value = betfairPrices.Next(_Value);
                     e.Handled = true;
                     break;
                 case Key.Down:
-                    Value = betfairPrices.Previous(Value);
+                    _Value = betfairPrices.Previous(_Value);
                     e.Handled = true;
                     break;
             }
-            NotifyPropertyChanged("");
+            Debug.WriteLine(tb.CaretIndex);
         }
     }
 }

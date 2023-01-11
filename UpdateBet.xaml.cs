@@ -38,7 +38,7 @@ namespace SpreadTrader
             BetReference = "Bet Reference: " + row.BetID;
             OriginalStake = Stake = (Int32)row.Stake;
             Odds = row.Odds;
-            UpDownOdds.Value = Odds;
+            UpDownOdds._Value = Odds;
             UpDownStake.Value = (short)Stake;
             NotifyPropertyChanged("");
         }
@@ -48,7 +48,7 @@ namespace SpreadTrader
         }
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            Odds = UpDownOdds.Value;
+            Odds = UpDownOdds._Value;
             Stake = UpDownStake.Value.Value;
 
             BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
@@ -119,7 +119,7 @@ namespace SpreadTrader
                 case Key.Return: Button_Click_1(Update, null); break;
                 case Key.Escape: Close(); break;
             }
-            UpDownOdds.Value = Odds;
+            UpDownOdds._Value = Odds;
             UpDownStake.Value = Stake;
             e.Handled = true;
             if ((e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9) || e.Key == Key.Decimal)
