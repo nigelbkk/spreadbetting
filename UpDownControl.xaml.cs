@@ -52,6 +52,7 @@ namespace SpreadTrader
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            tb.Text = _Value.ToString();
             tb.SelectAll();
         }
         private void Up_Click(object sender, RoutedEventArgs e)
@@ -59,44 +60,31 @@ namespace SpreadTrader
             RepeatButton b = sender as RepeatButton;
             switch (b.Name)
             {
-                case "Up": _Value = betfairPrices.Next(_Value); break;
-                case "Down": _Value = betfairPrices.Previous(_Value); break;
+                case "Up": 
+                    _Value = betfairPrices.Next(_Value);
+                    break;
+                case "Down": 
+                    _Value = betfairPrices.Previous(_Value);
+                    break;
                 default: return;
             }
+            SValue = _Value.ToString();
+            NotifyPropertyChanged("");
+            e.Handled = true;
         }
         private void tb_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            Int32 caret = tb.CaretIndex;
             switch (e.Key)
             {
-                case Key.OemPeriod:
-                    String cs = tb.Text;
-
-                    if (!cs.Contains("."))
-                    {
-                        cs += ".0";
-                    }
-
-                    Int32 idx = cs.IndexOf('.');
-                    if (idx < 0)
-                    {
-                        idx = cs.Length;
-                    }
-                    tb.Text = cs;
-                    _Value = Convert.ToDouble(cs);
-                    tb.CaretIndex = idx + 1;
-
-                    e.Handled = true;
-                    break;
-                case Key.Up:
-                    _Value = betfairPrices.Next(_Value);
-                    e.Handled = true;
-                    break;
-                case Key.Down:
-                    _Value = betfairPrices.Previous(_Value);
-                    e.Handled = true;
-                    break;
+                case Key.Up: _Value = betfairPrices.Next(_Value); break;
+                case Key.Down:  _Value = betfairPrices.Previous(_Value);break;
+                default: return;
             }
-            Debug.WriteLine(tb.CaretIndex);
+            SValue = _Value.ToString();
+            NotifyPropertyChanged("");
+            e.Handled = true;
+            tb.CaretIndex = caret;
         }
     }
 }
