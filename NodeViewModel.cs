@@ -17,7 +17,7 @@ namespace SpreadTrader
         private double _TotalMatched { get; set; }
         private double _BackBook { get; set; }
         private double _LayBook { get; set; }
-        public double TotalMatched { get { return _TotalMatched; } set { _TotalMatched = value; OnPropertyChanged(""); } }
+        public double TotalMatched { get { return _TotalMatched; } set { _TotalMatched = value; /*OnPropertyChanged("");*/ } }
         public double BackBook { get { return _BackBook; } set { _BackBook = value; OnPropertyChanged(""); } }
         public double LayBook { get { return _LayBook; } set { _LayBook = value; OnPropertyChanged(""); } }
         public bool InPlay { get; set; }
@@ -115,6 +115,7 @@ namespace SpreadTrader
             CalculateLevelProfit();
             return Runners;
         }
+
         private void OnItemSelected()
         {
             if (Market != null)

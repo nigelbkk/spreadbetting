@@ -29,6 +29,7 @@ namespace SpreadTrader
         public UpdateBet(Row row)
         {
             InitializeComponent();
+
             if (props.BRLeft >= 0 && props.BRTop >= 0)
             {
                 Top = props.BRTop + Application.Current.MainWindow.Top;
@@ -38,9 +39,11 @@ namespace SpreadTrader
             BetReference = "Bet Reference: " + row.BetID;
             OriginalStake = Stake = (Int32)row.Stake;
             Odds = row.Odds;
+
             UpDownOdds._Value = Odds;
             UpDownStake.Value = (short)Stake;
-            NotifyPropertyChanged("");
+            FocusManager.SetFocusedElement(Grid, UpDownOdds);
+            IInputElement focusedElement = FocusManager.GetFocusedElement(Grid);
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -101,6 +104,14 @@ namespace SpreadTrader
 
             return (value - 10) - (value % 10);
         }
+        private void Grid_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+            }
+            NotifyPropertyChanged("");
+        }
+
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             BetfairPrices betfairPrices = new BetfairPrices();
@@ -121,9 +132,9 @@ namespace SpreadTrader
             }
             UpDownOdds._Value = Odds;
             UpDownStake.Value = Stake;
-            e.Handled = true;
-            if ((e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9) || e.Key == Key.Decimal)
-                e.Handled = false;
+            //e.Handled = true;
+            //if ((e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9) || e.Key == Key.Decimal)
+            //    e.Handled = false;
             NotifyPropertyChanged("");
         }
     }

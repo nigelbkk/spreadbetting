@@ -54,6 +54,7 @@ namespace SpreadTrader
         {
             tb.Text = _Value.ToString();
             tb.SelectAll();
+            Debug.WriteLine(tb.SelectedText);
         }
         private void Up_Click(object sender, RoutedEventArgs e)
         {
@@ -72,6 +73,9 @@ namespace SpreadTrader
             NotifyPropertyChanged("");
             e.Handled = true;
         }
+
+        
+
         private void tb_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             Int32 caret = tb.CaretIndex;
