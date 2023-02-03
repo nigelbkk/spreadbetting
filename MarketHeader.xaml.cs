@@ -10,8 +10,15 @@ namespace SpreadTrader
     public partial class MarketHeader : UserControl, INotifyPropertyChanged
     {
         public MarketSelectionDelegate OnMarketSelected;
-        public TabContentControl TabContent { get; set; }
-        public NodeViewModel MarketNode { get; set; }
+        public TabContent TabContent { get; set; }
+        public String FullName { get {
+                if (TabContent?.MarketNode != null)
+                {
+                    Debug.WriteLine(TabContent?.MarketNode.FullName);
+                }
+                return TabContent?.MarketNode.FullName; 
+            } }
+//        public NodeViewModel MarketNode { get { return TabContent?.MarketNode;} }
         public Visibility up_visible { get; set; }
         public Visibility down_visible { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -26,14 +33,8 @@ namespace SpreadTrader
         public MarketHeader()
         {
             InitializeComponent();
-            OnMarketSelected += (node) =>
-            {
-                MarketNode = node;
-                NotifyPropertyChanged("");
-            };
             up_visible = Visibility.Visible;
             down_visible = Visibility.Collapsed;
-            NotifyPropertyChanged("");
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -42,7 +43,9 @@ namespace SpreadTrader
             {
                 switch (b.Tag)
                 {
-                    case "Market Description": new MarketDescription(this, b, MarketNode).ShowDialog(); break;
+                    case "Market Description": 
+                        //new MarketDescription(this, b, MarketNode).ShowDialog(); 
+                        break;
                     case "Hide Grid":
                         down_visible = TabContent.BettingGrid.Visibility;
                         up_visible = TabContent.BettingGrid.Visibility = TabContent.BettingGrid.Visibility == Visibility.Collapsed ? Visibility.Visible : Visibility.Collapsed;

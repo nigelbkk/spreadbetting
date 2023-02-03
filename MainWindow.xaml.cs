@@ -99,16 +99,17 @@ namespace SpreadTrader
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            AppendNewTab();
+            AppendNewTab("first");
         }
-        private void AppendNewTab()
+        private void AppendNewTab(String title)
         {
-            ClosableTab tab = new ClosableTab();
-            TabContentControl tc = tab.Content as TabContentControl;
-            EventsTree.OnMarketSelected += tc.OnMarketSelected;
-            EventsTree.OnMarketSelected += tab.OnMarketSelected;
+            TabItem tab = new TabItem();
+            tab.Header = String.Format("new header {0}", TabControl.Items.Count);
+            TabContent tabContent = new TabContent(tab);
+            tabContent.tabItem = tab;
 
-            tab.Title = "New Market";
+            tab.Content = tabContent;
+            EventsTree.OnMarketSelected += tabContent.OnMarketSelected;
 
             TabControl.Items.Insert(0, tab);
             tab.Focus();
@@ -121,11 +122,6 @@ namespace SpreadTrader
             {
                 OnShutdown();
             };
-        }
-        private void OnNewTab(object sender, MouseButtonEventArgs e)
-        {
-            AppendNewTab();
-            e.Handled = true;
         }
         private void OnUpdateAccount(object sender, MouseButtonEventArgs e)
         {
@@ -147,24 +143,26 @@ namespace SpreadTrader
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             TabControl tc = sender as TabControl;
-            TabContentControl tcc = tc.SelectedContent as TabContentControl;
+            TabContent tcc = tc.SelectedContent as TabContent;
 
             var selected = tc.SelectedItem;
-            //            NotifyPropertyChanged("");
+            NotifyPropertyChanged("");
 
             if (e.AddedItems.Count > 0 && e.RemovedItems.Count > 0)
             {
-                ClosableTab ctold = e.RemovedItems[0] as ClosableTab;
-                ClosableTab ctnew = e.AddedItems[0] as ClosableTab;
-                var tccold = ctold.Content as TabContentControl;
-                var mhold = tccold.MarketHeader.MarketNode;
-                var tccnew = ctnew.Content as TabContentControl;
-                var mhnew = tccnew.MarketHeader.MarketNode;
-
-                
-
-        //        tccnew.OnMarketSelected(tcc.MarketHeader.MarketNode);
+                var tcc2 = e.AddedItems[0];
+                var ctnew = e.AddedItems[0] as TabItem;
+                var tcnew = ctnew.Content;
+                //tcc.tabItem.Header = tcc?.MarketName;
+                //var v = tcc?.MarketName;
             }
+        }
+
+        private void TabItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var item= sender as TabItem;
+            var parent = item.Parent as TabControl;
+            AppendNewTab("awooga");
         }
     }
 }
