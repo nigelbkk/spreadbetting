@@ -71,7 +71,7 @@
 					</Grid>
 
 					<Grid Grid.Column="1" Name="RightGrid">
-						<TabControl Name ="TabControl">
+						<TabControl Name ="TabControl" SelectionChanged="TabControl_SelectionChanged" >
 							<local:ClosableTab Header="+" PreviewMouseDown="OnNewTab"/>
 						</TabControl>
 					</Grid>

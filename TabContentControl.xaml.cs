@@ -15,7 +15,11 @@ namespace SpreadTrader
             OnMarketSelected += (node) =>
             {
                 RunnersControl.OnMarketSelected(node);
-                MarketHeader.OnMarketSelected(node);
+//                MarketHeader.OnMarketSelected(node);
+
+                MarketHeader.MarketNode = node;
+
+                var mhc = MarketHeader.MarketNode;
                 BetsManager.OnMarketSelected(node);
             };
             MarketHeader.TabContent = this;

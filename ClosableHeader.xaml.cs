@@ -9,7 +9,16 @@ namespace SpreadTrader
     {
         public MarketSelectionDelegate OnMarketSelected;
         public StreamUpdateDelegate StreamUpdateEventSink = null;
-        public string Title { set { ((ClosableHeader)this.Header).Label.Content = value; } }
+        public string Title { 
+            set 
+            { 
+                ((ClosableHeader)this.Header).Label.Content = value; 
+            }
+            get
+            {
+                return ((ClosableHeader)this.Header).Label.Content.ToString();
+            }
+        }
         public ClosableTab()
         {
             ClosableHeader OurHeader = new ClosableHeader();

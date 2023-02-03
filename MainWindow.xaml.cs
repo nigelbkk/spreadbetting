@@ -144,5 +144,27 @@ namespace SpreadTrader
             props.Height = this.Height;
             props.Save();
         }
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TabControl tc = sender as TabControl;
+            TabContentControl tcc = tc.SelectedContent as TabContentControl;
+
+            var selected = tc.SelectedItem;
+            //            NotifyPropertyChanged("");
+
+            if (e.AddedItems.Count > 0 && e.RemovedItems.Count > 0)
+            {
+                ClosableTab ctold = e.RemovedItems[0] as ClosableTab;
+                ClosableTab ctnew = e.AddedItems[0] as ClosableTab;
+                var tccold = ctold.Content as TabContentControl;
+                var mhold = tccold.MarketHeader.MarketNode;
+                var tccnew = ctnew.Content as TabContentControl;
+                var mhnew = tccnew.MarketHeader.MarketNode;
+
+                
+
+        //        tccnew.OnMarketSelected(tcc.MarketHeader.MarketNode);
+            }
+        }
     }
 }
