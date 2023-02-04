@@ -11,14 +11,12 @@ namespace SpreadTrader
     {
         public MarketSelectionDelegate OnMarketSelected;
         public TabContent TabContent { get; set; }
-        public String FullName { get {
-                if (TabContent?.MarketNode != null)
-                {
-                    Debug.WriteLine(TabContent?.MarketNode.FullName);
-                }
-                return TabContent?.MarketNode.FullName; 
-            } }
-//        public NodeViewModel MarketNode { get { return TabContent?.MarketNode;} }
+        public String FullName { get { return TabContent == null ? "No market selected" : TabContent?.MarketName; } }
+        public String TimeToGo { get { return TabContent == null ? "" : TabContent.MarketNode.TimeToGo;  } }
+        public double TurnaroundTime { get { return TabContent == null ? 0 :  TabContent.MarketNode.TurnaroundTime; } }
+        public Int32 UpdateRate { get { return TabContent == null ? 0 : TabContent.MarketNode.UpdateRate; } }
+        public Double? TotalMatched { get { return TabContent == null ? 0 : TabContent?.TotalMatched; } }
+        
         public Visibility up_visible { get; set; }
         public Visibility down_visible { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;

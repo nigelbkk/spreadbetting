@@ -114,6 +114,9 @@
     <Compile Include="BettingGrid.xaml.cs">
       <DependentUpon>BettingGrid.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CustomTabHeader.xaml.cs">
+      <DependentUpon>CustomTabHeader.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TabHeader.xaml.cs">
       <DependentUpon>TabHeader.xaml</DependentUpon>
     </Compile>
@@ -165,6 +168,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BettingGrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CustomTabHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

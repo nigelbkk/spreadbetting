@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -101,18 +102,37 @@ namespace SpreadTrader
         {
             AppendNewTab("first");
         }
+        public void RemoveTab(CustomTabHeader e)
+        {
+            TabControl.Items.Remove(e.Tab);
+            TabContent tabContent = e.Tab.Content as TabContent;
+            EventsTree.OnMarketSelected -= tabContent.OnMarketSelected;
+            e.Tab.Content = null;
+        }
         private void AppendNewTab(String title)
         {
-            TabItem tab = new TabItem();
-            tab.Header = String.Format("new header {0}", TabControl.Items.Count);
-            TabContent tabContent = new TabContent(tab);
-            tabContent.tabItem = tab;
+            CustomTabHeader customTabHeader = new CustomTabHeader();
+            customTabHeader.mainWindow = this;
+            customTabHeader.Title = String.Format("Tab {0}", TabControl.Items.Count);
+            customTabHeader.ID = TabControl.Items.Count;
 
+            TabItem tab = new TabItem();
+            tab.PreviewMouseDown += TabItem_PreviewMouseDown2;
+            tab.Header = customTabHeader;
+
+            TabContent tabContent = new TabContent(customTabHeader);
+            tabContent.mainWindow = this;
+            tabContent.customHeader = customTabHeader;
             tab.Content = tabContent;
+
+            customTabHeader.Tab = tab;
+
             EventsTree.OnMarketSelected += tabContent.OnMarketSelected;
 
+            tab.IsSelected = true;
             TabControl.Items.Insert(0, tab);
-            tab.Focus();
+            TabControl.UpdateLayout();
+            Dispatcher.BeginInvoke(new Action(() => { tab.Focus(); }));
             NotifyPropertyChanged("");
         }
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -143,26 +163,27 @@ namespace SpreadTrader
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             TabControl tc = sender as TabControl;
-            TabContent tcc = tc.SelectedContent as TabContent;
-
-            var selected = tc.SelectedItem;
-            NotifyPropertyChanged("");
-
-            if (e.AddedItems.Count > 0 && e.RemovedItems.Count > 0)
-            {
-                var tcc2 = e.AddedItems[0];
-                var ctnew = e.AddedItems[0] as TabItem;
-                var tcnew = ctnew.Content;
-                //tcc.tabItem.Header = tcc?.MarketName;
-                //var v = tcc?.MarketName;
-            }
         }
-
         private void TabItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            var item= sender as TabItem;
+            var item = sender as TabItem;
             var parent = item.Parent as TabControl;
-            AppendNewTab("awooga");
+            AppendNewTab("");
+        }
+        private void TabItem_PreviewMouseDown2(object sender, MouseButtonEventArgs e)
+        {
+            var item = sender as TabItem;
+            var parent = item.Parent as TabControl;
+        }
+        private void TabControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            TabControl tc = sender as TabControl;
+            tc.Items.Remove(tc.SelectedItem);
+        }
+        private void TabControl_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            TabControl tc = sender as TabControl;
+            TabItem ti = tc.Items[tc.SelectedIndex] as TabItem;
         }
     }
 }
