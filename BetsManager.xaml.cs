@@ -44,7 +44,8 @@ namespace SpreadTrader
         public double OriginalStake { get; set; }
         public double Stake { get { return _Stake; } set { _Stake = value; NotifyPropertyChanged(""); } }
         public double Odds { get; set; }
-        public double DisplayOdds { get { return Odds; } }// IsFullyMatched || IsPartiallyMatched ? AvgPriceMatched : Odds; } }
+//        public double DisplayOdds { get { return Odds; } }// IsFullyMatched || IsPartiallyMatched ? AvgPriceMatched : Odds; } }
+        public double DisplayOdds { get { return SizeMatched > 0 ? Math.Round(AvgPriceMatched, 2) : Odds; } }
         public double DisplayStake { get {
                 //if (IsFullyMatched)
                 //    return OriginalStake;

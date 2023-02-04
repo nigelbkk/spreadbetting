@@ -10,12 +10,13 @@ namespace SpreadTrader
     public partial class MarketHeader : UserControl, INotifyPropertyChanged
     {
         public MarketSelectionDelegate OnMarketSelected;
+//        public MarketChangedDelegate OnMarketChanged;
         public TabContent TabContent { get; set; }
         public String FullName { get { return TabContent == null ? "No market selected" : TabContent?.MarketName; } }
         public String TimeToGo { get { return TabContent == null ? "" : TabContent.MarketNode.TimeToGo;  } }
         public double TurnaroundTime { get { return TabContent == null ? 0 :  TabContent.MarketNode.TurnaroundTime; } }
         public Int32 UpdateRate { get { return TabContent == null ? 0 : TabContent.MarketNode.UpdateRate; } }
-        public Double? TotalMatched { get { return TabContent == null ? 0 : TabContent?.TotalMatched; } }
+        public Double? TotalMatched { get { return TabContent == null ? 0 : TabContent.MarketNode.TotalMatched; } }
         
         public Visibility up_visible { get; set; }
         public Visibility down_visible { get; set; }

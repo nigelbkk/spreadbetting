@@ -10,6 +10,7 @@ using System.Windows.Media;
 
 namespace SpreadTrader
 {
+    public delegate void MarketChangedDelegate(NodeViewModel node);
     public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, bool inplay);
     public partial class RunnersControl : UserControl, INotifyPropertyChanged
     {
@@ -17,6 +18,7 @@ namespace SpreadTrader
         public MarketSelectionDelegate OnMarketSelected;
         public StreamUpdateDelegate StreamUpdateEventSink = null;
         public FavoriteChangedDelegate OnFavoriteChanged = null;
+        public MarketChangedDelegate OnMarketChanged = null;
         private StreamingAPI streamingAPI = new StreamingAPI();
         private BackgroundWorker Worker = null;
         public NodeViewModel _MarketNode { get; set; }
@@ -174,6 +176,13 @@ namespace SpreadTrader
                             DateTime LastUpdate = DateTime.UtcNow;
                             var lr = MarketNode.GetLiveRunners();
                             UpdateMarketStatus();
+
+                            if (OnMarketChanged != null)
+                            {
+                                OnMarketChanged(MarketNode);
+                            }
+
+                            //                            MarketHeader.NotifyP
                             NotifyPropertyChanged("");
                             Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
                             sender.ReportProgress(rate, lr);

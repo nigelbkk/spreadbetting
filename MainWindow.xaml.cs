@@ -128,6 +128,7 @@ namespace SpreadTrader
             customTabHeader.Tab = tab;
 
             EventsTree.OnMarketSelected += tabContent.OnMarketSelected;
+            //OnMarketChanged += tabContent.OnMarketSelected;
 
             tab.IsSelected = true;
             TabControl.Items.Insert(0, tab);
