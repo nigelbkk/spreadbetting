@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="SpreadTrader.TabHeader"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:extensions="clr-namespace:SpreadTrader"
+			 mc:Ignorable="d" 
+             d:DesignHeight="23" d:DesignWidth="81" Margin="0">
+	<UserControl.Resources>
+		<Style BasedOn="{StaticResource {x:Type Label}}" 
+            TargetType="{x:Type Label}">
+			<Setter Property="FontSize" Value="9"/>
+			<Setter Property="BorderThickness" Value="0.0"/>
+			<Setter Property="Width" Value="auto"/>
+			<Setter Property="HorizontalContentAlignment" Value="Left"/>
+			<Setter Property="Foreground"  Value="DarkGray"/>
+			<Setter Property="FontWeight"  Value="Bold"/>
+			<Setter Property="Background"  Value="#00000000"/>
+			<Setter Property="Margin"  Value="0"/>
+			<Setter Property="Padding"  Value="0"/>
+		</Style>
+	</UserControl.Resources>
+	<Grid>
+		<StackPanel Orientation="Horizontal" Height="16">
+			<!--<Label Name="Label" Content="TabItem" SizeChanged="Label_SizeChanged" />
+			<Image Name="CloseButton" Margin="4,2,4,0" Source="/SpreadTrader;component/Images/close.png" PreviewMouseDown="Image_PreviewMouseDown"/>-->
+		</StackPanel>
+	</Grid>
+</UserControl>
