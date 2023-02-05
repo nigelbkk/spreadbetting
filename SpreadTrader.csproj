@@ -114,8 +114,11 @@
     <Compile Include="BettingGrid.xaml.cs">
       <DependentUpon>BettingGrid.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ClosableHeader.xaml.cs">
-      <DependentUpon>ClosableHeader.xaml</DependentUpon>
+    <Compile Include="CustomTabHeader.xaml.cs">
+      <DependentUpon>CustomTabHeader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TabHeader.xaml.cs">
+      <DependentUpon>TabHeader.xaml</DependentUpon>
     </Compile>
     <Compile Include="ConfirmationDialog.xaml.cs">
       <DependentUpon>ConfirmationDialog.xaml</DependentUpon>
@@ -149,8 +152,8 @@
       <DependentUpon>SliderControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="StreamingAPI.cs" />
-    <Compile Include="TabContentControl.xaml.cs">
-      <DependentUpon>TabContentControl.xaml</DependentUpon>
+    <Compile Include="TabContent.xaml.cs">
+      <DependentUpon>TabContent.xaml</DependentUpon>
     </Compile>
     <Compile Include="UpdateBet.xaml.cs">
       <DependentUpon>UpdateBet.xaml</DependentUpon>
@@ -168,7 +171,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClosableHeader.xaml">
+    <Page Include="CustomTabHeader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TabHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -221,7 +228,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="TabContentControl.xaml">
+    <Page Include="TabContent.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

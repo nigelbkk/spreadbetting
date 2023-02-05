@@ -67,7 +67,7 @@ namespace SpreadTrader
                     }
                     else
                     {
-                        PlaceExecutionReport report2 = betfair.placeOrder(Row.MarketID, Row.SelectionID, Row.Side == "BACK" ? sideEnum.BACK : sideEnum.LAY, Stake, Odds);
+                        PlaceExecutionReport report2 = betfair.placeOrder(Row.MarketID, Row.SelectionID, Row.Side.ToUpper() == "BACK" ? sideEnum.BACK : sideEnum.LAY, Stake, Odds);
                         result = report2.errorCode != null ? report2.errorCode : report2.status;
                     }
                 });
@@ -111,7 +111,6 @@ namespace SpreadTrader
             }
             NotifyPropertyChanged("");
         }
-
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             BetfairPrices betfairPrices = new BetfairPrices();

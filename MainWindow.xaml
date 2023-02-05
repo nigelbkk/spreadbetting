@@ -71,9 +71,12 @@
 					</Grid>
 
 					<Grid Grid.Column="1" Name="RightGrid">
-						<TabControl Name ="TabControl">
-							<local:ClosableTab Header="+" PreviewMouseDown="OnNewTab"/>
-						</TabControl>
+						<TabControl Name ="TabControl" SelectionChanged="TabControl_SelectionChanged" MouseDoubleClick="TabControl_MouseDoubleClick" MouseDown="TabControl_MouseDown" >
+                            <TabItem Header="+" PreviewMouseDown="TabItem_PreviewMouseDown" >
+                                <local:TabContent/>
+                            </TabItem>
+                        </TabControl>
+                        
 					</Grid>
 					<GridSplitter Grid.Column="1" Background="DarkGray" Width="2.5" HorizontalAlignment="Left"/>
 				</Grid>

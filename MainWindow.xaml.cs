@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -99,19 +100,40 @@ namespace SpreadTrader
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            AppendNewTab();
+            AppendNewTab("first");
         }
-        private void AppendNewTab()
+        public void RemoveTab(CustomTabHeader e)
         {
-            ClosableTab tab = new ClosableTab();
-            TabContentControl tc = tab.Content as TabContentControl;
-            EventsTree.OnMarketSelected += tc.OnMarketSelected;
-            EventsTree.OnMarketSelected += tab.OnMarketSelected;
+            TabControl.Items.Remove(e.Tab);
+            TabContent tabContent = e.Tab.Content as TabContent;
+            EventsTree.OnMarketSelected -= tabContent.OnMarketSelected;
+            e.Tab.Content = null;
+        }
+        private void AppendNewTab(String title)
+        {
+            CustomTabHeader customTabHeader = new CustomTabHeader();
+            customTabHeader.mainWindow = this;
+            customTabHeader.Title = String.Format("Tab {0}", TabControl.Items.Count);
+            customTabHeader.ID = TabControl.Items.Count;
 
-            tab.Title = "New Market";
+            TabItem tab = new TabItem();
+            tab.PreviewMouseDown += TabItem_PreviewMouseDown2;
+            tab.Header = customTabHeader;
 
+            TabContent tabContent = new TabContent(customTabHeader);
+            tabContent.mainWindow = this;
+            tabContent.customHeader = customTabHeader;
+            tab.Content = tabContent;
+
+            customTabHeader.Tab = tab;
+
+            EventsTree.OnMarketSelected += tabContent.OnMarketSelected;
+            //OnMarketChanged += tabContent.OnMarketSelected;
+
+            tab.IsSelected = true;
             TabControl.Items.Insert(0, tab);
-            tab.Focus();
+            TabControl.UpdateLayout();
+            Dispatcher.BeginInvoke(new Action(() => { tab.Focus(); }));
             NotifyPropertyChanged("");
         }
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -121,11 +143,6 @@ namespace SpreadTrader
             {
                 OnShutdown();
             };
-        }
-        private void OnNewTab(object sender, MouseButtonEventArgs e)
-        {
-            AppendNewTab();
-            e.Handled = true;
         }
         private void OnUpdateAccount(object sender, MouseButtonEventArgs e)
         {
@@ -143,6 +160,31 @@ namespace SpreadTrader
             props.Width = this.Width;
             props.Height = this.Height;
             props.Save();
+        }
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TabControl tc = sender as TabControl;
+        }
+        private void TabItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var item = sender as TabItem;
+            var parent = item.Parent as TabControl;
+            AppendNewTab("");
+        }
+        private void TabItem_PreviewMouseDown2(object sender, MouseButtonEventArgs e)
+        {
+            var item = sender as TabItem;
+            var parent = item.Parent as TabControl;
+        }
+        private void TabControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            TabControl tc = sender as TabControl;
+            tc.Items.Remove(tc.SelectedItem);
+        }
+        private void TabControl_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            TabControl tc = sender as TabControl;
+            TabItem ti = tc.Items[tc.SelectedIndex] as TabItem;
         }
     }
 }

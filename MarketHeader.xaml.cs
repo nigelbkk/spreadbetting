@@ -10,8 +10,14 @@ namespace SpreadTrader
     public partial class MarketHeader : UserControl, INotifyPropertyChanged
     {
         public MarketSelectionDelegate OnMarketSelected;
-        public TabContentControl TabContent { get; set; }
-        public NodeViewModel MarketNode { get; set; }
+//        public MarketChangedDelegate OnMarketChanged;
+        public TabContent TabContent { get; set; }
+        public String FullName { get { return TabContent == null ? "No market selected" : TabContent?.MarketName; } }
+        public String TimeToGo { get { return TabContent == null ? "" : TabContent.MarketNode.TimeToGo;  } }
+        public double TurnaroundTime { get { return TabContent == null ? 0 :  TabContent.MarketNode.TurnaroundTime; } }
+        public Int32 UpdateRate { get { return TabContent == null ? 0 : TabContent.MarketNode.UpdateRate; } }
+        public Double? TotalMatched { get { return TabContent == null ? 0 : TabContent.MarketNode.TotalMatched; } }
+        
         public Visibility up_visible { get; set; }
         public Visibility down_visible { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -26,14 +32,8 @@ namespace SpreadTrader
         public MarketHeader()
         {
             InitializeComponent();
-            OnMarketSelected += (node) =>
-            {
-                MarketNode = node;
-                NotifyPropertyChanged("");
-            };
             up_visible = Visibility.Visible;
             down_visible = Visibility.Collapsed;
-            NotifyPropertyChanged("");
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -42,7 +42,9 @@ namespace SpreadTrader
             {
                 switch (b.Tag)
                 {
-                    case "Market Description": new MarketDescription(this, b, MarketNode).ShowDialog(); break;
+                    case "Market Description": 
+                        new MarketDescription(this, b, TabContent.MarketNode).ShowDialog(); 
+                        break;
                     case "Hide Grid":
                         down_visible = TabContent.BettingGrid.Visibility;
                         up_visible = TabContent.BettingGrid.Visibility = TabContent.BettingGrid.Visibility == Visibility.Collapsed ? Visibility.Visible : Visibility.Collapsed;
