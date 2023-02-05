@@ -10,7 +10,7 @@
         <StackPanel Orientation="Horizontal" MouseDown="StackPanel_MouseDown" >
             <Label Content="Custom TabItem"  Width="auto"  Foreground = "darkgray" Background="Transparent" Height="23" HorizontalAlignment="Left" Margin="0,1,0,0" Name="TabTitle" VerticalAlignment="Top" FontFamily="Courier" FontSize="12"  />
 
-            <Button Content="X" Click ="Button_Click" Background="Transparent" Margin="0,3,0,0" Height="19" HorizontalAlignment="Right"  VerticalAlignment="Top" Width="20" FontFamily="Courier" FontWeight="Normal" FontSize="12" Padding="0" ToolTip="Close"/>
+            <Button Content="X" Click ="Button_Click" Background="Transparent" Margin="0,4,0,0" Height="19" HorizontalAlignment="Right"  VerticalAlignment="Top" Width="20" FontFamily="Courier" FontWeight="Normal" FontSize="12" Padding="0" ToolTip="Close"/>
         </StackPanel>
     </Grid>
 </UserControl>
