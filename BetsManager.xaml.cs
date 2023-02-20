@@ -252,6 +252,8 @@ namespace SpreadTrader
             };
             Connect();
         }
+        Queue<UInt64> cancellation_queue = new Queue<UInt64>();
+        List<UInt64> submitted_cancellations = new List<UInt64>();
         private void OnOrderChanged(String json)
         {
             if (String.IsNullOrEmpty(json))
@@ -262,7 +264,7 @@ namespace SpreadTrader
             if (change.Orc == null)
                 return;
 
-            Debug.WriteLine(json);
+//            Debug.WriteLine(json);
             _LastUpdated = DateTime.UtcNow;
             try
             {
@@ -284,7 +286,16 @@ namespace SpreadTrader
                             List<Row> to_remove = new List<Row>();
                             foreach (Order o in orc.Uo)
                             {
+                                UInt64 betid = Convert.ToUInt64(o.Id);
                                 Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
+
+                                if (submitted_cancellations.Contains(betid))
+                                {
+                                    Debug.WriteLine("Bet enqueued for cancellation");
+                                    return;
+                                }
+
+
                                 Row row = FindUnmatchedRow(o.Id);
                                 if (row == null)
                                 {
@@ -345,7 +356,14 @@ namespace SpreadTrader
                                 }
                                 if (o.Sc > 0)                                       // cancelled
                                 {
-                                    Rows.Remove(row);
+                                    if (submitted_cancellations.Contains(betid))
+                                    {
+                                        submitted_cancellations.Remove(betid);
+                                        Debug.WriteLine("No action: Bet already submitted for cancellation");
+                                    } else {
+                                        Rows.Remove(row);
+                                    }
+
                                     Debug.WriteLine(o.Id, "cancelled");
                                 }
                             }
@@ -399,54 +417,48 @@ namespace SpreadTrader
                 }
             }
         }
+        private void ProcessCancellationQueue(String mid)
+        {
+            System.Threading.Thread t = new System.Threading.Thread(() =>
+            {
+                while (cancellation_queue.Count > 0)
+                {
+                    try
+                    {
+                        UInt64 betid = cancellation_queue.Dequeue();
+                        submitted_cancellations.Add(betid);
+
+                        Debug.WriteLine("submit cancel {0}", betid);
+                        CancelExecutionReport report = Betfair.cancelOrder(mid, betid);
+                        if (report.errorCode == null)
+                        { }
+                        Status = report.errorCode != null ? report.errorCode : report.status;
+                    }
+                    catch (Exception xe)
+                    {
+                        Status = xe.Message;
+                    }
+                }
+            });
+            t.Start();
+        }
         private void RowButton_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
             Row row = b.DataContext as Row;
             if (row != null)
             {
-                if (row.SizeMatched >= row.Stake)
+                if (row.IsMatched || row.SizeMatched >= row.Stake)
                 {
                     Status = "Bet already matched";
                     return;
                 }
-                if (Betfair == null)
-                {
-                    Betfair = MainWindow.Betfair;
-                }
+                Debug.WriteLine("enqueue cancel {0} for {1}", row.BetID, row.Runner);
+                
+                cancellation_queue.Enqueue(row.BetID);
+                Rows.Remove(row);
 
-                if (row.IsMatched)
-                {
-                    Debug.WriteLine("bet already matched");
-                    return;
-                }
-                Debug.WriteLine("submit cancel {0} for {1} {2}", MarketNode.MarketID, row.BetID, row.Runner);
-                DateTime LastUpdate = DateTime.UtcNow;
-                CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
-                Status = report.errorCode != null ? report.errorCode : report.status;
-                if (report.errorCode != null)
-                    Rows.Remove(row);
-                MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-
-
-                //System.Threading.Thread t = new System.Threading.Thread(() =>
-                //{
-                //    try
-                //    {
-                //        Debug.WriteLine("submit cancel {0} for {1} {2}", MarketNode.MarketID, row.BetID, row.Runner);
-                //        DateTime LastUpdate = DateTime.UtcNow;
-                //        CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
-                //        Status = report.errorCode != null ? report.errorCode : report.status;
-                //        if (report.errorCode != null)
-                //            Rows.Remove(row);
-                //        MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-                //    }
-                //    catch(Exception xe)
-                //    {
-                //        Status = xe.Message;
-                //    }
-                //});
-                //t.Start();
+                ProcessCancellationQueue(MarketNode.MarketID);
             }
             else
             {
