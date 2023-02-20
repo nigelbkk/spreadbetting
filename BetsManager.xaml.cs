@@ -188,6 +188,7 @@ namespace SpreadTrader
                     {
                         Debug.WriteLine("Fetch from queue");
                         String json = incomingOrdersQueue.Dequeue();
+                        OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
                         OnOrderChanged(json);
                     }
                     catch (Exception xe)
@@ -211,11 +212,11 @@ namespace SpreadTrader
             hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
             {
                 OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
+                OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json3);
                 if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
                 {
                     Debug.WriteLine("Add to queue");
-                    OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json3);
-                    incomingOrdersQueue.Enqueue(json3);
+                    incomingOrdersQueue.Enqueue(json1);
                 }
                 //BackgroundWorker bw = new BackgroundWorker();
                 //bw.DoWork += (o, e) =>
@@ -301,6 +302,7 @@ namespace SpreadTrader
 
 
             OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
+//            OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
 
             if (change.Orc == null)
                 return;
@@ -312,7 +314,8 @@ namespace SpreadTrader
                 if (change.Closed == true)
                 {
                     Debug.WriteLine("market closed");
-                    Rows.Clear();
+                    Dispatcher.BeginInvoke(new Action(() => { Rows.Clear(); }));
+//                    Rows.Clear();
                 }
 
                 if (change.Orc.Count > 0)
@@ -341,7 +344,9 @@ namespace SpreadTrader
                                 if (row == null)
                                 {
                                     row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
-                                    Rows.Insert(0, row);
+                                    Dispatcher.BeginInvoke(new Action(() => { Rows.Insert(0, row); }));
+
+//                                    Rows.Insert(0, row);
                                     Debug.WriteLine(o.Id, "new bet");
                                 }
                                 row.Runner = MarketNode.GetRunnerName(row.SelectionID);
@@ -384,7 +389,8 @@ namespace SpreadTrader
                                     mrow.AvgPriceMatched = o.Avp.Value;
                                     mrow.Hidden = UnmatchedOnly;
                                     Int32 idx = Rows.IndexOf(row);
-                                    Rows.Insert(idx + 1, mrow);
+                                    Dispatcher.BeginInvoke(new Action(() => { Rows.Insert(idx+1, row); }));
+//                                    Rows.Insert(idx + 1, mrow);
 
                                     row.Stake = o.Sr.Value;
 
@@ -404,7 +410,8 @@ namespace SpreadTrader
                                     }
                                     else
                                     {
-                                        Rows.Remove(row);
+                                        Dispatcher.BeginInvoke(new Action(() => { Rows.Remove(row); }));
+                                        //Rows.Remove(row);
                                     }
 
                                     Debug.WriteLine(o.Id, "cancelled");
@@ -412,7 +419,8 @@ namespace SpreadTrader
                             }
                             foreach (Row o in to_remove)
                             {
-                                Rows.Remove(o);
+                                Dispatcher.BeginInvoke(new Action(() => { Rows.Remove(o); }));
+//                                Rows.Remove(o);
                             }
                         }
                     }
