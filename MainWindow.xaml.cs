@@ -179,7 +179,7 @@ namespace SpreadTrader
         private void TabControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             TabControl tc = sender as TabControl;
-            tc.Items.Remove(tc.SelectedItem);
+//            tc.Items.Remove(tc.SelectedItem);
         }
         private void TabControl_MouseDown(object sender, MouseButtonEventArgs e)
         {
