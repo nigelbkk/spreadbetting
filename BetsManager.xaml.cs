@@ -198,6 +198,33 @@ namespace SpreadTrader
                 }
             }
         }
+        private void ProcessCancellationQueue(object o)
+        {
+            BackgroundWorker sender = o as BackgroundWorker;
+            while (!sender.CancellationPending)
+            {
+                while (cancellation_queue.Count > 0)
+                {
+                    try
+                    {
+                        UInt64 betid = cancellation_queue.Dequeue();
+                        submitted_cancellations.Add(betid);
+
+                        Debug.WriteLine("submit cancel {0}", betid);
+                        CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid);
+                        if (report.errorCode == null)
+                        {
+                            Debug.WriteLine("bet is cancelled {0}", betid);
+                        }
+                        Status = report.errorCode != null ? report.errorCode : report.status;
+                    }
+                    catch (Exception xe)
+                    {
+                        Status = xe.Message;
+                    }
+                }
+            }
+        }
 
         public BetsManager()
         {
@@ -205,7 +232,10 @@ namespace SpreadTrader
             bw.DoWork += (o, e) => ProcessIncomingOrders(o);
             bw.RunWorkerAsync();
 
-          
+            BackgroundWorker bw2 = new BackgroundWorker();
+            bw2.DoWork += (o, e) => ProcessCancellationQueue(o);
+            bw2.RunWorkerAsync();
+
             hubConnection = new HubConnection("http://" + props.StreamUrl);
             hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
@@ -218,16 +248,6 @@ namespace SpreadTrader
                     Debug.WriteLine("Add to queue");
                     incomingOrdersQueue.Enqueue(json1);
                 }
-                //BackgroundWorker bw = new BackgroundWorker();
-                //bw.DoWork += (o, e) =>
-                //{
-                //    OrderMarketSnap snap = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
-                //    if (MarketNode != null && snap.MarketId == MarketNode.MarketID)
-                //    {
-                //        Dispatcher.BeginInvoke(new Action(() => OnOrderChanged(json1)));
-                //    }
-                //};
-                //bw.RunWorkerAsync();
             });
             timer.Elapsed += (o, e) =>
             {
@@ -267,12 +287,6 @@ namespace SpreadTrader
                     sb.AppendFormat("{0:0.00}, ", p.price);
                 }
                 Debug.WriteLine(sb.ToString().TrimEnd(' ').TrimEnd(','));
-
-                //System.Threading.Thread t = new System.Threading.Thread(() =>
-                //{
-                //  PlaceExecutionReport report = Betfair.placeOrder(MarketNode.MarketID, SelectionId, sideEnum.LAY, Stake, a[0].price);
-                //});
-                //t.Start();
             };
 
             OnFavoriteChanged += (runner) =>
@@ -291,23 +305,16 @@ namespace SpreadTrader
             };
             Connect();
         }
-        
-       
         private void OnOrderChanged(String json)
         {
             if (String.IsNullOrEmpty(json))
                 return;
 
-            //            incomingOrdersQueue.Enqueue(json);
-
-
             OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
-//            OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
 
             if (change.Orc == null)
                 return;
 
-            //            Debug.WriteLine(json);
             _LastUpdated = DateTime.UtcNow;
             try
             {
@@ -315,7 +322,6 @@ namespace SpreadTrader
                 {
                     Debug.WriteLine("market closed");
                     Dispatcher.BeginInvoke(new Action(() => { Rows.Clear(); }));
-//                    Rows.Clear();
                 }
 
                 if (change.Orc.Count > 0)
@@ -335,18 +341,15 @@ namespace SpreadTrader
 
                                 if (submitted_cancellations.Contains(betid))
                                 {
-                                    Debug.WriteLine("Bet enqueued for cancellation");
+                                    Debug.WriteLine("No Action: Bet is enqueued for cancellation");
                                     return;
                                 }
-
 
                                 Row row = FindUnmatchedRow(o.Id);
                                 if (row == null)
                                 {
                                     row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
                                     Dispatcher.BeginInvoke(new Action(() => { Rows.Insert(0, row); }));
-
-//                                    Rows.Insert(0, row);
                                     Debug.WriteLine(o.Id, "new bet");
                                 }
                                 row.Runner = MarketNode.GetRunnerName(row.SelectionID);
@@ -390,8 +393,6 @@ namespace SpreadTrader
                                     mrow.Hidden = UnmatchedOnly;
                                     Int32 idx = Rows.IndexOf(row);
                                     Dispatcher.BeginInvoke(new Action(() => { Rows.Insert(idx+1, row); }));
-//                                    Rows.Insert(idx + 1, mrow);
-
                                     row.Stake = o.Sr.Value;
 
                                     if (!String.IsNullOrEmpty(props.MatchedBetAlert))
@@ -411,7 +412,6 @@ namespace SpreadTrader
                                     else
                                     {
                                         Dispatcher.BeginInvoke(new Action(() => { Rows.Remove(row); }));
-                                        //Rows.Remove(row);
                                     }
 
                                     Debug.WriteLine(o.Id, "cancelled");
@@ -420,7 +420,6 @@ namespace SpreadTrader
                             foreach (Row o in to_remove)
                             {
                                 Dispatcher.BeginInvoke(new Action(() => { Rows.Remove(o); }));
-//                                Rows.Remove(o);
                             }
                         }
                     }
@@ -468,31 +467,6 @@ namespace SpreadTrader
                 }
             }
         }
-        private void ProcessCancellationQueue(String mid)
-        {
-            System.Threading.Thread t = new System.Threading.Thread(() =>
-            {
-                while (cancellation_queue.Count > 0)
-                {
-                    try
-                    {
-                        UInt64 betid = cancellation_queue.Dequeue();
-                        submitted_cancellations.Add(betid);
-
-                        Debug.WriteLine("submit cancel {0}", betid);
-                        CancelExecutionReport report = Betfair.cancelOrder(mid, betid);
-                        if (report.errorCode == null)
-                        { }
-                        Status = report.errorCode != null ? report.errorCode : report.status;
-                    }
-                    catch (Exception xe)
-                    {
-                        Status = xe.Message;
-                    }
-                }
-            });
-            t.Start();
-        }
         private void RowButton_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
@@ -509,7 +483,7 @@ namespace SpreadTrader
                 cancellation_queue.Enqueue(row.BetID);
                 Rows.Remove(row);
 
-                ProcessCancellationQueue(MarketNode.MarketID);
+                //ProcessCancellationQueue(MarketNode.MarketID);
             }
             else
             {
