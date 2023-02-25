@@ -19,6 +19,8 @@
 		<StackPanel Orientation="Horizontal" Grid.Row="0" Background="Ivory">
 			<TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="{Binding Path=LastUpdated}"/>
 
+            <!--Useful debugging features-->
+            
             <!--<Button Margin="30,0,0,0" Tag="Back1"  Click="Button_Click">Back</Button>
             <Button Margin="30,0,0,0" Tag="Lay1"  Click="Button_Click">Lay</Button>
             <Button Margin="30,0,0,0" Tag="Match1"  Click="Button_Click">Match</Button>

@@ -111,6 +111,10 @@ namespace SpreadTrader
     }
     public partial class BetsManager : UserControl, INotifyPropertyChanged
     {
+        private Queue<String> incomingOrdersQueue = new Queue<String>();
+        private Queue<UInt64> cancellation_queue = new Queue<UInt64>();
+        private List<UInt64> submitted_cancellations = new List<UInt64>();
+
         private Properties.Settings props = Properties.Settings.Default;
         public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
         public MarketSelectionDelegate OnMarketSelected;
@@ -172,10 +176,6 @@ namespace SpreadTrader
             }
             return null;
         }
-
-        private Queue<String> incomingOrdersQueue = new Queue<String>();
-        private Queue<UInt64> cancellation_queue = new Queue<UInt64>();
-        private List<UInt64> submitted_cancellations = new List<UInt64>();
 
         private void ProcessIncomingOrders(object o)
         {
@@ -309,6 +309,14 @@ namespace SpreadTrader
         {
             if (String.IsNullOrEmpty(json))
                 return;
+
+            String file_name = String.Format(".\\notifications.json");
+            if (!File.Exists(file_name))
+            {
+                File.Create(file_name);
+            }
+            Dispatcher.BeginInvoke(new Action(() => { File.AppendAllText(file_name, json+"\n"); }));
+            Debug.WriteLine(json);
 
             OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
 
