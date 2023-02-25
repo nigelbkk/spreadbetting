@@ -313,9 +313,11 @@ namespace SpreadTrader
             String file_name = String.Format(".\\notifications.json");
             if (!File.Exists(file_name))
             {
-                File.Create(file_name);
+                using (var stream = File.CreateText(file_name))
+                {
+                }
             }
-            Dispatcher.BeginInvoke(new Action(() => { File.AppendAllText(file_name, json+"\n"); }));
+            File.AppendAllText(file_name, json + "\n"); 
             Debug.WriteLine(json);
 
             OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
