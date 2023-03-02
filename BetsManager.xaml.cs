@@ -395,15 +395,21 @@ namespace SpreadTrader
                                 }
                                 if (o.Sm > 0 && o.Sr > 0)                           // partially matched
                                 {
-                                    Row mrow = new Row(row);
+                                    Row mrow = new Row(row);                        
                                     mrow.SizeMatched = o.Sm.Value;
                                     mrow.Odds = o.P.Value;
                                     mrow.Stake = o.S.Value;
                                     mrow.AvgPriceMatched = o.Avp.Value;
                                     mrow.Hidden = UnmatchedOnly;
                                     Int32 idx = Rows.IndexOf(row);
-                                    Dispatcher.BeginInvoke(new Action(() => { Rows.Insert(idx+1, row); }));
-                                    row.Stake = o.Sr.Value;
+
+                                    Dispatcher.BeginInvoke(new Action(() => {
+
+                                        Rows.Insert(idx + 1, mrow);                  // insert a new row for the matched portion
+
+                                        row.Stake = o.Sr.Value;                     // change stake for the unmatched remainder
+                                        NotifyPropertyChanged("");
+                                    }));
 
                                     if (!String.IsNullOrEmpty(props.MatchedBetAlert))
                                     {
@@ -414,7 +420,13 @@ namespace SpreadTrader
                                 }
                                 if (o.Sc > 0)                                       // cancelled
                                 {
-                                    if (submitted_cancellations.Contains(betid))
+                                    if (o.Sr == 0)
+                                    {
+                                        submitted_cancellations.Remove(betid);
+                                        Debug.WriteLine("Bet fully cancelled");
+                                        Dispatcher.BeginInvoke(new Action(() => { Rows.Remove(row); }));
+                                    }
+                                    else if (submitted_cancellations.Contains(betid))
                                     {
                                         submitted_cancellations.Remove(betid);
                                         Debug.WriteLine("No action: Bet already submitted for cancellation");
