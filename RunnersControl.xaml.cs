@@ -19,6 +19,7 @@ namespace SpreadTrader
         public StreamUpdateDelegate StreamUpdateEventSink = null;
         public FavoriteChangedDelegate OnFavoriteChanged = null;
         public MarketChangedDelegate OnMarketChanged = null;
+
         private StreamingAPI streamingAPI = new StreamingAPI();
         private BackgroundWorker Worker = null;
         public NodeViewModel _MarketNode { get; set; }
