@@ -21,13 +21,17 @@
 
             <!--Useful debugging features-->
             
-            <Button Margin="30,0,0,0" Tag="Back1"  Click="Button_Click">Back</Button>
+            <!--<Button Margin="30,0,0,0" Tag="Reset"  Click="Button_Click">Reset</Button>
+            <Button Margin="30,0,0,0" Tag="Run"  Click="Button_Click">Run</Button>
+            <Button Margin="30,0,0,0" Tag="Next"  Click="Button_Click">Next</Button>-->
+
+            <!--<Button Margin="30,0,0,0" Tag="Back1"  Click="Button_Click">Back</Button>
             <Button Margin="30,0,0,0" Tag="Lay1"  Click="Button_Click">Lay</Button>
             <Button Margin="30,0,0,0" Tag="Match1"  Click="Button_Click">Match</Button>
             <Border Margin ="30,0,0,0" Background="DarkGray" Width="10"/>
             <Button Margin="30,0,0,0" Tag="Back2"  Click="Button_Click">Back</Button>
             <Button Margin="30,0,0,0" Tag="Lay2"  Click="Button_Click">Lay</Button>
-            <Button Margin="30,0,0,0" Tag="Match2"  Click="Button_Click">Match</Button>
+            <Button Margin="30,0,0,0" Tag="Match2"  Click="Button_Click">Match</Button>-->
             
             <Button Margin="30,0,0,0" Tag="CancelAll"  Click="Button_Click">Cancel All Bets</Button>
 			<CheckBox Margin="16,0,0,0" IsChecked="{Binding Path=UnmatchedOnly}" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" >Unmatched only</CheckBox>
