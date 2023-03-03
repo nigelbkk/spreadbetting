@@ -113,7 +113,7 @@ namespace SpreadTrader
     {
         private Queue<String> incomingOrdersQueue = new Queue<String>();
         private Queue<UInt64> cancellation_queue = new Queue<UInt64>();
-        private List<UInt64> submitted_cancellations = new List<UInt64>();
+//        private List<UInt64> submitted_cancellations = new List<UInt64>();
 
         private Properties.Settings props = Properties.Settings.Default;
         public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
@@ -208,7 +208,7 @@ namespace SpreadTrader
                     try
                     {
                         UInt64 betid = cancellation_queue.Dequeue();
-                        submitted_cancellations.Add(betid);
+//                        submitted_cancellations.Add(betid);
 
                         Debug.WriteLine("submit cancel {0}", betid);
                         CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid);
@@ -220,6 +220,7 @@ namespace SpreadTrader
                     }
                     catch (Exception xe)
                     {
+                        Debug.WriteLine(xe.Message);
                         Status = xe.Message;
                     }
                 }
@@ -232,9 +233,9 @@ namespace SpreadTrader
             bw.DoWork += (o, e) => ProcessIncomingOrders(o);
             bw.RunWorkerAsync();
 
-            BackgroundWorker bw2 = new BackgroundWorker();
-            bw2.DoWork += (o, e) => ProcessCancellationQueue(o);
-            bw2.RunWorkerAsync();
+            //BackgroundWorker bw2 = new BackgroundWorker();
+            //bw2.DoWork += (o, e) => ProcessCancellationQueue(o);
+            //bw2.RunWorkerAsync();
 
             hubConnection = new HubConnection("http://" + props.StreamUrl);
             hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
@@ -317,7 +318,7 @@ namespace SpreadTrader
                 {
                 }
             }
-            File.AppendAllText(file_name, json + "\n"); 
+            File.AppendAllText(file_name, json + "\n");
             Debug.WriteLine(json);
 
             OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
@@ -349,17 +350,15 @@ namespace SpreadTrader
                                 UInt64 betid = Convert.ToUInt64(o.Id);
                                 Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
 
-                                if (submitted_cancellations.Contains(betid))
-                                {
-                                    Debug.WriteLine("No Action: Bet is enqueued for cancellation");
-                                    return;
-                                }
-
                                 Row row = FindUnmatchedRow(o.Id);
                                 if (row == null)
                                 {
                                     row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
-                                    Dispatcher.BeginInvoke(new Action(() => { Rows.Insert(0, row); }));
+
+                                    Dispatcher.BeginInvoke(new Action(() => { 
+                                        Rows.Insert(0, row);
+                                    }));
+                                    NotifyPropertyChanged("");
                                     Debug.WriteLine(o.Id, "new bet");
                                 }
                                 row.Runner = MarketNode.GetRunnerName(row.SelectionID);
@@ -371,7 +370,7 @@ namespace SpreadTrader
                                     row.Hidden = false;
                                     Debug.WriteLine(o.Id, "unmatched");
                                 }
-                                if (o.Sm == o.S && o.Sr == 0)                       // fully matched
+                                if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                          // fully matched
                                 {
                                     foreach (Row r in Rows)
                                     {
@@ -398,18 +397,18 @@ namespace SpreadTrader
                                     Row mrow = new Row(row);                        
                                     mrow.SizeMatched = o.Sm.Value;
                                     mrow.Odds = o.P.Value;
-                                    mrow.Stake = o.S.Value;
+                                    mrow.Stake = o.Sm.Value;
                                     mrow.AvgPriceMatched = o.Avp.Value;
                                     mrow.Hidden = UnmatchedOnly;
                                     Int32 idx = Rows.IndexOf(row);
 
+                                    //to_remove.Add(row); 
                                     Dispatcher.BeginInvoke(new Action(() => {
-
                                         Rows.Insert(idx + 1, mrow);                  // insert a new row for the matched portion
-
-                                        row.Stake = o.Sr.Value;                     // change stake for the unmatched remainder
-                                        NotifyPropertyChanged("");
                                     }));
+
+                                    row.Stake = o.Sr.Value;                     // change stake for the unmatched remainder
+                                    NotifyPropertyChanged("");
 
                                     if (!String.IsNullOrEmpty(props.MatchedBetAlert))
                                     {
@@ -420,28 +419,29 @@ namespace SpreadTrader
                                 }
                                 if (o.Sc > 0)                                       // cancelled
                                 {
+                                    if (o.Sr != 0)                                  // cancellation of partially matched bet
+                                    {
+                                        row.Stake = o.Sr.Value;                     // adjust unmatched remainder
+                                        Debug.WriteLine(o.Id, "Cancellation of partially matched bet");
+                                    }
                                     if (o.Sr == 0)
                                     {
-                                        submitted_cancellations.Remove(betid);
                                         Debug.WriteLine("Bet fully cancelled");
-                                        Dispatcher.BeginInvoke(new Action(() => { Rows.Remove(row); }));
+                                        to_remove.Add(row); 
                                     }
-                                    else if (submitted_cancellations.Contains(betid))
-                                    {
-                                        submitted_cancellations.Remove(betid);
-                                        Debug.WriteLine("No action: Bet already submitted for cancellation");
-                                    }
-                                    else
-                                    {
-                                        Dispatcher.BeginInvoke(new Action(() => { Rows.Remove(row); }));
-                                    }
-
                                     Debug.WriteLine(o.Id, "cancelled");
                                 }
                             }
                             foreach (Row o in to_remove)
                             {
-                                Dispatcher.BeginInvoke(new Action(() => { Rows.Remove(o); }));
+                                Debug.WriteLine(o.BetID, "Remove");
+                                Dispatcher.BeginInvoke(new Action(() => {
+                                    if (Rows.Contains(o))
+                                    {
+                                        Debug.WriteLine(o.BetID);
+                                        Rows.Remove(o);
+                                    }
+                                }));
                             }
                         }
                     }
@@ -606,6 +606,8 @@ namespace SpreadTrader
             orc.Uo.Add(o);
             return JsonConvert.SerializeObject(change);
         }
+        Int32 json_index = 0;
+        String[] json_rows = new String[0];
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (Betfair == null)
@@ -615,6 +617,31 @@ namespace SpreadTrader
             Button b = sender as Button;
             switch (b.Tag)
             {
+                case "Reset":
+                    MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
+                    json_rows = File.ReadAllLines(".\\notifications.json");
+                    json_index = 0;
+                    Rows.Clear();
+                    break;
+                case "Run":
+                    MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
+                    json_rows = File.ReadAllLines(".\\notifications.json");
+                    json_index = 0;
+                    foreach (String j in json_rows)
+                    {
+                        json_index++;
+                        OnOrderChanged(j);
+                        if (json_index >= 780)
+                            break;
+                    }
+                    break;
+                case "Next":
+                    if (json_index >= json_rows.Length)
+                        break;
+                    String json_row = json_rows[json_index];
+                    OnOrderChanged(json_row);
+                    json_index++;
+                    break;
                 case "Back1":
                     OnOrderChanged(newbet(MarketNode.LiveRunners[0], Order.SideEnum.B)); break;
                 case "Lay1":
