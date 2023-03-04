@@ -233,9 +233,9 @@ namespace SpreadTrader
             bw.DoWork += (o, e) => ProcessIncomingOrders(o);
             bw.RunWorkerAsync();
 
-            //BackgroundWorker bw2 = new BackgroundWorker();
-            //bw2.DoWork += (o, e) => ProcessCancellationQueue(o);
-            //bw2.RunWorkerAsync();
+            BackgroundWorker bw2 = new BackgroundWorker();
+            bw2.DoWork += (o, e) => ProcessCancellationQueue(o);
+            bw2.RunWorkerAsync();
 
             hubConnection = new HubConnection("http://" + props.StreamUrl);
             hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
