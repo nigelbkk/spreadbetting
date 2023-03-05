@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -15,6 +16,7 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace SpreadTrader
 {
@@ -109,11 +111,11 @@ namespace SpreadTrader
             return String.Format("{0},{1},{2},{3},{4}", Runner, SelectionID, Odds, SizeMatched, BetID.ToString());
         }
     }
+
     public partial class BetsManager : UserControl, INotifyPropertyChanged
     {
         private Queue<String> incomingOrdersQueue = new Queue<String>();
         private Queue<UInt64> cancellation_queue = new Queue<UInt64>();
-//        private List<UInt64> submitted_cancellations = new List<UInt64>();
 
         private Properties.Settings props = Properties.Settings.Default;
         public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
@@ -176,7 +178,6 @@ namespace SpreadTrader
             }
             return null;
         }
-
         private void ProcessIncomingOrders(object o)
         {
             BackgroundWorker sender = o as BackgroundWorker;
@@ -208,7 +209,6 @@ namespace SpreadTrader
                     try
                     {
                         UInt64 betid = cancellation_queue.Dequeue();
-//                        submitted_cancellations.Add(betid);
 
                         Debug.WriteLine("submit cancel {0}", betid);
                         CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid);
@@ -224,6 +224,7 @@ namespace SpreadTrader
                         Status = xe.Message;
                     }
                 }
+                System.Threading.Thread.Sleep(10);
             }
         }
 
@@ -348,6 +349,10 @@ namespace SpreadTrader
                             foreach (Order o in orc.Uo)
                             {
                                 UInt64 betid = Convert.ToUInt64(o.Id);
+
+                                if (betid == 298374158730)
+                                {
+                                }
                                 Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
 
                                 Row row = FindUnmatchedRow(o.Id);
@@ -355,15 +360,17 @@ namespace SpreadTrader
                                 {
                                     row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
 
-                                    Dispatcher.BeginInvoke(new Action(() => { 
+                                    Dispatcher.BeginInvoke(new Action(() => {
+                                        lock (Rows);
                                         Rows.Insert(0, row);
                                     }));
+                                    KeyValuePair<int, Row> kvp = new KeyValuePair<int, Row>(0, row);
                                     NotifyPropertyChanged("");
                                     Debug.WriteLine(o.Id, "new bet");
                                 }
                                 row.Runner = MarketNode.GetRunnerName(row.SelectionID);
 
-                                if (o.Sm == 0 && o.Sr > 0)                          // unmatched
+                                if (o.Sm == 0 && o.Sr > 0)                                      // unmatched
                                 {
                                     row.Stake = o.S.Value;
                                     row.SizeMatched = o.Sm.Value;
@@ -403,7 +410,10 @@ namespace SpreadTrader
                                     Int32 idx = Rows.IndexOf(row);
 
                                     //to_remove.Add(row); 
+                                    KeyValuePair<int, Row> kvp = new KeyValuePair<int, Row>(idx+1, row);
+
                                     Dispatcher.BeginInvoke(new Action(() => {
+                                        lock (Rows);
                                         Rows.Insert(idx + 1, mrow);                  // insert a new row for the matched portion
                                     }));
 
@@ -436,6 +446,8 @@ namespace SpreadTrader
                             {
                                 Debug.WriteLine(o.BetID, "Remove");
                                 Dispatcher.BeginInvoke(new Action(() => {
+                                    lock (Rows) ;
+
                                     if (Rows.Contains(o))
                                     {
                                         Debug.WriteLine(o.BetID);
