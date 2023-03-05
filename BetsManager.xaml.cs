@@ -224,6 +224,7 @@ namespace SpreadTrader
                         Status = xe.Message;
                     }
                 }
+                System.Threading.Thread.Sleep(10);
             }
         }
 
