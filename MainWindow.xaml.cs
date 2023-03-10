@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -42,8 +43,22 @@ namespace SpreadTrader
                 Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
             }
         }
+
+        private Mutex mutex = null;
         public MainWindow()
         {
+            const string appName = "SpreadTrader";
+            bool createdNew;
+
+            mutex = new Mutex(true, appName, out createdNew);
+
+            if (!createdNew)
+            {
+                Debug.WriteLine(appName + " already running Exiting now");
+                Environment.Exit(0);
+            }
+
+            Debug.WriteLine("Continuing with the application");
             ServicePointManager.DefaultConnectionLimit = 800;
             System.Net.ServicePointManager.Expect100Continue = false;
             InitializeComponent();
