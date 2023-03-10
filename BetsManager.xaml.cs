@@ -307,163 +307,175 @@ namespace SpreadTrader
             };
             Connect();
         }
+        private object lockObj = new object();
         private void OnOrderChanged(String json)
         {
-            if (String.IsNullOrEmpty(json))
-                return;
-
-            String file_name = String.Format(".\\notifications.json");
-            if (!File.Exists(file_name))
+            lock (lockObj)
             {
-                using (var stream = File.CreateText(file_name))
+                if (String.IsNullOrEmpty(json))
+                    return;
+
+                String file_name = String.Format(".\\notifications.json");
+                if (!File.Exists(file_name))
                 {
-                }
-            }
-            File.AppendAllText(file_name, json + "\n");
-            Debug.WriteLine(json);
-
-            OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
-
-            if (change.Orc == null)
-                return;
-
-            _LastUpdated = DateTime.UtcNow;
-            try
-            {
-                if (change.Closed == true)
-                {
-                    Debug.WriteLine("market closed");
-                    Dispatcher.BeginInvoke(new Action(() => { Rows.Clear(); }));
-                }
-
-                if (change.Orc.Count > 0)
-                {
-                    foreach (OrderRunnerChange orc in change.Orc)
+                    using (var stream = File.CreateText(file_name))
                     {
-                        if (orc.Uo == null)
-                            continue;
+                    }
+                }
+                File.AppendAllText(file_name, json + "\n");
+                Debug.WriteLine(json);
 
-                        if (orc.Uo.Count > 0)
+                OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
+
+                if (change.Orc == null)
+                    return;
+
+                _LastUpdated = DateTime.UtcNow;
+                try
+                {
+                    if (change.Closed == true)
+                    {
+                        Debug.WriteLine("market closed");
+                        Dispatcher.BeginInvoke(new Action(() => { Rows.Clear(); }));
+                    }
+
+                    if (change.Orc.Count > 0)
+                    {
+                        foreach (OrderRunnerChange orc in change.Orc)
                         {
-                            List<Row> to_remove = new List<Row>();
-                            foreach (Order o in orc.Uo)
+                            if (orc.Uo == null)
+                                continue;
+
+                            if (orc.Uo.Count > 0)
                             {
-                                UInt64 betid = Convert.ToUInt64(o.Id);
-
-                                if (betid == 298374158730)
+                                List<Row> to_remove = new List<Row>();
+                                foreach (Order o in orc.Uo)
                                 {
-                                }
-                                Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
+                                    UInt64 betid = Convert.ToUInt64(o.Id);
 
-                                Row row = FindUnmatchedRow(o.Id);
-                                if (row == null)
-                                {
-                                    row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
-
-                                    Dispatcher.BeginInvoke(new Action(() => {
-                                        lock (Rows);
-                                        Rows.Insert(0, row);
-                                    }));
-                                    KeyValuePair<int, Row> kvp = new KeyValuePair<int, Row>(0, row);
-                                    NotifyPropertyChanged("");
-                                    Debug.WriteLine(o.Id, "new bet");
-                                }
-                                row.Runner = MarketNode.GetRunnerName(row.SelectionID);
-
-                                if (o.Sm == 0 && o.Sr > 0)                                      // unmatched
-                                {
-                                    row.Stake = o.S.Value;
-                                    row.SizeMatched = o.Sm.Value;
-                                    row.Hidden = false;
-                                    Debug.WriteLine(o.Id, "unmatched");
-                                }
-                                if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                          // fully matched
-                                {
-                                    foreach (Row r in Rows)
+                                    if (betid == 298597342042)
                                     {
-                                        if (r.BetID == Convert.ToUInt64(o.Id))
+                                    }
+                                    Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
+
+                                    Row row = FindUnmatchedRow(o.Id);
+                                    if (row == null)
+                                    {
+                                        row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
+
+                                        Dispatcher.BeginInvoke(new Action(() =>
                                         {
-                                            if (r.SizeMatched > 0)
+                                            lock (Rows)
                                             {
-                                                to_remove.Add(r);
+                                                Rows.Insert(0, row);
+                                            }
+                                        }));
+                                        KeyValuePair<int, Row> kvp = new KeyValuePair<int, Row>(0, row);
+                                        NotifyPropertyChanged("");
+                                        Debug.WriteLine(o.Id, "new bet");
+                                    }
+                                    row.Runner = MarketNode.GetRunnerName(row.SelectionID);
+
+                                    if (o.Sm == 0 && o.Sr > 0)                                      // unmatched
+                                    {
+                                        row.Stake = o.S.Value;
+                                        row.SizeMatched = o.Sm.Value;
+                                        row.Hidden = false;
+                                        Debug.WriteLine(o.Id, "unmatched");
+                                    }
+                                    if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                          // fully matched
+                                    {
+                                        foreach (Row r in Rows)
+                                        {
+                                            if (r.BetID == Convert.ToUInt64(o.Id))
+                                            {
+                                                if (r.SizeMatched > 0)
+                                                {
+                                                    to_remove.Add(r);
+                                                }
                                             }
                                         }
+                                        row.AvgPriceMatched = o.Avp.Value;
+                                        row.SizeMatched = row.OriginalStake;// o.Sm.Value;
+                                        row.Hidden = UnmatchedOnly;
+                                        if (!String.IsNullOrEmpty(props.MatchedBetAlert))
+                                        {
+                                            SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
+                                            snd.Play();
+                                        }
+                                        Debug.WriteLine(o.Id, "fully matched");
                                     }
-                                    row.AvgPriceMatched = o.Avp.Value;
-                                    row.SizeMatched = row.OriginalStake;// o.Sm.Value;
-                                    row.Hidden = UnmatchedOnly;
-                                    if (!String.IsNullOrEmpty(props.MatchedBetAlert))
+                                    if (o.Sm > 0 && o.Sr > 0)                           // partially matched
                                     {
-                                        SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
-                                        snd.Play();
+                                        Row mrow = new Row(row);
+                                        mrow.SizeMatched = o.Sm.Value;
+                                        mrow.Odds = o.P.Value;
+                                        mrow.Stake = o.Sm.Value;
+                                        mrow.AvgPriceMatched = o.Avp.Value;
+                                        mrow.Hidden = UnmatchedOnly;
+                                        Int32 idx = Rows.IndexOf(row);
+
+                                        //to_remove.Add(row); 
+                                        KeyValuePair<int, Row> kvp = new KeyValuePair<int, Row>(idx + 1, row);
+
+                                        Dispatcher.BeginInvoke(new Action(() =>
+                                        {
+                                            lock (Rows)
+                                            {
+                                                Rows.Insert(idx + 1, mrow);                  // insert a new row for the matched portion
+                                            }
+                                        }));
+
+                                        row.Stake = o.Sr.Value;                     // change stake for the unmatched remainder
+                                        NotifyPropertyChanged("");
+
+                                        if (!String.IsNullOrEmpty(props.MatchedBetAlert))
+                                        {
+                                            SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
+                                            snd.Play();
+                                        }
+                                        Debug.WriteLine(o.Id, "partial match");
                                     }
-                                    Debug.WriteLine(o.Id, "fully matched");
+                                    if (o.Sc > 0)                                       // cancelled
+                                    {
+                                        if (o.Sr != 0)                                  // cancellation of partially matched bet
+                                        {
+                                            row.Stake = o.Sr.Value;                     // adjust unmatched remainder
+                                            Debug.WriteLine(o.Id, "Cancellation of partially matched bet");
+                                        }
+                                        if (o.Sr == 0)
+                                        {
+                                            Debug.WriteLine("Bet fully cancelled");
+                                            to_remove.Add(row);
+                                        }
+                                        Debug.WriteLine(o.Id, "cancelled");
+                                    }
                                 }
-                                if (o.Sm > 0 && o.Sr > 0)                           // partially matched
+                                foreach (Row o in to_remove)
                                 {
-                                    Row mrow = new Row(row);                        
-                                    mrow.SizeMatched = o.Sm.Value;
-                                    mrow.Odds = o.P.Value;
-                                    mrow.Stake = o.Sm.Value;
-                                    mrow.AvgPriceMatched = o.Avp.Value;
-                                    mrow.Hidden = UnmatchedOnly;
-                                    Int32 idx = Rows.IndexOf(row);
-
-                                    //to_remove.Add(row); 
-                                    KeyValuePair<int, Row> kvp = new KeyValuePair<int, Row>(idx+1, row);
-
-                                    Dispatcher.BeginInvoke(new Action(() => {
-                                        lock (Rows);
-                                        Rows.Insert(idx + 1, mrow);                  // insert a new row for the matched portion
+                                    Debug.WriteLine(o.BetID, "Remove");
+                                    Dispatcher.BeginInvoke(new Action(() =>
+                                    {
+                                        lock (Rows)
+                                        {
+                                            if (Rows.Contains(o))
+                                            {
+                                                Debug.WriteLine(o.BetID);
+                                                Rows.Remove(o);
+                                            }
+                                        }
                                     }));
-
-                                    row.Stake = o.Sr.Value;                     // change stake for the unmatched remainder
-                                    NotifyPropertyChanged("");
-
-                                    if (!String.IsNullOrEmpty(props.MatchedBetAlert))
-                                    {
-                                        SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
-                                        snd.Play();
-                                    }
-                                    Debug.WriteLine(o.Id, "partial match");
                                 }
-                                if (o.Sc > 0)                                       // cancelled
-                                {
-                                    if (o.Sr != 0)                                  // cancellation of partially matched bet
-                                    {
-                                        row.Stake = o.Sr.Value;                     // adjust unmatched remainder
-                                        Debug.WriteLine(o.Id, "Cancellation of partially matched bet");
-                                    }
-                                    if (o.Sr == 0)
-                                    {
-                                        Debug.WriteLine("Bet fully cancelled");
-                                        to_remove.Add(row); 
-                                    }
-                                    Debug.WriteLine(o.Id, "cancelled");
-                                }
-                            }
-                            foreach (Row o in to_remove)
-                            {
-                                Debug.WriteLine(o.BetID, "Remove");
-                                Dispatcher.BeginInvoke(new Action(() => {
-                                    lock (Rows) ;
-
-                                    if (Rows.Contains(o))
-                                    {
-                                        Debug.WriteLine(o.BetID);
-                                        Rows.Remove(o);
-                                    }
-                                }));
                             }
                         }
                     }
+                    NotifyPropertyChanged("");
                 }
-                NotifyPropertyChanged("");
-            }
-            catch (Exception xe)
-            {
-                Status = xe.Message;
-                //Debug.WriteLine(xe.Message);
+                catch (Exception xe)
+                {
+                    Status = xe.Message;
+                    //Debug.WriteLine(xe.Message);
+                }
             }
         }
         private void PopulateDataGrid()
