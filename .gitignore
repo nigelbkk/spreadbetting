@@ -3,6 +3,7 @@
 
 keys.cs
 settings.xml
+notifications.json
 
 # User-specific files
 *.suo
