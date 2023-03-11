@@ -122,5 +122,11 @@
     <Setting Name="CDLeft" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="development" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="production" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

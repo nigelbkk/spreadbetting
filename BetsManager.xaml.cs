@@ -190,7 +190,9 @@ namespace SpreadTrader
                         Debug.WriteLine("Fetch from queue");
                         String json = incomingOrdersQueue.Dequeue();
                         OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
-                        OnOrderChanged(json);
+
+                        Dispatcher.BeginInvoke(new Action(() => { OnOrderChanged(json); }));
+                       
                     }
                     catch (Exception xe)
                     {
@@ -249,6 +251,18 @@ namespace SpreadTrader
                 {
                     Debug.WriteLine("Add to queue");
                     incomingOrdersQueue.Enqueue(json1);
+
+                    if (props.production)        // live system?
+                    {
+                        String file_name = String.Format(".\\notifications.json");
+                        if (!File.Exists(file_name))
+                        {
+                            using (var stream = File.CreateText(file_name))
+                            {
+                            }
+                        }
+                        File.AppendAllText(file_name, json1 + "\n");
+                    }
                 }
             });
             timer.Elapsed += (o, e) =>
@@ -308,6 +322,7 @@ namespace SpreadTrader
             Connect();
         }
         private object lockObj = new object();
+
         private void OnOrderChanged(String json)
         {
             lock (lockObj)
@@ -315,14 +330,6 @@ namespace SpreadTrader
                 if (String.IsNullOrEmpty(json))
                     return;
 
-                String file_name = String.Format(".\\notifications.json");
-                if (!File.Exists(file_name))
-                {
-                    using (var stream = File.CreateText(file_name))
-                    {
-                    }
-                }
-                File.AppendAllText(file_name, json + "\n");
                 Debug.WriteLine(json);
 
                 OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
@@ -353,7 +360,7 @@ namespace SpreadTrader
                                 {
                                     UInt64 betid = Convert.ToUInt64(o.Id);
 
-                                    if (betid == 298597342042)
+                                    if (betid == 299150050157)
                                     {
                                     }
                                     Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
@@ -362,15 +369,7 @@ namespace SpreadTrader
                                     if (row == null)
                                     {
                                         row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
-
-                                        Dispatcher.BeginInvoke(new Action(() =>
-                                        {
-                                            lock (Rows)
-                                            {
-                                                Rows.Insert(0, row);
-                                            }
-                                        }));
-                                        KeyValuePair<int, Row> kvp = new KeyValuePair<int, Row>(0, row);
+                                        Rows.Insert(0, row);
                                         NotifyPropertyChanged("");
                                         Debug.WriteLine(o.Id, "new bet");
                                     }
@@ -415,17 +414,7 @@ namespace SpreadTrader
                                         mrow.Hidden = UnmatchedOnly;
                                         Int32 idx = Rows.IndexOf(row);
 
-                                        //to_remove.Add(row); 
-                                        KeyValuePair<int, Row> kvp = new KeyValuePair<int, Row>(idx + 1, row);
-
-                                        Dispatcher.BeginInvoke(new Action(() =>
-                                        {
-                                            lock (Rows)
-                                            {
-                                                Rows.Insert(idx + 1, mrow);                  // insert a new row for the matched portion
-                                            }
-                                        }));
-
+                                        Rows.Insert(idx + 1, mrow);                  // insert a new row for the matched portion
                                         row.Stake = o.Sr.Value;                     // change stake for the unmatched remainder
                                         NotifyPropertyChanged("");
 
@@ -454,17 +443,11 @@ namespace SpreadTrader
                                 foreach (Row o in to_remove)
                                 {
                                     Debug.WriteLine(o.BetID, "Remove");
-                                    Dispatcher.BeginInvoke(new Action(() =>
+                                    if (Rows.Contains(o))
                                     {
-                                        lock (Rows)
-                                        {
-                                            if (Rows.Contains(o))
-                                            {
-                                                Debug.WriteLine(o.BetID);
-                                                Rows.Remove(o);
-                                            }
-                                        }
-                                    }));
+                                        Debug.WriteLine(o.BetID);
+                                        Rows.Remove(o);
+                                    }
                                 }
                             }
                         }
@@ -655,8 +638,6 @@ namespace SpreadTrader
                     {
                         json_index++;
                         OnOrderChanged(j);
-                        if (json_index >= 780)
-                            break;
                     }
                     break;
                 case "Next":
