@@ -191,7 +191,8 @@ namespace SpreadTrader
                         String json = incomingOrdersQueue.Dequeue();
                         OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
 
-                        Dispatcher.BeginInvoke(new Action(() => { OnOrderChanged(json); }));
+                        //                        Dispatcher.BeginInvoke(new Action(() => { OnOrderChanged(json); }));
+                        OnOrderChanged(json);
                        
                     }
                     catch (Exception xe)
@@ -369,20 +370,21 @@ namespace SpreadTrader
                                     if (row == null)
                                     {
                                         row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
-                                        Rows.Insert(0, row);
-                                        NotifyPropertyChanged("");
+                                        Dispatcher.BeginInvoke(new Action(() => { Rows.Insert(0, row); }));
+                                        //Rows.Insert(0, row);
+                                        //NotifyPropertyChanged("");
                                         Debug.WriteLine(o.Id, "new bet");
                                     }
                                     row.Runner = MarketNode.GetRunnerName(row.SelectionID);
 
-                                    if (o.Sm == 0 && o.Sr > 0)                                      // unmatched
+                                    if (o.Sm == 0 && o.Sr > 0)                                          // unmatched
                                     {
                                         row.Stake = o.S.Value;
                                         row.SizeMatched = o.Sm.Value;
                                         row.Hidden = false;
                                         Debug.WriteLine(o.Id, "unmatched");
                                     }
-                                    if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                          // fully matched
+                                    if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                             // fully matched
                                     {
                                         foreach (Row r in Rows)
                                         {
@@ -414,7 +416,8 @@ namespace SpreadTrader
                                         mrow.Hidden = UnmatchedOnly;
                                         Int32 idx = Rows.IndexOf(row);
 
-                                        Rows.Insert(idx + 1, mrow);                  // insert a new row for the matched portion
+                                        Dispatcher.BeginInvoke(new Action(() => { Rows.Insert(idx+1, mrow); }));
+//                                        Rows.Insert(idx + 1, mrow);                  // insert a new row for the matched portion
                                         row.Stake = o.Sr.Value;                     // change stake for the unmatched remainder
                                         NotifyPropertyChanged("");
 
@@ -443,11 +446,16 @@ namespace SpreadTrader
                                 foreach (Row o in to_remove)
                                 {
                                     Debug.WriteLine(o.BetID, "Remove");
-                                    if (Rows.Contains(o))
-                                    {
-                                        Debug.WriteLine(o.BetID);
-                                        Rows.Remove(o);
-                                    }
+                                    Dispatcher.BeginInvoke(new Action(() => {
+
+                                        if (Rows.Contains(o))
+                                        {
+                                            Debug.WriteLine(o.BetID);
+                                            Rows.Remove(o);
+                                        }
+
+                                    }));
+
                                 }
                             }
                         }
@@ -510,7 +518,8 @@ namespace SpreadTrader
                 Debug.WriteLine("enqueue cancel {0} for {1}", row.BetID, row.Runner);
                 
                 cancellation_queue.Enqueue(row.BetID);
-                Rows.Remove(row);
+                ///Rows.Remove(row);
+                row.Hidden = true;
 
                 //ProcessCancellationQueue(MarketNode.MarketID);
             }
