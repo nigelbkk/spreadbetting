@@ -187,13 +187,11 @@ namespace SpreadTrader
                 {
                     try
                     {
-                        lock (incomingOrdersQueue)
-                        {
-                            Debug.WriteLine("Fetch from queue");
-                            String json = incomingOrdersQueue.Dequeue();
-                            OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
-                            OnOrderChanged(json);
-                        }
+                        Debug.WriteLine("Fetch from queue");
+//                        lock (incomingOrdersQueue){}
+                        String json = incomingOrdersQueue.Dequeue();
+                        OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
+                        OnOrderChanged(json);
                     }
                     catch (Exception xe)
                     {
@@ -211,7 +209,7 @@ namespace SpreadTrader
                 {
                     try
                     {
-                        lock (cancellation_queue)
+                        //lock (cancellation_queue)
                         {
                             UInt64 betid = cancellation_queue.Dequeue();
 
@@ -253,9 +251,11 @@ namespace SpreadTrader
                 OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json3);
                 if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
                 {
-                    Debug.WriteLine("Add to queue");
-                    incomingOrdersQueue.Enqueue(json1);
-
+                    lock (incomingOrdersQueue)
+                    {
+                        Debug.WriteLine("Add to queue");
+                        incomingOrdersQueue.Enqueue(json1);
+                    }
                     if (props.production)        // live system?
                     {
                         String file_name = String.Format(".\\notifications.json");
@@ -521,13 +521,13 @@ namespace SpreadTrader
                     Status = "Bet already matched";
                     return;
                 }
-                Debug.WriteLine("enqueue cancel {0} for {1}", row.BetID, row.Runner);
-                
-                cancellation_queue.Enqueue(row.BetID);
-                ///Rows.Remove(row);
-                row.Hidden = true;
 
-                //ProcessCancellationQueue(MarketNode.MarketID);
+                lock (cancellation_queue)
+                {
+                    Debug.WriteLine("enqueue cancel {0} for {1}", row.BetID, row.Runner);
+                    cancellation_queue.Enqueue(row.BetID);
+                    row.Hidden = true;
+                }
             }
             else
             {
