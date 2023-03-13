@@ -187,13 +187,13 @@ namespace SpreadTrader
                 {
                     try
                     {
-                        Debug.WriteLine("Fetch from queue");
-                        String json = incomingOrdersQueue.Dequeue();
-                        OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
-
-                        //                        Dispatcher.BeginInvoke(new Action(() => { OnOrderChanged(json); }));
-                        OnOrderChanged(json);
-                       
+                        lock (incomingOrdersQueue)
+                        {
+                            Debug.WriteLine("Fetch from queue");
+                            String json = incomingOrdersQueue.Dequeue();
+                            OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
+                            OnOrderChanged(json);
+                        }
                     }
                     catch (Exception xe)
                     {
@@ -211,15 +211,18 @@ namespace SpreadTrader
                 {
                     try
                     {
-                        UInt64 betid = cancellation_queue.Dequeue();
-
-                        Debug.WriteLine("submit cancel {0}", betid);
-                        CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid);
-                        if (report.errorCode == null)
+                        lock (cancellation_queue)
                         {
-                            Debug.WriteLine("bet is cancelled {0}", betid);
+                            UInt64 betid = cancellation_queue.Dequeue();
+
+                            Debug.WriteLine("submit cancel {0}", betid);
+                            CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid);
+                            if (report.errorCode == null)
+                            {
+                                Debug.WriteLine("bet is cancelled {0}", betid);
+                            }
+                            Status = report.errorCode != null ? report.errorCode : report.status;
                         }
-                        Status = report.errorCode != null ? report.errorCode : report.status;
                     }
                     catch (Exception xe)
                     {
@@ -370,7 +373,10 @@ namespace SpreadTrader
                                     if (row == null)
                                     {
                                         row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
-                                        Dispatcher.BeginInvoke(new Action(() => { Rows.Insert(0, row); }));
+                                        Dispatcher.BeginInvoke(new Action(() => {
+                                            Debug.WriteLine("Insert into grid", row.BetID);
+                                            Rows.Insert(0, row); 
+                                        }));
                                         //Rows.Insert(0, row);
                                         //NotifyPropertyChanged("");
                                         Debug.WriteLine(o.Id, "new bet");
@@ -416,7 +422,10 @@ namespace SpreadTrader
                                         mrow.Hidden = UnmatchedOnly;
                                         Int32 idx = Rows.IndexOf(row);
 
-                                        Dispatcher.BeginInvoke(new Action(() => { Rows.Insert(idx+1, mrow); }));
+                                        Dispatcher.BeginInvoke(new Action(() => {
+                                            Debug.WriteLine("Append to grid", mrow.BetID);
+                                            Rows.Insert(idx+1, mrow); 
+                                        }));
 //                                        Rows.Insert(idx + 1, mrow);                  // insert a new row for the matched portion
                                         row.Stake = o.Sr.Value;                     // change stake for the unmatched remainder
                                         NotifyPropertyChanged("");
@@ -445,15 +454,12 @@ namespace SpreadTrader
                                 }
                                 foreach (Row o in to_remove)
                                 {
-                                    Debug.WriteLine(o.BetID, "Remove");
                                     Dispatcher.BeginInvoke(new Action(() => {
-
                                         if (Rows.Contains(o))
                                         {
-                                            Debug.WriteLine(o.BetID);
+                                            Debug.WriteLine("Remove from grid", o.BetID);
                                             Rows.Remove(o);
                                         }
-
                                     }));
 
                                 }
