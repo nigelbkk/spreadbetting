@@ -117,6 +117,7 @@
     <Compile Include="CustomTabHeader.xaml.cs">
       <DependentUpon>CustomTabHeader.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IncomingPacketQueue.cs" />
     <Compile Include="TabHeader.xaml.cs">
       <DependentUpon>TabHeader.xaml</DependentUpon>
     </Compile>

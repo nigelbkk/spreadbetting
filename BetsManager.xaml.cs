@@ -3,6 +3,7 @@ using BetfairAPI;
 using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -148,7 +149,7 @@ namespace SpreadTrader
                 Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = value; }));
                 //Extensions.MainWindow.Status = value;
             } }
-        private bool _Connected { get { return !String.IsNullOrEmpty(hubConnection.ConnectionId); } }
+        private bool _Connected { get { return !String.IsNullOrEmpty(hubConnection?.ConnectionId); } }
         public bool IsConnected { get { return _Connected; } }
         public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
         public String StreamingButtonText { get { return IsConnected ? "Streaming Connected" : "Streaming Disconnected"; } }
@@ -178,7 +179,7 @@ namespace SpreadTrader
             }
             return null;
         }
-        private void ProcessIncomingOrders(object o)
+        private void ProcessIncomingNotifications(object o)
         {
             BackgroundWorker sender = o as BackgroundWorker;
             while (!sender.CancellationPending)
@@ -198,6 +199,7 @@ namespace SpreadTrader
                         Status = xe.Message;
                     }
                 }
+                System.Threading.Thread.Sleep(10);
             }
         }
         private void ProcessCancellationQueue(object o)
@@ -235,7 +237,7 @@ namespace SpreadTrader
         public BetsManager()
         {
             BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += (o, e) => ProcessIncomingOrders(o);
+            bw.DoWork += (o, e) => ProcessIncomingNotifications(o);
             bw.RunWorkerAsync();
 
             BackgroundWorker bw2 = new BackgroundWorker();
@@ -537,16 +539,19 @@ namespace SpreadTrader
         private void Connect()
         {
             String result = "";
-            hubConnection.Start().ContinueWith(task =>
+            if (hubConnection != null)
             {
-                if (OnFail(task))
+                hubConnection.Start().ContinueWith(task =>
                 {
-                    result = "Failed to Connect";
-                    return;
-                }
-                result = "Connected";
-            }).Wait(1000);
-            Status = result;
+                    if (OnFail(task))
+                    {
+                        result = "Failed to Connect";
+                        return;
+                    }
+                    result = "Connected";
+                }).Wait(1000);
+                Status = result;
+            }
         }
         private void Disconnect()
         {
