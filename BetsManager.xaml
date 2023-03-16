@@ -21,9 +21,9 @@
 
             <!--Useful debugging features-->
             
-            <Button Margin="30,0,0,0" Tag="Reset"  Click="Button_Click">Reset</Button>
+            <!--<Button Margin="30,0,0,0" Tag="Reset"  Click="Button_Click">Reset</Button>
             <Button Margin="30,0,0,0" Tag="Run"  Click="Button_Click">Run</Button>
-            <Button Margin="30,0,0,0" Tag="Next"  Click="Button_Click">Next</Button>
+            <Button Margin="30,0,0,0" Tag="Next"  Click="Button_Click">Next</Button>-->
 
             <!--<Button Margin="30,0,0,0" Tag="Back1"  Click="Button_Click">Back</Button>
             <Button Margin="30,0,0,0" Tag="Lay1"  Click="Button_Click">Lay</Button>
