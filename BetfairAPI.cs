@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Windows;
 using Windows.Data.Json;
 
 namespace BetfairAPI
@@ -68,6 +69,14 @@ namespace BetfairAPI
                 if (err != null)
                 {
                     ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
+
+                    //if (oo.code == -32009)
+                    if (oo.message.Contains("underlying connection") && oo.message.Contains("closed"))
+                    {
+                        MessageBox.Show("The session token has expired\nPlease restart the application");
+                        Environment.Exit(0);
+                    }
+
                     throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
                 }
                 String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
