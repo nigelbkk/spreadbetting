@@ -69,10 +69,10 @@ namespace SpreadTrader
                 Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
             }
             UpdateAccountInformation();
-            this.Top = props.Top;
-            this.Left = props.Left;
-            this.Height = props.Height;
-            this.Width = props.Width;
+            this.Top = Math.Max(0, props.Top);
+            this.Left = Math.Max(0, props.Left);
+            this.Height = Math.Max(0, props.Height);
+            this.Width = Math.Max(0, props.Width);
         }
         public void UpdateAccountInformation()
         {

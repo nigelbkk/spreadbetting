@@ -17,6 +17,12 @@ namespace BetfairAPI
     {
         static private String AppKey { get; set; }
         static private String Token { get; set; }
+        static String CertFile { get; set; }
+        static String CertPassword { get; set; }
+        static String appKey { get; set; }
+        static  String username { get; set; }
+        static String password { get; set; }
+
         public String SessionToken { get { return Token; } }
         public BetfairAPI()
         {
@@ -70,11 +76,17 @@ namespace BetfairAPI
                 {
                     ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
 
-                    //if (oo.code == -32009)
-                    if (oo.message.Contains("underlying connection") && oo.message.Contains("closed"))
+                    if (oo.code == -32099)
+                    //if (oo.message.Contains("underlying connection") && oo.message.Contains("closed"))
                     {
-                        MessageBox.Show("The session token has expired\nPlease restart the application");
-                        Environment.Exit(0);
+                        Debug.WriteLine(oo.message);
+
+                        if (!String.IsNullOrEmpty(password))
+                        {
+                          login(CertFile, CertPassword, AppKey, username, password);
+                        }
+                        //MessageBox.Show("The session token has expired\nPlease restart the application");
+                        //Environment.Exit(0);
                     }
 
                     throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
@@ -118,6 +130,11 @@ namespace BetfairAPI
                         throw new Exception(o.ToString());
                     }
                     Token = o.sessionToken;
+
+                    BetfairAPI.CertFile = CertFile;
+                    BetfairAPI.CertPassword = CertPassword;
+                    BetfairAPI.username = username;
+                    BetfairAPI.password = password;
                 }
             }
         }
