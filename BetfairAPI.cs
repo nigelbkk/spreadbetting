@@ -28,7 +28,31 @@ namespace BetfairAPI
         {
         }
         public DateTime sysTime = DateTime.UtcNow;
-        public Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
+        public void KeepAlive()
+        {
+          HttpWebRequest wr = (HttpWebRequest)WebRequest.Create("https://identitysso.betfair.com/api/keepAlive");
+          wr.Method = WebRequestMethods.Http.Post;
+          wr.ContentType = "application/json";
+          wr.Accept = "application/json";
+          wr.Headers.Add("X-Authentication", Token);
+          using (WebResponse response = wr.GetResponse())
+          {
+            using (Stream ds = response.GetResponseStream())
+            {
+              StreamReader reader = new StreamReader(ds);
+              String rs = reader.ReadToEnd();
+
+              KeepAliveResponse o = JsonConvert.DeserializeObject<KeepAliveResponse>(rs);
+              if (o.status != "SUCCESS")
+              {
+                Console.WriteLine("Keepalive failed", o.error);
+                throw new Exception(o.error);
+              }
+              Token = o.token;
+            }
+          }
+        }
+    public Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
             String[] AccountCalls = new String[] { "getAccountFunds" };
             Dictionary<String, Object> joe = new Dictionary<string, object>();
