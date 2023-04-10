@@ -635,7 +635,7 @@ namespace SpreadTrader
         }
         Int32 json_index = 0;
         String[] json_rows = new String[0];
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (Betfair == null)
             {
@@ -644,6 +644,57 @@ namespace SpreadTrader
             Button b = sender as Button;
             switch (b.Tag)
             {
+
+                case "HalveUnmatched":
+
+                    if (MarketNode != null)
+                    {
+                        await Task.Run(() =>
+                        {
+                            List<PlaceInstruction> instructions = new List<PlaceInstruction>();
+                            List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
+
+                            foreach(Row row in Rows)
+                            {
+                                if (!row.IsMatched && row.Stake >= 4)
+                                {
+                                    cancel_instructions.Add(new CancelInstruction(row.BetID));
+                                    instructions.Add(new PlaceInstruction()
+                                    {
+                                        orderTypeEnum = orderTypeEnum.LIMIT,
+                                        sideEnum = row.Side.ToUpper() == "BACK" ? sideEnum.BACK : sideEnum.LAY,
+                                        Runner = row.Runner,
+                                        marketTypeEnum = marketTypeEnum.WIN,
+                                        selectionId = row.SelectionID,
+                                        limitOrder = new LimitOrder()
+                                        {
+                                            persistenceTypeEnum = persistenceTypeEnum.LAPSE,
+                                            price = row.Odds,
+                                            size = Math.Abs(row.Stake / 2),
+                                        }
+                                    });
+                                }
+                            }
+
+                            if (instructions.Count == 0)
+                            {
+                                Status = "Nothing to do";
+                            }
+                            else
+                            {
+                                CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
+                                if (report != null && report.errorCode != null)
+                                {
+                                    throw new Exception(ErrorCodes.FaultCode(report.errorCode));
+                                }
+
+                                PlaceExecutionReport report2 = Betfair.placeOrders(MarketNode.MarketID, instructions);
+                                Status = report2.errorCode != null ? report2.errorCode : report2.status;
+                            }
+                        });
+                    }
+                    break;
+
                 case "Reset":
                     MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
                     json_rows = File.ReadAllLines(".\\notifications.json");
