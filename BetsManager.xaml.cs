@@ -682,7 +682,7 @@ namespace SpreadTrader
                             }
                             else
                             {
-                                CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
+                                CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
                                 if (report != null && report.errorCode != null)
                                 {
                                     throw new Exception(ErrorCodes.FaultCode(report.errorCode));
