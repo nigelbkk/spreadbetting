@@ -913,6 +913,7 @@ namespace BetfairAPI
             this.betId = betId;
         }
         public UInt64 betId { get; set; }
+        public double sizeReduction { get; set; }
     }
     public class LimitOrder
     {

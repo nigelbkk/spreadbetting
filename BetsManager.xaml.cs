@@ -644,52 +644,34 @@ namespace SpreadTrader
             Button b = sender as Button;
             switch (b.Tag)
             {
-
                 case "HalveUnmatched":
 
                     if (MarketNode != null)
                     {
                         await Task.Run(() =>
                         {
-                            List<PlaceInstruction> instructions = new List<PlaceInstruction>();
-                            List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
+                            List<CancelInstruction> cancel_instructions = new List<CancelInstruction>() ;
 
-                            foreach(Row row in Rows)
+                            foreach (Row row in Rows)
                             {
                                 if (!row.IsMatched && row.Stake >= 4)
                                 {
-                                    cancel_instructions.Add(new CancelInstruction(row.BetID));
-                                    instructions.Add(new PlaceInstruction()
-                                    {
-                                        orderTypeEnum = orderTypeEnum.LIMIT,
-                                        sideEnum = row.Side.ToUpper() == "BACK" ? sideEnum.BACK : sideEnum.LAY,
-                                        Runner = row.Runner,
-                                        marketTypeEnum = marketTypeEnum.WIN,
-                                        selectionId = row.SelectionID,
-                                        limitOrder = new LimitOrder()
-                                        {
-                                            persistenceTypeEnum = persistenceTypeEnum.LAPSE,
-                                            price = row.Odds,
-                                            size = Math.Abs(row.Stake / 2),
-                                        }
-                                    });
+                                    cancel_instructions.Add(new CancelInstruction(row.BetID) { sizeReduction = row.Stake/ 2 });
                                 }
                             }
 
-                            if (instructions.Count == 0)
+                            if (cancel_instructions.Count == 0)
                             {
                                 Status = "Nothing to do";
                             }
                             else
                             {
-                                CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-                                if (report != null && report.errorCode != null)
-                                {
-                                    throw new Exception(ErrorCodes.FaultCode(report.errorCode));
-                                }
-
-                                PlaceExecutionReport report2 = Betfair.placeOrders(MarketNode.MarketID, instructions);
-                                Status = report2.errorCode != null ? report2.errorCode : report2.status;
+								CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+								if (report != null && report.errorCode != null)
+								{
+									throw new Exception(ErrorCodes.FaultCode(report.errorCode));
+								}
+                                Status = report.errorCode != null ? report.errorCode : report.status;
                             }
                         });
                     }
