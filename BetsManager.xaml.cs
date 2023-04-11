@@ -656,7 +656,7 @@ namespace SpreadTrader
                             {
                                 if (!row.IsMatched && row.Stake >= 4)
                                 {
-                                    cancel_instructions.Add(new CancelInstruction(row.BetID) { sizeReduction = row.Stake/ 2 });
+                                    cancel_instructions.Add(new CancelInstruction(row.BetID) { sizeReduction = Math.Round((row.Stake/ 2),2) });
                                 }
                             }
 
@@ -669,7 +669,7 @@ namespace SpreadTrader
 								CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
 								if (report != null && report.errorCode != null)
 								{
-									throw new Exception(ErrorCodes.FaultCode(report.errorCode));
+									//throw new Exception(ErrorCodes.FaultCode(report.errorCode));
 								}
                                 Status = report.errorCode != null ? report.errorCode : report.status;
                             }
