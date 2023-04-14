@@ -63,26 +63,34 @@ namespace SpreadTrader
             System.Net.ServicePointManager.Expect100Continue = false;
             InitializeComponent();
             this.Language = System.Windows.Markup.XmlLanguage.GetLanguage(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
-            Betfair = new BetfairAPI.BetfairAPI();
-            if (!props.UseProxy)
-            {
-                Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
-
-                System.Timers.Timer t = new System.Timers.Timer();
-                t.Elapsed += (o, e) =>
-                {
-                  Betfair.KeepAlive();
-                  Console.WriteLine("KeepAlive");
-                };
-                t.Interval = 1 * 60 * 60 * 1000;
-                t.Enabled = true;
-                t.Start();
-              }
-            UpdateAccountInformation();
             this.Top = Math.Max(0, props.Top);
             this.Left = Math.Max(0, props.Left);
             this.Height = Math.Max(0, props.Height);
             this.Width = Math.Max(0, props.Width);
+
+            Betfair = new BetfairAPI.BetfairAPI();
+            try
+            {
+                if (!props.UseProxy)
+                {
+                    Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
+
+                    System.Timers.Timer t = new System.Timers.Timer();
+                    t.Elapsed += (o, e) =>
+                    {
+                        Betfair.KeepAlive();
+                        Console.WriteLine("KeepAlive");
+                    };
+                    t.Interval = 1 * 60 * 60 * 1000;
+                    t.Enabled = true;
+                    t.Start();
+                }
+                UpdateAccountInformation();
+            }
+            catch(Exception xe)
+			{
+                Status = xe.Message;
+			}
         }
         public void UpdateAccountInformation()
         {

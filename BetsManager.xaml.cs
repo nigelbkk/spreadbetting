@@ -376,12 +376,12 @@ namespace SpreadTrader
                                     {
                                         row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
                                         Dispatcher.BeginInvoke(new Action(() => {
-                                            Debug.WriteLine("Insert into grid", row.BetID);
+                                            Debug.WriteLine("Insert into grid: " + row.BetID.ToString());
                                             Rows.Insert(0, row); 
                                         }));
                                         //Rows.Insert(0, row);
                                         //NotifyPropertyChanged("");
-                                        Debug.WriteLine(o.Id, "new bet");
+                                        Debug.WriteLine(o.Id, "new bet: " + row.BetID.ToString());
                                     }
                                     row.Runner = MarketNode.GetRunnerName(row.SelectionID);
 
@@ -390,7 +390,7 @@ namespace SpreadTrader
                                         row.Stake = o.S.Value;
                                         row.SizeMatched = o.Sm.Value;
                                         row.Hidden = false;
-                                        Debug.WriteLine(o.Id, "unmatched");
+                                        Debug.WriteLine(o.Id, "unmatched: " + row.BetID.ToString());
                                     }
                                     if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                             // fully matched
                                     {
@@ -412,7 +412,7 @@ namespace SpreadTrader
                                             SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
                                             snd.Play();
                                         }
-                                        Debug.WriteLine(o.Id, "fully matched");
+                                        Debug.WriteLine(o.Id, "fully matched: " + row.BetID.ToString());
                                     }
                                     if (o.Sm > 0 && o.Sr > 0)                           // partially matched
                                     {
@@ -437,21 +437,21 @@ namespace SpreadTrader
                                             SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
                                             snd.Play();
                                         }
-                                        Debug.WriteLine(o.Id, "partial match");
+                                        Debug.WriteLine(o.Id, "partial match: " + row.BetID.ToString());
                                     }
                                     if (o.Sc > 0)                                       // cancelled
                                     {
                                         if (o.Sr != 0)                                  // cancellation of partially matched bet
                                         {
                                             row.Stake = o.Sr.Value;                     // adjust unmatched remainder
-                                            Debug.WriteLine(o.Id, "Cancellation of partially matched bet");
+                                            Debug.WriteLine(o.Id, "Cancellation of partially matched bet: " + row.BetID.ToString());
                                         }
                                         if (o.Sr == 0)
                                         {
-                                            Debug.WriteLine("Bet fully cancelled");
+                                            Debug.WriteLine("Bet fully cancelled: " + row.BetID.ToString());
                                             to_remove.Add(row);
                                         }
-                                        Debug.WriteLine(o.Id, "cancelled");
+                                        Debug.WriteLine(o.Id, "cancelled: " + row.BetID.ToString());
                                     }
                                 }
                                 foreach (Row o in to_remove)
@@ -459,7 +459,7 @@ namespace SpreadTrader
                                     Dispatcher.BeginInvoke(new Action(() => {
                                         if (Rows.Contains(o))
                                         {
-                                            Debug.WriteLine("Remove from grid", o.BetID);
+                                            Debug.WriteLine("Remove from grid: "+ o.BetID.ToString());
                                             Rows.Remove(o);
                                         }
                                     }));
