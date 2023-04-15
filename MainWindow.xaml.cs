@@ -209,9 +209,12 @@ namespace SpreadTrader
 			if (e.AddedItems.Count > 0)
 			{
 				TabItem ti = e.AddedItems[0] as TabItem;
-				CustomTabHeader cth = ti.Header as CustomTabHeader;
-				if (cth != null)
-					cth.OnSelected();
+				if (ti != null)
+				{
+					CustomTabHeader cth = ti.Header as CustomTabHeader;
+					if (cth != null)
+						cth.OnSelected();
+				}
 			}
 		}
 		private void TabItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
