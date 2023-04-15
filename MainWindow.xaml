@@ -32,9 +32,7 @@
 					<RowDefinition/>
 				</Grid.RowDefinitions>
 				<Grid Grid.Row ="0" Name="MainMenu">
-					<StackPanel Orientation="Horizontal" VerticalAlignment="Top" DockPanel.Dock="Top" Height="28" ToolTip="Single click to update">
-							<Button Grid.Column="0" Width="2" Visibility="Hidden">
-							</Button>
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Top" DockPanel.Dock="Top" Height="28">
 							<Button Content ="Refresh" Tag="Refresh" Grid.Column="1" ToolTip="Refresh Markets" Click="Button_Click"/>
 							<Button Content ="Favourites" Tag="Favourites" Name="FavouritesButton" Grid.Column="2" ToolTip="Favourites" Click="Button_Click"/>
 							<Button Content ="Settings" Tag="Settings" Grid.Column="3" ToolTip="Settings" Click="Button_Click"/>
@@ -51,12 +49,12 @@
 									<TextBlock Text="{Binding Path=Exposure, Converter={StaticResource cconverter }}"/>
 								</StackPanel>
 							</Label>
-							<Label BorderThickness="0.5" >
+							<Button Tag="Commission" Click="Button_Click" BorderThickness="0.5"  ToolTip="Single click to update">
 								<StackPanel Orientation="Horizontal">
 									<TextBlock Text="Commission: "/>
 									<TextBlock Text="{Binding Path=Commission, Converter={StaticResource pcconverter }}"/>
 								</StackPanel>
-							</Label>
+							</Button>
 						</StackPanel>
 				</Grid>
 				<Grid Grid.Row="1" Name="InnerGrid" >

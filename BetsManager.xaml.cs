@@ -376,12 +376,12 @@ namespace SpreadTrader
                                     {
                                         row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
                                         Dispatcher.BeginInvoke(new Action(() => {
-                                            Debug.WriteLine("Insert into grid: " + row.BetID.ToString());
+                                            Debug.WriteLine(o.Id, "Insert into grid: ");
                                             Rows.Insert(0, row); 
                                         }));
                                         //Rows.Insert(0, row);
                                         //NotifyPropertyChanged("");
-                                        Debug.WriteLine(o.Id, "new bet: " + row.BetID.ToString());
+                                        Debug.WriteLine(o.Id, "new bet: ");
                                     }
                                     row.Runner = MarketNode.GetRunnerName(row.SelectionID);
 
@@ -390,7 +390,10 @@ namespace SpreadTrader
                                         row.Stake = o.S.Value;
                                         row.SizeMatched = o.Sm.Value;
                                         row.Hidden = false;
-                                        Debug.WriteLine(o.Id, "unmatched: " + row.BetID.ToString());
+                                        Debug.WriteLine(o.Id, "unmatched: ");
+
+                                        Debug.WriteLine(MarketNode.MarketName);
+
                                     }
                                     if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                             // fully matched
                                     {
@@ -412,9 +415,9 @@ namespace SpreadTrader
                                             SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
                                             snd.Play();
                                         }
-                                        Debug.WriteLine(o.Id, "fully matched: " + row.BetID.ToString());
+                                        Debug.WriteLine(o.Id, "fully matched: ");
                                     }
-                                    if (o.Sm > 0 && o.Sr > 0)                           // partially matched
+                                    if (o.Sm > 0 && o.Sr > 0)                                           // partially matched
                                     {
                                         Row mrow = new Row(row);
                                         mrow.SizeMatched = o.Sm.Value;
@@ -428,8 +431,8 @@ namespace SpreadTrader
                                             Debug.WriteLine("Append to grid", mrow.BetID);
                                             Rows.Insert(idx+1, mrow); 
                                         }));
-//                                        Rows.Insert(idx + 1, mrow);                  // insert a new row for the matched portion
-                                        row.Stake = o.Sr.Value;                     // change stake for the unmatched remainder
+//                                        Rows.Insert(idx + 1, mrow);                   // insert a new row for the matched portion
+                                        row.Stake = o.Sr.Value;                         // change stake for the unmatched remainder
                                         NotifyPropertyChanged("");
 
                                         if (!String.IsNullOrEmpty(props.MatchedBetAlert))
@@ -437,21 +440,37 @@ namespace SpreadTrader
                                             SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
                                             snd.Play();
                                         }
-                                        Debug.WriteLine(o.Id, "partial match: " + row.BetID.ToString());
+                                        Debug.WriteLine(o.Id, "partial match: ");
                                     }
                                     if (o.Sc > 0)                                       // cancelled
                                     {
                                         if (o.Sr != 0)                                  // cancellation of partially matched bet
                                         {
                                             row.Stake = o.Sr.Value;                     // adjust unmatched remainder
-                                            Debug.WriteLine(o.Id, "Cancellation of partially matched bet: " + row.BetID.ToString());
+                                            Debug.WriteLine(o.Id, "Cancellation of partially matched bet: ");
                                         }
                                         if (o.Sr == 0)
                                         {
-                                            Debug.WriteLine("Bet fully cancelled: " + row.BetID.ToString());
+                                            Debug.WriteLine(o.Id, "Bet fully cancelled: ");
                                             to_remove.Add(row);
                                         }
-                                        Debug.WriteLine(o.Id, "cancelled: " + row.BetID.ToString());
+                                        Debug.WriteLine(o.Id, "cancelled: ");
+
+                                        // change the tab color
+
+                                        Dispatcher.BeginInvoke(new Action(() => {
+                                            foreach (TabItem ti in Extensions.MainWindow.TabControl.Items)
+                                            {
+                                                TabContent ct = ti.Content as TabContent;
+                                                CustomTabHeader header = ti.Header as CustomTabHeader;
+
+												if (!ti.IsSelected && ct.MarketNode != null && ct.MarketNode.MarketID == MarketNode.MarketID)
+												{
+													header.OnMatched();
+                                                    break;
+												}
+											}
+                                        }));
                                     }
                                 }
                                 foreach (Row o in to_remove)

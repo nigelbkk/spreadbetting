@@ -103,7 +103,7 @@
 			<DataTemplate x:Key="DataTemplate_Runner">
 				<Grid>
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="156"/>
+						<ColumnDefinition Width="200"/>
 						<ColumnDefinition/>
 						<ColumnDefinition/>
 						<ColumnDefinition/>
@@ -139,7 +139,7 @@
 		</Grid.RowDefinitions>
 		<Grid Name="Header" Grid.Row="0" Margin="0,0,0,0">
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="142"/>
+				<ColumnDefinition Width="200"/>
 				<ColumnDefinition/>
 				<ColumnDefinition/>
 				<ColumnDefinition/>
@@ -153,7 +153,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-			<Label HorizontalAlignment="Left" Grid.Column="0" Content="Selection Name" FontSize="16"/>
+			<Label HorizontalAlignment="Left" Grid.Column="0" Content="Selection Name" FontSize="16" BorderBrush="Transparent"/>
 			<Label Grid.Column="1"/>
 			<Label Grid.Column="2"/>
 			<Label Content="{Binding Path=BackBook, Converter={StaticResource pconverter}}" FontSize="11" Grid.Column="3"/>

@@ -61,8 +61,8 @@ namespace SpreadTrader
                 return string.Empty;
 
             UInt32 val = System.Convert.ToUInt32(Math.Abs((double)value));
-            if (val == 0)
-                return string.Empty;
+            //if (val == 0)
+            //    return string.Empty;
 
             String cs = val.ToString();
             if (cs.Length > 3)

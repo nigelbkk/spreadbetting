@@ -34,14 +34,13 @@
 						<RowDefinition/>
 					</Grid.RowDefinitions>
 					<Grid Grid.Row="0">
-						<local:MarketHeader x:Name="marketHeader" />
+						<local:MarketHeader x:Name="marketHeader" Height="34"/>
 					</Grid>
 					<Grid Grid.Row="1" Name ="RunnerandSlidersGrid">
 						<DockPanel>
 							<Grid>
 								<Grid.ColumnDefinitions>
 									<ColumnDefinition Width="{Binding splitter1, Source={x:Static properties:Settings.Default}, Mode=TwoWay}" />
-									<!--<ColumnDefinition Width="600"/>-->
 									<ColumnDefinition/>
 								</Grid.ColumnDefinitions>
 								<Grid Grid.Column="0" Name="RunnersGrid">

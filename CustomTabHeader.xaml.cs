@@ -10,19 +10,34 @@ namespace SpreadTrader
         public String Title { set { TabTitle.Content = value; } }
         public Int32 ID { get; set; }
         public TabItem Tab { get; set; }
+        private bool inPlay { get; set; }
         public CustomTabHeader()
         {
             InitializeComponent();
             StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
             {
+                inPlay = inplay;
                 if (marketid != "")         //TODO
                 {
                     this.Dispatcher.Invoke(() =>
                     {
-                        TabTitle.Foreground = inplay ? Brushes.LightGreen : Brushes.DarkGray;
+                        TabTitle.Foreground = inplay ? Brushes.LightGreen : Brushes.DarkSlateGray;
                     });
                 }
             };
+        }
+        public void OnMatched()
+        {
+            if (!Tab.IsSelected)
+            {
+                TabTitle.Foreground = Brushes.WhiteSmoke;
+                TabTitle.Background = Brushes.Orange;
+            }
+        }
+        public void OnSelected()
+        {
+            TabTitle.Foreground = inPlay ? Brushes.LightGreen : Brushes.DarkSlateGray;
+            TabTitle.Background = Brushes.Transparent;
         }
         private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
         {
@@ -31,10 +46,6 @@ namespace SpreadTrader
             {
                 mainWindow.RemoveTab(this);
             }
-        }
-        private void StackPanel_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-
         }
     }
 }
