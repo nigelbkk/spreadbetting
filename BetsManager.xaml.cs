@@ -437,6 +437,7 @@ namespace SpreadTrader
 										row.SizeMatched = row.OriginalStake;// o.Sm.Value;
 										row.Hidden = UnmatchedOnly;
 										NotifyBetMatched();
+										NotifyPropertyChanged("");
 										Debug.WriteLine(o.Id, "fully matched: ");
 									}
 									if (o.Sm > 0 && o.Sr > 0)                                           // partially matched
