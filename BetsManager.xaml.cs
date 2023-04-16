@@ -268,7 +268,7 @@ namespace SpreadTrader
 						incomingOrdersQueue.Enqueue(json1);
 					}
 					if (props.production)        // live system?
-								{
+					{
 						String file_name = String.Format(".\\notifications.json");
 						if (!File.Exists(file_name))
 						{
@@ -322,9 +322,9 @@ namespace SpreadTrader
 
 			OnFavoriteChanged += (runner) =>
 			{
-							//Debug.WriteLine("OnFavoriteChanged");
-							// Favorite = runner;
-						};
+				//Debug.WriteLine("OnFavoriteChanged");
+				// Favorite = runner;
+			};
 
 			OnMarketSelected += (node) =>
 			{
@@ -337,6 +337,28 @@ namespace SpreadTrader
 			Connect();
 		}
 		private object lockObj = new object();
+		private void NotifyBetMatched()
+		{
+			Dispatcher.BeginInvoke(new Action(() =>
+			{
+				foreach (TabItem ti in Extensions.MainWindow.TabControl.Items)
+				{
+					TabContent ct = ti.Content as TabContent;
+					CustomTabHeader header = ti.Header as CustomTabHeader;
+
+					if (!ti.IsSelected && ct.MarketNode != null && ct.MarketNode.MarketID == MarketNode.MarketID)
+					{
+						header.OnMatched();						// change the tab color
+						break;
+					}
+				}
+			}));
+			if (!String.IsNullOrEmpty(props.MatchedBetAlert))
+			{
+				SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
+				snd.Play();
+			}
+		}
 
 		private void OnOrderChanged(String json)
 		{
@@ -374,10 +396,6 @@ namespace SpreadTrader
 								foreach (Order o in orc.Uo)
 								{
 									UInt64 betid = Convert.ToUInt64(o.Id);
-
-									if (betid == 299150050157)
-									{
-									}
 									Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
 
 									Row row = FindUnmatchedRow(o.Id);
@@ -389,8 +407,6 @@ namespace SpreadTrader
 											Debug.WriteLine(o.Id, "Insert into grid: ");
 											Rows.Insert(0, row);
 										}));
-										//Rows.Insert(0, row);
-										//NotifyPropertyChanged("");
 										Debug.WriteLine(o.Id, "new bet: ");
 									}
 									row.Runner = MarketNode.GetRunnerName(row.SelectionID);
@@ -420,11 +436,7 @@ namespace SpreadTrader
 										row.AvgPriceMatched = o.Avp.Value;
 										row.SizeMatched = row.OriginalStake;// o.Sm.Value;
 										row.Hidden = UnmatchedOnly;
-										if (!String.IsNullOrEmpty(props.MatchedBetAlert))
-										{
-											SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
-											snd.Play();
-										}
+										NotifyBetMatched();
 										Debug.WriteLine(o.Id, "fully matched: ");
 									}
 									if (o.Sm > 0 && o.Sr > 0)                                           // partially matched
@@ -442,15 +454,9 @@ namespace SpreadTrader
 											Debug.WriteLine("Append to grid", mrow.BetID);
 											Rows.Insert(idx + 1, mrow);
 										}));
-										//                                        Rows.Insert(idx + 1, mrow);                   // insert a new row for the matched portion
 										row.Stake = o.Sr.Value;                         // change stake for the unmatched remainder
+										NotifyBetMatched();
 										NotifyPropertyChanged("");
-
-										if (!String.IsNullOrEmpty(props.MatchedBetAlert))
-										{
-											SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
-											snd.Play();
-										}
 										Debug.WriteLine(o.Id, "partial match: ");
 									}
 									if (o.Sc > 0)                                       // cancelled
@@ -466,23 +472,7 @@ namespace SpreadTrader
 											to_remove.Add(row);
 										}
 										Debug.WriteLine(o.Id, "cancelled: ");
-
-										// change the tab color
-
-										Dispatcher.BeginInvoke(new Action(() =>
-										{
-											foreach (TabItem ti in Extensions.MainWindow.TabControl.Items)
-											{
-												TabContent ct = ti.Content as TabContent;
-												CustomTabHeader header = ti.Header as CustomTabHeader;
-
-												if (!ti.IsSelected && ct.MarketNode != null && ct.MarketNode.MarketID == MarketNode.MarketID)
-												{
-													header.OnMatched();
-													break;
-												}
-											}
-										}));
+//										NotifyBetMatched();
 									}
 								}
 								foreach (Row o in to_remove)
@@ -701,8 +691,8 @@ namespace SpreadTrader
 								CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
 								if (report != null && report.errorCode != null)
 								{
-															//throw new Exception(ErrorCodes.FaultCode(report.errorCode));
-														}
+									//throw new Exception(ErrorCodes.FaultCode(report.errorCode));
+								}
 								Status = report.errorCode != null ? report.errorCode : report.status;
 							}
 						});
