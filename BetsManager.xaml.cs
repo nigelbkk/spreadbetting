@@ -801,10 +801,12 @@ namespace SpreadTrader
 		{
 			String json = props.ColumnWidths;
 			double[] widths = JsonConvert.DeserializeObject<double[]>(json);
-			Debug.WriteLine(widths);
-			for(int i=0;i<widths.Length;i++)
+			if (widths != null)
 			{
-				dataGrid.Columns[i].Width = new DataGridLength(widths[i]);
+				for (int i = 0; i < widths.Length; i++)
+				{
+					dataGrid.Columns[i].Width = new DataGridLength(widths[i]);
+				}
 			}
 		}
 	}
