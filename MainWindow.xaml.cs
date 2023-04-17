@@ -24,7 +24,6 @@ namespace SpreadTrader
 			get { return _Status; }
 			set
 			{
-
 				_Status = value;
 				Debug.WriteLine(value);
 				Dispatcher.BeginInvoke(new Action(() =>
@@ -170,6 +169,7 @@ namespace SpreadTrader
 			customTabHeader.Tab = tab;
 
 			EventsTree.OnMarketSelected += tabContent.OnMarketSelected;
+			OnShutdown += tabContent.BetsManager.OnShutdown;
 			//OnMarketChanged += tabContent.OnMarketSelected;
 
 			tab.IsSelected = true;

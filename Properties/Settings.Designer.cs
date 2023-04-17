@@ -526,5 +526,17 @@ namespace SpreadTrader.Properties {
                 this["production"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ColumnWidths {
+            get {
+                return ((string)(this["ColumnWidths"]));
+            }
+            set {
+                this["ColumnWidths"] = value;
+            }
+        }
     }
 }
