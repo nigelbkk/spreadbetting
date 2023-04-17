@@ -49,12 +49,19 @@
 									<TextBlock Text="{Binding Path=Exposure, Converter={StaticResource cconverter }}"/>
 								</StackPanel>
 							</Label>
-							<Button Tag="Commission" Click="Button_Click" BorderThickness="0.5"  ToolTip="Single click to update">
+							<Label BorderThickness="0.5">
 								<StackPanel Orientation="Horizontal">
 									<TextBlock Text="Commission: "/>
 									<TextBlock Text="{Binding Path=Commission, Converter={StaticResource pcconverter }}"/>
 								</StackPanel>
-							</Button>
+							</Label>
+
+                        <!--<Button Tag="Commission" Click="Button_Click" BorderThickness="0.5"  ToolTip="Single click to update">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Text="Commission: "/>
+									<TextBlock Text="{Binding Path=Commission, Converter={StaticResource pcconverter }}"/>
+								</StackPanel>
+							</Button>-->
 						</StackPanel>
 				</Grid>
 				<Grid Grid.Row="1" Name="InnerGrid" >

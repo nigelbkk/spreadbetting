@@ -24,8 +24,9 @@ namespace SpreadTrader
         private BackgroundWorker Worker = null;
         public NodeViewModel _MarketNode { get; set; }
         public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
-        public double BackBook { get; set; }
-        public double LayBook { get; set; }
+        public double BackBook { get { return MarketNode == null ? 0.00 : MarketNode.BackBook; } }
+        public double LayBook { get { return MarketNode == null ? 0.00 : MarketNode.LayBook;  } }
+//        public double LayBook { get; set; }
         public List<LiveRunner> LiveRunners { get; set; }
         private Properties.Settings props = Properties.Settings.Default;
         public event PropertyChangedEventHandler PropertyChanged;
@@ -81,8 +82,8 @@ namespace SpreadTrader
                     MarketNode.LiveRunners = LiveRunners;
                     MarketNode.CalculateLevelProfit();
                     MarketNode.TotalMatched = tradedVolume;
-                    BackBook = totalBack;
-                    LayBook = totalLay;
+                    //BackBook = totalBack;
+                    //LayBook = totalLay;
                     UpdateMarketStatus();
                     NotifyPropertyChanged("");
                     if (Worker.IsBusy)
@@ -182,8 +183,6 @@ namespace SpreadTrader
                             {
                                 OnMarketChanged(MarketNode);
                             }
-
-                            //                            MarketHeader.NotifyP
                             NotifyPropertyChanged("");
                             Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
                             sender.ReportProgress(rate, lr);

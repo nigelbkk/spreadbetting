@@ -77,6 +77,8 @@ namespace SpreadTrader
             {
                 List<MarketProfitAndLoss> pl = Betfair.listMarketProfitAndLoss(MarketID);
                 Market.MarketBook = Betfair.GetMarketBook(Market);
+                BackBook = Market.MarketBook.BackBook;
+                LayBook = Market.MarketBook.LayBook;
                 TotalMatched = Market.MarketBook.totalMatched;
                 Status = Market.MarketBook.status;
                 if (Market.MarketBook.Runners.Count > 0) foreach (Runner r in Market.MarketBook.Runners)

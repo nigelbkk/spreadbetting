@@ -346,6 +346,7 @@ namespace SpreadTrader
 				if (IsLoaded)
 				{
 					MarketNode = node;
+					Extensions.MainWindow.Commission = MarketNode.Commission;
 					PopulateDataGrid();
 				}
 			};
@@ -540,7 +541,7 @@ namespace SpreadTrader
 								Runner = RunnersControl.GetRunnerName(o.selectionId),
 							});
 						}
-						dataGrid.Columns[0].Width = 200;
+						//dataGrid.Columns[0].Width = 200;
 						NotifyPropertyChanged("");
 					}
 					catch (Exception xe)
