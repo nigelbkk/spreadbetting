@@ -161,15 +161,6 @@ namespace SpreadTrader
         }
         private void LevelProfit(LiveRunner runner1, LiveRunner runner2)
         {
-            /////NH
-            //runner1.LayValues[0].price = 1.24;
-            //runner1.BackValues[0].price = 1.38;
-            //runner1.ifWin = -20.49;
-
-            //runner2.LayValues[0].price = 4.2;
-            //runner2.BackValues[0].price = 6.6;
-            //runner2.ifWin = 66.94;
-
             Double G3 = runner1.ifWin;
             Double J3 = runner2.ifWin;
 
@@ -208,19 +199,6 @@ namespace SpreadTrader
         }
         private void LevelProfit(LiveRunner runner1, LiveRunner runner2, LiveRunner draw)
         {
-            ///NH
-            //runner1.LayValues[0].price = 1.4;
-            //runner1.BackValues[0].price = 2.48;
-            //runner1.ifWin = -36.22;
-
-            //runner2.LayValues[0].price = 1.8;
-            //runner2.BackValues[0].price = 3.9;
-            //runner2.ifWin = 296.25;
-
-            //draw.LayValues[0].price = 26;
-            //draw.BackValues[0].price = 38;
-            //draw.ifWin = 296.25;
-
             Double D5 = runner1.ifWin;
             Double E5 = runner2.ifWin;
             Double F5 = draw.ifWin;
