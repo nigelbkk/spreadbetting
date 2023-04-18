@@ -48,7 +48,7 @@
 			<TextBox TextWrapping="Wrap" Text="{Binding Path=DebugID}" Visibility="Hidden" HorizontalContentAlignment="Center" />
 		</StackPanel>
 		<ContentControl Grid.Row="1">
-			<DataGrid Name="dataGrid" AutoGenerateColumns="False" Background="#00000000" ItemsSource="{Binding Rows}" MouseLeftButtonUp="dataGrid_MouseLeftButtonUp" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" Grid.ColumnSpan="2" IsReadOnly="True" CanUserSortColumns="True"
+			<DataGrid Name="dataGrid" AutoGenerateColumns="False" Background="#00000000" ItemsSource="{Binding Rows}" CanUserAddRows="False" CanUserResizeColumns="True" CanUserResizeRows="False" Grid.ColumnSpan="2" IsReadOnly="True" CanUserSortColumns="True"
 				ScrollViewer.CanContentScroll="True" 
 				ScrollViewer.VerticalScrollBarVisibility="Auto"
 				ScrollViewer.HorizontalScrollBarVisibility="Auto">

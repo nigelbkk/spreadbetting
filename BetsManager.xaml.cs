@@ -788,11 +788,6 @@ namespace SpreadTrader
 			UpdateBet ub = new UpdateBet(row);
 			ub.ShowDialog();
 		}
-		private void dataGrid_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-		{
-			dataGrid.Columns[0].Width = new DataGridLength(dataGrid.Columns[0].Width.Value * 2);
-			NotifyPropertyChanged("");
-		}
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
 
