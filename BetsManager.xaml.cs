@@ -144,6 +144,8 @@ namespace SpreadTrader
 			}
 		}
 		public Int32 DebugID { get; set; }
+		//public double ColumnWidth { get { return 5; }}
+
 		public double MatchAmount { get; set; }
 		public bool UnmatchedOnly { get; set; }
 		public String LastUpdated { get { return String.Format("Orders last updated {0}", _LastUpdated.AddHours(props.TimeOffset).ToString("HH:mm:ss")); } }
@@ -243,6 +245,7 @@ namespace SpreadTrader
 				System.Threading.Thread.Sleep(10);
 			}
 		}
+
 		public BetsManager()
 		{
 			BackgroundWorker bw = new BackgroundWorker();
@@ -252,21 +255,6 @@ namespace SpreadTrader
 			BackgroundWorker bw2 = new BackgroundWorker();
 			bw2.DoWork += (o, e) => ProcessCancellationQueue(o);
 			bw2.RunWorkerAsync();
-
-			OnShutdown += () =>
-			{
-				Debug.WriteLine("OnClose");
-				List<double> widths = new List<double>();
-
-				foreach (DataGridColumn col in dataGrid.Columns)
-				{
-					widths.Add(col.ActualWidth);
-				}
-				String json = JsonConvert.SerializeObject(widths.ToArray());
-				Debug.WriteLine(json);
-				props.ColumnWidths = json;
-				props.Save();
-			};
 
 			hubConnection = new HubConnection("http://" + props.StreamUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
@@ -352,6 +340,12 @@ namespace SpreadTrader
 			};
 			Connect();
 		}
+
+		//private void DataGrid_ColumnHeaderDragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
+		//{
+		//	throw new NotImplementedException();
+		//}
+
 		private object lockObj = new object();
 		private void NotifyBetMatched()
 		{
@@ -533,14 +527,14 @@ namespace SpreadTrader
 						CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.185904913"
 
 						if (report.currentOrders.Count > 0) foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
-						{
-							OrdersStatic.BetID2SelectionID[o.betId] = o.selectionId;
-							Row.RunnerNames[o.selectionId] = RunnersControl.GetRunnerName(o.selectionId);
-							Rows.Insert(0, new Row(o)
 							{
-								Runner = RunnersControl.GetRunnerName(o.selectionId),
-							});
-						}
+								OrdersStatic.BetID2SelectionID[o.betId] = o.selectionId;
+								Row.RunnerNames[o.selectionId] = RunnersControl.GetRunnerName(o.selectionId);
+								Rows.Insert(0, new Row(o)
+								{
+									Runner = RunnersControl.GetRunnerName(o.selectionId),
+								});
+							}
 						//dataGrid.Columns[0].Width = 200;
 						NotifyPropertyChanged("");
 					}
@@ -788,10 +782,6 @@ namespace SpreadTrader
 			UpdateBet ub = new UpdateBet(row);
 			ub.ShowDialog();
 		}
-		private void UserControl_Loaded(object sender, RoutedEventArgs e)
-		{
-
-		}
 		private void UserControl_Initialized(object sender, EventArgs e)
 		{
 			String json = props.ColumnWidths;
@@ -803,6 +793,19 @@ namespace SpreadTrader
 					dataGrid.Columns[i].Width = new DataGridLength(widths[i]);
 				}
 			}
+		}
+		private void dataGrid_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			List<double> widths = new List<double>();
+
+			foreach (DataGridColumn col in dataGrid.Columns)
+			{
+				widths.Add(col.ActualWidth);
+			}
+			String json = JsonConvert.SerializeObject(widths.ToArray());
+			Debug.WriteLine(json);
+			props.ColumnWidths = json;
+			props.Save();
 		}
 	}
 	public class OrderMarketSnap
