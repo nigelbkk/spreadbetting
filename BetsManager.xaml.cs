@@ -710,6 +710,47 @@ namespace SpreadTrader
 					}
 					break;
 
+				case "DoubleUnmatched":
+
+					if (MarketNode != null)
+					{
+						await Task.Run(() =>
+						{
+							List<PlaceInstruction> instructions = new List<PlaceInstruction>();
+
+							foreach (Row row in Rows)
+							{
+								if (!row.IsMatched && row.Stake > 0)
+								{
+									instructions.Add(new PlaceInstruction()
+									{
+										selectionId = row.SelectionID,
+										sideEnum = row.Side == "BACK" ? sideEnum.BACK : sideEnum.LAY,
+										orderTypeEnum = orderTypeEnum.LIMIT,
+										limitOrder = new LimitOrder()
+										{
+											size = row.Stake,
+											price = row.Odds,
+											persistenceTypeEnum = persistenceTypeEnum.LAPSE,
+										}
+									});
+								}
+							}
+
+							if (instructions.Count == 0)
+							{
+								Status = "Nothing to do";
+							}
+							else
+							{
+								PlaceExecutionReport report = Betfair.placeOrders(MarketNode.MarketID, instructions);
+
+								Status = report.errorCode != null ? report.errorCode : report.status;
+							}
+						});
+					}
+					break;
+
 				case "Reset":
 					MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
 					json_rows = File.ReadAllLines(".\\notifications.json");
@@ -732,7 +773,7 @@ namespace SpreadTrader
 					String json_row = json_rows[json_index];
 					OnOrderChanged(json_row);
 					json_index++;
-					break;
+				break;
 				case "Back1":
 					OnOrderChanged(newbet(MarketNode.LiveRunners[0], Order.SideEnum.B)); break;
 				case "Lay1":
@@ -748,76 +789,76 @@ namespace SpreadTrader
 				case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
 				case "CancelAll":
 					BackgroundWorker bw = new BackgroundWorker();
-					String result = "";
-					bw.RunWorkerCompleted += (o, e2) => { Status = result; };
-					bw.DoWork += (o, e2) =>
-					{
-						if (MarketNode != null)
-						{
-							CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
-							if (report != null)
-								result = report.errorCode != null ? report.errorCode : report.status;
-						}
-					};
-					bw.RunWorkerAsync();
-					break;
+String result = "";
+bw.RunWorkerCompleted += (o, e2) => { Status = result; };
+bw.DoWork += (o, e2) =>
+{
+	if (MarketNode != null)
+	{
+		CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
+		if (report != null)
+			result = report.errorCode != null ? report.errorCode : report.status;
+	}
+};
+bw.RunWorkerAsync();
+break;
 			}
 		}
 		private void CheckBox_Checked(object sender, RoutedEventArgs e)
+{
+	CheckBox cb = sender as CheckBox;
+	if (Rows.Count > 0) foreach (Row row in Rows)
 		{
-			CheckBox cb = sender as CheckBox;
-			if (Rows.Count > 0) foreach (Row row in Rows)
-				{
-					row.Hidden = cb.IsChecked == true && row.SizeMatched > 0;
-				}
+			row.Hidden = cb.IsChecked == true && row.SizeMatched > 0;
 		}
-		private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+}
+private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+{
+	CheckBox_Checked(sender, e);
+}
+private void Label_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+{
+	Label lb = sender as Label;
+	Row row = lb.DataContext as Row;
+	UpdateBet ub = new UpdateBet(row);
+	ub.ShowDialog();
+}
+private void UserControl_Initialized(object sender, EventArgs e)
+{
+	String json = props.ColumnWidths;
+	double[] widths = JsonConvert.DeserializeObject<double[]>(json);
+	if (widths != null)
+	{
+		for (int i = 0; i < widths.Length; i++)
 		{
-			CheckBox_Checked(sender, e);
+			dataGrid.Columns[i].Width = new DataGridLength(widths[i]);
 		}
-		private void Label_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-		{
-			Label lb = sender as Label;
-			Row row = lb.DataContext as Row;
-			UpdateBet ub = new UpdateBet(row);
-			ub.ShowDialog();
-		}
-		private void UserControl_Initialized(object sender, EventArgs e)
-		{
-			String json = props.ColumnWidths;
-			double[] widths = JsonConvert.DeserializeObject<double[]>(json);
-			if (widths != null)
-			{
-				for (int i = 0; i < widths.Length; i++)
-				{
-					dataGrid.Columns[i].Width = new DataGridLength(widths[i]);
-				}
-			}
-		}
-		private void dataGrid_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-		{
-			List<double> widths = new List<double>();
+	}
+}
+private void dataGrid_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+{
+	List<double> widths = new List<double>();
 
-			foreach (DataGridColumn col in dataGrid.Columns)
-			{
-				widths.Add(col.ActualWidth);
-			}
-			String json = JsonConvert.SerializeObject(widths.ToArray());
-			Debug.WriteLine(json);
-			props.ColumnWidths = json;
-			props.Save();
-		}
+	foreach (DataGridColumn col in dataGrid.Columns)
+	{
+		widths.Add(col.ActualWidth);
+	}
+	String json = JsonConvert.SerializeObject(widths.ToArray());
+	Debug.WriteLine(json);
+	props.ColumnWidths = json;
+	props.Save();
+}
 	}
 	public class OrderMarketSnap
-	{
-		public string MarketId { get; set; }
-		public bool IsClosed { get; set; }
-		public IEnumerable<OrderMarketRunnerSnap> OrderMarketRunners { get; set; }
-	}
-	public class OrderMarketRunnerSnap
-	{
-		public IList<PriceSize> MatchedLay { get; set; }
-		public IList<PriceSize> MatchedBack { get; set; }
-		public Dictionary<string, Order> UnmatchedOrders { get; set; }
-	}
+{
+	public string MarketId { get; set; }
+	public bool IsClosed { get; set; }
+	public IEnumerable<OrderMarketRunnerSnap> OrderMarketRunners { get; set; }
+}
+public class OrderMarketRunnerSnap
+{
+	public IList<PriceSize> MatchedLay { get; set; }
+	public IList<PriceSize> MatchedBack { get; set; }
+	public Dictionary<string, Order> UnmatchedOrders { get; set; }
+}
 }
