@@ -73,9 +73,6 @@ namespace SpreadTrader
             NotifyPropertyChanged("");
             e.Handled = true;
         }
-
-        
-
         private void tb_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             Int32 caret = tb.CaretIndex;

@@ -228,7 +228,7 @@ namespace SpreadTrader
 							UInt64 betid = cancellation_queue.Dequeue();
 
 							Debug.WriteLine("submit cancel {0}", betid);
-							CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid);
+							CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid, null);
 							if (report.errorCode == null)
 							{
 								Debug.WriteLine("bet is cancelled {0}", betid);
@@ -340,11 +340,6 @@ namespace SpreadTrader
 			};
 			Connect();
 		}
-
-		//private void DataGrid_ColumnHeaderDragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
-		//{
-		//	throw new NotImplementedException();
-		//}
 
 		private object lockObj = new object();
 		private void NotifyBetMatched()
@@ -716,36 +711,47 @@ namespace SpreadTrader
 					{
 						await Task.Run(() =>
 						{
-							List<PlaceInstruction> instructions = new List<PlaceInstruction>();
+							List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
+							List<PlaceInstruction> place_instructions = new List<PlaceInstruction>();
 
 							foreach (Row row in Rows)
 							{
 								if (!row.IsMatched && row.Stake > 0)
 								{
-									instructions.Add(new PlaceInstruction()
+									cancel_instructions.Add(new CancelInstruction(row.BetID)
+									{
+										sizeReduction = null
+									});
+									place_instructions.Add(new PlaceInstruction()
 									{
 										selectionId = row.SelectionID,
 										sideEnum = row.Side == "BACK" ? sideEnum.BACK : sideEnum.LAY,
 										orderTypeEnum = orderTypeEnum.LIMIT,
 										limitOrder = new LimitOrder()
 										{
-											size = row.Stake,
+											size = row.Stake*2,
 											price = row.Odds,
 											persistenceTypeEnum = persistenceTypeEnum.LAPSE,
 										}
 									});
 								}
 							}
-
-							if (instructions.Count == 0)
+							if (cancel_instructions.Count == 0)
 							{
 								Status = "Nothing to do";
 							}
 							else
 							{
-								PlaceExecutionReport report = Betfair.placeOrders(MarketNode.MarketID, instructions);
+								CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
 
-								Status = report.errorCode != null ? report.errorCode : report.status;
+								if (cancel_report.status != "SUCCESS")
+								{
+									Status = cancel_report.status;
+								} else
+								{
+									PlaceExecutionReport place_report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
+									Status = place_report.status;
+								}
 							}
 						});
 					}
@@ -773,7 +779,7 @@ namespace SpreadTrader
 					String json_row = json_rows[json_index];
 					OnOrderChanged(json_row);
 					json_index++;
-				break;
+					break;
 				case "Back1":
 					OnOrderChanged(newbet(MarketNode.LiveRunners[0], Order.SideEnum.B)); break;
 				case "Lay1":
@@ -789,76 +795,76 @@ namespace SpreadTrader
 				case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
 				case "CancelAll":
 					BackgroundWorker bw = new BackgroundWorker();
-String result = "";
-bw.RunWorkerCompleted += (o, e2) => { Status = result; };
-bw.DoWork += (o, e2) =>
-{
-	if (MarketNode != null)
-	{
-		CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
-		if (report != null)
-			result = report.errorCode != null ? report.errorCode : report.status;
-	}
-};
-bw.RunWorkerAsync();
-break;
+					String result = "";
+					bw.RunWorkerCompleted += (o, e2) => { Status = result; };
+					bw.DoWork += (o, e2) =>
+					{
+						if (MarketNode != null)
+						{
+							CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
+							if (report != null)
+								result = report.errorCode != null ? report.errorCode : report.status;
+						}
+					};
+					bw.RunWorkerAsync();
+					break;
 			}
 		}
 		private void CheckBox_Checked(object sender, RoutedEventArgs e)
-{
-	CheckBox cb = sender as CheckBox;
-	if (Rows.Count > 0) foreach (Row row in Rows)
 		{
-			row.Hidden = cb.IsChecked == true && row.SizeMatched > 0;
+			CheckBox cb = sender as CheckBox;
+			if (Rows.Count > 0) foreach (Row row in Rows)
+				{
+					row.Hidden = cb.IsChecked == true && row.SizeMatched > 0;
+				}
 		}
-}
-private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
-{
-	CheckBox_Checked(sender, e);
-}
-private void Label_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-{
-	Label lb = sender as Label;
-	Row row = lb.DataContext as Row;
-	UpdateBet ub = new UpdateBet(row);
-	ub.ShowDialog();
-}
-private void UserControl_Initialized(object sender, EventArgs e)
-{
-	String json = props.ColumnWidths;
-	double[] widths = JsonConvert.DeserializeObject<double[]>(json);
-	if (widths != null)
-	{
-		for (int i = 0; i < widths.Length; i++)
+		private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
 		{
-			dataGrid.Columns[i].Width = new DataGridLength(widths[i]);
+			CheckBox_Checked(sender, e);
 		}
-	}
-}
-private void dataGrid_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-{
-	List<double> widths = new List<double>();
+		private void Label_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			Label lb = sender as Label;
+			Row row = lb.DataContext as Row;
+			UpdateBet ub = new UpdateBet(row);
+			ub.ShowDialog();
+		}
+		private void UserControl_Initialized(object sender, EventArgs e)
+		{
+			String json = props.ColumnWidths;
+			double[] widths = JsonConvert.DeserializeObject<double[]>(json);
+			if (widths != null)
+			{
+				for (int i = 0; i < widths.Length; i++)
+				{
+					dataGrid.Columns[i].Width = new DataGridLength(widths[i]);
+				}
+			}
+		}
+		private void dataGrid_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			List<double> widths = new List<double>();
 
-	foreach (DataGridColumn col in dataGrid.Columns)
-	{
-		widths.Add(col.ActualWidth);
-	}
-	String json = JsonConvert.SerializeObject(widths.ToArray());
-	Debug.WriteLine(json);
-	props.ColumnWidths = json;
-	props.Save();
-}
+			foreach (DataGridColumn col in dataGrid.Columns)
+			{
+				widths.Add(col.ActualWidth);
+			}
+			String json = JsonConvert.SerializeObject(widths.ToArray());
+			Debug.WriteLine(json);
+			props.ColumnWidths = json;
+			props.Save();
+		}
 	}
 	public class OrderMarketSnap
-{
-	public string MarketId { get; set; }
-	public bool IsClosed { get; set; }
-	public IEnumerable<OrderMarketRunnerSnap> OrderMarketRunners { get; set; }
-}
-public class OrderMarketRunnerSnap
-{
-	public IList<PriceSize> MatchedLay { get; set; }
-	public IList<PriceSize> MatchedBack { get; set; }
-	public Dictionary<string, Order> UnmatchedOrders { get; set; }
-}
+	{
+		public string MarketId { get; set; }
+		public bool IsClosed { get; set; }
+		public IEnumerable<OrderMarketRunnerSnap> OrderMarketRunners { get; set; }
+	}
+	public class OrderMarketRunnerSnap
+	{
+		public IList<PriceSize> MatchedLay { get; set; }
+		public IList<PriceSize> MatchedBack { get; set; }
+		public Dictionary<string, Order> UnmatchedOrders { get; set; }
+	}
 }

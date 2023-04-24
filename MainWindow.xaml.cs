@@ -215,6 +215,9 @@ namespace SpreadTrader
 					if (cth != null)
 						cth.OnSelected();
 				}
+
+				TabContent content = TabControl.SelectedContent as TabContent;
+				Commission = content.MarketNode == null ? 0.00 : content.MarketNode.Commission;
 			}
 		}
 		private void TabItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)

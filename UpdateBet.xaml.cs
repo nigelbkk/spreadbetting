@@ -57,21 +57,33 @@ namespace SpreadTrader
             BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
             String result = "";
 
-            if (OriginalStake != Stake)
+            if (Stake < OriginalStake)
             {
                 await Task.Run(() => {
-                    CancelExecutionReport report = betfair.cancelOrder(Row.MarketID, Row.BetID);
-                    if (report.errorCode != null)
-                    {
-                        result = report.errorCode;
-                    }
-                    else
-                    {
+                    CancelExecutionReport report = betfair.cancelOrder(Row.MarketID, Row.BetID, OriginalStake - Stake);
+                    //if (report != null)
+                    //{
+                    //    result = report.errorCode;
+                    //}
+                    result = report.errorCode != null ? report.errorCode : report.status;
+                });
+    //            Extensions.MainWindow.Status = result;
+            }
+            else if (Stake > OriginalStake)
+            {
+                await Task.Run(() => {
+                    CancelExecutionReport report = betfair.cancelOrder(Row.MarketID, Row.BetID, null);
+                    //if (report.errorCode != null)
+                    //{
+                    //    result = report.errorCode;
+                    //}
+                    //else
+                    //{
                         PlaceExecutionReport report2 = betfair.placeOrder(Row.MarketID, Row.SelectionID, Row.Side.ToUpper() == "BACK" ? sideEnum.BACK : sideEnum.LAY, Stake, Odds);
                         result = report2.errorCode != null ? report2.errorCode : report2.status;
-                    }
+                    //}
                 });
-                Extensions.MainWindow.Status = result;
+  //              Extensions.MainWindow.Status = result;
             }
             else
             {
@@ -79,8 +91,9 @@ namespace SpreadTrader
                     ReplaceExecutionReport report = betfair.replaceOrder(Row.MarketID, Row.BetID.ToString(), Odds, Stake);
                     result = report.status != ExecutionReportStatusEnum.SUCCESS ? report.instructionReports[0].errorCode.ToString(): report.status.ToString();
                 });
-                Extensions.MainWindow.Status = result;
+//                Extensions.MainWindow.Status = result;
             }
+            Extensions.MainWindow.Status = result;
         }
         private void Window_Closing(object sender, CancelEventArgs e)
         {
@@ -102,7 +115,7 @@ namespace SpreadTrader
             if (value <= 10)
                 return value - 1;
 
-            return (value - 10) - (value % 10);
+            return Math.Max(value - 10, (value - 10) - (value % 10));
         }
         private void Grid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
@@ -131,9 +144,6 @@ namespace SpreadTrader
             }
             UpDownOdds._Value = Odds;
             UpDownStake.Value = Stake;
-            //e.Handled = true;
-            //if ((e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9) || e.Key == Key.Decimal)
-            //    e.Handled = false;
             NotifyPropertyChanged("");
         }
     }

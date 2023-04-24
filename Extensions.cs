@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Media;
 
 namespace SpreadTrader
@@ -37,7 +38,7 @@ namespace SpreadTrader
             if (value <= 10)
                 return value - 1;
 
-            return (value - 10) - (value % 10);
+            return Math.Max(value - 10, (value - 10) - (value % 10));
         }
         protected override int IncrementValue(int value, int increment)
         {

@@ -463,10 +463,10 @@ namespace BetfairAPI
 			pis.Add(pi);
 			return placeOrders(marketId, pis);
 		}
-		public CancelExecutionReport cancelOrder(String marketId, UInt64 betId)
+		public CancelExecutionReport cancelOrder(String marketId, UInt64 betId, double? sizeReduction)
 		{
 			List<CancelInstruction> pis = new List<CancelInstruction>();
-			CancelInstruction pi = new CancelInstruction(betId) { sizeReduction = null };
+			CancelInstruction pi = new CancelInstruction(betId) { sizeReduction = sizeReduction };
 			pis.Add(pi);
 			return cancelOrders(marketId, pis);
 		}
