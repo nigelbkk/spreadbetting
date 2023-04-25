@@ -87,7 +87,7 @@
 				</Grid>
 			</Grid>
 		</DockPanel>
-		<StatusBar DockPanel.Dock="Bottom" Height="23" VerticalAlignment="Bottom" >
+        <StatusBar DockPanel.Dock="Bottom" Height="23" VerticalAlignment="Bottom" >
 			<TextBlock Text="{Binding Path=Status}"></TextBlock>
 		</StatusBar>
 	</Grid>

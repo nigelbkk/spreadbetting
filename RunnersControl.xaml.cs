@@ -26,7 +26,6 @@ namespace SpreadTrader
         public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
         public double BackBook { get { return MarketNode == null ? 0.00 : MarketNode.BackBook; } }
         public double LayBook { get { return MarketNode == null ? 0.00 : MarketNode.LayBook;  } }
-//        public double LayBook { get; set; }
         public List<LiveRunner> LiveRunners { get; set; }
         private Properties.Settings props = Properties.Settings.Default;
         public event PropertyChangedEventHandler PropertyChanged;
@@ -41,8 +40,8 @@ namespace SpreadTrader
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                Overlay.Visibility = MarketNode.Status == marketStatusEnum.OPEN ? Visibility.Hidden : Visibility.Visible;
-                OverlayText.Text = MarketNode.Status.ToString();
+                //Overlay.Visibility = MarketNode.Status == marketStatusEnum.OPEN ? Visibility.Hidden : Visibility.Visible;
+                //OverlayText.Text = MarketNode.Status.ToString();
             }));
         }
         public RunnersControl()
@@ -172,7 +171,7 @@ namespace SpreadTrader
                 {
                     try
                     {
-                        if (MarketNode != null)// && MarketNode.MarketName != null && IsSelected)
+                        if (MarketNode != null)
                         {
                             //var runners = streamingAPI.LiveRunners;
                             DateTime LastUpdate = DateTime.UtcNow;

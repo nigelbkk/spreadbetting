@@ -1,11 +1,12 @@
-﻿using System;
+﻿using BetfairAPI;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Controls;
 
 namespace SpreadTrader
 {
-    public partial class TabContent : UserControl
+    public partial class TabContent : UserControl, INotifyPropertyChanged
     {
         public MarketChangedDelegate OnMarketChanged;
         public CustomTabHeader customHeader = null;
@@ -13,10 +14,20 @@ namespace SpreadTrader
 
         public MarketSelectionDelegate OnMarketSelected;
         public NodeViewModel MarketNode = null;
-        public string MarketName { get { return MarketNode?.MarketName;  }  }
+        public string MarketName { get { return MarketNode?.MarketName; } }
+        public string OverlayStatus { get { return MarketNode?.Status.ToString(); } }
+        public System.Windows.Visibility OverlayVisibility { get { return MarketNode?.Status == marketStatusEnum.OPEN ? System.Windows.Visibility.Hidden : System.Windows.Visibility.Visible;  }  }
         public Double? TotalMatched { get { return MarketNode?.TotalMatched;  }  }
-        public TabContent() { }
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(String info)
+        {
+            if (PropertyChanged != null)
+            {
+                Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
+            }
+        }
 
+        public TabContent() { }
         public TabContent(CustomTabHeader header)
         {
             customHeader = header;
@@ -24,6 +35,7 @@ namespace SpreadTrader
 
             OnMarketChanged += (node) => 
             {
+                NotifyPropertyChanged("");
                 marketHeader.NotifyPropertyChanged("");
             };
 
