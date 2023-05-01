@@ -63,7 +63,6 @@ namespace SpreadTrader
 			get { return Convert.ToDouble(props.StakesPreselect.Split(',')[2]); }
 		}
 
-
 		public double Balance { get; set; }
 		public double Exposure { get; set; }
 		private double _DiscountRate { get; set; }

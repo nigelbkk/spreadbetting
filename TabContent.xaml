@@ -52,7 +52,7 @@
 								</Grid>
 								<GridSplitter Background="DarkGray" Width="2.5" VerticalAlignment="Stretch" Grid.Column="0"/>
                                 <Border Name="Overlay" Background="#00000000" BorderThickness="2" BorderBrush="DarkGray" Visibility="{Binding OverlayVisibility}" IsHitTestVisible="False" Panel.ZIndex="1000" Width="600" Height="150">
-                                    <TextBlock Name="OverlayText" Foreground="DarkGray" Background="#00000000" Width="600" FontSize="100" TextAlignment="Center" FontWeight="Medium" Text="{Binding OverlayStatus}"></TextBlock>
+                                    <TextBlock Name="OverlayText" Foreground="DarkGray" Background="#00000000" Width="600" FontSize="75" TextAlignment="Center" FontWeight="Medium" Text="{Binding OverlayStatus}"></TextBlock>
                                 </Border>
                             </Grid>
 						</DockPanel>

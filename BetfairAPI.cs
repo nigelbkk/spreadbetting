@@ -22,6 +22,7 @@ namespace BetfairAPI
 		static String appKey { get; set; }
 		static String username { get; set; }
 		static String password { get; set; }
+		public bool ConnectionLost { get; set; }
 
 		public String SessionToken { get { return Token; } }
 		public BetfairAPI()
@@ -99,18 +100,31 @@ namespace BetfairAPI
 				if (jsonResponse.Contains("The underlying connection was closed"))
 				{
 					Debug.WriteLine(jsonResponse);              // let's assume this is fatal
-					throw new Exception("The underlying connection was closed");
+					ConnectionLost = true;
 
-					//if (!String.IsNullOrEmpty(password))
-					//{
-					//	Debug.WriteLine("Trying to log in again");
-					//	login(CertFile, CertPassword, AppKey, username, password);
-					//}
-					//else
-					//{
-					//	throw new Exception("The underlying connection was closed");
-					//}
+					MessageBoxResult Result = MessageBox.Show("Press Yes to try and reconnect\nCancel to ignore it\nNo to exit the application", "The connection to Betfair was closed", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+					switch(Result)
+					{
+						case MessageBoxResult.Yes:
+							if (!String.IsNullOrEmpty(password))
+							{
+								Debug.WriteLine("Trying to log in again");
+								login(CertFile, CertPassword, AppKey, username, password);
+							}
+							else
+							{
+								throw new Exception("The underlying connection was closed");
+							}
+							break;
+						case MessageBoxResult.No:
+							Environment.Exit(0);
+							break;
+						case MessageBoxResult.Cancel:
+							throw new Exception("The underlying connection was closed");
+					}
 				}
+				ConnectionLost = false;
+				//ConnectionLost = true;
 
 				var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
 				if (err != null)
