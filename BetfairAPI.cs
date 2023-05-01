@@ -98,16 +98,18 @@ namespace BetfairAPI
 
 				if (jsonResponse.Contains("The underlying connection was closed"))
 				{
-					Debug.WriteLine(jsonResponse);
+					Debug.WriteLine(jsonResponse);              // let's assume this is fatal
+					throw new Exception("The underlying connection was closed");
 
-					if (!String.IsNullOrEmpty(password))
-					{
-						login(CertFile, CertPassword, AppKey, username, password);
-					}
-					else
-					{
-						throw new Exception("The underlying connection was closed");
-					}
+					//if (!String.IsNullOrEmpty(password))
+					//{
+					//	Debug.WriteLine("Trying to log in again");
+					//	login(CertFile, CertPassword, AppKey, username, password);
+					//}
+					//else
+					//{
+					//	throw new Exception("The underlying connection was closed");
+					//}
 				}
 
 				var err = JArray.Parse(jsonResponse)[0].SelectToken("error");

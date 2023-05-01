@@ -49,6 +49,18 @@ namespace SpreadTrader
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            String[] cs = props.StakesPreselect.Split(',');
+
+            if (cs.Length < 3)
+			{
+                var Result = MessageBox.Show("Would you like to fix it now?", "The Stakes Preselect should have 3 values", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (Result == MessageBoxResult.Yes)
+				{
+                    e.Cancel = true;
+                    return;
+				}
+            }
+
             Properties.Settings.Default.Save();
         }
     }

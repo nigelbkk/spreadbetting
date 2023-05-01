@@ -32,6 +32,38 @@ namespace SpreadTrader
 				}));
 			}
 		}
+
+		public String StakesPreselectTooltip0
+		{
+			get { return $"Set default stake to ${StakesPreselect0}"; }
+		}
+
+		public String StakesPreselectTooltip1
+		{
+			get { return $"Set default stake to ${StakesPreselect1}"; }
+		}
+
+		public String StakesPreselectTooltip2
+		{
+			get { return $"Set default stake to ${StakesPreselect2}"; }
+		}
+
+		public double StakesPreselect0
+		{
+			get { return Convert.ToDouble(props.StakesPreselect.Split(',')[0]); }
+		}
+
+		public double StakesPreselect1
+		{
+			get { return Convert.ToDouble(props.StakesPreselect.Split(',')[1]); }
+		}
+
+		public double StakesPreselect2
+		{
+			get { return Convert.ToDouble(props.StakesPreselect.Split(',')[2]); }
+		}
+
+
 		public double Balance { get; set; }
 		public double Exposure { get; set; }
 		private double _DiscountRate { get; set; }
@@ -131,7 +163,19 @@ namespace SpreadTrader
 					case "Commission":
 						UpdateAccountInformation();
 						break;
+
+					//case "25":
+					//	props.DefaultStake = StakesPreselect0;
+					//	break;
+					//case "50":
+					//	props.DefaultStake = StakesPreselect1;
+					//	break;
+					//case "100":
+					//	props.DefaultStake = StakesPreselect2;
+					//	break;
 				}
+				props.Save();
+				NotifyPropertyChanged("");
 				e.Handled = true;
 			}
 			catch (Exception xe)

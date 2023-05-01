@@ -68,7 +68,7 @@
 		<Grid>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="160"/>
-				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="400"/>
 			</Grid.ColumnDefinitions>
 			<StackPanel Grid.Column="0">
 				<CheckBox Content="Active" HorizontalAlignment="Left" IsChecked="{Binding Path=BackActive}"/>
@@ -81,7 +81,7 @@
 		<Grid>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="160"/>
-				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="400"/>
 			</Grid.ColumnDefinitions>
 			<StackPanel Grid.Column="0">
 				<CheckBox Content="Active" Margin="10,0,0,0" HorizontalAlignment="Left" IsChecked="{Binding Path=LayActive}"/>

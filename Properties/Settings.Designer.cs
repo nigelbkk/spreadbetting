@@ -538,5 +538,17 @@ namespace SpreadTrader.Properties {
                 this["ColumnWidths"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2,5,10")]
+        public string StakesPreselect {
+            get {
+                return ((string)(this["StakesPreselect"]));
+            }
+            set {
+                this["StakesPreselect"] = value;
+            }
+        }
     }
 }

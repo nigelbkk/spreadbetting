@@ -40,7 +40,8 @@
 					<Label Content="Cert File Password"  />
 					<Label Content="Back Stake" />
 					<Label Content="Lay Stake" />
-					<Label Content="Default Stake" />
+                    <Label Content="Default Stake" />
+                    <Label Content="Preselect Stakes" />
 					<Label Content="Matched Bet Alert" />
 					<Label Content="Default Action" />
 					<Label Content="Net of Commissions" />
@@ -65,7 +66,8 @@
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=CertPassword, Mode=TwoWay}" />
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=BackStake, Mode=TwoWay}" />
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=LayStake, Mode=TwoWay}" />
-					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=DefaultStake, Mode=TwoWay}" />
+                    <TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=DefaultStake, Mode=TwoWay}" />
+                    <TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=StakesPreselect, Mode=TwoWay}" />
 
 					<StackPanel Orientation="Horizontal">
 						<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=MatchedBetAlert, Mode=TwoWay}" Width="136" />

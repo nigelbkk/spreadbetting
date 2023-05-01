@@ -33,36 +33,33 @@
 				</Grid.RowDefinitions>
 				<Grid Grid.Row ="0" Name="MainMenu">
 					<StackPanel Orientation="Horizontal" VerticalAlignment="Top" DockPanel.Dock="Top" Height="28">
-							<Button Content ="Refresh" Tag="Refresh" Grid.Column="1" ToolTip="Refresh Markets" Click="Button_Click"/>
-							<Button Content ="Favourites" Tag="Favourites" Name="FavouritesButton" Grid.Column="2" ToolTip="Favourites" Click="Button_Click"/>
-							<Button Content ="Settings" Tag="Settings" Grid.Column="3" ToolTip="Settings" Click="Button_Click"/>
-							<Label Width="58" />
-							<Label BorderThickness="0.5" MouseDown="OnUpdateAccount">
-								<StackPanel Orientation="Horizontal" >
-									<TextBlock Text="Balance: "/>
-									<TextBlock Text="{Binding Path=Balance, Converter={StaticResource cconverter }}" />
-								</StackPanel>
-							</Label>
-							<Label BorderThickness="0.5">
-								<StackPanel Orientation="Horizontal">
-									<TextBlock Text="Exposure: "/>
-									<TextBlock Text="{Binding Path=Exposure, Converter={StaticResource cconverter }}"/>
-								</StackPanel>
-							</Label>
-							<Label BorderThickness="0.5">
-								<StackPanel Orientation="Horizontal">
-									<TextBlock Text="Commission: "/>
-									<TextBlock Text="{Binding Path=Commission, Converter={StaticResource pcconverter }}"/>
-								</StackPanel>
-							</Label>
+						<Button Content ="Refresh" Tag="Refresh" Grid.Column="1" ToolTip="Refresh Markets" Click="Button_Click"/>
+						<Button Content ="Favourites" Tag="Favourites" Name="FavouritesButton" Grid.Column="2" ToolTip="Favourites" Click="Button_Click"/>
+						<Button Content ="Settings" Tag="Settings" Grid.Column="3" ToolTip="Settings" Click="Button_Click"/>
+						<Label Width="58" />
+						<Label BorderThickness="0.5" MouseDown="OnUpdateAccount">
+							<StackPanel Orientation="Horizontal" >
+								<TextBlock Text="Balance: "/>
+								<TextBlock Text="{Binding Path=Balance, Converter={StaticResource cconverter }}" />
+							</StackPanel>
+						</Label>
+						<Label BorderThickness="0.5">
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="Exposure: "/>
+								<TextBlock Text="{Binding Path=Exposure, Converter={StaticResource cconverter }}"/>
+							</StackPanel>
+						</Label>
+						<Label BorderThickness="0.5" Margin="0, 0, 8, 0">
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="Commission: "/>
+								<TextBlock Text="{Binding Path=Commission, Converter={StaticResource pcconverter }}"/>
+							</StackPanel>
+						</Label>
 
-                        <!--<Button Tag="Commission" Click="Button_Click" BorderThickness="0.5"  ToolTip="Single click to update">
-								<StackPanel Orientation="Horizontal">
-									<TextBlock Text="Commission: "/>
-									<TextBlock Text="{Binding Path=Commission, Converter={StaticResource pcconverter }}"/>
-								</StackPanel>
-							</Button>-->
-						</StackPanel>
+                        <Button Tag="25" Content="{Binding StakesPreselect0, Mode=OneWay}" Click="Button_Click" BorderThickness="0.0" ToolTip="{Binding StakesPreselectTooltip0}" />
+                        <Button Tag="50" Content="{Binding StakesPreselect1, Mode=OneWay}" Click="Button_Click" BorderThickness="0.0" ToolTip="{Binding StakesPreselectTooltip1}" />
+                        <Button Tag="100" Content="{Binding StakesPreselect2, Mode=OneWay}" Click="Button_Click" BorderThickness="0.0" ToolTip="{Binding StakesPreselectTooltip2}"/>
+                    </StackPanel>
 				</Grid>
 				<Grid Grid.Row="1" Name="InnerGrid" >
 					<Grid.ColumnDefinitions>
