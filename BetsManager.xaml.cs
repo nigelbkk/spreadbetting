@@ -306,6 +306,8 @@ namespace SpreadTrader
 				String MarketID = MarketNode.MarketID;
 				long Selection = runner.SelectionId;
 
+				Debug.WriteLine("###################################################");
+				Debug.WriteLine("###                                             ###");
 				StringBuilder sb = new StringBuilder(String.Format("Back: {0} for {1:c} at ", runner.Name, back[0].size));
 
 				foreach (PriceSize p in back)
@@ -321,6 +323,8 @@ namespace SpreadTrader
 					sb.AppendFormat("{0:0.00}, ", p.price);
 				}
 				Debug.WriteLine(sb.ToString().TrimEnd(' ').TrimEnd(','));
+				Debug.WriteLine("###                                             ###");
+				Debug.WriteLine("###################################################");
 			};
 
 			OnFavoriteChanged += (runner) =>
