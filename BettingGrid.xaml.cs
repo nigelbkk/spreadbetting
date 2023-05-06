@@ -5,6 +5,7 @@ using System.Windows.Media;
 namespace SpreadTrader
 {
     public delegate void SubmitBetsDelegate(LiveRunner runner, PriceSize[] lay, PriceSize[] back);
+//    public delegate void SubmitBetsDelegate(LiveRunner runner, ItemsControl itemsControl);
 
     public partial class BettingGrid : UserControl
     {

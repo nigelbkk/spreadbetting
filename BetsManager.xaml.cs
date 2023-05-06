@@ -312,7 +312,10 @@ namespace SpreadTrader
 
 				foreach (PriceSize p in back)
 				{
-					sb.AppendFormat("{0:0.00}, ", p.price);
+					if (p.IsChecked)
+					{
+						sb.AppendFormat("{0:0.00}, ", p.price);
+					}
 				}
 				Debug.WriteLine(sb.ToString().TrimEnd(' ').TrimEnd(','));
 
@@ -320,7 +323,10 @@ namespace SpreadTrader
 
 				foreach (PriceSize p in lay)
 				{
-					sb.AppendFormat("{0:0.00}, ", p.price);
+					if (p.IsChecked)
+					{
+						sb.AppendFormat("{0:0.00}, ", p.price);
+					}
 				}
 				Debug.WriteLine(sb.ToString().TrimEnd(' ').TrimEnd(','));
 				Debug.WriteLine("###                                             ###");
