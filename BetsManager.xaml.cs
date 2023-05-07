@@ -310,11 +310,25 @@ namespace SpreadTrader
 				Debug.WriteLine("###                                             ###");
 				StringBuilder sb = new StringBuilder(String.Format("Back: {0} for {1:c} at ", runner.Name, back[0].size));
 
+				List<PlaceInstruction> place_instructions = new List<PlaceInstruction>();
+
 				foreach (PriceSize p in back)
 				{
 					if (p.IsChecked)
 					{
 						sb.AppendFormat("{0:0.00}, ", p.price);
+						place_instructions.Add(new PlaceInstruction()
+						{
+							selectionId = runner.SelectionId,
+							sideEnum = sideEnum.BACK,
+							orderTypeEnum = orderTypeEnum.LIMIT,
+							limitOrder = new LimitOrder()
+							{
+								size = p.size,
+								price = p.price,
+								persistenceTypeEnum = persistenceTypeEnum.LAPSE,
+							}
+						});
 					}
 				}
 				Debug.WriteLine(sb.ToString().TrimEnd(' ').TrimEnd(','));
@@ -326,11 +340,32 @@ namespace SpreadTrader
 					if (p.IsChecked)
 					{
 						sb.AppendFormat("{0:0.00}, ", p.price);
+						place_instructions.Add(new PlaceInstruction()
+						{
+							selectionId = runner.SelectionId,
+							sideEnum = sideEnum.LAY,
+							orderTypeEnum = orderTypeEnum.LIMIT,
+							limitOrder = new LimitOrder()
+							{
+								size = p.size,
+								price = p.price,
+								persistenceTypeEnum = persistenceTypeEnum.LAPSE,
+							}
+						});
 					}
 				}
 				Debug.WriteLine(sb.ToString().TrimEnd(' ').TrimEnd(','));
 				Debug.WriteLine("###                                             ###");
 				Debug.WriteLine("###################################################");
+
+				System.Threading.Thread t = new System.Threading.Thread(() =>
+				{
+					PlaceExecutionReport report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
+					Status = report.status;
+					//Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
+				});
+				t.Start();
+
 			};
 
 			OnFavoriteChanged += (runner) =>
