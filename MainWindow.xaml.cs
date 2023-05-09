@@ -163,15 +163,15 @@ namespace SpreadTrader
 						UpdateAccountInformation();
 						break;
 
-					//case "25":
-					//	props.DefaultStake = StakesPreselect0;
-					//	break;
-					//case "50":
-					//	props.DefaultStake = StakesPreselect1;
-					//	break;
-					//case "100":
-					//	props.DefaultStake = StakesPreselect2;
-					//	break;
+					case "25":
+						props.DefaultStake = StakesPreselect0;
+						break;
+					case "50":
+						props.DefaultStake = StakesPreselect1;
+						break;
+					case "100":
+						props.DefaultStake = StakesPreselect2;
+						break;
 				}
 				props.Save();
 				NotifyPropertyChanged("");
