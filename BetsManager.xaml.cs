@@ -267,17 +267,20 @@ namespace SpreadTrader
 						Debug.WriteLine("Add to queue");
 						incomingOrdersQueue.Enqueue(json1);
 					}
-					if (props.production)        // live system?
-					{
-						String file_name = String.Format(".\\notifications.json");
-						if (!File.Exists(file_name))
-						{
-							using (var stream = File.CreateText(file_name))
-							{
-							}
-						}
-						File.AppendAllText(file_name, json1 + "\n");
-					}
+
+					// Not threadsafe
+
+					//if (props.development)        // live system?
+					//{
+					//	String file_name = String.Format(".\\notifications.json");
+					//	if (!File.Exists(file_name))
+					//	{
+					//		using (var stream = File.CreateText(file_name))
+					//		{
+					//		}
+					//	}
+					//	File.AppendAllText(file_name, json1 + "\n");
+					//}
 				}
 			});
 			timer.Elapsed += (o, e) =>
@@ -710,144 +713,152 @@ namespace SpreadTrader
 				Betfair = MainWindow.Betfair;
 			}
 			Button b = sender as Button;
-			switch (b.Tag)
+			try
 			{
-				case "HalveUnmatched":
+				switch (b.Tag)
+				{
+					case "HalveUnmatched":
 
-					if (MarketNode != null)
-					{
-						await Task.Run(() =>
-						{
-							List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
-
-							foreach (Row row in Rows)
-							{
-								if (!row.IsMatched && row.Stake >= 4)
-								{
-									cancel_instructions.Add(new CancelInstruction(row.BetID) { sizeReduction = Math.Round((row.Stake / 2), 2) });
-								}
-							}
-
-							if (cancel_instructions.Count == 0)
-							{
-								Status = "Nothing to do";
-							}
-							else
-							{
-								CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-								if (report != null && report.errorCode != null)
-								{
-									//throw new Exception(ErrorCodes.FaultCode(report.errorCode));
-								}
-								Status = report.errorCode != null ? report.errorCode : report.status;
-							}
-						});
-					}
-					break;
-
-				case "DoubleUnmatched":
-
-					if (MarketNode != null)
-					{
-						await Task.Run(() =>
-						{
-							List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
-							List<PlaceInstruction> place_instructions = new List<PlaceInstruction>();
-
-							foreach (Row row in Rows)
-							{
-								if (!row.IsMatched && row.Stake > 0)
-								{
-									cancel_instructions.Add(new CancelInstruction(row.BetID)
-									{
-										sizeReduction = null
-									});
-									place_instructions.Add(new PlaceInstruction()
-									{
-										selectionId = row.SelectionID,
-										sideEnum = row.Side == "BACK" ? sideEnum.BACK : sideEnum.LAY,
-										orderTypeEnum = orderTypeEnum.LIMIT,
-										limitOrder = new LimitOrder()
-										{
-											size = row.Stake*2,
-											price = row.Odds,
-											persistenceTypeEnum = persistenceTypeEnum.LAPSE,
-										}
-									});
-								}
-							}
-							if (cancel_instructions.Count == 0)
-							{
-								Status = "Nothing to do";
-							}
-							else
-							{
-								CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-
-								if (cancel_report.status != "SUCCESS")
-								{
-									Status = cancel_report.status;
-								} else
-								{
-									PlaceExecutionReport place_report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
-									Status = place_report.status;
-								}
-							}
-						});
-					}
-					break;
-
-				case "Reset":
-					MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
-					json_rows = File.ReadAllLines(".\\notifications.json");
-					json_index = 0;
-					Rows.Clear();
-					break;
-				case "Run":
-					MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
-					json_rows = File.ReadAllLines(".\\notifications.json");
-					json_index = 0;
-					foreach (String j in json_rows)
-					{
-						json_index++;
-						OnOrderChanged(j);
-					}
-					break;
-				case "Next":
-					if (json_index >= json_rows.Length)
-						break;
-					String json_row = json_rows[json_index];
-					OnOrderChanged(json_row);
-					json_index++;
-					break;
-				case "Back1":
-					OnOrderChanged(newbet(MarketNode.LiveRunners[0], Order.SideEnum.B)); break;
-				case "Lay1":
-					OnOrderChanged(newbet(MarketNode.LiveRunners[0], Order.SideEnum.L)); break;
-				case "Match1":
-					OnOrderChanged(matchbet(MarketNode.LiveRunners[0])); break;
-				case "Back2":
-					OnOrderChanged(newbet(MarketNode.LiveRunners[1], Order.SideEnum.B)); break;
-				case "Lay2":
-					OnOrderChanged(newbet(MarketNode.LiveRunners[1], Order.SideEnum.L)); break;
-				case "Match2":
-					OnOrderChanged(matchbet(MarketNode.LiveRunners[1])); break;
-				case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
-				case "CancelAll":
-					BackgroundWorker bw = new BackgroundWorker();
-					String result = "";
-					bw.RunWorkerCompleted += (o, e2) => { Status = result; };
-					bw.DoWork += (o, e2) =>
-					{
 						if (MarketNode != null)
 						{
-							CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
-							if (report != null)
-								result = report.errorCode != null ? report.errorCode : report.status;
+							await Task.Run(() =>
+							{
+								List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
+
+								foreach (Row row in Rows)
+								{
+									if (!row.IsMatched && row.Stake >= 4)
+									{
+										cancel_instructions.Add(new CancelInstruction(row.BetID) { sizeReduction = Math.Round((row.Stake / 2), 2) });
+									}
+								}
+
+								if (cancel_instructions.Count == 0)
+								{
+									Status = "Nothing to do";
+								}
+								else
+								{
+									CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+									if (report != null && report.errorCode != null)
+									{
+									//throw new Exception(ErrorCodes.FaultCode(report.errorCode));
+								}
+									Status = report.errorCode != null ? report.errorCode : report.status;
+								}
+							});
 						}
-					};
-					bw.RunWorkerAsync();
-					break;
+						break;
+
+					case "DoubleUnmatched":
+
+						if (MarketNode != null)
+						{
+							await Task.Run(() =>
+							{
+								List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
+								List<PlaceInstruction> place_instructions = new List<PlaceInstruction>();
+
+								foreach (Row row in Rows)
+								{
+									if (!row.IsMatched && row.Stake > 0)
+									{
+										cancel_instructions.Add(new CancelInstruction(row.BetID)
+										{
+											sizeReduction = null
+										});
+										place_instructions.Add(new PlaceInstruction()
+										{
+											selectionId = row.SelectionID,
+											sideEnum = row.Side == "BACK" ? sideEnum.BACK : sideEnum.LAY,
+											orderTypeEnum = orderTypeEnum.LIMIT,
+											limitOrder = new LimitOrder()
+											{
+												size = row.Stake * 2,
+												price = row.Odds,
+												persistenceTypeEnum = persistenceTypeEnum.LAPSE,
+											}
+										});
+									}
+								}
+								if (cancel_instructions.Count == 0)
+								{
+									Status = "Nothing to do";
+								}
+								else
+								{
+									CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+
+									if (cancel_report.status != "SUCCESS")
+									{
+										Status = cancel_report.status;
+									}
+									else
+									{
+										PlaceExecutionReport place_report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
+										Status = place_report.status;
+									}
+								}
+							});
+						}
+						break;
+
+					case "Reset":
+						MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
+						json_rows = File.ReadAllLines(".\\notifications.json");
+						json_index = 0;
+						Rows.Clear();
+						break;
+					case "Run":
+						MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
+						json_rows = File.ReadAllLines(".\\notifications.json");
+						json_index = 0;
+						foreach (String j in json_rows)
+						{
+							json_index++;
+							OnOrderChanged(j);
+						}
+						break;
+					case "Next":
+						if (json_index >= json_rows.Length)
+							break;
+						String json_row = json_rows[json_index];
+						OnOrderChanged(json_row);
+						json_index++;
+						break;
+					case "Back1":
+						OnOrderChanged(newbet(MarketNode.LiveRunners[0], Order.SideEnum.B)); break;
+					case "Lay1":
+						OnOrderChanged(newbet(MarketNode.LiveRunners[0], Order.SideEnum.L)); break;
+					case "Match1":
+						OnOrderChanged(matchbet(MarketNode.LiveRunners[0])); break;
+					case "Back2":
+						OnOrderChanged(newbet(MarketNode.LiveRunners[1], Order.SideEnum.B)); break;
+					case "Lay2":
+						OnOrderChanged(newbet(MarketNode.LiveRunners[1], Order.SideEnum.L)); break;
+					case "Match2":
+						OnOrderChanged(matchbet(MarketNode.LiveRunners[1])); break;
+					case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
+					case "CancelAll":
+						BackgroundWorker bw = new BackgroundWorker();
+						String result = "";
+						bw.RunWorkerCompleted += (o, e2) => { Status = result; };
+						bw.DoWork += (o, e2) =>
+						{
+							if (MarketNode != null)
+							{
+								CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
+								if (report != null)
+									result = report.errorCode != null ? report.errorCode : report.status;
+							}
+						};
+						bw.RunWorkerAsync();
+						break;
+				}
+			}
+			catch(Exception xe)
+			{
+				Debug.WriteLine(xe.Message);
 			}
 		}
 		private void CheckBox_Checked(object sender, RoutedEventArgs e)
