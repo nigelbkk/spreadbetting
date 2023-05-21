@@ -49,6 +49,8 @@ namespace SpreadTrader
                 marketHeader.NotifyPropertyChanged("");
             };
 
+            oBettingGrid.sliderControl = SliderControl;
+
             BetsManager.RunnersControl = RunnersControl;
             SliderControl.OnSubmitBets += BetsManager.OnSubmitBets;
             RunnersControl.OnMarketChanged += OnMarketChanged;
@@ -64,6 +66,7 @@ namespace SpreadTrader
                     marketHeader.NotifyPropertyChanged("");
                 }
                 BetsManager.OnMarketSelected(node);
+                oBettingGrid.OnMarketSelected(node);
             };
             marketHeader.TabContent = this;
         }

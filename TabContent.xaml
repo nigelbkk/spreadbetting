@@ -47,7 +47,7 @@
 									<local:RunnersControl x:Name ="RunnersControl"/>
 								</Grid>
 
-								<Grid Grid.Column="1">
+								<Grid Grid.Column="1" Name="SlidersGrid">
 									<local:SliderControl x:Name ="SliderControl"/>
 								</Grid>
 								<GridSplitter Background="DarkGray" Width="2.5" VerticalAlignment="Stretch" Grid.Column="0"/>

@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -6,7 +8,7 @@ namespace SpreadTrader
 {
     public delegate void SubmitBetsDelegate(LiveRunner runner, PriceSize[] lay, PriceSize[] back);
 
-    public partial class BettingGrid : UserControl
+    public partial class BettingGrid : UserControl, INotifyPropertyChanged
     {
         private bool _BackActive { get; set; }
         public bool BackActive
@@ -37,22 +39,62 @@ namespace SpreadTrader
         public PriceSize[] BackValues { get; set; }
         public PriceSize[] LayValues { get; set; }
         public NodeViewModel MarketNode { get; set; }
+        public MarketSelectionDelegate OnMarketSelected;
+        public SliderControl sliderControl { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void NotifyPropertyChanged(String info)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(info));
+            }
+        }
         public BettingGrid()
         {
-            BackValues = SliderControl.BackValues;
-            LayValues = SliderControl.LayValues;
-
-            if (BackValues != null)
+            BetfairPrices betfairPrices = new BetfairPrices();
+            BackValues = new PriceSize[9];
+            LayValues = new PriceSize[9];
+            for (Int32 i = 0; i < 9; i++)
             {
-                for (int i = 0; i < 3; i++) BackValues[i].Color = Application.Current.FindResource("Back2Color") as SolidColorBrush;
-                for (int i = 3; i < 6; i++) BackValues[i].Color = Application.Current.FindResource("Back1Color") as SolidColorBrush;
-                for (int i = 6; i < 9; i++) BackValues[i].Color = Application.Current.FindResource("Back0Color") as SolidColorBrush;
-                for (int i = 0; i < 3; i++) LayValues[i].Color = Application.Current.FindResource("Lay0Color") as SolidColorBrush;
-                for (int i = 3; i < 6; i++) LayValues[i].Color = Application.Current.FindResource("Lay1Color") as SolidColorBrush;
-                for (int i = 6; i < 9; i++) LayValues[i].Color = Application.Current.FindResource("Lay2Color") as SolidColorBrush;
-                BackActive = LayActive = true;
+                BackValues[i] = new PriceSize(betfairPrices[i], 20 + 1 * 10);
+                LayValues[i] = new PriceSize(betfairPrices[i], 20 + 1 * 10);
             }
+            for (int i = 0; i < 3; i++) BackValues[i].Color = Application.Current.FindResource("Back2Color") as SolidColorBrush;
+            for (int i = 3; i < 6; i++) BackValues[i].Color = Application.Current.FindResource("Back1Color") as SolidColorBrush;
+            for (int i = 6; i < 9; i++) BackValues[i].Color = Application.Current.FindResource("Back0Color") as SolidColorBrush;
+            for (int i = 0; i < 3; i++) LayValues[i].Color = Application.Current.FindResource("Lay0Color") as SolidColorBrush;
+            for (int i = 3; i < 6; i++) LayValues[i].Color = Application.Current.FindResource("Lay1Color") as SolidColorBrush;
+            for (int i = 6; i < 9; i++) LayValues[i].Color = Application.Current.FindResource("Lay2Color") as SolidColorBrush;
+
+            OnMarketSelected += (node) =>
+            {
+                if (IsLoaded)
+                {
+                    MarketNode = node;
+
+                    BackValues = sliderControl.BackValues;
+                    LayValues = sliderControl.LayValues;
+                    NotifyPropertyChanged("");
+
+
+					//SliderControl sc = content.SliderControl;
+					//BettingGrid bg = content.oBettingGrid;
+					//if (bg != null)
+					//{
+					//    bg.OnSelectionChanged(sender, e);
+					//}
+
+				}
+            };
             InitializeComponent();
+            BackActive = LayActive = true;
+            
+            //BackValues = SliderControl.BackValues;
+            //LayValues = SliderControl.LayValues;
+
+            //TabContent tc = Extensions.MainWindow.TabControl.SelectedContent as TabContent;
+            //SliderControl sc = tc.SliderControl;
+
         }
     }
 }

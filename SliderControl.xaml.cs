@@ -28,8 +28,8 @@ namespace SpreadTrader
         public double CutStakes { get; set; }
         public double MoveBack { get; set; }
         public double MoveLay { get; set; }
-        public static PriceSize[] BackValues { get; set; }
-        public static PriceSize[] LayValues { get; set; }
+        public PriceSize[] BackValues { get; set; }
+        public PriceSize[] LayValues { get; set; }
         public static bool AutoBackLay { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(String info)
@@ -106,12 +106,14 @@ namespace SpreadTrader
                 {
                     LayValues[i].price = betfairPrices[base_index + offset + i];
                 }
+                Debug.WriteLine(BackValues[0]);
                 NotifyPropertyChanged("");
             }
         }
         private Properties.Settings props = Properties.Settings.Default;
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            Slider slider = sender as Slider;
             SyncPrices();
         }
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -146,16 +148,6 @@ namespace SpreadTrader
             }
         }
 
-        //public void OnFavoriteChanged(LiveRunner runner)
-        //{
-        //    // set last traded price to the grid and recenter the sliders	
-        //    Favorite = runner;
-        //    NotifyPropertyChanged("");
-        //    BasePrice = runner.LastPriceTraded;
-        //    MoveBack = 10;
-        //    MoveLay = 22;
-        //    SyncPrices();
-        //}
         private void Slider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             MoveStakes((Int32)e.NewValue, (Int32)e.OldValue);

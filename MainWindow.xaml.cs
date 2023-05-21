@@ -162,16 +162,6 @@ namespace SpreadTrader
 					case "Commission":
 						UpdateAccountInformation();
 						break;
-
-					//case "25":
-					//	props.DefaultStake = StakesPreselect0;
-					//	break;
-					//case "50":
-					//	props.DefaultStake = StakesPreselect1;
-					//	break;
-					//case "100":
-					//	props.DefaultStake = StakesPreselect2;
-					//	break;
 				}
 				props.Save();
 				NotifyPropertyChanged("");
@@ -261,6 +251,13 @@ namespace SpreadTrader
 
 				TabContent content = TabControl.SelectedContent as TabContent;
 				Commission = content.MarketNode == null ? 0.00 : content.MarketNode.Commission;
+
+				//SliderControl sc = content.SliderControl;
+				//BettingGrid bg = content.oBettingGrid;
+				//if (bg != null)
+				//{
+				//	bg.OnSelectionChanged(sender, e);
+				//}
 			}
 		}
 		private void TabItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
