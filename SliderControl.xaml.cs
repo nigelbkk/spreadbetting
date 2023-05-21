@@ -106,7 +106,6 @@ namespace SpreadTrader
                 {
                     LayValues[i].price = betfairPrices[base_index + offset + i];
                 }
-                Debug.WriteLine(BackValues[0]);
                 NotifyPropertyChanged("");
             }
         }
@@ -121,10 +120,12 @@ namespace SpreadTrader
             Button b = sender as Button;
             if (BasePrice < 1000 && BasePrice > 1.01)
             {
+                Debug.WriteLine("Tag");
+
                 switch (b.Tag)
                 {
-                    case "-": BasePrice = betfairPrices.Previous(BasePrice); break;
-                    case "+": BasePrice = betfairPrices.Next(BasePrice); break;
+                    //case "-": BasePrice = betfairPrices.Previous(BasePrice); break;
+                    //case "+": BasePrice = betfairPrices.Next(BasePrice); break;
                     case "Execute":
                         if (OnSubmitBets != null)
                         {
@@ -163,6 +164,35 @@ namespace SpreadTrader
                 tx.Text = Convert.ToString(BasePrice);
                 props.Save();
             }
+        }
+
+        System.Timers.Timer timer = new System.Timers.Timer();
+
+		private void Button_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+            Button b = sender as Button;
+            String Tag = b.Tag as String;
+            timer = new System.Timers.Timer(50);
+
+            timer.Enabled = true;
+            timer.Start();
+            timer.Elapsed += (o, _e) =>
+            {
+                Debug.WriteLine("Down");
+
+                switch (Tag)
+                {
+                    case "-": BasePrice = betfairPrices.Previous(BasePrice); break;
+                    case "+": BasePrice = betfairPrices.Next(BasePrice); break;
+                }
+                SyncPrices();
+            };
+        }
+		private void Button_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+            Debug.WriteLine("Up");
+            timer.Enabled = false;
+            timer.Stop();
         }
     }
 }

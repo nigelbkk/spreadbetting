@@ -75,26 +75,10 @@ namespace SpreadTrader
                     BackValues = sliderControl.BackValues;
                     LayValues = sliderControl.LayValues;
                     NotifyPropertyChanged("");
-
-
-					//SliderControl sc = content.SliderControl;
-					//BettingGrid bg = content.oBettingGrid;
-					//if (bg != null)
-					//{
-					//    bg.OnSelectionChanged(sender, e);
-					//}
-
 				}
             };
             InitializeComponent();
             BackActive = LayActive = true;
-            
-            //BackValues = SliderControl.BackValues;
-            //LayValues = SliderControl.LayValues;
-
-            //TabContent tc = Extensions.MainWindow.TabControl.SelectedContent as TabContent;
-            //SliderControl sc = tc.SliderControl;
-
         }
     }
 }
