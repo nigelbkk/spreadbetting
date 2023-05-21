@@ -48,9 +48,9 @@
 							<ColumnDefinition/>
 							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
-						<Button Grid.Column="0" Tag="-"  Content="-" ></Button>
+						<Button Grid.Column="0" Tag="-"  Content="-" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" ></Button>
 						<TextBox Grid.Column="1" Text="{Binding Path=BasePrice}" Background="LightCyan" HorizontalContentAlignment="Center" LostFocus="TextBox_LostFocus"></TextBox>
-						<Button Grid.Column="2" Tag="+" Content="+" ></Button>
+                        <Button Grid.Column="2" Tag="+" Content="+" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp"></Button>
 					</Grid>
 				</Grid>
 
@@ -77,7 +77,7 @@
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Move Back Bets" HorizontalContentAlignment="Left"/>
-					<Slider Grid.Column="1" Value="{Binding Path=MoveBack}"/>
+					<Slider Grid.Column="1" Value="{Binding Path=MoveBack}" />
 				</Grid>
 				<Grid>
 					<Grid.ColumnDefinitions>
@@ -85,7 +85,7 @@
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="Move Lay Bets" HorizontalContentAlignment="Left" />
-					<Slider Grid.Column="1" Value="{Binding Path=MoveLay}"/>
+					<Slider Grid.Column="1" Value="{Binding Path=MoveLay}" />
 				</Grid>
 			</StackPanel>
 		</Grid>

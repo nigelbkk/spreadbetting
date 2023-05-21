@@ -119,9 +119,6 @@ namespace SpreadTrader
         }
         private void Grid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.Key)
-            {
-            }
             NotifyPropertyChanged("");
         }
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)

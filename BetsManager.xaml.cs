@@ -144,8 +144,6 @@ namespace SpreadTrader
 			}
 		}
 		public Int32 DebugID { get; set; }
-		//public double ColumnWidth { get { return 5; }}
-
 		public double MatchAmount { get; set; }
 		public bool UnmatchedOnly { get; set; }
 		public String LastUpdated { get { return String.Format("Orders last updated {0}", _LastUpdated.AddHours(props.TimeOffset).ToString("HH:mm:ss")); } }
@@ -245,7 +243,6 @@ namespace SpreadTrader
 				System.Threading.Thread.Sleep(10);
 			}
 		}
-
 		public BetsManager()
 		{
 			BackgroundWorker bw = new BackgroundWorker();
@@ -468,7 +465,6 @@ namespace SpreadTrader
 										Debug.WriteLine(o.Id, "unmatched: ");
 
 										Debug.WriteLine(MarketNode.MarketName);
-
 									}
 									if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                             // fully matched
 									{
@@ -535,7 +531,6 @@ namespace SpreadTrader
 											Rows.Remove(o);
 										}
 									}));
-
 								}
 							}
 						}
