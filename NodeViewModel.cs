@@ -155,10 +155,10 @@ namespace SpreadTrader
             Double option2 = J8;
 
             runner1.LevelSide = sideEnum.LAY;
-            runner1.LevelProfit = Math.Round(G18, 3);
+            runner1.LevelProfit = Math.Round(G18, 0);
             runner1.LevelStake = Math.Round(D8, 2);
             runner2.LevelSide = sideEnum.BACK;
-            runner2.LevelProfit = Math.Round(J18, 3);
+            runner2.LevelProfit = Math.Round(J18, 0);
             runner2.LevelStake = Math.Round(J8, 2);
         }
         private void LevelProfit(LiveRunner runner1, LiveRunner runner2)
@@ -191,11 +191,11 @@ namespace SpreadTrader
             Double option2 = J8;
 
             runner1.LevelSide = G3 < 0 ? sideEnum.BACK : sideEnum.LAY;
-            runner1.LevelProfit = Math.Round(G18, 2);
+            runner1.LevelProfit = Math.Round(G18, 0);
             runner1.LevelStake = Math.Abs(Math.Round(runner1.LevelSide == sideEnum.BACK ? D8 : G10, 2));
 
             runner2.LevelSide = J3 < 0 ? sideEnum.BACK : sideEnum.LAY;
-            runner2.LevelProfit = Math.Round(J18, 2);
+            runner2.LevelProfit = Math.Round(J18, 0);
             runner2.LevelStake = Math.Abs(Math.Round(runner2.LevelSide == sideEnum.BACK ? J8 : G13, 2));
             //runner2.LevelStake = Math.Abs(Math.Round(J3 < 0 ? J8 : G13, 2));
         }
@@ -221,15 +221,15 @@ namespace SpreadTrader
             Double F16 = F12 > 0 ? F15 - F12 : -F12 + F15;
 
             runner1.LevelSide = F11 >= 0 ? sideEnum.BACK : sideEnum.LAY;
-            runner1.LevelProfit = Math.Round(D16, 2);
+            runner1.LevelProfit = Math.Round(D16, 0);
             runner1.LevelStake = Math.Abs(Math.Round(F11, 2));
 
             runner2.LevelSide = F12 >= 0 ? sideEnum.BACK : sideEnum.LAY;
-            runner2.LevelProfit = Math.Round(E16, 2);
+            runner2.LevelProfit = Math.Round(E16, 0);
             runner2.LevelStake = Math.Abs(Math.Round(F12, 2));
 
             draw.LevelSide = F5 < 0 ? sideEnum.BACK : sideEnum.LAY;
-            draw.LevelProfit = Math.Round(F16, 2);
+            draw.LevelProfit = Math.Round(F16, 0);
 //            draw.LevelStake = Math.Abs(Math.Round(J3 < 0 ? J8 : G13, 2));
         }
         public void CalculateLevelProfit()

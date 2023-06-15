@@ -42,7 +42,7 @@ namespace SpreadTrader
         }
         public SliderControl()
         {
-            CutStakes = 10;
+            CutStakes = 5;
             MoveBack = 10;
             MoveLay = 22;
             BackValues = new PriceSize[9];
@@ -67,7 +67,7 @@ namespace SpreadTrader
             };
         }
         private double _BasePrice;
-        public double BasePrice { get { return _BasePrice; } set { _BasePrice = Math.Max(value, 1.10); } }
+        public double BasePrice { get { return _BasePrice; } set { _BasePrice = value; } }// = Math.Max(value, 1.01); } }
         public void MoveStakes(Int32 newvalue, Int32 oldvalue)
         {
             for (Int32 i = 0; i < 9; i++)
@@ -95,7 +95,7 @@ namespace SpreadTrader
         }
         public void SyncPrices()
         {
-            if (BackValues != null && BasePrice < 1000 && BasePrice > 1.01)
+            if (BackValues != null && BasePrice < 1000 && BasePrice >= 1.01)
             {
                 Int32 offset = Convert.ToInt32(MoveBack);
                 for (int i = 0; i < 9; i++)
@@ -166,22 +166,27 @@ namespace SpreadTrader
         }
 		private void Button_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
+            Debug.WriteLine("Down");
             Button b = sender as Button;
             String Tag = b.Tag as String;
             timer = new System.Timers.Timer(75);
 
             timer.Enabled = true;
-            timer.Start();
+            timer.AutoReset = false;
             timer.Elapsed += (o, _e) =>
             {
-                Debug.WriteLine("Down");
 
                 switch (Tag)
                 {
-                    case "-": BasePrice = betfairPrices.Previous(BasePrice); break;
+                    case "-": BasePrice = betfairPrices.Previous(BasePrice); 
+                        break;
                     case "+": BasePrice = betfairPrices.Next(BasePrice); break;
                 }
+                timer.Stop();
+                timer.Enabled = false;
+                Debug.WriteLine(BasePrice);
                 SyncPrices();
+                timer.Start();
             };
         }
 		private void Button_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
