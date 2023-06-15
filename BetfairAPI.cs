@@ -102,7 +102,7 @@ namespace BetfairAPI
 					Debug.WriteLine(jsonResponse);              // let's assume this is fatal
 					ConnectionLost = true;
 
-					MessageBoxResult Result = MessageBox.Show("Press Yes to try and reconnect\nCancel to ignore it\nNo to exit the application", "The connection to Betfair was closed", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+					MessageBoxResult Result = MessageBoxResult.Yes;// MessageBox.Show("Press Yes to try and reconnect\nCancel to ignore it\nNo to exit the application", "The connection to Betfair was closed", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 					switch(Result)
 					{
 						case MessageBoxResult.Yes:

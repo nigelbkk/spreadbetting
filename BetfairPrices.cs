@@ -5,6 +5,10 @@ namespace SpreadTrader
 {
     public class BetfairPrices
     {
+        public enum MatchTypeEnum
+        {
+            Nearest, Lower, Higher,
+        }
         private List<double> AllPrices = null;
         public BetfairPrices()
         {
@@ -26,6 +30,44 @@ namespace SpreadTrader
                 }
             }
         }
+
+        private static Double BetfairPrice(Double v, MatchTypeEnum Type)
+        {
+            double OriginalPrice = v;
+            v = Math.Round(v, 2);
+            if (v <= 1.01) return 1.01;
+            if (v >= 1000) return 1000;
+
+            Double[] MinValue = { 1.01, 2, 3, 4, 6, 10, 20, 30, 50, 100 };
+            Double[] MaxValue = { 2, 3, 4, 6, 10, 20, 30, 50, 100, 1000 };
+            Double[] Increment = { 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10 };
+
+            Int32 idx = 0;
+            for (; idx < MinValue.Length; idx++)
+            {
+                if (v >= MinValue[idx] && v <= MaxValue[idx])
+                {
+                    break;
+                }
+            }
+            Double lo = (Int32)(v / Increment[idx]) * Increment[idx];
+            lo = Math.Round(lo, 2);
+
+            if (lo == v)
+            {
+                return v;
+            }
+            Double hi = lo + Increment[idx];
+            switch (Type)
+            {
+                case MatchTypeEnum.Lower: return lo;
+                case MatchTypeEnum.Nearest: return Math.Abs(lo - OriginalPrice) < Math.Abs(hi - OriginalPrice) ? lo : hi;
+                case MatchTypeEnum.Higher: return hi;
+            }
+            return 0;
+        }
+
+
         public Int32 Index(double v)
         {
             v = BetfairAPI.BetfairAPI.BetfairPrice(v);
@@ -40,13 +82,17 @@ namespace SpreadTrader
         }
         public double Previous(double v)
         {
-            if (v <= 1.01) return 1.01;
-            return (double)AllPrices[Index(v) - 1];
+            double retval = BetfairPrice(v-0.01, MatchTypeEnum.Lower);
+            return retval;
+            //if (v <= 1.01) return 1.01;
+            //return (double)AllPrices[Index(v) - 1];
         }
         public double Next(double v)
         {
-            if (v >= 1000) return 1000;
-            return (double)AllPrices[Index(v) + 1];
+            double retval = BetfairPrice(v+0.01, MatchTypeEnum.Higher);
+            return retval;
+            //if (v >= 1000) return 1000;
+            //return (double)AllPrices[Index(v) + 1];
         }
         public double this[int i]
         {

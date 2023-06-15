@@ -162,6 +162,15 @@ namespace SpreadTrader
 					case "Commission":
 						UpdateAccountInformation();
 						break;
+					case "25":
+						props.DefaultStake = Convert.ToDouble(props.StakesPreselect.Split(',')[0]);
+						break;
+					case "50":
+						props.DefaultStake = Convert.ToDouble(props.StakesPreselect.Split(',')[1]);
+						break;
+					case "100":
+						props.DefaultStake = Convert.ToDouble(props.StakesPreselect.Split(',')[2]);
+						break;
 				}
 				props.Save();
 				NotifyPropertyChanged("");
