@@ -77,6 +77,7 @@ namespace SpreadTrader
                 if (newvalue > oldvalue)
                 {
                     vb.size = 10 * newvalue;
+                    vl.size = 10 * newvalue;
                     //vb.size /= 9; vb.size *= 10;
                     //vl.size /= 9; vl.size *= 10;
                     //vl.size = Math.Round(vl.size);
@@ -87,6 +88,7 @@ namespace SpreadTrader
                 else if (oldvalue > newvalue)
                 {
                     vb.size = 10 * newvalue;
+                    vl.size = 10 * newvalue;
                     //vl.size /= 10; vl.size *= 9; vb.size /= 10; vb.size *= 9;
                     //vl.size = Math.Round(vl.size, 2);
                     //vb.size = Math.Round(vb.size, 2);
