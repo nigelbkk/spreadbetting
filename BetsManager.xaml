@@ -38,8 +38,9 @@
             <Button Margin="30,0,0,0" Tag="Back2"  Click="Button_Click">Back</Button>
             <Button Margin="30,0,0,0" Tag="Lay2"  Click="Button_Click">Lay</Button>
             <Button Margin="30,0,0,0" Tag="Match2"  Click="Button_Click">Match</Button>-->
-            
-            <Button Margin="30,0,0,0" Tag="CancelAll"  Click="Button_Click">Cancel All Bets</Button>
+
+            <Button Margin="30,0,0,0" Tag="AbsoluteCancelAll"  Click="Button_Click">Absolute Cancel All</Button>
+            <Button Margin="30,0,0,0" Tag="CancelAll"  Click="Button_Click">Cancel All</Button>
             <Button Margin="30,0,0,0" Tag="HalveUnmatched"  Click="Button_Click" FontSize="14">&#x00BD;</Button>
             <Button Margin="30,0,0,0" Tag="DoubleUnmatched"  Click="Button_Click">2X</Button>
             <CheckBox Margin="16,0,0,0" IsChecked="{Binding Path=UnmatchedOnly}" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" >Unmatched only</CheckBox>
@@ -76,7 +77,27 @@
 							</DataTemplate>
 						</DataGridTemplateColumn.CellTemplate>
 					</DataGridTemplateColumn>
-					<DataGridCheckBoxColumn Binding="{Binding Override}"/>
+
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox Tag="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}}" Click="OverrideCheckBox_Click"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <CheckBox Tag="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}}" Click="NoCancelCheckBox_Click"/>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--<DataGridCheckBoxColumn Binding="{Binding Override}"/>
+                    <DataGridCheckBoxColumn Binding="{Binding NoCancel}" IsReadOnly="False" />-->
 					<DataGridTextColumn Width="120" Header="Time" Binding="{Binding Time}"/>
 					<DataGridTextColumn Width="1.25*" Header="BetID" Binding="{Binding BetID}"/>
 					<DataGridTextColumn Width="1.5*" Header="Runner" Binding="{Binding Runner}" />
