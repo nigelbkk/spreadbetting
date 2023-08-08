@@ -3,10 +3,8 @@ using BetfairAPI;
 using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -53,10 +51,6 @@ namespace SpreadTrader
 		{
 			get
 			{
-				//if (IsFullyMatched)
-				//    return OriginalStake;
-				//if (IsPartiallyMatched)
-				//    return SizeMatched;
 				return Stake;
 			}
 		}
@@ -65,14 +59,12 @@ namespace SpreadTrader
 		public double _SizeMatched { get; set; }
 		public double SizeMatched { get { return _SizeMatched; } set { _SizeMatched = value; NotifyPropertyChanged(""); } }
 		public bool IsMatched { get { return SizeMatched > 0; } }
-		//public bool IsUnMatched { get { return AvgPriceMatched == 0; } }
-		//public bool IsPartiallyMatched { get { return ; } }
-		//public bool IsFullyMatched { get { return AvgPriceMatched > 0; } }
 		public String IsMatchedString { get { return SizeMatched > 0 ? "F" : "U"; } }
 		public bool IsBack { get { return Side.ToUpper() == "BACK"; } }
 		private bool _Hidden = false;
 		public bool Hidden { get { return _Hidden; } set { _Hidden = value; NotifyPropertyChanged(""); } }
-		public bool Override { get; set; }
+        public bool Override { get; set; }
+        public bool NoCancel { get; set; }
 		public Row(String id)
 		{
 			BetID = Convert.ToUInt64(id);
@@ -840,20 +832,93 @@ namespace SpreadTrader
 						OnOrderChanged(matchbet(MarketNode.LiveRunners[1])); break;
 					case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
 					case "CancelAll":
-						BackgroundWorker bw = new BackgroundWorker();
-						String result = "";
-						bw.RunWorkerCompleted += (o, e2) => { Status = result; };
-						bw.DoWork += (o, e2) =>
-						{
-							if (MarketNode != null)
-							{
-								CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
-								if (report != null)
-									result = report.errorCode != null ? report.errorCode : report.status;
-							}
-						};
-						bw.RunWorkerAsync();
+
+                        if (MarketNode != null)
+                        {
+                            await Task.Run(() =>
+                            {
+                                List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
+
+                                foreach (Row row in Rows)
+                                {
+									if (row.NoCancel)
+										continue;
+
+                                    if (!row.IsMatched && row.Stake > 0)
+                                    {
+                                        cancel_instructions.Add(new CancelInstruction(row.BetID)
+                                        {
+                                            sizeReduction = null
+                                        });
+                                    }
+                                }
+                                if (cancel_instructions.Count == 0)
+                                {
+                                    Status = "Nothing to do";
+                                }
+                                else
+                                {
+                                    CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+
+                                    if (cancel_report.status != "SUCCESS")
+                                    {
+                                        Status = cancel_report.status;
+                                    }
+                                }
+                            });
+                        }
 						break;
+
+                    case "AbsoluteCancelAll":
+
+                        if (MarketNode != null)
+                        {
+                            await Task.Run(() =>
+                            {
+                                List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
+
+                                foreach (Row row in Rows)
+                                {
+                                    if (!row.IsMatched && row.Stake > 0)
+                                    {
+                                        cancel_instructions.Add(new CancelInstruction(row.BetID)
+                                        {
+                                            sizeReduction = null
+                                        });
+                                    }
+                                }
+                                if (cancel_instructions.Count == 0)
+                                {
+                                    Status = "Nothing to do";
+                                }
+                                else
+                                {
+                                    CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+
+                                    if (cancel_report.status != "SUCCESS")
+                                    {
+                                        Status = cancel_report.status;
+                                    }
+                                }
+                            });
+                        }
+
+
+
+                        //BackgroundWorker bw = new BackgroundWorker();
+                        //String result = "";
+                        //bw.RunWorkerCompleted += (o, e2) => { Status = result; };
+                        //bw.DoWork += (o, e2) =>
+                        //{
+                        //	if (MarketNode != null)
+                        //	{
+                        //		CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
+                        //		if (report != null)
+                        //			result = report.errorCode != null ? report.errorCode : report.status;
+                        //	}
+                        //};
+                        //bw.RunWorkerAsync();
+                        break;
 				}
 			}
 			catch(Exception xe)
@@ -905,8 +970,21 @@ namespace SpreadTrader
 			props.ColumnWidths = json;
 			props.Save();
 		}
-	}
-	public class OrderMarketSnap
+
+        private void NoCancelCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            CheckBox cb = sender as CheckBox;
+            Row row = cb.DataContext as Row;
+            row.NoCancel = cb.IsChecked == true;
+        }
+        private void OverrideCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            CheckBox cb = sender as CheckBox;
+            Row row = cb.DataContext as Row;
+            row.Override = cb.IsChecked == true;
+        }
+    }
+    public class OrderMarketSnap
 	{
 		public string MarketId { get; set; }
 		public bool IsClosed { get; set; }
