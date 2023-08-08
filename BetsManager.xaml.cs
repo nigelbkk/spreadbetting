@@ -951,7 +951,7 @@ namespace SpreadTrader
 			double[] widths = JsonConvert.DeserializeObject<double[]>(json);
 			if (widths != null)
 			{
-				for (int i = 0; i < widths.Length; i++)
+				for (int i = 0; i < Math.Min(dataGrid.Columns.Count, widths.Length); i++)
 				{
 					dataGrid.Columns[i].Width = new DataGridLength(widths[i]);
 				}

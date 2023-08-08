@@ -78,15 +78,15 @@
 						</DataGridTemplateColumn.CellTemplate>
 					</DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn>
+                    <!--<DataGridTemplateColumn>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox Tag="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}}" Click="OverrideCheckBox_Click"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                    </DataGridTemplateColumn>-->
 
-                    <DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="NC">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid>
