@@ -151,7 +151,7 @@ namespace SpreadTrader
 				//Extensions.MainWindow.Status = value;
 			}
 		}
-		private String _Notification = "Notifications will appear here";
+		private String _Notification = "";
 		public String Notification
 		{
 			get { return _Notification; }

@@ -19,7 +19,7 @@ namespace SpreadTrader
 		public OnShutdownDelegate OnShutdown = null;
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
-		private static String _Notification = "Notifications will appear here";
+		private static String _Notification = "";
 		public String Status
 		{
 			get { return _Status; }
