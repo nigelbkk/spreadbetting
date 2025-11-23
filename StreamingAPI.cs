@@ -27,7 +27,8 @@ namespace SpreadTrader
                 "identitysso-cert.betfair.com",
                 props.AppKey,
                 props.BFUser,
-                props.BFPassword);
+                props.BFPassword,
+                MainWindow.Betfair.SessionToken);
 
             ClientCache.Client.ConnectionStatusChanged += (o, e) =>
             {
@@ -37,9 +38,9 @@ namespace SpreadTrader
                 }
             };
         }
-        public void NewSessionProvider(string ssohost, string appkey, string username, string password)
+        public void NewSessionProvider(string ssohost, string appkey, string username, string password, string session_token)
         {
-            AppKeyAndSessionProvider sessionProvider = new AppKeyAndSessionProvider(ssohost, appkey, username, password);
+            AppKeyAndSessionProvider sessionProvider = new AppKeyAndSessionProvider(ssohost, appkey, username, password, props.CertFile, props.CertPassword, session_token);
             SessionProvider = sessionProvider;
         }
         public ClientCache ClientCache

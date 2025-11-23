@@ -151,6 +151,17 @@ namespace SpreadTrader
 				//Extensions.MainWindow.Status = value;
 			}
 		}
+		private String _Notification = "Notifications will appear here";
+		public String Notification
+		{
+			get { return _Notification; }
+			set
+			{
+				_Notification = value;
+				Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Notification = value; }));
+				//Extensions.MainWindow.Status = value;
+			}
+		}
 		private bool _Connected { get { return !String.IsNullOrEmpty(hubConnection?.ConnectionId); } }
 		public bool IsConnected { get { return _Connected; } }
 		public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
@@ -727,7 +738,7 @@ namespace SpreadTrader
 
 								if (cancel_instructions.Count == 0)
 								{
-									Status = "Nothing to do";
+									Notification = "Nothing to do";
 								}
 								else
 								{
@@ -775,7 +786,7 @@ namespace SpreadTrader
 								}
 								if (cancel_instructions.Count == 0)
 								{
-									Status = "Nothing to do";
+									Notification = "Nothing to do";
 								}
 								else
 								{
@@ -832,41 +843,59 @@ namespace SpreadTrader
 						OnOrderChanged(matchbet(MarketNode.LiveRunners[1])); break;
 					case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
 					case "CancelAll":
-
+						Status = "CancelAll";
+						Notification = "";
+						if (MarketNode == null)
+						{
+							Notification = "CancelAll No Market Selected";
+						}
                         if (MarketNode != null)
                         {
-                            await Task.Run(() =>
+							try
+							{
+								await Task.Run(() =>
+								{
+									List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
+
+									foreach (Row row in Rows)
+									{
+										if (row.NoCancel)
+											continue;
+
+										if (!row.IsMatched && row.Stake > 0)
+										{
+											cancel_instructions.Add(new CancelInstruction(row.BetID)
+											{
+												sizeReduction = null
+											});
+										}
+									}
+									if (cancel_instructions.Count == 0)
+									{
+										Notification = "Nothing to do";
+									}
+									else
+									{
+										Notification = $"Cancelling {cancel_instructions.Count} bets";
+										CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+
+										if (cancel_report.status != "SUCCESS")
+										{
+											Status = cancel_report.errorCode;
+										}
+										else
+										{
+											Status = cancel_report.status;
+										}
+									}
+									//Status = "Cancellation Task completed";
+								});
+							}
+							catch(Exception xxe)
                             {
-                                List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
-
-                                foreach (Row row in Rows)
-                                {
-									if (row.NoCancel)
-										continue;
-
-                                    if (!row.IsMatched && row.Stake > 0)
-                                    {
-                                        cancel_instructions.Add(new CancelInstruction(row.BetID)
-                                        {
-                                            sizeReduction = null
-                                        });
-                                    }
-                                }
-                                if (cancel_instructions.Count == 0)
-                                {
-                                    Status = "Nothing to do";
-                                }
-                                else
-                                {
-                                    CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-
-                                    if (cancel_report.status != "SUCCESS")
-                                    {
-                                        Status = cancel_report.status;
-                                    }
-                                }
-                            });
-                        }
+								Notification = $"Cancellation Task failed with {xxe}";
+							}
+						}
 						break;
 
                     case "AbsoluteCancelAll":

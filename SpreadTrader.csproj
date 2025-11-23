@@ -60,9 +60,8 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Betfair.ESAClient, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\BetfairProxy\bin\Debug\Betfair.ESAClient.dll</HintPath>
+    <Reference Include="Betfair.ESAClient">
+      <HintPath>..\Betfair.ESAClient\bin\Debug\Betfair.ESAClient.dll</HintPath>
     </Reference>
     <Reference Include="Betfair.ESASwagger, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
