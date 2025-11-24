@@ -61,8 +61,8 @@ namespace SpreadTrader
                 Favorite = runner;
                 NotifyPropertyChanged("");
                 BasePrice = runner.LastPriceTraded;
-                MoveBack = 10;
-                MoveLay = 22;
+                //MoveBack = 10;
+                //MoveLay = 22;
                 SyncPrices();
             };
         }
