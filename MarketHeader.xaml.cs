@@ -18,6 +18,7 @@ namespace SpreadTrader
         public TabContent TabContent { get; set; }
         public String FullName { get { return MarketNode == null ? "No Market Selected" : MarketNode.MarketName; } }
         public String TimeToGo { get { return MarketNode == null ? "00:00:00" : MarketNode.TimeToGo;  } }
+		private System.Timers.Timer timer = new System.Timers.Timer();
         public double TurnaroundTime { get { return MarketNode == null ? 0 : MarketNode.TurnaroundTime; } }
         public Int32 UpdateRate { get { return MarketNode == null ? 0 : MarketNode.UpdateRate; } }
         public Double? TotalMatched { get { return MarketNode == null ? 0 : MarketNode.TotalMatched; } }
@@ -38,6 +39,21 @@ namespace SpreadTrader
             InitializeComponent();
             up_visible = Visibility.Visible;
             down_visible = Visibility.Collapsed;
+            timer.Elapsed += (o, e) =>
+            {
+                try
+                {
+                    NotifyPropertyChanged("");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+            };
+            timer.Interval = 1000;
+            timer.Enabled = true;
+            timer.Start();
+
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {

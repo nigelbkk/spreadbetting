@@ -256,6 +256,24 @@ namespace SpreadTrader
 			bw2.DoWork += (o, e) => ProcessCancellationQueue(o);
 			bw2.RunWorkerAsync();
 
+
+			// REVIEW!!
+			timer.Elapsed += (o, e) =>
+			{
+				try
+				{
+					NotifyPropertyChanged("");
+				}
+				catch (Exception ex)
+				{
+					Debug.WriteLine(ex);
+				}
+			};
+			timer.Interval = 1000;
+			timer.Enabled = true;
+			timer.Start();
+
+
 			hubConnection = new HubConnection("http://" + props.StreamUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
@@ -270,35 +288,20 @@ namespace SpreadTrader
 						Debug.WriteLine("Add to queue");
 						incomingOrdersQueue.Enqueue(json1);
 					}
-
-					// Not threadsafe
-
-					//if (props.development)        // live system?
-					//{
-					//	String file_name = String.Format(".\\notifications.json");
-					//	if (!File.Exists(file_name))
-					//	{
-					//		using (var stream = File.CreateText(file_name))
-					//		{
-					//		}
-					//	}
-					//	File.AppendAllText(file_name, json1 + "\n");
-					//}
 				}
 			});
-			timer.Elapsed += (o, e) =>
-			{
-				StreamActive = false;
-				timer.Stop();
-			};
-			timer.Interval = 10000;
-			timer.Enabled = true;
-			timer.Start();
 
 			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
 			{
-				StreamActive = true;
-				timer.Start();
+				try
+				{
+					StreamActive = true;
+					timer.Start();
+				}
+				catch (Exception ex)
+				{
+					Debug.WriteLine(ex);
+				}
 			};
 
 			Rows = new ObservableCollection<Row>();
