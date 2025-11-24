@@ -45,7 +45,8 @@ namespace SpreadTrader
             Int32 idx = 0;
             for (; idx < MinValue.Length; idx++)
             {
-                if (v >= MinValue[idx] && v <= MaxValue[idx])
+                //if (v >= MinValue[idx] && v <= MaxValue[idx])
+                if (v >= MinValue[idx] && (idx == MinValue.Length - 1 ? v <= MaxValue[idx] : v < MaxValue[idx]))
                 {
                     break;
                 }
