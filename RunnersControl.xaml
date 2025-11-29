@@ -117,8 +117,11 @@
                         <ColumnDefinition Width="46"/>
                     </Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="{Binding Name}" FontSize="16" Background="{Binding Path=FavoritesColor}"  PreviewMouseDown="NameMouseDown" HorizontalContentAlignment="Left"/>
-					<Button Grid.Column="1" DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
-					<Button Grid.Column="2"  DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
+
+                    <!--<Button Grid.Column="1" DataContext="{Binding BackValues[2]}" Background="{Binding BackColor}"/>-->
+                    <!--<Button Grid.Column="1" DataContext="{Binding BackValues[2]}" Background="{Binding BackColors[2]}"/>-->
+                    <Button Grid.Column="1"  DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
+                    <Button Grid.Column="2"  DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
 					<Button Grid.Column="3" DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
 					<Label Grid.Column="4"/>
 					<Button Grid.Column="5" DataContext="{Binding LayValues[0]}" Background="{StaticResource Lay0Color}"/>

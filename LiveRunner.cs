@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -11,6 +13,8 @@ namespace SpreadTrader
 {
     public class LiveRunner : INotifyPropertyChanged
     {
+        Brush b = (Brush)Application.Current.Resources["Back0Color"];
+
         public Runner ngrunner { get; set; }
         private BitmapImage _colors = null;
         public BitmapImage Colors { get { return _colors; } set { _colors = value; NotifyPropertyChanged("Colors"); } }
@@ -63,10 +67,23 @@ namespace SpreadTrader
                 return Brushes.Red;
             }
         }
+        //private bool TradedVolumeFlag = false;
         public double BackStake { get; set; }
         public double LayStake { get; set; }
         private double _ifWin { get; set; }
         public double ifWin { get { return _ifWin; } set { _ifWin = value; NotifyPropertyChanged(""); } }
+
+        private Double _TradedVolume { get; set; }
+        public Double TradedVolume{ get { return _TradedVolume; } set 
+            { 
+                if (value > _TradedVolume)
+                {
+               //     Debug.WriteLine($"{ SelectionId} : { value }");
+                }
+                _TradedVolume = value; NotifyPropertyChanged(""); 
+            } 
+        }
+
         private Double _LevelStake = 0;
         public Double LevelStake { get { return _LevelStake; } set { _LevelStake = value; NotifyPropertyChanged(""); } }
         public sideEnum LevelSide { get; set; }
@@ -82,6 +99,15 @@ namespace SpreadTrader
         }
         public double LastPriceTraded { get; set; }
         public List<PriceSize> BackValues { get; set; }
+        public List<Brush> LayColors { get; set; }
+        public Brush BackColor
+        {
+            get
+            {
+                return Brushes.Yellow;
+            }
+        }
+        public List<Brush> BackColors { get; set; }
         public ObservableCollection<PriceSize> LayValues { get; set; }
         public double BackLayRatio { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -94,6 +120,20 @@ namespace SpreadTrader
         }
         public LiveRunner()
         {
+            //BackColors = new List<Brush>
+            //{
+            //    (Brush)Application.Current.Resources["Back0Color"],
+            //    (Brush)Application.Current.Resources["Back1Color"],
+            //    (Brush)Application.Current.Resources["Back2Color"]
+            //};
+            //LayColors = new List<Brush>
+            //{
+            //    (Brush)Application.Current.Resources["Lay0Color"],
+            //    (Brush)Application.Current.Resources["Lay1Color"],
+            //    (Brush)Application.Current.Resources["Lay2Color"]
+            //};
+            //BackColor = Brushes.Yellow;
+
             BackStake = Properties.Settings.Default.BackStake;
             LayStake = Properties.Settings.Default.LayStake;
             BackValues = new List<PriceSize>();

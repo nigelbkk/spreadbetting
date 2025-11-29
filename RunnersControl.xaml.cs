@@ -19,7 +19,6 @@ namespace SpreadTrader
         public StreamUpdateDelegate StreamUpdateEventSink = null;
         public FavoriteChangedDelegate OnFavoriteChanged = null;
         public MarketChangedDelegate OnMarketChanged = null;
-
         private StreamingAPI streamingAPI = new StreamingAPI();
         private BackgroundWorker Worker = null;
         public NodeViewModel _MarketNode { get; set; }
@@ -44,6 +43,7 @@ namespace SpreadTrader
                 //OverlayText.Text = MarketNode.Status.ToString();
             }));
         }
+
         public RunnersControl()
         {
             LiveRunners = new List<LiveRunner>();
@@ -69,6 +69,18 @@ namespace SpreadTrader
                         LiveRunners[i].LastPriceTraded = liveRunners[i].LastPriceTraded;
                         LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
                         LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
+
+                        //if (LiveRunners[i].TradedVolume != liveRunners[i].TradedVolume)
+                        //{
+                        //    Debug.WriteLine($"{ LiveRunners[i].SelectionId} : { liveRunners[i].TradedVolume}");
+                        //    liveRunners[i].BackValues[2].BackColors[0] = Brushes.Yellow;
+                        //    //liveRunners[i].BackValues[2].BackColors[1] = Brushes.Yellow;
+                        //    //liveRunners[i].BackValues[2].BackColors[2] = Brushes.Yellow;
+                        //    NotifyPropertyChanged("");
+                        //}
+
+
+                        LiveRunners[i].TradedVolume = liveRunners[i].TradedVolume;
                         LiveRunners[i].NotifyPropertyChanged("");
                         if (pl.Count > 0 && pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
                             {

@@ -106,6 +106,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BetfairOrderStreamClient.cs" />
     <Compile Include="BetfairPrices.cs" />
     <Compile Include="BetsManager.xaml.cs">
       <DependentUpon>BetsManager.xaml</DependentUpon>
@@ -299,6 +300,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Web.WebView2">
       <Version>1.0.664.37</Version>
+    </PackageReference>
+    <PackageReference Include="WebSocketSharp-netstandard">
+      <Version>1.0.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

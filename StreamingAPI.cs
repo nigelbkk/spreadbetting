@@ -23,13 +23,7 @@ namespace SpreadTrader
         private static Properties.Settings props = Properties.Settings.Default;
         public StreamingAPI()
         {
-            NewSessionProvider(
-                "identitysso-cert.betfair.com",
-                props.AppKey,
-                props.BFUser,
-                props.BFPassword,
-                MainWindow.Betfair.SessionToken);
-
+            NewSessionProvider("identitysso-cert.betfair.com",props.AppKey,props.BFUser,props.BFPassword,MainWindow.Betfair.SessionToken);
             ClientCache.Client.ConnectionStatusChanged += (o, e) =>
             {
                 if (!String.IsNullOrEmpty(e.ConnectionId))
@@ -38,6 +32,7 @@ namespace SpreadTrader
                 }
             };
         }
+
         public void NewSessionProvider(string ssohost, string appkey, string username, string password, string session_token)
         {
             AppKeyAndSessionProvider sessionProvider = new AppKeyAndSessionProvider(ssohost, appkey, username, password, props.CertFile, props.CertPassword, session_token);
@@ -68,8 +63,10 @@ namespace SpreadTrader
                 {
                     LiveRunner lr = new LiveRunner();
                     lr.SetPrices(e.Snap.MarketRunners[i]);
-                    _LiveRunners.Add(lr);
+                    lr.TradedVolume = e.Snap.MarketRunners[i].Prices.TradedVolume;
                     tradedVolume += e.Snap.MarketRunners[i].Prices.TradedVolume;
+                 
+                    _LiveRunners.Add(lr);
                 }
                 Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
             }
