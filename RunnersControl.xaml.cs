@@ -11,7 +11,7 @@ using System.Windows.Media;
 namespace SpreadTrader
 {
     public delegate void MarketChangedDelegate(NodeViewModel node);
-    public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, bool inplay);
+    public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, List<Tuple<long, double>> last_traded, bool inplay);
     public partial class RunnersControl : UserControl, INotifyPropertyChanged
     {
         public BetsManager betsManager = null;
@@ -44,15 +44,55 @@ namespace SpreadTrader
             }));
         }
 
+        Tuple<int, int> GetPriceID(List<LiveRunner> liveRunners,  long selid, Double price)
+        {
+            int runnerid = 0;
+            foreach (var runner in liveRunners)
+            {
+                if (runner.SelectionId == selid)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        if (liveRunners[runnerid].BackValues[i].price == price)
+                            return new Tuple<int, int>(runnerid, i);
+                    }
+                    for (int j = 0; j < 3; j++)
+                    {
+                        if (liveRunners[runnerid].LayValues[j].price == price)
+                            return new Tuple<int, int>(runnerid, j+3);
+                    }
+                }
+                runnerid++;
+            }
+            return null;
+        }
+
+        void FlashTraded(List<LiveRunner> liveRunners, List<Tuple<long, double>> last_traded)
+        {
+            foreach (var rc in last_traded)
+            {
+                Tuple<int, int> id = GetPriceID(LiveRunners, rc.Item1, rc.Item2);
+                if (id != null)
+                {
+                    Debug.WriteLine($"selid = {rc.Item1} : Ltp = {rc.Item2} : {LiveRunners[id.Item1].Name} : price id = {id.Item2}");
+                    if (id.Item2 > 2)
+                        liveRunners[id.Item1].LayValues[id.Item2 - 3].CellBackgroundColor = Brushes.Yellow;
+                    else
+                        liveRunners[id.Item1].BackValues[id.Item2].CellBackgroundColor = Brushes.Yellow;
+                }
+            }
+        }
+
         public RunnersControl()
         {
             LiveRunners = new List<LiveRunner>();
             InitializeComponent();
 
-            StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
+            StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, last_traded, inplay) =>
             {
                 if (MarketNode != null &&  marketid == MarketNode.MarketID)
                 {
+                    FlashTraded(liveRunners, last_traded);
                     List<MarketProfitAndLoss> pl = MainWindow.Betfair.listMarketProfitAndLoss(MarketNode.MarketID);
 
                     double totalBack = 0;
@@ -70,29 +110,39 @@ namespace SpreadTrader
                         LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
                         LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
 
-                        //if (LiveRunners[i].TradedVolume != liveRunners[i].TradedVolume)
-                        //{
-                        //    Debug.WriteLine($"{ LiveRunners[i].SelectionId} : { liveRunners[i].TradedVolume}");
-                        //    liveRunners[i].BackValues[2].BackColors[0] = Brushes.Yellow;
-                        //    //liveRunners[i].BackValues[2].BackColors[1] = Brushes.Yellow;
-                        //    //liveRunners[i].BackValues[2].BackColors[2] = Brushes.Yellow;
-                        //    NotifyPropertyChanged("");
-                        //}
+                        //Tuple<int, int> previous_id = null;
 
+                        //foreach (var rc in last_traded)
+                        //{
+                        //    Tuple<int, int> id = GetPriceID(LiveRunners, rc.Item1, rc.Item2);
+                        //    if (id != null)
+                        //    {
+                        //        if (id == previous_id)
+                        //            break;
+
+                        //        Debug.WriteLine($"selid = {rc.Item1} : Ltp = {rc.Item2} : {LiveRunners[id.Item1].Name} : price id = {id.Item2}");
+                        //        if (id.Item2 > 2)
+                        //            liveRunners[id.Item1].LayValues[id.Item2-3].CellBackgroundColor = Brushes.Yellow;
+                        //        else
+                        //            liveRunners[id.Item1].BackValues[id.Item2].CellBackgroundColor = Brushes.Yellow;
+                        //    }
+                        //    previous_id = id;
+                        //}
 
                         LiveRunners[i].TradedVolume = liveRunners[i].TradedVolume;
                         LiveRunners[i].NotifyPropertyChanged("");
                         if (pl.Count > 0 && pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
+                        {
+                            if (p.selectionId == LiveRunners[i].SelectionId)
                             {
-                                if (p.selectionId == LiveRunners[i].SelectionId)
-                                {
-                                    LiveRunners[i].ifWin = p.ifWin;
-                                }
+                                LiveRunners[i].ifWin = p.ifWin;
                             }
+                        }
                     }
                     MarketNode.LiveRunners = LiveRunners;
                     MarketNode.CalculateLevelProfit();
                     MarketNode.TotalMatched = tradedVolume;
+                    List<Tuple<long, double>> _last_traded = last_traded;
                     //BackBook = totalBack;
                     //LayBook = totalLay;
                     UpdateMarketStatus();
@@ -157,8 +207,8 @@ namespace SpreadTrader
                         {
                             for (int i = 0; i < 3; i++)
                             {
-                                lr.BackValues[i] = new PriceSize();
-                                lr.LayValues[i] = new PriceSize();
+                                lr.BackValues[i] = new PriceSize(i);
+                                lr.LayValues[i] = new PriceSize(i+3);
                             }
                         }
                     for (int i = 0; i < LiveRunners.Count; i++)

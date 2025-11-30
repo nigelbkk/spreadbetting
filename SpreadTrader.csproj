@@ -106,7 +106,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BetfairOrderStreamClient.cs" />
     <Compile Include="BetfairPrices.cs" />
     <Compile Include="BetsManager.xaml.cs">
       <DependentUpon>BetsManager.xaml</DependentUpon>

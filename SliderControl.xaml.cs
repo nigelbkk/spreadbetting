@@ -49,8 +49,8 @@ namespace SpreadTrader
             LayValues = new PriceSize[9];
             for (Int32 i = 0; i < 9; i++)
             {
-                BackValues[i] = new PriceSize(betfairPrices[i], 20 + 1 * 10);
-                LayValues[i] = new PriceSize(betfairPrices[i], 20 + 1 * 10);
+                BackValues[i] = new PriceSize(0, betfairPrices[i], 20 + 1 * 10);
+                LayValues[i] = new PriceSize(0, betfairPrices[i], 20 + 1 * 10);
             }
             BasePrice = props.BasePrice;
             InitializeComponent();
