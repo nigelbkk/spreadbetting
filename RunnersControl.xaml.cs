@@ -8,6 +8,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Betfair.ESASwagger.Model;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace SpreadTrader
 {
@@ -165,6 +167,32 @@ namespace SpreadTrader
                 Debug.WriteLine(e.Message);
             }
         }
+        private async Task<List<MarketProfitAndLoss>> GetProfitAndLossAsync(string marketId)
+        {
+            return await Task.Run(() =>
+            {
+                return MainWindow.Betfair.listMarketProfitAndLoss(marketId);
+            });
+        }
+
+        public async Task UpdateRunnerPnLAsync()
+        {
+            var plList = await GetProfitAndLossAsync(MarketNode.MarketID);
+            var pl = plList?.FirstOrDefault();
+            if (pl == null || pl.profitAndLosses == null)
+                return;
+
+            // Build lookup for speed
+            var lookup = pl.profitAndLosses.ToDictionary(x => x.selectionId);
+
+            foreach (var runner in LiveRunners)
+            {
+                if (lookup.TryGetValue(runner.SelectionId, out var pnl))
+                {
+                    runner.ifWin = pnl.ifWin;
+                }
+            }
+        }
 
         public RunnersControl()
         {
@@ -176,13 +204,10 @@ namespace SpreadTrader
                 if (MarketNode != null &&  marketid == MarketNode.MarketID)
                 {
                     FlashTraded(liveRunners, Rc);
-                    //List<MarketProfitAndLoss> pl = MainWindow.Betfair.listMarketProfitAndLoss(MarketNode.MarketID);
-                    //return;
 
                     double totalBack = 0;
                     double totalLay = 0;
                     Int32 ct = Math.Min(LiveRunners.Count, liveRunners.Count); //TOCHECK
-                   // return;
                     for (int i = 0; i < ct; i++)
                     {
                         if (liveRunners[i].BackValues[0].price > 0)
@@ -194,24 +219,17 @@ namespace SpreadTrader
                         LiveRunners[i].LastPriceTraded = liveRunners[i].LastPriceTraded;
                         LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
                         LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
-
                         LiveRunners[i].TradedVolume = liveRunners[i].TradedVolume;
                         LiveRunners[i].NotifyPropertyChanged("");
-                        //if (pl.Count > 0 && pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
-                        //{
-                        //    if (p.selectionId == LiveRunners[i].SelectionId)
-                        //    {
-                        //        LiveRunners[i].ifWin = p.ifWin;
-                        //    }
-                        //}
                     }
                     MarketNode.LiveRunners = LiveRunners;
                     MarketNode.CalculateLevelProfit();
                     MarketNode.TotalMatched = tradedVolume;
-                    //List<Tuple<long, double>> _last_traded = last_traded;
                     if (Worker.IsBusy)
                         Worker.CancelAsync();
                 }
+                _ = UpdateRunnerPnLAsync();
+
             };
             OnMarketSelected += (node) =>
             {
