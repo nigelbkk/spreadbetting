@@ -31,7 +31,7 @@ public class PriceSize : INotifyPropertyChanged
     public PriceSize(int index) {
         IsChecked = true;
         Index = index;
-        CellBackgroundColor = BackgroundColors[index];
+        //CellBackgroundColor = BackgroundColors[index];
     }
     private int Index { get; set; }
     private bool _IsChecked { get; set; }
@@ -43,7 +43,24 @@ public class PriceSize : INotifyPropertyChanged
     private Double _size { get; set; }
     public Double size { get { return _size; } set { _size = value; NotifyPropertyChanged(""); } }
     public SolidColorBrush Color { get; set; }
-    public Brush CellBackgroundColor { get; set; }
+    private object _timer;
+    private Brush _CellBackgroundColor { get; set; }
+    public Brush CellBackgroundColor {
+        get { return _CellBackgroundColor; }
+        set {
+            _CellBackgroundColor = value;
+            var timer = new System.Timers.Timer(1000);
+
+            // assign it to the field so it never gets GC’ed
+            _timer = timer;
+
+            ((System.Timers.Timer)_timer).Elapsed += (_, __) => 
+            {
+                CellBackgroundColor = BackgroundColors[Index];
+            };
+            ((System.Timers.Timer)_timer).Start();
+        }
+    }
     public override string ToString()
     {
         return String.Format("{0:0.00}:{1:0.00}", price, size);

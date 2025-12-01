@@ -57,6 +57,13 @@ namespace SpreadTrader
         {
             try
             {
+                var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                long unixSeconds = (long)epoch.TotalSeconds;
+                long diff = DateTime.UtcNow.Ticks - e.Snap.Time.Ticks;
+
+
+                //Debug.WriteLine($"{diff/ (double)TimeSpan.TicksPerSecond} seconds behind");
+
                 double tradedVolume = 0;
                 _LiveRunners = new List<LiveRunner>();
                 for (int i = 0; i < e.Snap.MarketRunners.Count; i++)
@@ -69,19 +76,22 @@ namespace SpreadTrader
                     _LiveRunners.Add(lr);
                 }
 
-                List<Tuple<long, double>> last_traded = new List<Tuple<long, double>>();
+                List<Tuple<long, double?, double?>> last_traded = new List<Tuple<long, double?, double?>>();
                 if (e.Change?.Rc != null)
                 {
-                    foreach (RunnerChange rc in e.Change?.Rc)
+                    foreach (RunnerChange rc in e.Change?.Rc)  /// examine Atb abd Atl get determine correct side
                     {
-                        if (rc.Ltp != null)
+                        if (rc.Tv != null && rc.Ltp == null)
                         {
-                            //Debug.WriteLine($"selid = {rc.Id} : Ltp = {rc.Ltp}");
-                            last_traded.Add(new Tuple<long, double>((long)rc.Id, (double)rc.Ltp));
+                            last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
+                        }
+                        else if (rc.Ltp != null)
+                        {
+                            last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
                         }
                     }
                 }
-                Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, last_traded, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
+                Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, e.Change.Rc, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
             }
             catch (Exception xe)
             {

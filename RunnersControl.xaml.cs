@@ -7,11 +7,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Betfair.ESASwagger.Model;
 
 namespace SpreadTrader
 {
     public delegate void MarketChangedDelegate(NodeViewModel node);
-    public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, List<Tuple<long, double>> last_traded, bool inplay);
+    public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, List<RunnerChange> last_traded, bool inplay);
+//    public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, List<Tuple<long, double?, double?>> last_traded, bool inplay);
     public partial class RunnersControl : UserControl, INotifyPropertyChanged
     {
         public BetsManager betsManager = null;
@@ -44,42 +46,123 @@ namespace SpreadTrader
             }));
         }
 
-        Tuple<int, int> GetPriceID(List<LiveRunner> liveRunners,  long selid, Double price)
+        String RunnerFromSelid(long selid)
         {
-            int runnerid = 0;
-            foreach (var runner in liveRunners)
+            foreach (var runner in LiveRunners)
             {
                 if (runner.SelectionId == selid)
                 {
-                    for (int i = 0; i < 3; i++)
-                    {
-                        if (liveRunners[runnerid].BackValues[i].price == price)
-                            return new Tuple<int, int>(runnerid, i);
-                    }
-                    for (int j = 0; j < 3; j++)
-                    {
-                        if (liveRunners[runnerid].LayValues[j].price == price)
-                            return new Tuple<int, int>(runnerid, j+3);
-                    }
+                    return runner.Name;
                 }
-                runnerid++;
             }
             return null;
         }
 
-        void FlashTraded(List<LiveRunner> liveRunners, List<Tuple<long, double>> last_traded)
+        Int32? GetCellidFromPricePoint(Int32 runner_id, sideEnum side, double price)
         {
-            foreach (var rc in last_traded)
+            for (int i = 0; i < 3; i++)
             {
-                Tuple<int, int> id = GetPriceID(LiveRunners, rc.Item1, rc.Item2);
-                if (id != null)
+                if (side == sideEnum.BACK)
+                    if (LiveRunners[runner_id].BackValues[i].price == price)
+                        return i;
+                if (side == sideEnum.LAY)
+                    if (LiveRunners[runner_id].LayValues[i].price == price)
+                        return i;
+            }
+            return null;
+        }
+
+        Tuple<int, List<Int32>, List<Int32>> GetCellIDs(RunnerChange rc)   // for a single last traded item
+        { 
+            int runner_id = 0;
+            long selid = rc.Id.Value;
+            double? price = null;
+            foreach (var runner in LiveRunners)
+            {
+                if (runner.SelectionId == selid)
                 {
-                    Debug.WriteLine($"selid = {rc.Item1} : Ltp = {rc.Item2} : {LiveRunners[id.Item1].Name} : price id = {id.Item2}");
-                    if (id.Item2 > 2)
-                        liveRunners[id.Item1].LayValues[id.Item2 - 3].CellBackgroundColor = Brushes.Yellow;
+                    String runner_name = LiveRunners[runner_id].Name;
+                    List<Int32> back_ids = new List<Int32>();
+                    List<Int32> lay_ids = new List<Int32>();
+                    
+                    if (rc.Ltp == null && rc.Tv == null)
+                        return null;
+                    if (rc.Ltp == null && rc.Tv != null)
+                        price = LiveRunners[runner_id].LastPriceTraded;
                     else
-                        liveRunners[id.Item1].BackValues[id.Item2].CellBackgroundColor = Brushes.Yellow;
+                        price = rc.Ltp.Value;
+                    
+                    if (rc.Atb != null)
+                    {
+                        int i = 0;
+                        foreach (var atb in rc.Atb)
+                        {
+                            double? ltp = atb[0];
+                            if (price == ltp)
+                            {
+                                Int32? cell_id = GetCellidFromPricePoint(runner_id, sideEnum.BACK,  ltp.Value);
+                                if (cell_id != null)
+                                    back_ids.Add(cell_id.Value);
+                            }
+                            i++;
+                        }
+                    }
+                    if (rc.Atl != null)
+                    {
+                        int i = 0;
+                        foreach (var atl in rc.Atl)
+                        {
+                            double? ltp = atl[0];
+                            if (price == ltp)
+                            {
+                                Int32? cell_id = GetCellidFromPricePoint(runner_id, sideEnum.LAY, ltp.Value);
+                                if (cell_id != null)
+                                    lay_ids.Add(cell_id.Value);
+                            }
+                            i++;
+                        }
+                    }
+                    return new Tuple<Int32, List<Int32>, List<Int32>> (runner_id, back_ids, lay_ids);
                 }
+                runner_id++;
+            }
+            return null;
+        }
+
+        void FlashTraded(List<LiveRunner> liveRunners, List<RunnerChange> Rc)
+        {
+            if (Rc == null)
+                return;
+
+            try
+            {
+                foreach (var rc in Rc)
+                {
+                    if (rc.Ltp != null)
+                    {
+                    }
+                    String RunnerName = RunnerFromSelid(rc.Id.Value);
+
+                    Tuple<int, List<Int32>, List<Int32>> cell_ids = GetCellIDs(rc);
+                    if (cell_ids != null)
+                    {
+                        foreach (Int32 cell_id in cell_ids.Item2)
+                        {
+                            Debug.WriteLine($"Back: {RunnerName} : {rc.Ltp} : cell id = {cell_id}");
+                            liveRunners[cell_ids.Item1].BackValues[cell_id].CellBackgroundColor = Brushes.Yellow;
+                        }
+                        foreach (Int32 cell_id in cell_ids.Item3)
+                        {
+                            Debug.WriteLine($"Lay:  {RunnerName} : {rc.Ltp} : cell id = {cell_id}");
+                            liveRunners[cell_ids.Item1].LayValues[cell_id].CellBackgroundColor = Brushes.Yellow;
+                        }
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
             }
         }
 
@@ -88,16 +171,18 @@ namespace SpreadTrader
             LiveRunners = new List<LiveRunner>();
             InitializeComponent();
 
-            StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, last_traded, inplay) =>
+            StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, Rc, inplay) =>
             {
                 if (MarketNode != null &&  marketid == MarketNode.MarketID)
                 {
-                    FlashTraded(liveRunners, last_traded);
-                    List<MarketProfitAndLoss> pl = MainWindow.Betfair.listMarketProfitAndLoss(MarketNode.MarketID);
+                    FlashTraded(liveRunners, Rc);
+                    //List<MarketProfitAndLoss> pl = MainWindow.Betfair.listMarketProfitAndLoss(MarketNode.MarketID);
+                    //return;
 
                     double totalBack = 0;
                     double totalLay = 0;
                     Int32 ct = Math.Min(LiveRunners.Count, liveRunners.Count); //TOCHECK
+                   // return;
                     for (int i = 0; i < ct; i++)
                     {
                         if (liveRunners[i].BackValues[0].price > 0)
@@ -110,43 +195,20 @@ namespace SpreadTrader
                         LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
                         LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
 
-                        //Tuple<int, int> previous_id = null;
-
-                        //foreach (var rc in last_traded)
-                        //{
-                        //    Tuple<int, int> id = GetPriceID(LiveRunners, rc.Item1, rc.Item2);
-                        //    if (id != null)
-                        //    {
-                        //        if (id == previous_id)
-                        //            break;
-
-                        //        Debug.WriteLine($"selid = {rc.Item1} : Ltp = {rc.Item2} : {LiveRunners[id.Item1].Name} : price id = {id.Item2}");
-                        //        if (id.Item2 > 2)
-                        //            liveRunners[id.Item1].LayValues[id.Item2-3].CellBackgroundColor = Brushes.Yellow;
-                        //        else
-                        //            liveRunners[id.Item1].BackValues[id.Item2].CellBackgroundColor = Brushes.Yellow;
-                        //    }
-                        //    previous_id = id;
-                        //}
-
                         LiveRunners[i].TradedVolume = liveRunners[i].TradedVolume;
                         LiveRunners[i].NotifyPropertyChanged("");
-                        if (pl.Count > 0 && pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
-                        {
-                            if (p.selectionId == LiveRunners[i].SelectionId)
-                            {
-                                LiveRunners[i].ifWin = p.ifWin;
-                            }
-                        }
+                        //if (pl.Count > 0 && pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
+                        //{
+                        //    if (p.selectionId == LiveRunners[i].SelectionId)
+                        //    {
+                        //        LiveRunners[i].ifWin = p.ifWin;
+                        //    }
+                        //}
                     }
                     MarketNode.LiveRunners = LiveRunners;
                     MarketNode.CalculateLevelProfit();
                     MarketNode.TotalMatched = tradedVolume;
-                    List<Tuple<long, double>> _last_traded = last_traded;
-                    //BackBook = totalBack;
-                    //LayBook = totalLay;
-                    UpdateMarketStatus();
-                    NotifyPropertyChanged("");
+                    //List<Tuple<long, double>> _last_traded = last_traded;
                     if (Worker.IsBusy)
                         Worker.CancelAsync();
                 }

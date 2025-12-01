@@ -69,16 +69,7 @@ namespace SpreadTrader
         public double LayStake { get; set; }
         private double _ifWin { get; set; }
         public double ifWin { get { return _ifWin; } set { _ifWin = value; NotifyPropertyChanged(""); } }
-        private Double _TradedVolume { get; set; }
-        public Double TradedVolume{ get { return _TradedVolume; } set 
-            { 
-                if (value > _TradedVolume)
-                {
-               //     Debug.WriteLine($"{ SelectionId} : { value }");
-                }
-                _TradedVolume = value; NotifyPropertyChanged(""); 
-            } 
-        }
+        public Double TradedVolume { get; set; }
         private Double _LevelStake = 0;
         public Double LevelStake { get { return _LevelStake; } set { _LevelStake = value; NotifyPropertyChanged(""); } }
         public sideEnum LevelSide { get; set; }
@@ -93,8 +84,8 @@ namespace SpreadTrader
             }
         }
         public double LastPriceTraded { get; set; }
+        public double LastTradedPice { get; set; }      // this one is for partial match notifications
         public List<PriceSize> BackValues { get; set; }
-        //public List<Brush> LayColors { get; set; }
         public Brush BackColor
         {
             get
@@ -102,7 +93,6 @@ namespace SpreadTrader
                 return Brushes.Yellow;
             }
         }
-        //public List<Brush> BackColors { get; set; }
         public ObservableCollection<PriceSize> LayValues { get; set; }
         public double BackLayRatio { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
