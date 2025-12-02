@@ -28,12 +28,17 @@ public class PriceSize : INotifyPropertyChanged
         CellBackgroundColor = BackgroundColors[index];
         this.price = price; this.size = size; IsChecked = true;
     }
-    public PriceSize(int index) {
-        IsChecked = true;
-        Index = index;
-        CellBackgroundColor = BackgroundColors[index];
-    }
-    private int Index { get; set; }
+	public PriceSize(int index)
+	{
+		IsChecked = true;
+		Index = index;
+		CellBackgroundColor = BackgroundColors[index];
+	}
+	public PriceSize()
+	{
+		CellBackgroundColor = BackgroundColors[0];
+	}
+	private int Index { get; set; }
     private bool _IsChecked { get; set; }
     private bool _ParentChecked { get; set; }
     public bool ParentChecked { get { return _ParentChecked; } set { _ParentChecked = value; NotifyPropertyChanged(""); } }

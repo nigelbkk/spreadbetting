@@ -273,7 +273,6 @@ namespace SpreadTrader
 			timer.Enabled = true;
 			timer.Start();
 
-
 			hubConnection = new HubConnection("http://" + props.StreamUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
