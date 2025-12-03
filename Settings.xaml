@@ -50,9 +50,9 @@
 					<Label Content="Hilite Unselected When matched" />
 					<Label Content="Time Zone Offset" Height="21" />
 					<Label Content="Safe Bets" Height="21" />
-					<Label Content="Use Proxy"  />
-					<Label Content="Use Streaming API" Height="21" />
-                    <Label Content="Order Stream URL" Height="21" />
+					<Label Content="Remote Betfair Proxy"  />
+					<Label Content="Remote Order Streaming" Height="21" />
+                    <!--<Label Content="Order Stream URL" Height="21" />-->
                     <Label Content="Development" Height="21" />
                     <Label Content="Production" Height="21" />
 				</StackPanel>
@@ -88,11 +88,15 @@
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=TimeOffset, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=SafeBets, Mode=TwoWay}" />
 					<StackPanel Orientation="Horizontal">
-						<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=UseProxy, Mode=TwoWay}" Margin="0,0,2,0"/>
-						<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=Proxy, Mode=TwoWay}" Padding="0,0,0,0" IsEnabled="{Binding Source={x:Static p:Settings.Default}, Path=UseProxy}"/>
+						<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=UseBetfairProxy, Mode=TwoWay}" Margin="0,0,2,0"/>
+						<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=BetfairProxyUrl, Mode=TwoWay}" Padding="0,0,0,0" IsEnabled="{Binding Source={x:Static p:Settings.Default}, Path=UseBetfairProxy}"/>
 					</StackPanel>
-					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=UseStreaming, Mode=TwoWay}" />
-                    <TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=StreamUrl, Mode=TwoWay}" />
+					<StackPanel Orientation="Horizontal">
+						<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=UseRemoteStreamProxy, Mode=TwoWay}" Margin="0,0,2,0"/>
+						<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=RemoteStreamProxyUrl, Mode=TwoWay}" Padding="0,0,0,0" IsEnabled="{Binding Source={x:Static p:Settings.Default}, Path=UseRemoteStreamProxy}"/>
+						<!--<TextBox  Text="127.0.0.1:8088" Padding="0,0,0,0" IsEnabled="{Binding Source={x:Static p:Settings.Default}, Path=RemoteStreamProxyUrl}"/>-->
+					</StackPanel>
+                    <!--<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=StreamUrl, Mode=TwoWay}" />-->
                     <CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=development, Mode=TwoWay}" />
                     <CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=production, Mode=TwoWay}" />
 				</StackPanel>

@@ -41,7 +41,7 @@
     <Setting Name="Favourites" Type="System.String" Scope="User">
       <Value Profile="(Default)">1,2,3</Value>
     </Setting>
-    <Setting Name="Proxy" Type="System.String" Scope="User">
+    <Setting Name="BetfairProxyUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">127.0.0.1:5055</Value>
     </Setting>
     <Setting Name="BasePrice" Type="System.Double" Scope="User">
@@ -68,10 +68,10 @@
     <Setting Name="LogFile" Type="System.String" Scope="User">
       <Value Profile="(Default)">log.csv</Value>
     </Setting>
-    <Setting Name="UseStreaming" Type="System.Boolean" Scope="User">
+    <Setting Name="UseRemoteStreamProxy" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="StreamUrl" Type="System.String" Scope="User">
+    <Setting Name="RemoteStreamProxyUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">127.0.0.1:8088</Value>
     </Setting>
     <Setting Name="SafeBets" Type="System.Boolean" Scope="User">
@@ -80,7 +80,7 @@
     <Setting Name="StreamActive" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="UseProxy" Type="System.Boolean" Scope="User">
+    <Setting Name="UseBetfairProxy" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="TimeOffset" Type="System.Int32" Scope="User">

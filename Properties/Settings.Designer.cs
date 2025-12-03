@@ -182,12 +182,12 @@ namespace SpreadTrader.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1:5055")]
-        public string Proxy {
+        public string BetfairProxyUrl {
             get {
-                return ((string)(this["Proxy"]));
+                return ((string)(this["BetfairProxyUrl"]));
             }
             set {
-                this["Proxy"] = value;
+                this["BetfairProxyUrl"] = value;
             }
         }
         
@@ -290,24 +290,24 @@ namespace SpreadTrader.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool UseStreaming {
+        public bool UseRemoteStreamProxy {
             get {
-                return ((bool)(this["UseStreaming"]));
+                return ((bool)(this["UseRemoteStreamProxy"]));
             }
             set {
-                this["UseStreaming"] = value;
+                this["UseRemoteStreamProxy"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1:8088")]
-        public string StreamUrl {
+        public string RemoteStreamProxyUrl {
             get {
-                return ((string)(this["StreamUrl"]));
+                return ((string)(this["RemoteStreamProxyUrl"]));
             }
             set {
-                this["StreamUrl"] = value;
+                this["RemoteStreamProxyUrl"] = value;
             }
         }
         
@@ -338,12 +338,12 @@ namespace SpreadTrader.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool UseProxy {
+        public bool UseBetfairProxy {
             get {
-                return ((bool)(this["UseProxy"]));
+                return ((bool)(this["UseBetfairProxy"]));
             }
             set {
-                this["UseProxy"] = value;
+                this["UseBetfairProxy"] = value;
             }
         }
         

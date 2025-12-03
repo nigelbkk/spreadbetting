@@ -61,7 +61,6 @@ namespace SpreadTrader
                 long unixSeconds = (long)epoch.TotalSeconds;
                 long diff = DateTime.UtcNow.Ticks - e.Snap.Time.Ticks;
 
-
                 //Debug.WriteLine($"{diff/ (double)TimeSpan.TicksPerSecond} seconds behind");
 
                 double tradedVolume = 0;
@@ -139,10 +138,7 @@ namespace SpreadTrader
             };
             ClientCache.SubscribeMarkets(msm);
 
-            OrderSubscriptionMessage osm = new OrderSubscriptionMessage()
-            {
-                SegmentationEnabled = true
-            };
+            OrderSubscriptionMessage osm = new OrderSubscriptionMessage() { SegmentationEnabled = true };
             ClientCache.SubscribeOrders(osm);
         }
         public void Stop()

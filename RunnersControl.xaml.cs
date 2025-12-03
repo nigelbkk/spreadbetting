@@ -30,7 +30,9 @@ namespace SpreadTrader
         public double BackBook { get { return MarketNode == null ? 0.00 : MarketNode.BackBook; } }
         public double LayBook { get { return MarketNode == null ? 0.00 : MarketNode.LayBook;  } }
         public List<LiveRunner> LiveRunners { get; set; }
+        private ApiClient apiClient = null;
         private Properties.Settings props = Properties.Settings.Default;
+
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(String info)
         {
@@ -240,9 +242,23 @@ namespace SpreadTrader
                     {
                         LiveRunners = MarketNode.GetLiveRunners();
                         //Debug.WriteLine(MarketNode.Status);
-                        if (props.UseStreaming)
+                        if (props.UseRemoteStreamProxy)
                         {
-                            BackgroundWorker bw = new BackgroundWorker();
+                            if (apiClient == null)
+                                apiClient = new ApiClient("http://88.202.230.157:8088/api/");
+							// http request to http://88.202.230.157:8088/api/market/subscribe
+
+                            apiClient.SubscribeMarket(MarketNode.MarketID);
+						}
+						else
+                        {
+							////////////////////////////////////////////////////////
+							////////////////////////////////////////////////////////
+                            /// replace with Task 
+							////////////////////////////////////////////////////////
+							////////////////////////////////////////////////////////
+
+							BackgroundWorker bw = new BackgroundWorker();
                             bw.DoWork += (o, e) =>
                             {
                                 try
@@ -257,12 +273,12 @@ namespace SpreadTrader
                             };
                             bw.RunWorkerAsync();
                         }
-                        else
-                        {
-                            streamingAPI.Stop();
-                        }
-                        if (!Worker.IsBusy)
-                            Worker.RunWorkerAsync();
+                        //else
+                        //{
+                        //    streamingAPI.Stop();
+                        //}
+//                        if (!Worker.isbusy)
+//                            Worker.runworkerasync();
                     }
                     catch (Exception xe)
                     {
@@ -308,7 +324,13 @@ namespace SpreadTrader
             };
             Worker.DoWork += (o, ea) =>
             {
-                BackgroundWorker sender = o as BackgroundWorker;
+				///////////////////////////////////////////
+				///////////////////////////////////////////
+				/////// Update runner prices on a timer
+                ///////////////////////////////////////////
+				///////////////////////////////////////////
+
+				BackgroundWorker sender = o as BackgroundWorker;
                 while (!sender.CancellationPending)
                 {
                     try
@@ -340,6 +362,7 @@ namespace SpreadTrader
                         }));
                     }
                     System.Threading.Thread.Sleep(props.WaitBF);
+					break;  //////////////////  Move to a Task!!!
                 }
             };
             Worker.RunWorkerAsync();

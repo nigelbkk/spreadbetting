@@ -48,7 +48,7 @@ public class PriceSize : INotifyPropertyChanged
     private Double _size { get; set; }
     public Double size { get { return _size; } set { _size = value; NotifyPropertyChanged(""); } }
     public SolidColorBrush Color { get; set; }
-    private object _timer;
+    //private object _timer;
     private Brush _CellBackgroundColor { get; set; }
     public Brush CellBackgroundColor {
         get { return _CellBackgroundColor; }

@@ -112,6 +112,7 @@ namespace SpreadTrader
 	public partial class BetsManager : UserControl, INotifyPropertyChanged
 	{
 		public OnShutdownDelegate OnShutdown;
+		//private Queue<String> incomingMarketQueue = new Queue<String>();
 		private Queue<String> incomingOrdersQueue = new Queue<String>();
 		private Queue<UInt64> cancellation_queue = new Queue<UInt64>();
 
@@ -197,11 +198,25 @@ namespace SpreadTrader
 			BackgroundWorker sender = o as BackgroundWorker;
 			while (!sender.CancellationPending)
 			{
+				//while (incomingMarketQueue.Count > 0)
+				//{
+				//	try
+				//	{
+				//		Debug.WriteLine("Fetch from Market queue");
+				//		String json = incomingMarketQueue.Dequeue();
+				//		OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
+				//		OnMarketChanged(json);
+				//	}
+				//	catch (Exception xe)
+				//	{
+				//		Status = xe.Message;
+				//	}
+				//}
 				while (incomingOrdersQueue.Count > 0)
 				{
 					try
 					{
-						Debug.WriteLine("Fetch from queue");
+						Debug.WriteLine("Fetch from Orders queue");
 						//                        lock (incomingOrdersQueue){}
 						String json = incomingOrdersQueue.Dequeue();
 						OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
@@ -273,22 +288,48 @@ namespace SpreadTrader
 			timer.Enabled = true;
 			timer.Start();
 
-			hubConnection = new HubConnection("http://" + props.StreamUrl);
-			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
-
-			hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
+			if (props.UseRemoteStreamProxy)
 			{
-				OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
-				OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json3);
-				if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
+				hubConnection = new HubConnection("http://" + props.RemoteStreamProxyUrl);
+				hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
+
+				hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
 				{
-					lock (incomingOrdersQueue)
+					OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
+					OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json2);
+					if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
 					{
-						Debug.WriteLine("Add to queue");
-						incomingOrdersQueue.Enqueue(json1);
+						lock (incomingOrdersQueue)
+						{
+							Debug.WriteLine("Add to Orders queue");
+							incomingOrdersQueue.Enqueue(json1);
+						}
+						//lock (incomingMarketQueue)
+						//{
+						//	Debug.WriteLine("Add to Market queue");
+						//	incomingMarketQueue.Enqueue(json1);
+						//}
 					}
-				}
-			});
+				});
+				hubProxy.On<string, string, string>("runnersChanged", (json1, json2, json3) =>
+				{
+					OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
+					OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json3);
+					if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
+					{
+						lock (incomingOrdersQueue)
+						{
+							Debug.WriteLine("Add to Orders queue");
+							incomingOrdersQueue.Enqueue(json1);
+						}
+						//lock (incomingMarketQueue)
+						//{
+						//	Debug.WriteLine("Add to Market queue");
+						//	incomingMarketQueue.Enqueue(json1);
+						//}
+					}
+				});
+			}
 
 			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, last_traded, inplay) =>
 			{

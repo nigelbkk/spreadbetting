@@ -16,7 +16,6 @@ namespace SpreadTrader
 	public delegate void OnShutdownDelegate();
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
-		//public OnShutdownDelegate OnShutdown = null;
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
 		private static String _Notification = "";
@@ -122,7 +121,7 @@ namespace SpreadTrader
 			Betfair = new BetfairAPI.BetfairAPI();
 			try
 			{
-				if (!props.UseProxy)
+				if (!props.UseBetfairProxy)
 				{
 					Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
 
@@ -165,6 +164,8 @@ namespace SpreadTrader
 			{
 				switch (b.Tag)
 				{
+					case "Connect":
+						break;
 					case "Settings":
 						new Settings(this, b).ShowDialog();
 						break;
