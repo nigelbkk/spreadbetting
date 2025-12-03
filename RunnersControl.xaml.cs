@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Linq;
 
 namespace SpreadTrader
 {
@@ -44,7 +46,35 @@ namespace SpreadTrader
                 //OverlayText.Text = MarketNode.Status.ToString();
             }));
         }
-        public RunnersControl()
+
+		private async Task<List<MarketProfitAndLoss>> GetProfitAndLossAsync(string marketId)
+		{
+			return await Task.Run(() =>
+			{
+				return MainWindow.Betfair.listMarketProfitAndLoss(marketId);
+			});
+		}
+
+		public async Task UpdateRunnerPnLAsync()
+		{
+			var plList = await GetProfitAndLossAsync(MarketNode.MarketID);
+			var pl = plList?.FirstOrDefault();
+			if (pl == null || pl.profitAndLosses == null)
+				return;
+
+			// Build lookup for speed
+			var lookup = pl.profitAndLosses.ToDictionary(x => x.selectionId);
+
+			foreach (var runner in LiveRunners)
+			{
+				if (lookup.TryGetValue(runner.SelectionId, out var pnl))
+				{
+					runner.ifWin = pnl.ifWin;
+				}
+			}
+		}
+
+		public RunnersControl()
         {
             LiveRunners = new List<LiveRunner>();
             InitializeComponent();
@@ -53,7 +83,7 @@ namespace SpreadTrader
             {
                 if (MarketNode != null &&  marketid == MarketNode.MarketID)
                 {
-                    List<MarketProfitAndLoss> pl = MainWindow.Betfair.listMarketProfitAndLoss(MarketNode.MarketID);
+                    //List<MarketProfitAndLoss> pl = MainWindow.Betfair.listMarketProfitAndLoss(MarketNode.MarketID);
 
                     double totalBack = 0;
                     double totalLay = 0;
@@ -88,7 +118,8 @@ namespace SpreadTrader
                     if (Worker.IsBusy)
                         Worker.CancelAsync();
                 }
-            };
+				_ = UpdateRunnerPnLAsync();
+			};
             OnMarketSelected += (node) =>
             {
                 if (IsLoaded)
