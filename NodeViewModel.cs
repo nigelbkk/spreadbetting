@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Media;
 
@@ -27,7 +28,7 @@ namespace SpreadTrader
         private double _TurnaroundTime { get; set; }
         public Int32 UpdateRate { get { return _UpdateRate; } set { _UpdateRate = value; OnPropertyChanged("UpdateRate"); } }
         public double TurnaroundTime { get { return Math.Round(_TurnaroundTime, 5); } set { _TurnaroundTime = value; OnPropertyChanged("TurnaroundTime"); } }
-        public SolidColorBrush TimeToGoColor { get { return (Market.description.marketTime - DateTime.UtcNow).TotalSeconds > 0 ? System.Windows.Media.Brushes.Blue : System.Windows.Media.Brushes.Red; } }
+//        public SolidColorBrush TimeToGoColor { get { return (Market.description.marketTime - DateTime.UtcNow).TotalSeconds > 0 ? System.Windows.Media.Brushes.Blue : System.Windows.Media.Brushes.Red; } }
         public String TimeToGo { get { return String.Format("{0}{1}", (Market.description.marketTime - DateTime.UtcNow).TotalSeconds > 0 ? "" : "-", (Market.description.marketTime - DateTime.UtcNow).ToString(@"hh\:mm\:ss")); } }
         List<EventTypeResult> EventTypes { get; set; }
         private Properties.Settings props = Properties.Settings.Default;
@@ -61,10 +62,21 @@ namespace SpreadTrader
 
             OnItemSelected();
         }
-        public NodeViewModel(String name)
+		private void OnMessageReceived(string messageName, object data)
+		{
+			if (messageName == "UserSelected")
+			{
+				dynamic d = data;
+				Debug.WriteLine((String) d.Name);
+			}
+		}
+
+		public NodeViewModel(String name)
         {
             Name = name;
             Nodes = new ObservableCollection<NodeViewModel>();
+
+			ControlMessenger.MessageSent += OnMessageReceived;
         }
         public List<LiveRunner> LiveRunners = null;// new List<LiveRunner>();
         

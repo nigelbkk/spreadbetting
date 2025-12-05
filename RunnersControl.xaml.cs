@@ -22,7 +22,7 @@ namespace SpreadTrader
         public FavoriteChangedDelegate OnFavoriteChanged = null;
         public MarketChangedDelegate OnMarketChanged = null;
 
-        private StreamingAPI streamingAPI = new StreamingAPI();
+        //private StreamingAPI streamingAPI = new StreamingAPI();
         private BackgroundWorker Worker = null;
         public NodeViewModel _MarketNode { get; set; }
         public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
@@ -38,15 +38,6 @@ namespace SpreadTrader
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
         }
-        public void UpdateMarketStatus()
-        {
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                //Overlay.Visibility = MarketNode.Status == marketStatusEnum.OPEN ? Visibility.Hidden : Visibility.Visible;
-                //OverlayText.Text = MarketNode.Status.ToString();
-            }));
-        }
-
 		private async Task<List<MarketProfitAndLoss>> GetProfitAndLossAsync(string marketId)
 		{
 			return await Task.Run(() =>
@@ -74,52 +65,16 @@ namespace SpreadTrader
 			}
 		}
 
+        private async Task PopulateNewMarket()
+        {
+
+        }
+
 		public RunnersControl()
         {
             LiveRunners = new List<LiveRunner>();
             InitializeComponent();
 
-            StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
-            {
-                if (MarketNode != null &&  marketid == MarketNode.MarketID)
-                {
-                    //List<MarketProfitAndLoss> pl = MainWindow.Betfair.listMarketProfitAndLoss(MarketNode.MarketID);
-
-                    double totalBack = 0;
-                    double totalLay = 0;
-                    Int32 ct = Math.Min(LiveRunners.Count, liveRunners.Count); //TOCHECK
-                    for (int i = 0; i < ct; i++)
-                    {
-                        if (liveRunners[i].BackValues[0].price > 0)
-                            totalBack += 100 / liveRunners[i].BackValues[0].price;
-                        if (liveRunners[i].LayValues[0].price > 0)
-                            totalLay += 100 / liveRunners[i].LayValues[0].price;
-                        LiveRunners[i].BackValues = liveRunners[i].BackValues;
-                        LiveRunners[i].LayValues = liveRunners[i].LayValues;
-                        LiveRunners[i].LastPriceTraded = liveRunners[i].LastPriceTraded;
-                        LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
-                        LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
-                        LiveRunners[i].NotifyPropertyChanged("");
-                        //if (pl.Count > 0 && pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
-                        //    {
-                        //        if (p.selectionId == LiveRunners[i].SelectionId)
-                        //        {
-                        //            LiveRunners[i].ifWin = p.ifWin;
-                        //        }
-                        //    }
-                    }
-                    MarketNode.LiveRunners = LiveRunners;
-                    MarketNode.CalculateLevelProfit();
-                    MarketNode.TotalMatched = tradedVolume;
-                    //BackBook = totalBack;
-                    //LayBook = totalLay;
-                    UpdateMarketStatus();
-                    NotifyPropertyChanged("");
-                    if (Worker.IsBusy)
-                        Worker.CancelAsync();
-                }
-				_ = UpdateRunnerPnLAsync();
-			};
             OnMarketSelected += (node) =>
             {
                 if (IsLoaded)
@@ -127,32 +82,8 @@ namespace SpreadTrader
                     MarketNode = node;
                     try
                     {
-                        LiveRunners = MarketNode.GetLiveRunners();
-                        //Debug.WriteLine(MarketNode.Status);
-                        if (props.UseStreaming)
-                        {
-                            BackgroundWorker bw = new BackgroundWorker();
-                            bw.DoWork += (o, e) =>
-                            {
-                                try
-                                {
-                                    streamingAPI.Start(MarketNode.MarketID);
-                                }
-                                catch (Exception xe)
-                                {
-                                    Debug.WriteLine(xe.Message);
-                                    //Extensions.MainWindow.Status = xe.Message;
-                                }
-                            };
-                            bw.RunWorkerAsync();
-                        }
-                        else
-                        {
-                            streamingAPI.Stop();
-                        }
-                        if (!Worker.IsBusy)
-                            Worker.RunWorkerAsync();
-                    }
+						ControlMessenger.Send("UserSelected", new { UserId = 123, Name = "John" });
+					}
                     catch (Exception xe)
                     {
                         Debug.WriteLine(xe.Message);
@@ -164,36 +95,36 @@ namespace SpreadTrader
             Worker = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
             Worker.ProgressChanged += (o, e) =>
             {
-                List<LiveRunner> NewRunners = e.UserState as List<LiveRunner>;
+                //List<LiveRunner> NewRunners = e.UserState as List<LiveRunner>;
 
-                if (NewRunners != null)
-                {
-                    if (LiveRunners.Count != NewRunners.Count)
-                    {
-                        LiveRunners = NewRunners;
-                    }
-                    if (LiveRunners.Count > 0) foreach (LiveRunner lr in LiveRunners)
-                        {
-                            for (int i = 0; i < 3; i++)
-                            {
-                                lr.BackValues[i] = new PriceSize();
-                                lr.LayValues[i] = new PriceSize();
-                            }
-                        }
-                    for (int i = 0; i < LiveRunners.Count; i++)
-                    {
-                        if (NewRunners[i].ngrunner != null)
-                        {
-                            LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
-                            LiveRunners[i].LevelProfit = NewRunners[i].LevelProfit;
-                            LiveRunners[i].LevelStake = NewRunners[i].LevelStake;
-                            LiveRunners[i].LevelSide = NewRunners[i].LevelSide;
-                            LiveRunners[i].NotifyPropertyChanged("");
-                        }
-                    }
-                    MarketNode.UpdateRate = e.ProgressPercentage;
-                    NotifyPropertyChanged("");
-                }
+                //if (NewRunners != null)
+                //{
+                //    if (LiveRunners.Count != NewRunners.Count)
+                //    {
+                //        LiveRunners = NewRunners;
+                //    }
+                //    if (LiveRunners.Count > 0) foreach (LiveRunner lr in LiveRunners)
+                //        {
+                //            for (int i = 0; i < 3; i++)
+                //            {
+                //                lr.BackValues[i] = new PriceSize();
+                //                lr.LayValues[i] = new PriceSize();
+                //            }
+                //        }
+                //    for (int i = 0; i < LiveRunners.Count; i++)
+                //    {
+                //        if (NewRunners[i].ngrunner != null)
+                //        {
+                //            LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
+                //            LiveRunners[i].LevelProfit = NewRunners[i].LevelProfit;
+                //            LiveRunners[i].LevelStake = NewRunners[i].LevelStake;
+                //            LiveRunners[i].LevelSide = NewRunners[i].LevelSide;
+                //            LiveRunners[i].NotifyPropertyChanged("");
+                //        }
+                //    }
+                //    MarketNode.UpdateRate = e.ProgressPercentage;
+                //    NotifyPropertyChanged("");
+                //}
             };
             Worker.DoWork += (o, ea) =>
             {
@@ -202,23 +133,23 @@ namespace SpreadTrader
                 {
                     try
                     {
-                        if (MarketNode != null)
-                        {
-                            //var runners = streamingAPI.LiveRunners;
-                            DateTime LastUpdate = DateTime.UtcNow;
-                            var lr = MarketNode.GetLiveRunners();
-                            UpdateMarketStatus();
+                        //if (MarketNode != null)
+                        //{
+                        //    //var runners = streamingAPI.LiveRunners;
+                        //    DateTime LastUpdate = DateTime.UtcNow;
+                        //    var lr = MarketNode.GetLiveRunners();
+                        //    UpdateMarketStatus();
 
-                            if (OnMarketChanged != null)
-                            {
-                                OnMarketChanged(MarketNode);
-                            }
-                            NotifyPropertyChanged("");
-                            Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-                            sender.ReportProgress(rate, lr);
-                            if (stop_async)
-                                break;
-                        }
+                        //    if (OnMarketChanged != null)
+                        //    {
+                        //        OnMarketChanged(MarketNode);
+                        //    }
+                        //    NotifyPropertyChanged("");
+                        //    Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+                        //    sender.ReportProgress(rate, lr);
+                        //    if (stop_async)
+                        //        break;
+                        //}
                     }
                     catch (Exception xe)
                     {

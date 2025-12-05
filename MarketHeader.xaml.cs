@@ -24,7 +24,9 @@ namespace SpreadTrader
         public Double? TotalMatched { get { return MarketNode == null ? 0 : MarketNode.TotalMatched; } }
         
         public Visibility up_visible { get; set; }
-        public Visibility down_visible { get; set; }
+		public SolidColorBrush TimeToGoColor { get { return System.Windows.Media.Brushes.Yellow;  } }
+
+		public Visibility down_visible { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
         public SolidColorBrush StreamingColor { get { return System.Windows.Media.Brushes.LightGreen; } }
         public void NotifyPropertyChanged(String info)

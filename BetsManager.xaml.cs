@@ -291,18 +291,18 @@ namespace SpreadTrader
 				}
 			});
 
-			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
-			{
-				try
-				{
-					StreamActive = true;
-					timer.Start();
-				}
-				catch (Exception ex)
-				{
-					Debug.WriteLine(ex);
-				}
-			};
+			//StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
+			//{
+			//	try
+			//	{
+			//		StreamActive = true;
+			//		timer.Start();
+			//	}
+			//	catch (Exception ex)
+			//	{
+			//		Debug.WriteLine(ex);
+			//	}
+			//};
 
 			Rows = new ObservableCollection<Row>();
 			InitializeComponent();

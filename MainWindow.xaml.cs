@@ -14,6 +14,17 @@ namespace SpreadTrader
 {
 	public delegate void MarketSelectionDelegate(NodeViewModel node);
 	public delegate void OnShutdownDelegate();
+
+	public static class ControlMessenger
+	{
+		public static event Action<string, object> MessageSent;
+
+		public static void Send(string messageName, object data = null)
+		{
+			MessageSent?.Invoke(messageName, data);
+		}
+	}
+
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
 		public OnShutdownDelegate OnShutdown = null;
