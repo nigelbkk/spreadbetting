@@ -9,16 +9,12 @@ namespace SpreadTrader
         public EventsTreeControl()
         {
             InitializeComponent();
-        }
-        public String Status
-        {
-//            get { return _Status; }
-            set
-            {
-//                _Status = value;
-                Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = value; }));
-                //Extensions.MainWindow.Status = value;
-            }
+            //public String Status
+            //      {
+            //          set
+            //          {
+            //              Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = value; }));
+            //          }
         }
         public MarketSelectionDelegate OnMarketSelected;
         public NodeViewModel RootNode { get; set; }
@@ -38,14 +34,14 @@ namespace SpreadTrader
         public void Populate()
         {
             RootNode = new NodeViewModel(MainWindow.Betfair);
-            RootNode.OnMarketSelected += (node) =>
-            {
-                if (OnMarketSelected != null)
-                {
-                    OnMarketSelected(node);
-                }
-            };
-            RootNode.PopulateEventTypes();
+			//RootNode.OnMarketSelected += (node) =>
+			//{
+			//    if (OnMarketSelected != null)
+			//    {
+			//        OnMarketSelected(node);
+			//    }
+			//};
+			RootNode.PopulateEventTypes();
         }
         private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
@@ -56,7 +52,7 @@ namespace SpreadTrader
             }
             catch(Exception xe)
             {
-                Status = xe.Message;
+                _ = xe.Message;
             }
         }
     }

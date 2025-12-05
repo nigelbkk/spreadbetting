@@ -65,17 +65,27 @@ namespace SpreadTrader
 			}
 		}
 
-        private async Task PopulateNewMarket()
+        private async Task PopulateNewMarket(NodeViewModel node)
         {
 
         }
 
+		private void OnMessageReceived(string messageName, object data)
+		{
+			if (messageName == "Market Selected")
+			{
+				dynamic d = data;
+                Debug.WriteLine((String) d.Name);
+                PopulateNewMarket(d.MarketNode);
+			}
+		}
 		public RunnersControl()
         {
             LiveRunners = new List<LiveRunner>();
             InitializeComponent();
+			ControlMessenger.MessageSent += OnMessageReceived;
 
-            OnMarketSelected += (node) =>
+			OnMarketSelected += (node) =>
             {
                 if (IsLoaded)
                 {
@@ -173,7 +183,7 @@ namespace SpreadTrader
                 }
             return null;
         }
-        bool stop_async = false;
+        //bool stop_async = false;
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;

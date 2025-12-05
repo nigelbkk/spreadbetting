@@ -139,11 +139,12 @@ namespace SpreadTrader
                     FullName = String.Format("{0} - {1}", Parent.Name, Name);
                     MarketName = Parent.Name;
                     MarketID = Market.marketId;
-                }
-                if (OnMarketSelected != null)
-                {
-                    OnMarketSelected(this);
-                }
+					ControlMessenger.Send("Market Selected", new { MarketNode = this, Name = FullName });
+				}
+				//if (OnMarketSelected != null)
+    //            {
+    //                OnMarketSelected(this);
+    //            }
             }
         }
         private void LevelProfitBothGreen(LiveRunner runner1, LiveRunner runner2)

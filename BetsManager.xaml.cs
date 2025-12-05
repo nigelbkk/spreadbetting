@@ -111,7 +111,7 @@ namespace SpreadTrader
 
 	public partial class BetsManager : UserControl, INotifyPropertyChanged
 	{
-		public OnShutdownDelegate OnShutdown;
+		//public OnShutdownDelegate OnShutdown;
 		private Queue<String> incomingOrdersQueue = new Queue<String>();
 		private Queue<UInt64> cancellation_queue = new Queue<UInt64>();
 

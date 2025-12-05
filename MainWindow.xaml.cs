@@ -13,7 +13,7 @@ using System.Windows.Input;
 namespace SpreadTrader
 {
 	public delegate void MarketSelectionDelegate(NodeViewModel node);
-	public delegate void OnShutdownDelegate();
+	//public delegate void OnShutdownDelegate();
 
 	public static class ControlMessenger
 	{
@@ -27,7 +27,7 @@ namespace SpreadTrader
 
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
-		public OnShutdownDelegate OnShutdown = null;
+		//public OnShutdownDelegate OnShutdown = null;
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
 		private static String _Notification = "";
@@ -208,7 +208,7 @@ namespace SpreadTrader
 		{
 			TabControl.Items.Remove(e.Tab);
 			TabContent tabContent = e.Tab.Content as TabContent;
-			EventsTree.OnMarketSelected -= tabContent.OnMarketSelected;
+			//EventsTree.OnMarketSelected -= tabContent.OnMarketSelected;
 			e.Tab.Content = null;
 		}
 		private void AppendNewTab(String title)
@@ -229,8 +229,8 @@ namespace SpreadTrader
 
 			customTabHeader.Tab = tab;
 
-			EventsTree.OnMarketSelected += tabContent.OnMarketSelected;
-			OnShutdown += tabContent.BetsManager.OnShutdown;
+			//EventsTree.OnMarketSelected += tabContent.OnMarketSelected;
+			//OnShutdown += tabContent.BetsManager.OnShutdown;
 			//OnMarketChanged += tabContent.OnMarketSelected;
 
 			tab.IsSelected = true;
@@ -242,10 +242,10 @@ namespace SpreadTrader
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
 			props.Save();
-			if (OnShutdown != null)
-			{
-				OnShutdown();
-			};
+			//if (OnShutdown != null)
+			//{
+			//	OnShutdown();
+			//};
 		}
 		private void OnUpdateAccount(object sender, MouseButtonEventArgs e)
 		{
