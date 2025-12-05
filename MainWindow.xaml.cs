@@ -145,18 +145,11 @@ namespace SpreadTrader
 		}
 		public void UpdateAccountInformation()
 		{
-			try
-			{
-				AccountFundsResponse response = Betfair.getAccountFunds(1);
-				Balance = response.availableToBetBalance;
-				Exposure = response.exposure;
-				Commission = response.retainedCommission - response.discountRate;
-				NotifyPropertyChanged("");
-			}
-			catch (Exception xe)
-			{
-				Debug.WriteLine(xe.Message);
-			}
+			AccountFundsResponse response = Betfair.getAccountFunds(1);
+			Balance = response.availableToBetBalance;
+			Exposure = response.exposure;
+			Commission = response.retainedCommission - response.discountRate;
+			NotifyPropertyChanged("");
 		}
 		private void Button_Click(object sender, RoutedEventArgs e) // move to tab
 		{

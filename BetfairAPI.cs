@@ -15,6 +15,8 @@ namespace BetfairAPI
 {
 	public class BetfairAPI
 	{
+		private static readonly string API_KEY = Environment.GetEnvironmentVariable("BF_API_KEY") ?? throw new Exception("BF_API_KEY environment variable not set");
+
 		static private String AppKey { get; set; }
 		static private String Token { get; set; }
 		static String CertFile { get; set; }
@@ -55,85 +57,94 @@ namespace BetfairAPI
 		}
 		public Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
 		{
-			String[] AccountCalls = new String[] { "getAccountFunds" };
-			Dictionary<String, Object> joe = new Dictionary<string, object>();
-			joe["jsonrpc"] = "2.0";
-			joe["id"] = "1";
-			joe["method"] = "SportsAPING/v1.0/" + Method;
-			joe["params"] = Params;
-
-			String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy;
-			if (!SpreadTrader.Properties.Settings.Default.UseProxy || String.IsNullOrEmpty(SpreadTrader.Properties.Settings.Default.Proxy))
+			try
 			{
-				if (!String.IsNullOrEmpty(Token))
+				String[] AccountCalls = new String[] { "getAccountFunds" };
+				Dictionary<String, Object> joe = new Dictionary<string, object>();
+				joe["jsonrpc"] = "2.0";
+				joe["id"] = "1";
+				joe["method"] = "SportsAPING/v1.0/" + Method;
+				joe["params"] = Params;
+
+				String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy;
+				if (!SpreadTrader.Properties.Settings.Default.UseProxy || String.IsNullOrEmpty(SpreadTrader.Properties.Settings.Default.Proxy))
 				{
-					url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";
-					if (Method.Contains(AccountCalls[0]))
-						url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
-				}
-			}
-			if (AccountCalls.Contains(Method))
-			{
-				joe["method"] = "AccountAPING/v1.0/" + Method;
-			}
-			String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
-			var bytes = Encoding.GetEncoding("UTF-8").GetBytes(postData);
-			HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
-			wr.Method = WebRequestMethods.Http.Post;
-			wr.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-			wr.Headers.Add("X-Application", AppKey);
-			wr.Headers.Add("X-Authentication", Token);
-			wr.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); wr.Accept = "*/*";
-			wr.ContentType = "application/json";
-			wr.ContentLength = bytes.Length;
-
-			using (Stream stream = wr.GetRequestStream())
-			{
-				stream.Write(bytes, 0, bytes.Length);
-			}
-			using (WebResponse response = wr.GetResponse())
-			using (Stream stream = response.GetResponseStream())
-			using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
-			{
-				var jsonResponse = reader.ReadToEnd();
-
-				if (jsonResponse.Contains("The underlying connection was closed"))
-				{
-					Debug.WriteLine(jsonResponse);              // let's assume this is fatal
-					ConnectionLost = true;
-
-					MessageBoxResult Result = MessageBoxResult.Yes;// MessageBox.Show("Press Yes to try and reconnect\nCancel to ignore it\nNo to exit the application", "The connection to Betfair was closed", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-					switch(Result)
+					if (!String.IsNullOrEmpty(Token))
 					{
-						case MessageBoxResult.Yes:
-							if (!String.IsNullOrEmpty(password))
-							{
-								Debug.WriteLine("Trying to log in again");
-								login(CertFile, CertPassword, AppKey, username, password);
-							}
-							else
-							{
-								throw new Exception("The underlying connection was closed");
-							}
-							break;
-						case MessageBoxResult.No:
-							Environment.Exit(0);
-							break;
-						case MessageBoxResult.Cancel:
-							throw new Exception("The underlying connection was closed");
+						url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";
+						if (Method.Contains(AccountCalls[0]))
+							url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
 					}
 				}
-				ConnectionLost = false;
-				//ConnectionLost = true;
-
-				var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
-				if (err != null)
+				if (AccountCalls.Contains(Method))
 				{
-					ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
-					throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
+					joe["method"] = "AccountAPING/v1.0/" + Method;
 				}
-				String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
-				return JsonConvert.DeserializeObject<T>(res);
+				String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
+				var bytes = Encoding.GetEncoding("UTF-8").GetBytes(postData);
+				HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
+				wr.Method = WebRequestMethods.Http.Post;
+				wr.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+				wr.Headers.Add("X-API-Key", API_KEY);
+				wr.Headers.Add("X-Application", AppKey);
+				wr.Headers.Add("X-Authentication", Token);
+				wr.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); wr.Accept = "*/*";
+				wr.ContentType = "application/json";
+				wr.ContentLength = bytes.Length;
+
+				using (Stream stream = wr.GetRequestStream())
+				{
+					stream.Write(bytes, 0, bytes.Length);
+				}
+				using (WebResponse response = wr.GetResponse())
+				using (Stream stream = response.GetResponseStream())
+				using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+				{
+					var jsonResponse = reader.ReadToEnd();
+
+					if (jsonResponse.Contains("The underlying connection was closed"))
+					{
+						Debug.WriteLine(jsonResponse);              // let's assume this is fatal
+						ConnectionLost = true;
+
+						MessageBoxResult Result = MessageBoxResult.Yes;// MessageBox.Show("Press Yes to try and reconnect\nCancel to ignore it\nNo to exit the application", "The connection to Betfair was closed", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+						switch (Result)
+						{
+							case MessageBoxResult.Yes:
+								if (!String.IsNullOrEmpty(password))
+								{
+									Debug.WriteLine("Trying to log in again");
+									login(CertFile, CertPassword, AppKey, username, password);
+								}
+								else
+								{
+									throw new Exception("The underlying connection was closed");
+								}
+								break;
+							case MessageBoxResult.No:
+								Environment.Exit(0);
+								break;
+							case MessageBoxResult.Cancel:
+								throw new Exception("The underlying connection was closed");
+						}
+					}
+					ConnectionLost = false;
+					//ConnectionLost = true;
+
+					var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
+					if (err != null)
+					{
+						ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
+						throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
+					}
+					String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
+					return JsonConvert.DeserializeObject<T>(res);
+				}
+			}
+			catch (Exception xe)
+			{
+				Debug.WriteLine(xe.Message);
+				return null;
 			}
 		}
 		public void login(String CertFile, String CertPassword, String appKey, String username, String password)
