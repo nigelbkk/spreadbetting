@@ -8,11 +8,11 @@ using System.Windows.Media;
 
 namespace SpreadTrader
 {
-    public class NodeViewModel : ViewModelBase
+    public class Market : ViewModelBase
     {
         public MarketSelectionDelegate OnMarketSelected;
         public String FullName { get; set; }
-        public Market Market { get; set; }
+        private BetfairAPI.Market _Market { get; set; }
         public String MarketID { get; set; }
         public String MarketName { get; set; }
         private double _TotalMatched { get; set; }
@@ -28,8 +28,8 @@ namespace SpreadTrader
         private double _TurnaroundTime { get; set; }
         public Int32 UpdateRate { get { return _UpdateRate; } set { _UpdateRate = value; OnPropertyChanged("UpdateRate"); } }
         public double TurnaroundTime { get { return Math.Round(_TurnaroundTime, 5); } set { _TurnaroundTime = value; OnPropertyChanged("TurnaroundTime"); } }
-//        public SolidColorBrush TimeToGoColor { get { return (Market.description.marketTime - DateTime.UtcNow).TotalSeconds > 0 ? System.Windows.Media.Brushes.Blue : System.Windows.Media.Brushes.Red; } }
-        public String TimeToGo { get { return String.Format("{0}{1}", (Market.description.marketTime - DateTime.UtcNow).TotalSeconds > 0 ? "" : "-", (Market.description.marketTime - DateTime.UtcNow).ToString(@"hh\:mm\:ss")); } }
+//        public SolidColorBrush TimeToGoColor { get { return (_Market.description.marketTime - DateTime.UtcNow).TotalSeconds > 0 ? System.Windows.Media.Brushes.Blue : System.Windows.Media.Brushes.Red; } }
+        public String TimeToGo { get { return String.Format("{0}{1}", (_Market.description.marketTime - DateTime.UtcNow).TotalSeconds > 0 ? "" : "-", (_Market.description.marketTime - DateTime.UtcNow).ToString(@"hh\:mm\:ss")); } }
         List<EventTypeResult> EventTypes { get; set; }
         private Properties.Settings props = Properties.Settings.Default;
         public static BetfairAPI.BetfairAPI Betfair { get; set; }
@@ -57,19 +57,17 @@ namespace SpreadTrader
         {
             NodeViewModel.Betfair = Betfair;
             Nodes = new ObservableCollection<NodeViewModel>();
-            Market = new Market();
-            Market.marketId = "1.175371349";
-
+            _Market = new BetfairAPI.Market();
             OnItemSelected();
         }
-		private void OnMessageReceived(string messageName, object data)
-		{
-			if (messageName == "UserSelected")
-			{
-				dynamic d = data;
-				Debug.WriteLine((String) d.Name);
-			}
-		}
+		//private void OnMessageReceived(string messageName, object data)
+		//{
+		//	if (messageName == "UserSelected")
+		//	{
+		//		dynamic d = data;
+		//		Debug.WriteLine((String) d.Name);
+		//	}
+		//}
 
 		public NodeViewModel(String name)
         {
@@ -78,22 +76,20 @@ namespace SpreadTrader
 
 			ControlMessenger.MessageSent += OnMessageReceived;
         }
-        public List<LiveRunner> LiveRunners = null;// new List<LiveRunner>();
-        
-        Random rnd = new Random();
+        public List<LiveRunner> LiveRunners = null;
 
         public List<LiveRunner> GetLiveRunners()
         {
             List<LiveRunner> Runners = new List<LiveRunner>();
-            if (Market != null)
+            if (_Market != null)
             {
                 List<MarketProfitAndLoss> pl = Betfair.listMarketProfitAndLoss(MarketID);
-                Market.MarketBook = Betfair.GetMarketBook(Market);
-                BackBook = Market.MarketBook.BackBook;
-                LayBook = Market.MarketBook.LayBook;
-                TotalMatched = Market.MarketBook.totalMatched;
-                Status = Market.MarketBook.status;
-                if (Market.MarketBook.Runners.Count > 0) foreach (Runner r in Market.MarketBook.Runners)
+                _Market.MarketBook = Betfair.GetMarketBook(_Market);
+                BackBook = _Market.MarketBook.BackBook;
+                LayBook = _Market.MarketBook.LayBook;
+                TotalMatched = _Market.MarketBook.totalMatched;
+                Status = _Market.MarketBook.status;
+                if (_Market.MarketBook.Runners.Count > 0) foreach (Runner r in _Market.MarketBook.Runners)
                 {
                     if (pl != null && pl.Count > 0)
                     {
@@ -112,7 +108,7 @@ namespace SpreadTrader
                 {
                     FullName = String.Format("{0} - {1}", Parent.Name, Name);
                     MarketName = Parent.Name;
-                    MarketID = Market.marketId;
+                    MarketID = _Market.marketId;
                 }
             }
             LiveRunners = Runners;
@@ -132,19 +128,15 @@ namespace SpreadTrader
 
         private void OnItemSelected()
         {
-            if (Market != null)
+            if (_Market != null)
             {
                 if (Parent != null)
                 {
                     FullName = String.Format("{0} - {1}", Parent.Name, Name);
                     MarketName = Parent.Name;
-                    MarketID = Market.marketId;
+                    MarketID = _Market.marketId;
 					ControlMessenger.Send("Market Selected", new { MarketNode = this, Name = FullName });
 				}
-				//if (OnMarketSelected != null)
-    //            {
-    //                OnMarketSelected(this);
-    //            }
             }
         }
         private void LevelProfitBothGreen(LiveRunner runner1, LiveRunner runner2)
@@ -372,7 +364,7 @@ namespace SpreadTrader
             List<Market> markets = Betfair.GetMarkets(event_type, ID).OrderBy(o => o.marketStartTime).ToList();
             foreach (Market m in markets)
             {
-                NodeViewModel nvm = new NodeViewModel(String.Format("{0:HH:mm} {1}", m.description.marketTime.AddHours(props.TimeOffset), m.marketName)) { Market = m };
+                NodeViewModel nvm = new NodeViewModel(String.Format("{0:HH:mm} {1}", m.description.marketTime.AddHours(props.TimeOffset), m.marketName)) { _Market = m };
                 nvm.Commission = m.description.marketBaseRate;
                 Add(nvm);
             }
