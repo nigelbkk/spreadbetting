@@ -1,4 +1,5 @@
-﻿using BetfairAPI;
+﻿using Betfair.ESAClient.Cache;
+using BetfairAPI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -48,15 +49,15 @@ namespace SpreadTrader
         }
         public delegate void CallBackDelegate();
         public CallBackDelegate Populate = null;
-        public NodeViewModel Parent { get; set; }
+        public Market Parent { get; set; }
         public Int32 ID { get; set; }
         public string Name { get; set; }
         public string Tag { get; set; }
-        public ObservableCollection<NodeViewModel> Nodes { get; set; }
-        public NodeViewModel(BetfairAPI.BetfairAPI Betfair)
+        public ObservableCollection<Market> Nodes { get; set; }
+        public Market(BetfairAPI.BetfairAPI Betfair)
         {
-            NodeViewModel.Betfair = Betfair;
-            Nodes = new ObservableCollection<NodeViewModel>();
+            Market.Betfair = Betfair;
+            Nodes = new ObservableCollection<Market>();
             _Market = new BetfairAPI.Market();
             OnItemSelected();
         }
@@ -69,16 +70,33 @@ namespace SpreadTrader
 		//	}
 		//}
 
-		public NodeViewModel(String name)
+		public Market(String name)
         {
             Name = name;
-            Nodes = new ObservableCollection<NodeViewModel>();
+            Nodes = new ObservableCollection<Market>();
 
-			ControlMessenger.MessageSent += OnMessageReceived;
+			//ControlMessenger.MessageSent += OnMessageReceived;
         }
         public List<LiveRunner> LiveRunners = null;
 
-        public List<LiveRunner> GetLiveRunners()
+        private void PopulateRunners()
+        {
+            LiveRunners = new List<LiveRunner>();
+            _Market.MarketBook = Betfair.GetMarketBook(_Market);
+            BackBook = _Market.MarketBook.BackBook;
+            LayBook = _Market.MarketBook.LayBook;
+            TotalMatched = _Market.MarketBook.totalMatched;
+            Status = _Market.MarketBook.status;
+            if (_Market.MarketBook.Runners.Count > 0)
+            {
+                foreach (Runner r in _Market.MarketBook.Runners)
+                {
+                    LiveRunners.Add(new LiveRunner(r));
+                }
+            }
+        }
+
+		public List<LiveRunner> OldGetLiveRunners()
         {
             List<LiveRunner> Runners = new List<LiveRunner>();
             if (_Market != null)
@@ -135,6 +153,7 @@ namespace SpreadTrader
                     FullName = String.Format("{0} - {1}", Parent.Name, Name);
                     MarketName = Parent.Name;
                     MarketID = _Market.marketId;
+                    PopulateRunners();
 					ControlMessenger.Send("Market Selected", new { MarketNode = this, Name = FullName });
 				}
             }
@@ -283,12 +302,12 @@ namespace SpreadTrader
         {
             Nodes.Clear();
         }
-        public void Add(NodeViewModel node, bool leaf = false)
+        public void Add(Market node, bool leaf = false)
         {
             node.Parent = this;
             node.OnMarketSelected = OnMarketSelected;
             Nodes.Add(node);
-            if (node.Populate != null) node.Nodes.Add(new NodeViewModel("x"));
+            if (node.Populate != null) node.Nodes.Add(new Market("x"));
         }
         public void PopulateEventTypes()
         {
@@ -299,7 +318,7 @@ namespace SpreadTrader
                 {
                     if (Favourites.IsFavourite(ev.eventType.id))
                     {
-                        NodeViewModel nvm = new NodeViewModel(ev.eventType.name) { ID = ev.eventType.id };
+                        Market nvm = new Market(ev.eventType.name) { ID = ev.eventType.id };
                         nvm.Populate = nvm.PopulateCompetitionsOrCountries;
                         Add(nvm);
                     }
@@ -312,7 +331,7 @@ namespace SpreadTrader
             List<Event> events = Betfair.GetEvents(ID, Tag as String).OrderBy(o => o.details.name).ToList();
             foreach (Event ev in events)
             {
-                NodeViewModel nvm = new NodeViewModel(ev.details.name) { ID = ev.details.id, Tag = this.ID.ToString() };
+                Market nvm = new Market(ev.details.name) { ID = ev.details.id, Tag = this.ID.ToString() };
                 nvm.Populate = nvm.PopulateMarkets;
                 Add(nvm);
             }
@@ -322,7 +341,7 @@ namespace SpreadTrader
             List<Event> events = Betfair.GetEventsForCompetition(ID).OrderBy(o => o.details.name).ToList();
             foreach (Event ev in events)
             {
-                NodeViewModel nvm = new NodeViewModel(ev.details.name) { ID = ev.details.id };
+                Market nvm = new Market(ev.details.name) { ID = ev.details.id };
                 nvm.Populate = nvm.PopulateMarkets;
                 Add(nvm);
             }
@@ -334,7 +353,7 @@ namespace SpreadTrader
             {
                 foreach (CompetitionResult cr in competitions)
                 {
-                    NodeViewModel nvm = new NodeViewModel(cr.competition.name) { ID = cr.competition.id };
+                    Market nvm = new Market(cr.competition.name) { ID = cr.competition.id };
                     nvm.Populate = nvm.PopulateEventsForCompetition;
                     Add(nvm);
                 }
@@ -343,7 +362,7 @@ namespace SpreadTrader
             List<CountryCodeResult> countries = Betfair.GetCountries(ID);
             foreach (CountryCodeResult cr in countries)
             {
-                NodeViewModel nvm = new NodeViewModel(cr.countryCode) { ID = ID, Tag = cr.countryCode };
+                Market nvm = new Market(cr.countryCode) { ID = ID, Tag = cr.countryCode };
                 nvm.Populate = nvm.PopulateVenues;
                 Add(nvm);
             }
@@ -353,7 +372,7 @@ namespace SpreadTrader
             List<VenueResult> venues = Betfair.GetVenues(ID, Tag as String).OrderBy(o => o.venue).ToList();
             foreach (VenueResult v in venues)
             {
-                NodeViewModel nvm = new NodeViewModel(v.venue) { ID = this.ID, Tag = v.venue };
+                Market nvm = new Market(v.venue) { ID = this.ID, Tag = v.venue };
                 nvm.Populate = nvm.PopulateEvents;
                 Add(nvm);
             }
@@ -361,10 +380,10 @@ namespace SpreadTrader
         public void PopulateMarkets()
         {
             Int32 event_type = Convert.ToInt32(Tag);
-            List<Market> markets = Betfair.GetMarkets(event_type, ID).OrderBy(o => o.marketStartTime).ToList();
-            foreach (Market m in markets)
+            List<BetfairAPI.Market> markets = Betfair.GetMarkets(event_type, ID).OrderBy(o => o.marketStartTime).ToList();
+            foreach (BetfairAPI.Market m in markets)
             {
-                NodeViewModel nvm = new NodeViewModel(String.Format("{0:HH:mm} {1}", m.description.marketTime.AddHours(props.TimeOffset), m.marketName)) { _Market = m };
+                Market nvm = new Market(String.Format("{0:HH:mm} {1}", m.description.marketTime.AddHours(props.TimeOffset), m.marketName)) { _Market = m };
                 nvm.Commission = m.description.marketBaseRate;
                 Add(nvm);
             }

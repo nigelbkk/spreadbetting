@@ -7,8 +7,8 @@ namespace SpreadTrader
 {
     public partial class MarketDescription : Window
     {
-        NodeViewModel node = null;
-        public MarketDescription(Visual visual, Button b, NodeViewModel node)
+        Market node = null;
+        public MarketDescription(Visual visual, Button b, Market node)
         {
             this.node = node;
             InitializeComponent();

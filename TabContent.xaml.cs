@@ -13,7 +13,7 @@ namespace SpreadTrader
         public MainWindow mainWindow { get; set; }
 
         public MarketSelectionDelegate OnMarketSelected;
-        public NodeViewModel MarketNode = null;
+        public Market MarketNode = null;
         public string MarketName { get { return MarketNode?.MarketName; } }
         public string OverlayStatus { get {
                 if (MainWindow.Betfair.ConnectionLost)

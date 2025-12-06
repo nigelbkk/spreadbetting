@@ -16,7 +16,7 @@
 			</Style>
 		</TreeView.ItemContainerStyle>
 		<TreeView.Resources>
-			<HierarchicalDataTemplate DataType="{x:Type local:NodeViewModel}" ItemsSource="{Binding Nodes}">
+			<HierarchicalDataTemplate DataType="{x:Type local:Market}" ItemsSource="{Binding Nodes}">
 				<TextBlock Text="{Binding Name}"></TextBlock>
 			</HierarchicalDataTemplate>
 			<Style TargetType="TreeViewItem">

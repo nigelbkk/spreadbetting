@@ -122,7 +122,7 @@ namespace SpreadTrader
 		public SubmitBetsDelegate OnSubmitBets;
 		public RunnersControl RunnersControl { get; set; }
 		public ObservableCollection<Row> Rows { get; set; }
-		private NodeViewModel MarketNode { get; set; }
+		private Market MarketNode { get; set; }
 		private DateTime _LastUpdated { get; set; }
 		private BetfairAPI.BetfairAPI Betfair { get; set; }
 		private bool _StreamActive { get; set; }
@@ -810,13 +810,13 @@ namespace SpreadTrader
 						break;
 
 					case "Reset":
-						MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
+						MarketNode = new Market("json") { MarketID = "1.448881" };
 						json_rows = File.ReadAllLines(".\\notifications.json");
 						json_index = 0;
 						Rows.Clear();
 						break;
 					case "Run":
-						MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
+						MarketNode = new Market("json") { MarketID = "1.448881" };
 						json_rows = File.ReadAllLines(".\\notifications.json");
 						json_index = 0;
 						foreach (String j in json_rows)

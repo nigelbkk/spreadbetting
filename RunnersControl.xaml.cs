@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace SpreadTrader
 {
-    public delegate void MarketChangedDelegate(NodeViewModel node);
+    public delegate void MarketChangedDelegate(Market node);
     public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, bool inplay);
     public partial class RunnersControl : UserControl, INotifyPropertyChanged
     {
@@ -24,8 +24,8 @@ namespace SpreadTrader
 
         //private StreamingAPI streamingAPI = new StreamingAPI();
         private BackgroundWorker Worker = null;
-        public NodeViewModel _MarketNode { get; set; }
-        public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
+        public Market _MarketNode { get; set; }
+        public Market MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
         public double BackBook { get { return MarketNode == null ? 0.00 : MarketNode.BackBook; } }
         public double LayBook { get { return MarketNode == null ? 0.00 : MarketNode.LayBook;  } }
         public List<LiveRunner> LiveRunners { get; set; }
@@ -65,7 +65,7 @@ namespace SpreadTrader
 			}
 		}
 
-        private async Task PopulateNewMarket(NodeViewModel node)
+        private async Task PopulateNewMarket(Market node)
         {
 
         }

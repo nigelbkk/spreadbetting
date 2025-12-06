@@ -38,7 +38,7 @@ namespace SpreadTrader
         }
         public PriceSize[] BackValues { get; set; }
         public PriceSize[] LayValues { get; set; }
-        public NodeViewModel MarketNode { get; set; }
+        public Market MarketNode { get; set; }
         public MarketSelectionDelegate OnMarketSelected;
         public SliderControl sliderControl { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;

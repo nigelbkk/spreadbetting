@@ -17,7 +17,7 @@ namespace SpreadTrader
             //          }
         }
         public MarketSelectionDelegate OnMarketSelected;
-        public NodeViewModel RootNode { get; set; }
+        public Market RootNode { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(String info)
         {
@@ -33,7 +33,7 @@ namespace SpreadTrader
         }
         public void Populate()
         {
-            RootNode = new NodeViewModel(MainWindow.Betfair);
+            RootNode = new Market(MainWindow.Betfair);
 			//RootNode.OnMarketSelected += (node) =>
 			//{
 			//    if (OnMarketSelected != null)

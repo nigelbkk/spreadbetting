@@ -10,7 +10,7 @@ namespace SpreadTrader
     public partial class MarketHeader : UserControl, INotifyPropertyChanged
     {
         public MarketSelectionDelegate OnMarketSelected;
-        private NodeViewModel MarketNode { get 
+        private Market MarketNode { get 
             {
                 return TabContent != null && TabContent.MarketNode != null ? TabContent.MarketNode : null;
             } 

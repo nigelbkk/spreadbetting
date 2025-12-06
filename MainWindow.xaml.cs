@@ -12,7 +12,7 @@ using System.Windows.Input;
 
 namespace SpreadTrader
 {
-	public delegate void MarketSelectionDelegate(NodeViewModel node);
+	public delegate void MarketSelectionDelegate(Market node);
 	//public delegate void OnShutdownDelegate();
 
 	public static class ControlMessenger
@@ -147,7 +147,7 @@ namespace SpreadTrader
 					t.Enabled = true;
 					t.Start();
 				}
-				UpdateAccountInformation();
+				//UpdateAccountInformation();
 			}
 			catch (Exception xe)
 			{
@@ -176,8 +176,8 @@ namespace SpreadTrader
 						EventsTree.Refresh();
 						break;
 					case "Favourites":
-						if (NodeViewModel.Betfair == null) break;
-						new Favourites(this, b, NodeViewModel.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList()).ShowDialog(); break;
+						if (Market.Betfair == null) break;
+						new Favourites(this, b, Market.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList()).ShowDialog(); break;
 					case "Commission":
 						UpdateAccountInformation();
 						break;
