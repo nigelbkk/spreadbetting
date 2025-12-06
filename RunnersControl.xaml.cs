@@ -19,7 +19,6 @@ namespace SpreadTrader
         //public BetsManager betsManager = null;
         //public MarketSelectionDelegate OnMarketSelected;
         //public StreamUpdateDelegate StreamUpdateEventSink = null;
-        //public FavoriteChangedDelegate OnFavoriteChanged = null;
         //public MarketChangedDelegate OnMarketChanged = null;
 
 		public Market MarketNode { get; set; }
@@ -144,12 +143,10 @@ namespace SpreadTrader
             if (LiveRunner.Favorite != null) LiveRunner.Favorite.IsFavorite = false;
             LiveRunner.Favorite = cp.Content as LiveRunner;
             LiveRunner.Favorite.IsFavorite = true;
-            //if (OnFavoriteChanged != null)
-            //{
-            //    OnFavoriteChanged(LiveRunner.Favorite);
-            //}
+			ControlMessenger.Send("Favorite Changed", new { Favorite = LiveRunner.Favorite, Name = LiveRunner.Favorite.Name });
+
         }
-        private void LevelProfitMouseDown(object sender, MouseButtonEventArgs e)
+		private void LevelProfitMouseDown(object sender, MouseButtonEventArgs e)
         {
             Label lb = sender as Label;
             ContentPresenter cp = Extensions.FindParentOfType<ContentPresenter>(lb);

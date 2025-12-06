@@ -118,7 +118,6 @@ namespace SpreadTrader
 		private Properties.Settings props = Properties.Settings.Default;
 		public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
 		public MarketSelectionDelegate OnMarketSelected;
-		public FavoriteChangedDelegate OnFavoriteChanged;
 		public SubmitBetsDelegate OnSubmitBets;
 		public RunnersControl RunnersControl { get; set; }
 		public ObservableCollection<Row> Rows { get; set; }
@@ -246,8 +245,21 @@ namespace SpreadTrader
 				System.Threading.Thread.Sleep(10);
 			}
 		}
+		private void OnMessageReceived(string messageName, object data)
+		{
+			if (messageName == "Favorite Changed")
+			{
+				dynamic d = data;
+				Debug.WriteLine($"BetsManager: {messageName} : {d.Name}");
+			}
+		}
+
 		public BetsManager()
 		{
+			Rows = new ObservableCollection<Row>();
+			InitializeComponent();
+			ControlMessenger.MessageSent += OnMessageReceived;
+
 			BackgroundWorker bw = new BackgroundWorker();
 			bw.DoWork += (o, e) => ProcessIncomingNotifications(o);
 			bw.RunWorkerAsync();
@@ -258,20 +270,20 @@ namespace SpreadTrader
 
 
 			// REVIEW!!
-			timer.Elapsed += (o, e) =>
-			{
-				try
-				{
-					NotifyPropertyChanged("");
-				}
-				catch (Exception ex)
-				{
-					Debug.WriteLine(ex);
-				}
-			};
-			timer.Interval = 1000;
-			timer.Enabled = true;
-			timer.Start();
+			//timer.Elapsed += (o, e) =>
+			//{
+			//	try
+			//	{
+			//		NotifyPropertyChanged("");
+			//	}
+			//	catch (Exception ex)
+			//	{
+			//		Debug.WriteLine(ex);
+			//	}
+			//};
+			//timer.Interval = 1000;
+			//timer.Enabled = true;
+			//timer.Start();
 
 			hubConnection = new HubConnection("http://" + props.StreamUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
@@ -289,9 +301,6 @@ namespace SpreadTrader
 					}
 				}
 			});
-
-			Rows = new ObservableCollection<Row>();
-			InitializeComponent();
 
 			OnSubmitBets += (runner, lay, back) =>
 			{
@@ -359,11 +368,11 @@ namespace SpreadTrader
 				t.Start();
 			};
 
-			OnFavoriteChanged += (runner) =>
-			{
-				//Debug.WriteLine("OnFavoriteChanged");
-				// Favorite = runner;
-			};
+			//OnFavoriteChanged += (runner) =>
+			//{
+			//	Debug.WriteLine("OnFavoriteChanged");
+			//	 //Favorite = runner;
+			//};
 
 			OnMarketSelected += (node) =>
 			{

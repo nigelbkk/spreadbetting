@@ -6,12 +6,9 @@ using System.Windows.Controls;
 
 namespace SpreadTrader
 {
-    public delegate void FavoriteChangedDelegate(LiveRunner runner);
-    
     public partial class SliderControl : UserControl, INotifyPropertyChanged
     {
         public SubmitBetsDelegate OnSubmitBets = null;
-        public FavoriteChangedDelegate OnFavoriteChanged = null;
 
         private System.Timers.Timer timer = null;
         private BetfairPrices betfairPrices = new BetfairPrices();
@@ -40,7 +37,19 @@ namespace SpreadTrader
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
         }
-        public SliderControl()
+		private void OnMessageReceived(string messageName, object data)
+		{
+			if (messageName == "Favorite Changed")
+			{
+				dynamic d = data;
+				Debug.WriteLine($"BetsManager: {messageName} : {d.Name}");
+                Favorite = d.Favorite;
+                BasePrice = Favorite.LastPriceTraded;
+                SyncPrices();
+                NotifyPropertyChanged("");
+            }
+		}
+		public SliderControl()
         {
             CutStakes = 5;
             MoveBack = 10;
@@ -53,20 +62,10 @@ namespace SpreadTrader
                 LayValues[i] = new PriceSize(betfairPrices[i], 20 + 1 * 10);
             }
             BasePrice = props.BasePrice;
-            InitializeComponent();
-
-            OnFavoriteChanged += (runner) =>
-            {
-                // set last traded price to the grid and recenter the sliders	
-                Favorite = runner;
-                NotifyPropertyChanged("");
-                BasePrice = runner.LastPriceTraded;
-                //MoveBack = 10;
-                //MoveLay = 22;
-                SyncPrices();
-            };
-        }
-        private double _BasePrice;
+			InitializeComponent();
+			ControlMessenger.MessageSent += OnMessageReceived;
+		}
+		private double _BasePrice;
         public double BasePrice { get { return _BasePrice; } set { _BasePrice = value; } }// = Math.Max(value, 1.01); } }
         public void MoveStakes(Int32 newvalue, Int32 oldvalue)
         {
@@ -78,10 +77,6 @@ namespace SpreadTrader
                 {
                     vb.size = 10 * newvalue;
                     vl.size = 10 * newvalue;
-                    //vb.size /= 9; vb.size *= 10;
-                    //vl.size /= 9; vl.size *= 10;
-                    //vl.size = Math.Round(vl.size);
-                    //vb.size = Math.Round(vb.size);
                     BackValues[i] = vb;
                     LayValues[i] = vl;
                 }
@@ -89,9 +84,6 @@ namespace SpreadTrader
                 {
                     vb.size = 10 * newvalue;
                     vl.size = 10 * newvalue;
-                    //vl.size /= 10; vl.size *= 9; vb.size /= 10; vb.size *= 9;
-                    //vl.size = Math.Round(vl.size, 2);
-                    //vb.size = Math.Round(vb.size, 2);
                     BackValues[i] = vb;
                     LayValues[i] = vl;
                 }
@@ -127,8 +119,6 @@ namespace SpreadTrader
             {
                 switch (b.Tag)
                 {
-                    //case "-": BasePrice = betfairPrices.Previous(BasePrice); break;
-                    //case "+": BasePrice = betfairPrices.Next(BasePrice); break;
                     case "Execute":
                         if (OnSubmitBets != null)
                         {
