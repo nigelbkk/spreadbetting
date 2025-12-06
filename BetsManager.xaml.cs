@@ -426,7 +426,7 @@ namespace SpreadTrader
 				if (String.IsNullOrEmpty(json))
 					return;
 
-				Debug.WriteLine(json);
+				//Debug.WriteLine(json);
 
 				OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
 
