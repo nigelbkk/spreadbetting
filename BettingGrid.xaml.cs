@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -11,17 +12,7 @@ namespace SpreadTrader
     public partial class BettingGrid : UserControl, INotifyPropertyChanged
     {
         private bool _BackActive { get; set; }
-        public bool BackActive
-        {
-            get { return _BackActive; }
-            set
-            {
-                _BackActive = value;
-                if (BackValues.Length > 0) foreach (PriceSize o in BackValues)
-                    {
-                        o.IsChecked = o.ParentChecked = value;
-                    }
-            }
+        public bool BackActive { get { return _BackActive; } set { _BackActive = value; if (BackValues.Length > 0) foreach (PriceSize o in BackValues) { o.IsChecked = o.ParentChecked = value; } }
         }
         private bool _LayActive { get; set; }
         public bool LayActive
@@ -49,8 +40,20 @@ namespace SpreadTrader
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
         }
-        public BettingGrid()
+		private void OnMessageReceived(string messageName, object data)
+		{
+			if (messageName == "Market Selected")
+			{
+				dynamic d = data;
+				Debug.WriteLine($"BettingGrid: {d.Name}");
+			}
+		}
+
+		public BettingGrid()
         {
+			InitializeComponent();
+			ControlMessenger.MessageSent += OnMessageReceived;
+			
             BetfairPrices betfairPrices = new BetfairPrices();
             BackValues = new PriceSize[9];
             LayValues = new PriceSize[9];
@@ -77,8 +80,8 @@ namespace SpreadTrader
                     NotifyPropertyChanged("");
 				}
             };
-            InitializeComponent();
-            BackActive = LayActive = true;
+
+			BackActive = LayActive = true;
         }
     }
 }

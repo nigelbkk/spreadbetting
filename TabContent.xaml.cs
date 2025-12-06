@@ -70,7 +70,7 @@ namespace SpreadTrader
             //    BetsManager.OnMarketSelected(node);
             //    oBettingGrid.OnMarketSelected(node);
             //};
-            //marketHeader.TabContent = this;
+            marketHeader.TabContent = this;
         }
 		private void OnMessageReceived(string messageName, object data)
 		{
