@@ -275,7 +275,7 @@ namespace SpreadTrader
 
 
 			hubConnection = new HubConnection("http://" + props.StreamUrl);
-			hubConnection.TraceLevel = TraceLevels.All;
+			hubConnection.TraceLevel = TraceLevels.None;
 			hubConnection.TraceWriter = Console.Out;
 
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
@@ -390,9 +390,10 @@ namespace SpreadTrader
 					MarketNode = node;
 					Extensions.MainWindow.Commission = MarketNode.Commission;
 					PopulateDataGrid();
+					Connect();
 				}
 			};
-			Connect();
+			//Connect();
 		}
 
 		private object lockObj = new object();
@@ -624,13 +625,18 @@ namespace SpreadTrader
 			{
 				if (hubConnection != null)
 				{
-					Console.WriteLine($"Connecting to: {hubConnection.Url}");
-
-					await hubConnection.Start();
-
-					Status = "Connected";
-					Console.WriteLine($"✓ Connected! ID: {hubConnection.ConnectionId}");
-					Console.WriteLine($"✓ Transport: {hubConnection.Transport.Name}");
+					if (hubConnection.State == ConnectionState.Disconnected)
+					{
+						Console.WriteLine($"Connecting to: {hubConnection.Url}");
+						await hubConnection.Start();
+						Status = "Connected";
+						Console.WriteLine($"✓ Connected! ID: {hubConnection.ConnectionId}");
+					}
+					else
+					{
+						Console.WriteLine($"Already in state: {hubConnection.State}");
+						Status = hubConnection.State.ToString();
+					}
 				}
 			}
 			catch (Exception ex)
@@ -639,35 +645,11 @@ namespace SpreadTrader
 				Console.WriteLine($"✗ ERROR: {ex.Message}");
 				Console.WriteLine($"✗ Inner: {ex.InnerException?.Message}");
 			}
-
-
-
-			//if (hubConnection != null)
-			//{
-			//	hubConnection.Start().ContinueWith(task =>
-			//	{
-			//		if (OnFail(task))
-			//		{
-			//			result = "Failed to Connect";
-			//			return;
-			//		}
-			//		result = "Connected";
-			//	}).Wait(1000);
-			//	Status = result;
-			//}
 		}
 		private void Disconnect()
 		{
 			hubConnection.Stop(new TimeSpan(2000));
 			Status = "Disconnected";
-		}
-		private bool OnFail(Task task)
-		{
-			if (task.IsFaulted)
-			{
-				Debug.WriteLine("Exception:{0}", task.Exception.GetBaseException());
-			}
-			return task.IsFaulted;
 		}
 		private Int32 newbetid = 44448880;
 		private double amount_remaining = 0;
