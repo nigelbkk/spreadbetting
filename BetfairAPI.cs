@@ -29,6 +29,7 @@ namespace BetfairAPI
 		{
 		}
 		public DateTime sysTime = DateTime.UtcNow;
+		private static readonly string API_KEY = Environment.GetEnvironmentVariable("BF_API_KEY") ?? throw new Exception("BF_API_KEY environment variable not set");
 		public void KeepAlive()
 		{
 			HttpWebRequest wr = (HttpWebRequest)WebRequest.Create("https://identitysso.betfair.com/api/keepAlive");
@@ -81,6 +82,7 @@ namespace BetfairAPI
 			HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
 			wr.Method = WebRequestMethods.Http.Post;
 			wr.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+			wr.Headers.Add("X-API-Key", API_KEY);
 			wr.Headers.Add("X-Application", AppKey);
 			wr.Headers.Add("X-Authentication", Token);
 			wr.Headers.Add(HttpRequestHeader.AcceptCharset, "ISO-8859-1,utf-8"); wr.Accept = "*/*";
