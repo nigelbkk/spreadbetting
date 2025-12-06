@@ -275,6 +275,9 @@ namespace SpreadTrader
 
 
 			hubConnection = new HubConnection("http://" + props.StreamUrl);
+			hubConnection.TraceLevel = TraceLevels.All;
+			hubConnection.TraceWriter = Console.Out;
+
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
 			hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
@@ -613,22 +616,45 @@ namespace SpreadTrader
 				Debug.WriteLine("null context");
 			}
 		}
-		private void Connect()
+		private async void Connect()
 		{
-			String result = "";
-			if (hubConnection != null)
+			//String result = "";
+
+			try
 			{
-				hubConnection.Start().ContinueWith(task =>
+				if (hubConnection != null)
 				{
-					if (OnFail(task))
-					{
-						result = "Failed to Connect";
-						return;
-					}
-					result = "Connected";
-				}).Wait(1000);
-				Status = result;
+					Console.WriteLine($"Connecting to: {hubConnection.Url}");
+
+					await hubConnection.Start();
+
+					Status = "Connected";
+					Console.WriteLine($"✓ Connected! ID: {hubConnection.ConnectionId}");
+					Console.WriteLine($"✓ Transport: {hubConnection.Transport.Name}");
+				}
 			}
+			catch (Exception ex)
+			{
+				Status = "Failed to Connect";
+				Console.WriteLine($"✗ ERROR: {ex.Message}");
+				Console.WriteLine($"✗ Inner: {ex.InnerException?.Message}");
+			}
+
+
+
+			//if (hubConnection != null)
+			//{
+			//	hubConnection.Start().ContinueWith(task =>
+			//	{
+			//		if (OnFail(task))
+			//		{
+			//			result = "Failed to Connect";
+			//			return;
+			//		}
+			//		result = "Connected";
+			//	}).Wait(1000);
+			//	Status = result;
+			//}
 		}
 		private void Disconnect()
 		{
