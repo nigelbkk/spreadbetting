@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -8,8 +9,6 @@ namespace SpreadTrader
 {
     public partial class SliderControl : UserControl, INotifyPropertyChanged
     {
-        public SubmitBetsDelegate OnSubmitBets = null;
-
         private System.Timers.Timer timer = null;
         private BetfairPrices betfairPrices = new BetfairPrices();
         private Int32 base_index
@@ -22,7 +21,7 @@ namespace SpreadTrader
             }
         }
         public LiveRunner Favorite { get; set; }
-        public bool FavoriteSelected { get { return Favorite != null;   } }
+        public bool FavoriteSelected { get { return Favorite != null; } }
         public double CutStakes { get; set; }
         public double MoveBack { get; set; }
         public double MoveLay { get; set; }
@@ -37,19 +36,19 @@ namespace SpreadTrader
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
         }
-		private void OnMessageReceived(string messageName, object data)
-		{
-			if (messageName == "Favorite Changed")
-			{
-				dynamic d = data;
-				Debug.WriteLine($"BetsManager: {messageName} : {d.Name}");
+        private void OnMessageReceived(string messageName, object data)
+        {
+            if (messageName == "Favorite Changed")
+            {
+                dynamic d = data;
+                Debug.WriteLine($"BetsManager: {messageName} : {d.Name}");
                 Favorite = d.Favorite;
                 BasePrice = Favorite.LastPriceTraded;
                 SyncPrices();
                 NotifyPropertyChanged("");
             }
-		}
-		public SliderControl()
+        }
+        public SliderControl()
         {
             CutStakes = 5;
             MoveBack = 10;
@@ -62,10 +61,10 @@ namespace SpreadTrader
                 LayValues[i] = new PriceSize(betfairPrices[i], 20 + 1 * 10);
             }
             BasePrice = props.BasePrice;
-			InitializeComponent();
-			ControlMessenger.MessageSent += OnMessageReceived;
-		}
-		private double _BasePrice;
+            InitializeComponent();
+            ControlMessenger.MessageSent += OnMessageReceived;
+        }
+        private double _BasePrice;
         public double BasePrice { get { return _BasePrice; } set { _BasePrice = value; } }// = Math.Max(value, 1.01); } }
         public void MoveStakes(Int32 newvalue, Int32 oldvalue)
         {
@@ -120,21 +119,27 @@ namespace SpreadTrader
                 switch (b.Tag)
                 {
                     case "Execute":
-                        if (OnSubmitBets != null)
+                        if (Favorite != null)
                         {
-                            try
-                            {
-                                if (Favorite != null)
-                                {
-                                   OnSubmitBets(Favorite, LayValues, BackValues);
-                                }
-                            }
-                            catch (Exception xe)
-                            {
-                                Debug.WriteLine(xe.Message);
-                                Extensions.MainWindow.Status = xe.Message;
-                            }
+                            ControlMessenger.Send("Execute Bets", new { Favorite = Favorite, LayValues = LayValues.ToList(), BackValues = BackValues.ToList() });
                         }
+
+                        //if (OnSubmitBets != null)
+                        //                  {
+                        //                      try
+                        //                      {
+                        //                          if (Favorite != null)
+                        //                          {
+                        //			ControlMessenger.Send("Execute Bets", new { Favorite = Favorite, LayValues = LayValues, BackValues = BackValues });
+                        //                             //OnSubmitBets(Favorite, LayValues, BackValues);
+                        //                          }
+                        //                      }
+                        //                      catch (Exception xe)
+                        //                      {
+                        //                          Debug.WriteLine(xe.Message);
+                        //                          Extensions.MainWindow.Status = xe.Message;
+                        //                      }
+                        //                  }
                         break;
                     default: return;
                 }
@@ -158,8 +163,8 @@ namespace SpreadTrader
                 props.Save();
             }
         }
-		private void Button_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-		{
+        private void Button_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
             Debug.WriteLine("Down");
             Button b = sender as Button;
             String Tag = b.Tag as String;
@@ -172,7 +177,8 @@ namespace SpreadTrader
 
                 switch (Tag)
                 {
-                    case "-": BasePrice = betfairPrices.Previous(BasePrice); 
+                    case "-":
+                        BasePrice = betfairPrices.Previous(BasePrice);
                         break;
                     case "+": BasePrice = betfairPrices.Next(BasePrice); break;
                 }
@@ -183,8 +189,8 @@ namespace SpreadTrader
                 timer.Start();
             };
         }
-		private void Button_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-		{
+        private void Button_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
             Debug.WriteLine("Up");
             timer.Enabled = false;
             timer.Stop();

@@ -1,17 +1,13 @@
-﻿using Betfair.ESAClient.Cache;
-using BetfairAPI;
+﻿using BetfairAPI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Media;
-
 namespace SpreadTrader
 {
     public class Market : ViewModelBase
     {
-        public MarketSelectionDelegate OnMarketSelected;
         public String FullName { get; set; }
         private BetfairAPI.Market _Market { get; set; }
         public String MarketID { get; set; }
@@ -29,7 +25,7 @@ namespace SpreadTrader
         private double _TurnaroundTime { get; set; }
         public Int32 UpdateRate { get { return _UpdateRate; } set { _UpdateRate = value; OnPropertyChanged("UpdateRate"); } }
         public double TurnaroundTime { get { return Math.Round(_TurnaroundTime, 5); } set { _TurnaroundTime = value; OnPropertyChanged("TurnaroundTime"); } }
-//        public SolidColorBrush TimeToGoColor { get { return (_Market.description.marketTime - DateTime.UtcNow).TotalSeconds > 0 ? System.Windows.Media.Brushes.Blue : System.Windows.Media.Brushes.Red; } }
+        //        public SolidColorBrush TimeToGoColor { get { return (_Market.description.marketTime - DateTime.UtcNow).TotalSeconds > 0 ? System.Windows.Media.Brushes.Blue : System.Windows.Media.Brushes.Red; } }
         public String TimeToGo { get { return String.Format("{0}{1}", (_Market.description.marketTime - DateTime.UtcNow).TotalSeconds > 0 ? "" : "-", (_Market.description.marketTime - DateTime.UtcNow).ToString(@"hh\:mm\:ss")); } }
         List<EventTypeResult> EventTypes { get; set; }
         private Properties.Settings props = Properties.Settings.Default;
@@ -61,21 +57,22 @@ namespace SpreadTrader
             _Market = new BetfairAPI.Market();
             OnItemSelected();
         }
-		//private void OnMessageReceived(string messageName, object data)
-		//{
-		//	if (messageName == "UserSelected")
-		//	{
-		//		dynamic d = data;
-		//		Debug.WriteLine((String) d.Name);
-		//	}
-		//}
 
-		public Market(String name)
+        //private void Populate()
+        //{ }
+        private void OnMessageReceived(string messageName, object data)
+        {
+            if (messageName == "Market Selected")
+            {
+                dynamic d = data;
+                Debug.WriteLine($"Market: {d.Name}");
+            }
+        }
+        public Market(String name)
         {
             Name = name;
             Nodes = new ObservableCollection<Market>();
-
-			//ControlMessenger.MessageSent += OnMessageReceived;
+            ControlMessenger.MessageSent += OnMessageReceived;
         }
         public List<LiveRunner> LiveRunners = null;
 
@@ -95,55 +92,6 @@ namespace SpreadTrader
                 }
             }
         }
-
-		public List<LiveRunner> OldGetLiveRunners()
-        {
-            List<LiveRunner> Runners = new List<LiveRunner>();
-            if (_Market != null)
-            {
-                List<MarketProfitAndLoss> pl = Betfair.listMarketProfitAndLoss(MarketID);
-                _Market.MarketBook = Betfair.GetMarketBook(_Market);
-                BackBook = _Market.MarketBook.BackBook;
-                LayBook = _Market.MarketBook.LayBook;
-                TotalMatched = _Market.MarketBook.totalMatched;
-                Status = _Market.MarketBook.status;
-                if (_Market.MarketBook.Runners.Count > 0) foreach (Runner r in _Market.MarketBook.Runners)
-                {
-                    if (pl != null && pl.Count > 0)
-                    {
-                        if (pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
-                        {
-                            if (p.selectionId == r.selectionId)
-                            {
-                                r.ifWin = p.ifWin;  ///NH
-                                //r.ifWin = rnd.NextDouble() * 100.00;
-                            }
-                        }
-                    }
-                    Runners.Add(new LiveRunner(r));
-                }
-                if (Parent != null)
-                {
-                    FullName = String.Format("{0} - {1}", Parent.Name, Name);
-                    MarketName = Parent.Name;
-                    MarketID = _Market.marketId;
-                }
-            }
-            LiveRunners = Runners;
-
-            for (int i = 0; i < LiveRunners.Count; i++)
-            {
-                LiveRunner r = Runners[i];
-                LiveRunner lr = LiveRunners[i];
-
-                lr.BackValues = r.BackValues;
-                lr.LayValues = r.LayValues;
-                lr.ifWin = r.ifWin;    ///NH
-            }
-            CalculateLevelProfit();
-            return Runners;
-        }
-
         private void OnItemSelected()
         {
             if (_Market != null)
@@ -154,8 +102,8 @@ namespace SpreadTrader
                     MarketName = Parent.Name;
                     MarketID = _Market.marketId;
                     PopulateRunners();
-					ControlMessenger.Send("Market Selected", new { MarketNode = this, Name = FullName });
-				}
+                    ControlMessenger.Send("Market Selected", new { MarketNode = this, Name = FullName });
+                }
             }
         }
         private void LevelProfitBothGreen(LiveRunner runner1, LiveRunner runner2)
@@ -254,7 +202,7 @@ namespace SpreadTrader
 
             draw.LevelSide = F5 < 0 ? sideEnum.BACK : sideEnum.LAY;
             draw.LevelProfit = Math.Round(F16, 0);
-//            draw.LevelStake = Math.Abs(Math.Round(J3 < 0 ? J8 : G13, 2));
+            //            draw.LevelStake = Math.Abs(Math.Round(J3 < 0 ? J8 : G13, 2));
         }
         public void CalculateLevelProfit()
         {
@@ -262,10 +210,10 @@ namespace SpreadTrader
             {
                 List<LiveRunner> runners = new List<LiveRunner>();
                 if (LiveRunners.Count > 0) foreach (LiveRunner lr in LiveRunners)
-                {
-                    if (lr.ifWin != 0)
-                        runners.Add(lr);
-                }
+                    {
+                        if (lr.ifWin != 0)
+                            runners.Add(lr);
+                    }
                 if (LiveRunners.Count == 2)
                 {
                     LevelProfit(LiveRunners[0], LiveRunners[1]);
@@ -305,7 +253,6 @@ namespace SpreadTrader
         public void Add(Market node, bool leaf = false)
         {
             node.Parent = this;
-            node.OnMarketSelected = OnMarketSelected;
             Nodes.Add(node);
             if (node.Populate != null) node.Nodes.Add(new Market("x"));
         }

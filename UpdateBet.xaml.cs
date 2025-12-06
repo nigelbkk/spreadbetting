@@ -1,7 +1,6 @@
 ﻿using BetfairAPI;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -59,7 +58,8 @@ namespace SpreadTrader
 
             if (Stake < OriginalStake)
             {
-                await Task.Run(() => {
+                await Task.Run(() =>
+                {
                     CancelExecutionReport report = betfair.cancelOrder(Row.MarketID, Row.BetID, OriginalStake - Stake);
                     //if (report != null)
                     //{
@@ -67,11 +67,12 @@ namespace SpreadTrader
                     //}
                     result = report.errorCode != null ? report.errorCode : report.status;
                 });
-    //            Extensions.MainWindow.Status = result;
+                //            Extensions.MainWindow.Status = result;
             }
             else if (Stake > OriginalStake)
             {
-                await Task.Run(() => {
+                await Task.Run(() =>
+                {
                     CancelExecutionReport report = betfair.cancelOrder(Row.MarketID, Row.BetID, null);
                     //if (report.errorCode != null)
                     //{
@@ -79,19 +80,20 @@ namespace SpreadTrader
                     //}
                     //else
                     //{
-                        PlaceExecutionReport report2 = betfair.placeOrder(Row.MarketID, Row.SelectionID, Row.Side.ToUpper() == "BACK" ? sideEnum.BACK : sideEnum.LAY, Stake, Odds);
-                        result = report2.errorCode != null ? report2.errorCode : report2.status;
+                    PlaceExecutionReport report2 = betfair.placeOrder(Row.MarketID, Row.SelectionID, Row.Side.ToUpper() == "BACK" ? sideEnum.BACK : sideEnum.LAY, Stake, Odds);
+                    result = report2.errorCode != null ? report2.errorCode : report2.status;
                     //}
                 });
-  //              Extensions.MainWindow.Status = result;
+                //              Extensions.MainWindow.Status = result;
             }
             else
             {
-                await Task.Run(() => {
+                await Task.Run(() =>
+                {
                     ReplaceExecutionReport report = betfair.replaceOrder(Row.MarketID, Row.BetID.ToString(), Odds, Stake);
-                    result = report.status != ExecutionReportStatusEnum.SUCCESS ? report.instructionReports[0].errorCode.ToString(): report.status.ToString();
+                    result = report.status != ExecutionReportStatusEnum.SUCCESS ? report.instructionReports[0].errorCode.ToString() : report.status.ToString();
                 });
-//                Extensions.MainWindow.Status = result;
+                //                Extensions.MainWindow.Status = result;
             }
             Extensions.MainWindow.Status = result;
         }

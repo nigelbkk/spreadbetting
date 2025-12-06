@@ -3,27 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Linq;
 
 namespace SpreadTrader
 {
-    public delegate void MarketChangedDelegate(Market node);
-    public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, bool inplay);
     public partial class RunnersControl : UserControl, INotifyPropertyChanged
     {
-        //public BetsManager betsManager = null;
-        //public MarketSelectionDelegate OnMarketSelected;
-        //public StreamUpdateDelegate StreamUpdateEventSink = null;
-        //public MarketChangedDelegate OnMarketChanged = null;
-
-		public Market MarketNode { get; set; }
+        public Market MarketNode { get; set; }
         public double BackBook { get { return MarketNode == null ? 0.00 : MarketNode.BackBook; } }
-        public double LayBook { get { return MarketNode == null ? 0.00 : MarketNode.LayBook;  } }
+        public double LayBook { get { return MarketNode == null ? 0.00 : MarketNode.LayBook; } }
         public List<LiveRunner> LiveRunners { get { return MarketNode?.LiveRunners ?? new List<LiveRunner>(); } }
         private Properties.Settings props = Properties.Settings.Default;
         public event PropertyChangedEventHandler PropertyChanged;
@@ -34,50 +27,50 @@ namespace SpreadTrader
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
         }
-		private async Task<List<MarketProfitAndLoss>> GetProfitAndLossAsync(string marketId)
-		{
-			return await Task.Run(() =>
-			{
-				return MainWindow.Betfair.listMarketProfitAndLoss(marketId);
-			});
-		}
+        private async Task<List<MarketProfitAndLoss>> GetProfitAndLossAsync(string marketId)
+        {
+            return await Task.Run(() =>
+            {
+                return MainWindow.Betfair.listMarketProfitAndLoss(marketId);
+            });
+        }
 
-		public async Task UpdateRunnerPnLAsync()
-		{
-			var plList = await GetProfitAndLossAsync(MarketNode.MarketID);
-			var pl = plList?.FirstOrDefault();
-			if (pl == null || pl.profitAndLosses == null)
-				return;
+        public async Task UpdateRunnerPnLAsync()
+        {
+            var plList = await GetProfitAndLossAsync(MarketNode.MarketID);
+            var pl = plList?.FirstOrDefault();
+            if (pl == null || pl.profitAndLosses == null)
+                return;
 
-			// Build lookup for speed
-			var lookup = pl.profitAndLosses.ToDictionary(x => x.selectionId);
+            // Build lookup for speed
+            var lookup = pl.profitAndLosses.ToDictionary(x => x.selectionId);
 
-			foreach (var runner in LiveRunners)
-			{
-				if (lookup.TryGetValue(runner.SelectionId, out var pnl))
-				{
-					runner.ifWin = pnl.ifWin;
-				}
-			}
-		}
+            foreach (var runner in LiveRunners)
+            {
+                if (lookup.TryGetValue(runner.SelectionId, out var pnl))
+                {
+                    runner.ifWin = pnl.ifWin;
+                }
+            }
+        }
         private async Task PopulateNewMarket(Market node)
         {
             MarketNode = node;
-			NotifyPropertyChanged("");
-		}
-		private void OnMessageReceived(string messageName, object data)
-		{
-			if (messageName == "Market Selected")
-			{
-				dynamic d = data;
-                Debug.WriteLine((String) d.Name);
+            NotifyPropertyChanged("");
+        }
+        private void OnMessageReceived(string messageName, object data)
+        {
+            if (messageName == "Market Selected")
+            {
+                dynamic d = data;
+                Debug.WriteLine((String)d.Name);
                 PopulateNewMarket(d.MarketNode);
-			}
-		}
-		public RunnersControl()
+            }
+        }
+        public RunnersControl()
         {
             InitializeComponent();
-			ControlMessenger.MessageSent += OnMessageReceived;
+            ControlMessenger.MessageSent += OnMessageReceived;
         }
         public String GetRunnerName(Int64 SelectionID)
         {
@@ -143,10 +136,10 @@ namespace SpreadTrader
             if (LiveRunner.Favorite != null) LiveRunner.Favorite.IsFavorite = false;
             LiveRunner.Favorite = cp.Content as LiveRunner;
             LiveRunner.Favorite.IsFavorite = true;
-			ControlMessenger.Send("Favorite Changed", new { Favorite = LiveRunner.Favorite, Name = LiveRunner.Favorite.Name });
+            ControlMessenger.Send("Favorite Changed", new { Favorite = LiveRunner.Favorite, Name = LiveRunner.Favorite.Name });
 
         }
-		private void LevelProfitMouseDown(object sender, MouseButtonEventArgs e)
+        private void LevelProfitMouseDown(object sender, MouseButtonEventArgs e)
         {
             Label lb = sender as Label;
             ContentPresenter cp = Extensions.FindParentOfType<ContentPresenter>(lb);

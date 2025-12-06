@@ -3,32 +3,36 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Controls;
-using System.Xml.Linq;
 
 namespace SpreadTrader
 {
     public partial class TabContent : UserControl, INotifyPropertyChanged
     {
-        public MarketChangedDelegate OnMarketChanged;
         public CustomTabHeader customHeader = null;
         public MainWindow mainWindow { get; set; }
-
-        public MarketSelectionDelegate OnMarketSelected;
         public Market MarketNode = null;
         public string MarketName { get { return MarketNode?.MarketName; } }
-        public string OverlayStatus { get {
+        public string OverlayStatus
+        {
+            get
+            {
                 if (MainWindow.Betfair.ConnectionLost)
                     return "Connection Lost";
 
-                return MarketNode?.Status.ToString(); 
-            } }
-        public System.Windows.Visibility OverlayVisibility { get {
+                return MarketNode?.Status.ToString();
+            }
+        }
+        public System.Windows.Visibility OverlayVisibility
+        {
+            get
+            {
                 if (MainWindow.Betfair.ConnectionLost)
                     return System.Windows.Visibility.Visible;
 
-                return MarketNode == null || MarketNode?.Status == marketStatusEnum.OPEN ? System.Windows.Visibility.Hidden : System.Windows.Visibility.Visible;  
-            }  }
-        public Double? TotalMatched { get { return MarketNode?.TotalMatched;  }  }
+                return MarketNode == null || MarketNode?.Status == marketStatusEnum.OPEN ? System.Windows.Visibility.Hidden : System.Windows.Visibility.Visible;
+            }
+        }
+        public Double? TotalMatched { get { return MarketNode?.TotalMatched; } }
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(String info)
         {
@@ -44,42 +48,16 @@ namespace SpreadTrader
             customHeader = header;
             InitializeComponent();
             ControlMessenger.MessageSent += OnMessageReceived;
-
-            //OnMarketChanged += (node) => 
-            //         {
-            //             NotifyPropertyChanged("");
-            //             marketHeader.NotifyPropertyChanged("");
-            //         };
-
-            //oBettingGrid.sliderControl = SliderControl;
-
-            //BetsManager.RunnersControl = RunnersControl;
-            //SliderControl.OnSubmitBets += BetsManager.OnSubmitBets;
-            //RunnersControl.OnMarketChanged += OnMarketChanged;
-            //RunnersControl.OnFavoriteChanged += BetsManager.OnFavoriteChanged;
-            //RunnersControl.OnFavoriteChanged += SliderControl.OnFavoriteChanged;
-            //OnMarketSelected += (node) =>
-            //{
-            //    RunnersControl.OnMarketSelected(node);
-            //    if (mainWindow.TabControl.SelectedContent == this)
-            //    {
-            //        MarketNode = node;
-            //        customHeader.Title = node.FullName;
-            //        marketHeader.NotifyPropertyChanged("");
-            //    }
-            //    BetsManager.OnMarketSelected(node);
-            //    oBettingGrid.OnMarketSelected(node);
-            //};
             marketHeader.TabContent = this;
         }
-		private void OnMessageReceived(string messageName, object data)
-		{
-			if (messageName == "Market Selected")
-			{
-				dynamic d = data;
-				Debug.WriteLine($"TabContent: {d.Name}");
-				customHeader.Title = d.Name;
-			}
-		}
-	}
+        private void OnMessageReceived(string messageName, object data)
+        {
+            if (messageName == "Market Selected")
+            {
+                dynamic d = data;
+                Debug.WriteLine($"TabContent: {d.Name}");
+                customHeader.Title = d.Name;
+            }
+        }
+    }
 }

@@ -7,12 +7,13 @@ using System.Windows.Media;
 
 namespace SpreadTrader
 {
-    public delegate void SubmitBetsDelegate(LiveRunner runner, PriceSize[] lay, PriceSize[] back);
-
     public partial class BettingGrid : UserControl, INotifyPropertyChanged
     {
         private bool _BackActive { get; set; }
-        public bool BackActive { get { return _BackActive; } set { _BackActive = value; if (BackValues.Length > 0) foreach (PriceSize o in BackValues) { o.IsChecked = o.ParentChecked = value; } }
+        public bool BackActive
+        {
+            get { return _BackActive; }
+            set { _BackActive = value; if (BackValues.Length > 0) foreach (PriceSize o in BackValues) { o.IsChecked = o.ParentChecked = value; } }
         }
         private bool _LayActive { get; set; }
         public bool LayActive
@@ -29,9 +30,8 @@ namespace SpreadTrader
         }
         public PriceSize[] BackValues { get; set; }
         public PriceSize[] LayValues { get; set; }
-        public Market MarketNode { get; set; }
-        public MarketSelectionDelegate OnMarketSelected;
-        public SliderControl sliderControl { get; set; }
+        //public Market MarketNode { get; set; }
+        //public SliderControl sliderControl { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(String info)
         {
@@ -40,20 +40,25 @@ namespace SpreadTrader
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
         }
-		private void OnMessageReceived(string messageName, object data)
-		{
-			if (messageName == "Market Selected")
-			{
-				dynamic d = data;
-				Debug.WriteLine($"BettingGrid: {d.Name}");
-			}
-		}
-
-		public BettingGrid()
+        private void OnMessageReceived(string messageName, object data)
         {
-			InitializeComponent();
-			ControlMessenger.MessageSent += OnMessageReceived;
-			
+            if (messageName == "Market Selected")
+            {
+                dynamic d = data;
+                Debug.WriteLine($"BettingGrid: {d.Name}");
+            }
+            if (messageName == "Execute Bets")
+            {
+                dynamic d = data;
+                Debug.WriteLine($"BettingGrid: {messageName}");
+            }
+        }
+
+        public BettingGrid()
+        {
+            InitializeComponent();
+            ControlMessenger.MessageSent += OnMessageReceived;
+
             BetfairPrices betfairPrices = new BetfairPrices();
             BackValues = new PriceSize[9];
             LayValues = new PriceSize[9];
@@ -69,19 +74,7 @@ namespace SpreadTrader
             for (int i = 3; i < 6; i++) LayValues[i].Color = Application.Current.FindResource("Lay1Color") as SolidColorBrush;
             for (int i = 6; i < 9; i++) LayValues[i].Color = Application.Current.FindResource("Lay2Color") as SolidColorBrush;
 
-            OnMarketSelected += (node) =>
-            {
-                if (IsLoaded)
-                {
-                    MarketNode = node;
-
-                    BackValues = sliderControl.BackValues;
-                    LayValues = sliderControl.LayValues;
-                    NotifyPropertyChanged("");
-				}
-            };
-
-			BackActive = LayActive = true;
+            BackActive = LayActive = true;
         }
     }
 }

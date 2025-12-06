@@ -89,14 +89,14 @@ namespace SpreadTrader
         }
         public double Previous(double v)
         {
-            double retval = BetfairPrice(v-0.01, MatchTypeEnum.Lower);
+            double retval = BetfairPrice(v - 0.01, MatchTypeEnum.Lower);
             return retval;
             //if (v <= 1.01) return 1.01;
             //return (double)AllPrices[Index(v) - 1];
         }
         public double Next(double v)
         {
-            double retval = BetfairPrice(v+0.01, MatchTypeEnum.Higher);
+            double retval = BetfairPrice(v + 0.01, MatchTypeEnum.Higher);
             return retval;
             //if (v >= 1000) return 1000;
             //return (double)AllPrices[Index(v) + 1];

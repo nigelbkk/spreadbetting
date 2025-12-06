@@ -1,11 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Input;
 
 namespace SpreadTrader
@@ -14,12 +12,17 @@ namespace SpreadTrader
     {
         private String SValue { get; set; }
         public double _Value { get; set; }
-        public String Value {
-            get {
-                return SValue; } 
-            set { SValue = value;
-                NotifyPropertyChanged("");             
-            } 
+        public String Value
+        {
+            get
+            {
+                return SValue;
+            }
+            set
+            {
+                SValue = value;
+                NotifyPropertyChanged("");
+            }
         }
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(String info)
@@ -61,10 +64,10 @@ namespace SpreadTrader
             RepeatButton b = sender as RepeatButton;
             switch (b.Name)
             {
-                case "Up": 
+                case "Up":
                     _Value = betfairPrices.Next(_Value);
                     break;
-                case "Down": 
+                case "Down":
                     _Value = betfairPrices.Previous(_Value);
                     break;
                 default: return;
@@ -79,7 +82,7 @@ namespace SpreadTrader
             switch (e.Key)
             {
                 case Key.Up: _Value = betfairPrices.Next(_Value); break;
-                case Key.Down:  _Value = betfairPrices.Previous(_Value);break;
+                case Key.Down: _Value = betfairPrices.Previous(_Value); break;
                 default: return;
             }
             SValue = _Value.ToString();
