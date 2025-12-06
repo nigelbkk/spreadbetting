@@ -273,7 +273,6 @@ namespace SpreadTrader
 			timer.Enabled = true;
 			timer.Start();
 
-
 			hubConnection = new HubConnection("http://" + props.StreamUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
@@ -290,19 +289,6 @@ namespace SpreadTrader
 					}
 				}
 			});
-
-			//StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
-			//{
-			//	try
-			//	{
-			//		StreamActive = true;
-			//		timer.Start();
-			//	}
-			//	catch (Exception ex)
-			//	{
-			//		Debug.WriteLine(ex);
-			//	}
-			//};
 
 			Rows = new ObservableCollection<Row>();
 			InitializeComponent();
@@ -371,7 +357,6 @@ namespace SpreadTrader
 					//Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
 				});
 				t.Start();
-
 			};
 
 			OnFavoriteChanged += (runner) =>

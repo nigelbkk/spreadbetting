@@ -22,7 +22,6 @@ namespace SpreadTrader
         public double TurnaroundTime { get { return MarketNode == null ? 0 : MarketNode.TurnaroundTime; } }
         public Int32 UpdateRate { get { return MarketNode == null ? 0 : MarketNode.UpdateRate; } }
         public Double? TotalMatched { get { return MarketNode == null ? 0 : MarketNode.TotalMatched; } }
-        
         public Visibility up_visible { get; set; }
 		public SolidColorBrush TimeToGoColor { get { return System.Windows.Media.Brushes.Yellow;  } }
 
@@ -36,9 +35,19 @@ namespace SpreadTrader
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
         }
-        public MarketHeader()
+		//private void OnMessageReceived(string messageName, object data)
+		//{
+		//	if (messageName == "Market Selected")
+		//	{
+		//		dynamic d = data;
+		//		Debug.WriteLine($"MarketHeader: {d.Name}");
+		//	}
+		//}
+		public MarketHeader()
         {
             InitializeComponent();
+			//ControlMessenger.MessageSent += OnMessageReceived;
+
             up_visible = Visibility.Visible;
             down_visible = Visibility.Collapsed;
             timer.Elapsed += (o, e) =>

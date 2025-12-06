@@ -16,19 +16,16 @@ namespace SpreadTrader
     public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, bool inplay);
     public partial class RunnersControl : UserControl, INotifyPropertyChanged
     {
-        public BetsManager betsManager = null;
-        public MarketSelectionDelegate OnMarketSelected;
-        public StreamUpdateDelegate StreamUpdateEventSink = null;
-        public FavoriteChangedDelegate OnFavoriteChanged = null;
-        public MarketChangedDelegate OnMarketChanged = null;
+        //public BetsManager betsManager = null;
+        //public MarketSelectionDelegate OnMarketSelected;
+        //public StreamUpdateDelegate StreamUpdateEventSink = null;
+        //public FavoriteChangedDelegate OnFavoriteChanged = null;
+        //public MarketChangedDelegate OnMarketChanged = null;
 
-        //private StreamingAPI streamingAPI = new StreamingAPI();
-        private BackgroundWorker Worker = null;
-        public Market _MarketNode { get; set; }
-        public Market MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
+		public Market MarketNode { get; set; }
         public double BackBook { get { return MarketNode == null ? 0.00 : MarketNode.BackBook; } }
         public double LayBook { get { return MarketNode == null ? 0.00 : MarketNode.LayBook;  } }
-        public List<LiveRunner> LiveRunners { get; set; }
+        public List<LiveRunner> LiveRunners { get { return MarketNode?.LiveRunners ?? new List<LiveRunner>(); } }
         private Properties.Settings props = Properties.Settings.Default;
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(String info)
@@ -64,12 +61,11 @@ namespace SpreadTrader
 				}
 			}
 		}
-
         private async Task PopulateNewMarket(Market node)
         {
-
-        }
-
+            MarketNode = node;
+			NotifyPropertyChanged("");
+		}
 		private void OnMessageReceived(string messageName, object data)
 		{
 			if (messageName == "Market Selected")
@@ -81,98 +77,8 @@ namespace SpreadTrader
 		}
 		public RunnersControl()
         {
-            LiveRunners = new List<LiveRunner>();
             InitializeComponent();
 			ControlMessenger.MessageSent += OnMessageReceived;
-
-			OnMarketSelected += (node) =>
-            {
-                if (IsLoaded)
-                {
-                    MarketNode = node;
-                    try
-                    {
-						ControlMessenger.Send("UserSelected", new { UserId = 123, Name = "John" });
-					}
-                    catch (Exception xe)
-                    {
-                        Debug.WriteLine(xe.Message);
-                        Extensions.MainWindow.Status = xe.Message;
-                    }
-                }
-            };
-
-            Worker = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
-            Worker.ProgressChanged += (o, e) =>
-            {
-                //List<LiveRunner> NewRunners = e.UserState as List<LiveRunner>;
-
-                //if (NewRunners != null)
-                //{
-                //    if (LiveRunners.Count != NewRunners.Count)
-                //    {
-                //        LiveRunners = NewRunners;
-                //    }
-                //    if (LiveRunners.Count > 0) foreach (LiveRunner lr in LiveRunners)
-                //        {
-                //            for (int i = 0; i < 3; i++)
-                //            {
-                //                lr.BackValues[i] = new PriceSize();
-                //                lr.LayValues[i] = new PriceSize();
-                //            }
-                //        }
-                //    for (int i = 0; i < LiveRunners.Count; i++)
-                //    {
-                //        if (NewRunners[i].ngrunner != null)
-                //        {
-                //            LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
-                //            LiveRunners[i].LevelProfit = NewRunners[i].LevelProfit;
-                //            LiveRunners[i].LevelStake = NewRunners[i].LevelStake;
-                //            LiveRunners[i].LevelSide = NewRunners[i].LevelSide;
-                //            LiveRunners[i].NotifyPropertyChanged("");
-                //        }
-                //    }
-                //    MarketNode.UpdateRate = e.ProgressPercentage;
-                //    NotifyPropertyChanged("");
-                //}
-            };
-            Worker.DoWork += (o, ea) =>
-            {
-                BackgroundWorker sender = o as BackgroundWorker;
-                while (!sender.CancellationPending)
-                {
-                    try
-                    {
-                        //if (MarketNode != null)
-                        //{
-                        //    //var runners = streamingAPI.LiveRunners;
-                        //    DateTime LastUpdate = DateTime.UtcNow;
-                        //    var lr = MarketNode.GetLiveRunners();
-                        //    UpdateMarketStatus();
-
-                        //    if (OnMarketChanged != null)
-                        //    {
-                        //        OnMarketChanged(MarketNode);
-                        //    }
-                        //    NotifyPropertyChanged("");
-                        //    Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-                        //    sender.ReportProgress(rate, lr);
-                        //    if (stop_async)
-                        //        break;
-                        //}
-                    }
-                    catch (Exception xe)
-                    {
-                        Debug.WriteLine(xe.Message);
-                        Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            Extensions.MainWindow.Status = xe.Message;
-                        }));
-                    }
-                    System.Threading.Thread.Sleep(props.WaitBF);
-                }
-            };
-            Worker.RunWorkerAsync();
         }
         public String GetRunnerName(Int64 SelectionID)
         {
@@ -183,7 +89,6 @@ namespace SpreadTrader
                 }
             return null;
         }
-        //bool stop_async = false;
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
@@ -239,10 +144,10 @@ namespace SpreadTrader
             if (LiveRunner.Favorite != null) LiveRunner.Favorite.IsFavorite = false;
             LiveRunner.Favorite = cp.Content as LiveRunner;
             LiveRunner.Favorite.IsFavorite = true;
-            if (OnFavoriteChanged != null)
-            {
-                OnFavoriteChanged(LiveRunner.Favorite);
-            }
+            //if (OnFavoriteChanged != null)
+            //{
+            //    OnFavoriteChanged(LiveRunner.Favorite);
+            //}
         }
         private void LevelProfitMouseDown(object sender, MouseButtonEventArgs e)
         {

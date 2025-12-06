@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Controls;
+using System.Xml.Linq;
 
 namespace SpreadTrader
 {
@@ -42,33 +43,43 @@ namespace SpreadTrader
         {
             customHeader = header;
             InitializeComponent();
+            ControlMessenger.MessageSent += OnMessageReceived;
 
-            OnMarketChanged += (node) => 
-            {
-                NotifyPropertyChanged("");
-                marketHeader.NotifyPropertyChanged("");
-            };
+            //OnMarketChanged += (node) => 
+            //         {
+            //             NotifyPropertyChanged("");
+            //             marketHeader.NotifyPropertyChanged("");
+            //         };
 
-            oBettingGrid.sliderControl = SliderControl;
+            //oBettingGrid.sliderControl = SliderControl;
 
-            BetsManager.RunnersControl = RunnersControl;
-            SliderControl.OnSubmitBets += BetsManager.OnSubmitBets;
-            RunnersControl.OnMarketChanged += OnMarketChanged;
-            RunnersControl.OnFavoriteChanged += BetsManager.OnFavoriteChanged;
-            RunnersControl.OnFavoriteChanged += SliderControl.OnFavoriteChanged;
-            OnMarketSelected += (node) =>
-            {
-                RunnersControl.OnMarketSelected(node);
-                if (mainWindow.TabControl.SelectedContent == this)
-                {
-                    MarketNode = node;
-                    customHeader.Title = node.FullName;
-                    marketHeader.NotifyPropertyChanged("");
-                }
-                BetsManager.OnMarketSelected(node);
-                oBettingGrid.OnMarketSelected(node);
-            };
-            marketHeader.TabContent = this;
+            //BetsManager.RunnersControl = RunnersControl;
+            //SliderControl.OnSubmitBets += BetsManager.OnSubmitBets;
+            //RunnersControl.OnMarketChanged += OnMarketChanged;
+            //RunnersControl.OnFavoriteChanged += BetsManager.OnFavoriteChanged;
+            //RunnersControl.OnFavoriteChanged += SliderControl.OnFavoriteChanged;
+            //OnMarketSelected += (node) =>
+            //{
+            //    RunnersControl.OnMarketSelected(node);
+            //    if (mainWindow.TabControl.SelectedContent == this)
+            //    {
+            //        MarketNode = node;
+            //        customHeader.Title = node.FullName;
+            //        marketHeader.NotifyPropertyChanged("");
+            //    }
+            //    BetsManager.OnMarketSelected(node);
+            //    oBettingGrid.OnMarketSelected(node);
+            //};
+            //marketHeader.TabContent = this;
         }
-    }
+		private void OnMessageReceived(string messageName, object data)
+		{
+			if (messageName == "Market Selected")
+			{
+				dynamic d = data;
+				Debug.WriteLine($"TabContent: {d.Name}");
+				customHeader.Title = d.Name;
+			}
+		}
+	}
 }
