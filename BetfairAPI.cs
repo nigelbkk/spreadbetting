@@ -442,8 +442,10 @@ namespace BetfairAPI
 			return RPCRequest<PlaceExecutionReport>("placeOrders", p) as PlaceExecutionReport;
 		}
 
-		public CancelExecutionReport cancelOrders(String marketId, List<CancelInstruction> instructions)
+		public CancelExecutionReport  cancelOrders(String marketId, List<CancelInstruction> instructions)
 		{
+			CancelExecutionReport new_report = new CancelExecutionReport();
+			new_report.statuses = new List<Tuple<ulong, string>>();
 			foreach (CancelInstruction ci in instructions)
 			{
 				Dictionary<String, Object> p = new Dictionary<string, object>();
@@ -451,8 +453,9 @@ namespace BetfairAPI
 				List<CancelInstruction> new_list = new List<CancelInstruction>();
 				new_list.Add(ci); p["instructions"] = new_list;
 				CancelExecutionReport report = RPCRequest<CancelExecutionReport>("cancelOrders", p) as CancelExecutionReport;
+				new_report.statuses.Add(new Tuple<ulong, string>(ci.betId, report.status));
 			}
-			return new CancelExecutionReport();
+			return new_report;
 		}
 		//public CancelExecutionReport cancelOrders(String marketId, List<CancelInstruction> instructions)
 		//{

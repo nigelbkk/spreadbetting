@@ -905,6 +905,7 @@ namespace BetfairAPI
         public String status { get; set; }
         public String errorCode { get; set; }
         public String marketId { get; set; }
+        public List<Tuple<UInt64, String>> statuses { get; set; }
     }
     public class CancelInstruction
     {

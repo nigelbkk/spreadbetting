@@ -246,6 +246,62 @@ namespace SpreadTrader
 				System.Threading.Thread.Sleep(10);
 			}
 		}
+		private async Task AttemptReconnectAsync()
+		{
+			while (true)
+			{
+				try
+				{
+					Debug.WriteLine("[SignalR] Trying reconnect...");
+					await hubConnection.Start();
+					Debug.WriteLine("[SignalR] Reconnected successfully.");
+					return;
+				}
+				catch
+				{
+					Debug.WriteLine("[SignalR] Reconnect failed, retry in 2 sec...");
+					await Task.Delay(2000);
+				}
+			}
+		}
+
+		private async void StartSignalRHub()
+		{
+			hubConnection = new HubConnection("http://" + props.StreamUrl);
+			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
+
+			// Attach Closed BEFORE Start()
+			hubConnection.Closed += async () =>
+			{
+				Debug.WriteLine("[SignalR] Connection closed — reconnecting...");
+
+				while (true)
+				{
+					try
+					{
+						await hubConnection.Start();
+						Debug.WriteLine("[SignalR] Reconnected!");
+						break; // success
+					}
+					catch
+					{
+						Debug.WriteLine("[SignalR] Retry in 3s...");
+						await Task.Delay(3000);
+					}
+				}
+			};
+
+			try
+			{
+				await hubConnection.Start();
+				Debug.WriteLine("[SignalR] Connected.");
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine("[SignalR] Initial connect failed: " + ex.Message);
+			}
+		}
+
 		public BetsManager()
 		{
 			BackgroundWorker bw = new BackgroundWorker();
@@ -273,9 +329,28 @@ namespace SpreadTrader
 			timer.Enabled = true;
 			timer.Start();
 
-
 			hubConnection = new HubConnection("http://" + props.StreamUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
+
+			hubConnection.Reconnecting += () =>
+			{
+				Debug.WriteLine("[SignalR] Reconnecting...");
+				Connect();
+			};
+
+			hubConnection.Reconnected += () =>
+			{
+				Debug.WriteLine("[SignalR] Reconnected!");
+				Connect();
+			};
+
+			hubConnection.Closed += () =>
+			{
+				Debug.WriteLine("[SignalR] Closed — manual reconnect required.");
+				Connect();
+				//StartSignalRHub();
+			};
+
 
 			hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
 			{
@@ -290,22 +365,6 @@ namespace SpreadTrader
 					}
 				}
 			});
-
-			hubConnection.Closed += async () =>
-			{
-				Debug.WriteLine("[SignalR] Lost connection, retrying...");
-				await Task.Delay(1000);
-
-				try
-				{
-					await hubConnection.Start();
-					Debug.WriteLine("[SignalR] Reconnected.");
-				}
-				catch (Exception ex)
-				{
-					Debug.WriteLine("[SignalR] Reconnect failed: " + ex.Message);
-				}
-			};
 
 			//await hubConnection.Start();
 
@@ -410,6 +469,11 @@ namespace SpreadTrader
 			Connect();
 		}
 
+		~BetsManager()
+		{
+			hubConnection?.Dispose();
+			hubConnection?.Stop();
+		}
 		private object lockObj = new object();
 		private void NotifyBetMatched()
 		{
@@ -835,10 +899,7 @@ namespace SpreadTrader
 						break;
 
 					case "Reset":
-						MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
-						json_rows = File.ReadAllLines(".\\notifications.json");
-						json_index = 0;
-						Rows.Clear();
+						hubConnection.Stop();
 						break;
 					case "Run":
 						MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
@@ -905,18 +966,14 @@ namespace SpreadTrader
 									else
 									{
 										Notification = $"Cancelling {cancel_instructions.Count} bets";
-										CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+										CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
 
-										if (cancel_report.status != "SUCCESS")
+										foreach (Tuple<UInt64, String>  _report in report.statuses)
 										{
-											Status = cancel_report.errorCode;
-										}
-										else
-										{
-											Status = cancel_report.status;
+											Debug.WriteLine(_report.Item1, _report.Item2);
 										}
 									}
-									//Status = "Cancellation Task completed";
+									Status = $"Cancellation Task completed";
 								});
 							}
 							catch(Exception xxe)
