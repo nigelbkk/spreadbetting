@@ -291,6 +291,24 @@ namespace SpreadTrader
 				}
 			});
 
+			hubConnection.Closed += async () =>
+			{
+				Debug.WriteLine("[SignalR] Lost connection, retrying...");
+				await Task.Delay(1000);
+
+				try
+				{
+					await hubConnection.Start();
+					Debug.WriteLine("[SignalR] Reconnected.");
+				}
+				catch (Exception ex)
+				{
+					Debug.WriteLine("[SignalR] Reconnect failed: " + ex.Message);
+				}
+			};
+
+			//await hubConnection.Start();
+
 			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
 			{
 				try
@@ -613,6 +631,13 @@ namespace SpreadTrader
 				Debug.WriteLine("null context");
 			}
 		}
+		
+		/// <summary>
+		/// HUB stuff ///////////////////////////////////
+		/// </summary>
+		
+
+
 		private void Connect()
 		{
 			String result = "";
