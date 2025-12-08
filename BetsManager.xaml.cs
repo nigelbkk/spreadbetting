@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Media;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -732,6 +733,12 @@ namespace SpreadTrader
 			}
 			return task.IsFaulted;
 		}
+		private async void RequestCapture()
+		{
+			var client = new HttpClient();
+			string response = await client.GetStringAsync("http://88.202.230.157:8088/api/market/capture");
+			Debug.WriteLine(response);
+		}
 		private Int32 newbetid = 44448880;
 		private double amount_remaining = 0;
 		private String newbet(LiveRunner lr, Order.SideEnum side)
@@ -898,8 +905,8 @@ namespace SpreadTrader
 						}
 						break;
 
-					case "Reset":
-						hubConnection.Stop();
+					case "Capture":
+						RequestCapture();
 						break;
 					case "Run":
 						MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
