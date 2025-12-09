@@ -266,45 +266,47 @@ namespace SpreadTrader
 			}
 		}
 
-		private async void StartSignalRHub()
-		{
-			hubConnection = new HubConnection("http://" + props.StreamUrl);
-			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
+		//private async void StartSignalRHub()
+		//{
+		//	hubConnection = new HubConnection("http://" + props.StreamUrl);
+		//	hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
-			// Attach Closed BEFORE Start()
-			hubConnection.Closed += async () =>
-			{
-				Debug.WriteLine("[SignalR] Connection closed — reconnecting...");
+		//	// Attach Closed BEFORE Start()
+		//	hubConnection.Closed += async () =>
+		//	{
+		//		Debug.WriteLine("[SignalR] Connection closed — reconnecting...");
 
-				while (true)
-				{
-					try
-					{
-						await hubConnection.Start();
-						Debug.WriteLine("[SignalR] Reconnected!");
-						break; // success
-					}
-					catch
-					{
-						Debug.WriteLine("[SignalR] Retry in 3s...");
-						await Task.Delay(3000);
-					}
-				}
-			};
+		//		while (true)
+		//		{
+		//			try
+		//			{
+		//				await hubConnection.Start();
+		//				Debug.WriteLine("[SignalR] Reconnected!");
+		//				break; // success
+		//			}
+		//			catch
+		//			{
+		//				Debug.WriteLine("[SignalR] Retry in 3s...");
+		//				await Task.Delay(3000);
+		//			}
+		//		}
+		//	};
 
-			try
-			{
-				await hubConnection.Start();
-				Debug.WriteLine("[SignalR] Connected.");
-			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine("[SignalR] Initial connect failed: " + ex.Message);
-			}
-		}
+		//	try
+		//	{
+		//		await hubConnection.Start();
+		//		Debug.WriteLine("[SignalR] Connected.");
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		Debug.WriteLine("[SignalR] Initial connect failed: " + ex.Message);
+		//	}
+		//}
 
 		public BetsManager()
 		{
+
+			///////  never used //////////////
 			BackgroundWorker bw = new BackgroundWorker();
 			bw.DoWork += (o, e) => ProcessIncomingNotifications(o);
 			bw.RunWorkerAsync();
@@ -312,7 +314,6 @@ namespace SpreadTrader
 			BackgroundWorker bw2 = new BackgroundWorker();
 			bw2.DoWork += (o, e) => ProcessCancellationQueue(o);
 			bw2.RunWorkerAsync();
-
 
 			// REVIEW!!
 			timer.Elapsed += (o, e) =>
@@ -908,6 +909,9 @@ namespace SpreadTrader
 					case "Capture":
 						RequestCapture();
 						break;
+					case "Fail":
+						Betfair.cancelOrder(MarketNode.MarketID, 42, 0);
+						break;
 					case "Run":
 						MarketNode = new NodeViewModel("json") { MarketID = "1.448881" };
 						json_rows = File.ReadAllLines(".\\notifications.json");
@@ -1014,31 +1018,15 @@ namespace SpreadTrader
                                 }
                                 else
                                 {
-                                    CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-
-                                    if (cancel_report.status != "SUCCESS")
-                                    {
-                                        Status = cancel_report.status;
-                                    }
+                                    CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+									foreach (Tuple<UInt64, String> _report in report.statuses)
+									{
+										Debug.WriteLine(_report.Item1, _report.Item2);
+									}
+									Status = $"Cancellation Task completed";
                                 }
                             });
                         }
-
-
-
-                        //BackgroundWorker bw = new BackgroundWorker();
-                        //String result = "";
-                        //bw.RunWorkerCompleted += (o, e2) => { Status = result; };
-                        //bw.DoWork += (o, e2) =>
-                        //{
-                        //	if (MarketNode != null)
-                        //	{
-                        //		CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, null);
-                        //		if (report != null)
-                        //			result = report.errorCode != null ? report.errorCode : report.status;
-                        //	}
-                        //};
-                        //bw.RunWorkerAsync();
                         break;
 				}
 			}

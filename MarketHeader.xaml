@@ -55,7 +55,8 @@
 						<TextBlock Text="{Binding TotalMatched, Mode=OneWay, Converter={StaticResource cconverter}}"/>
 					</StackPanel>
 				</Label>
-				<Label Grid.Column="5" Content="{Binding Path=TimeToGo}" Foreground="{Binding Path=TimeToGoColor}" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"></Label>
+				<Label Grid.Column="5" Content="{Binding Path=TimeToGo}" Foreground="DarkGray" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"></Label>
+				<!--<Label Grid.Column="5" Content="{Binding Path=TimeToGo}" Foreground="{Binding Path=TimeToGoColor}" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"></Label>-->
 				<Label Grid.Column="6" Padding="6,0,10,0"  HorizontalAlignment="Right">
 					<StackPanel Orientation="Horizontal">
 						<TextBox Text="Streaming" Background="{Binding Path=StreamingColor}" Margin="10,0" Padding="6,0,7,2" Height="28"/>
