@@ -374,6 +374,7 @@ namespace SpreadTrader
 				OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json3);
 				if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
 				{
+					Debug.WriteLine($"marketChanged: {MarketNode.FullName}");
 					//lock (incomingOrdersQueue)
 					//{
 					//	Debug.WriteLine("Add to queue");
@@ -481,9 +482,26 @@ namespace SpreadTrader
 					Extensions.MainWindow.Commission = MarketNode.Commission;
 					PopulateDataGrid();
 					Debug.WriteLine($"Selected: {MarketNode.Name} : {MarketNode.MarketID}");
+					RequestMarketSelected(MarketNode.MarketID);
 				}
 			};
 			Connect();
+		}
+		private async void RequestMarketSelected(String marketid)
+		{
+			var http = new HttpClient();
+			var url = $"{props.StreamUrl}/api/market/subscribe";
+			var payload = new { MarketId = marketid, };
+			string json = JsonConvert.SerializeObject(payload);
+			var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+			HttpResponseMessage response = await http.PostAsync(url, content);
+			string responseString = await response.Content.ReadAsStringAsync();
+			Console.WriteLine(responseString);
+
+			//var client = new HttpClient();
+			//string response = await client.GetStringAsync("http://88.202.230.157:8088/api/market/subscribe");
+			//Debug.WriteLine(response);
 		}
 
 		~BetsManager()
