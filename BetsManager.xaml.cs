@@ -202,7 +202,7 @@ namespace SpreadTrader
 				{
 					try
 					{
-						Debug.WriteLine("Fetch from queue");
+						//Debug.WriteLine("Fetch from queue");
 						//                        lock (incomingOrdersQueue){}
 						String json = incomingOrdersQueue.Dequeue();
 						OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
@@ -229,7 +229,7 @@ namespace SpreadTrader
 						{
 							UInt64 betid = cancellation_queue.Dequeue();
 
-							Debug.WriteLine("submit cancel {0}", betid);
+							//Debug.WriteLine("submit cancel {0}", betid);
 							CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid, null);
 							if (report.errorCode == null)
 							{
@@ -368,6 +368,20 @@ namespace SpreadTrader
 				}
 			});
 
+			hubProxy.On<string, string, string>("marketChanged", (json1, json2, json3) =>
+			{
+				OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
+				OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json3);
+				if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
+				{
+					//lock (incomingOrdersQueue)
+					//{
+					//	Debug.WriteLine("Add to queue");
+					//	incomingOrdersQueue.Enqueue(json1);
+					//}
+				}
+			});
+
 			//await hubConnection.Start();
 
 			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
@@ -466,6 +480,7 @@ namespace SpreadTrader
 					MarketNode = node;
 					Extensions.MainWindow.Commission = MarketNode.Commission;
 					PopulateDataGrid();
+					Debug.WriteLine($"Selected: {MarketNode.Name} : {MarketNode.MarketID}");
 				}
 			};
 			Connect();
@@ -506,7 +521,7 @@ namespace SpreadTrader
 				if (String.IsNullOrEmpty(json))
 					return;
 
-				Debug.WriteLine(json);
+				//Debug.WriteLine(json);
 
 				OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
 
@@ -610,7 +625,7 @@ namespace SpreadTrader
 											Debug.WriteLine(o.Id, "Bet fully cancelled: ");
 											to_remove.Add(row);
 										}
-										Debug.WriteLine(o.Id, "cancelled: ");
+										//Debug.WriteLine(o.Id, "cancelled: ");
 										//										NotifyBetMatched();
 									}
 								}
@@ -620,7 +635,7 @@ namespace SpreadTrader
 									{
 										if (Rows.Contains(o))
 										{
-											Debug.WriteLine("Remove from grid: " + o.BetID.ToString());
+											//Debug.WriteLine("Remove from grid: " + o.BetID.ToString());
 											Rows.Remove(o);
 										}
 									}));
