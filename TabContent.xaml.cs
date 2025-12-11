@@ -58,7 +58,10 @@ namespace SpreadTrader
             RunnersControl.OnFavoriteChanged += SliderControl.OnFavoriteChanged;
             OnMarketSelected += (node) =>
             {
-                RunnersControl.OnMarketSelected(node);
+                if (RunnersControl.OnMarketSelected != null)
+                {
+                    RunnersControl.OnMarketSelected(node);
+                }
                 if (mainWindow.TabControl.SelectedContent == this)
                 {
                     MarketNode = node;

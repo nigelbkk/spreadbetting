@@ -96,6 +96,11 @@ namespace SpreadTrader
 		}
 
 		private Mutex mutex = null;
+		public static bool IsDevMachine()
+		{
+			string machineName = Environment.MachineName.ToLower();
+			return machineName == "desktop-vsermig";
+		}
 		public MainWindow()
 		{
 			const string appName = "SpreadTrader";
@@ -122,8 +127,11 @@ namespace SpreadTrader
 			Betfair = new BetfairAPI.BetfairAPI();
 			try
 			{
-                Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
-                if (!props.UseProxy)
+				if (!IsDevMachine())
+				{
+					Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
+				}
+				if (!props.UseProxy)
 				{
 				//	Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
 
