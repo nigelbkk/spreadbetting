@@ -128,7 +128,7 @@ namespace BetfairAPI
 					ConnectionLost = true;
 
 					MessageBoxResult Result = MessageBoxResult.Yes;// MessageBox.Show("Press Yes to try and reconnect\nCancel to ignore it\nNo to exit the application", "The connection to Betfair was closed", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-					switch(Result)
+					switch (Result)
 					{
 						case MessageBoxResult.Yes:
 							if (!String.IsNullOrEmpty(password))
@@ -505,7 +505,7 @@ namespace BetfairAPI
 			}
 		}
 
-		public CancelExecutionReport  cancelOrders(String marketId, List<CancelInstruction> instructions)
+		public CancelExecutionReport cancelOrders(String marketId, List<CancelInstruction> instructions)
 		{
 			CancelExecutionReport new_report = new CancelExecutionReport();
 			new_report.statuses = new List<Tuple<ulong, string>>();

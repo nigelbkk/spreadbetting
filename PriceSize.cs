@@ -1,11 +1,40 @@
 ﻿using System;
+using System.Windows;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Media;
-
 public class PriceSize : INotifyPropertyChanged
 {
-    public PriceSize(double price, double size) { this.price = price; this.size = size; IsChecked = true; }
-    public PriceSize() { IsChecked = true; }
+
+    static List<Brush> BackgroundColors = new List<Brush>
+    {
+        (Brush) Application.Current.Resources["Back0Color"],
+        (Brush) Application.Current.Resources["Back1Color"],
+        (Brush) Application.Current.Resources["Back2Color"],
+        (Brush) Application.Current.Resources["Lay0Color"],
+        (Brush) Application.Current.Resources["Lay1Color"],
+        (Brush) Application.Current.Resources["Lay2Color"]
+    };
+
+    public PriceSize(double price, double size)
+    {
+        Index = 0;
+        CellBackgroundColor = BackgroundColors[Index];
+        this.price = price; this.size = size; IsChecked = true;
+    }
+    public PriceSize(int index, double price, double size)
+    {
+        Index = index;
+        CellBackgroundColor = BackgroundColors[index];
+        this.price = price; this.size = size; IsChecked = true;
+    }
+    public PriceSize(int index)
+    {
+        IsChecked = true;
+        Index = index;
+        CellBackgroundColor = BackgroundColors[index];
+    }
+    private int Index { get; set; }
     private bool _IsChecked { get; set; }
     private bool _ParentChecked { get; set; }
     public bool ParentChecked { get { return _ParentChecked; } set { _ParentChecked = value; NotifyPropertyChanged(""); } }
@@ -16,7 +45,7 @@ public class PriceSize : INotifyPropertyChanged
     public Double size { get { return _size; } set { _size = value; NotifyPropertyChanged(""); } }
     public SolidColorBrush Color { get; set; }
     public Brush CellBackgroundColor { get; set; }
-	public override string ToString()
+    public override string ToString()
     {
         return String.Format("{0:0.00}:{1:0.00}", price, size);
     }

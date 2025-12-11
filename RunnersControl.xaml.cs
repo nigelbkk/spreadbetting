@@ -8,12 +8,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Betfair.ESASwagger.Model;
 using System.Linq;
 
 namespace SpreadTrader
 {
     public delegate void MarketChangedDelegate(NodeViewModel node);
-    public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, List<Tuple<long, double>> last_traded, bool inplay);
+    public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, List<RunnerChange> last_traded, bool inplay);
+//    public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, List<Tuple<long, double?, double?>> last_traded, bool inplay);
     public partial class RunnersControl : UserControl, INotifyPropertyChanged
     {
         public BetsManager betsManager = null;
@@ -21,7 +23,6 @@ namespace SpreadTrader
         public StreamUpdateDelegate StreamUpdateEventSink = null;
         public FavoriteChangedDelegate OnFavoriteChanged = null;
         public MarketChangedDelegate OnMarketChanged = null;
-
         private StreamingAPI streamingAPI = new StreamingAPI();
         private BackgroundWorker Worker = null;
         public NodeViewModel _MarketNode { get; set; }
@@ -46,227 +47,316 @@ namespace SpreadTrader
                 //OverlayText.Text = MarketNode.Status.ToString();
             }));
         }
+        String RunnerFromSelid(long selid)
+        {
+            foreach (var runner in LiveRunners)
+            {
+                if (runner.SelectionId == selid)
+                {
+                    return runner.Name;
+                }
+            }
+            return null;
+        }
 
-		private async Task<List<MarketProfitAndLoss>> GetProfitAndLossAsync(string marketId)
-		{
-			return await Task.Run(() =>
-			{
-				return MainWindow.Betfair.listMarketProfitAndLoss(marketId);
-			});
-		}
+        Int32? GetCellidFromPricePoint(Int32 runner_id, sideEnum side, double price)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                if (side == sideEnum.BACK)
+                    if (LiveRunners[runner_id].BackValues[i].price == price)
+                        return i;
+                if (side == sideEnum.LAY)
+                    if (LiveRunners[runner_id].LayValues[i].price == price)
+                        return i;
+            }
+            return null;
+        }
 
-		public async Task UpdateRunnerPnLAsync()
-		{
-			var plList = await GetProfitAndLossAsync(MarketNode.MarketID);
-			var pl = plList?.FirstOrDefault();
-			if (pl == null || pl.profitAndLosses == null)
-				return;
+        Tuple<int, List<Int32>, List<Int32>> GetCellIDs(RunnerChange rc)   // for a single last traded item
+        { 
+            int runner_id = 0;
+            long selid = rc.Id.Value;
+            double? price = null;
+            foreach (var runner in LiveRunners)
+            {
+                if (runner.SelectionId == selid)
+                {
+                    String runner_name = LiveRunners[runner_id].Name;
+                    List<Int32> back_ids = new List<Int32>();
+                    List<Int32> lay_ids = new List<Int32>();
+                    
+                    if (rc.Ltp == null && rc.Tv == null)
+                        return null;
+                    if (rc.Ltp == null && rc.Tv != null)
+                        price = LiveRunners[runner_id].LastPriceTraded;
+                    else
+                        price = rc.Ltp.Value;
+                    
+                    if (rc.Atb != null)
+                    {
+                        int i = 0;
+                        foreach (var atb in rc.Atb)
+                        {
+                            double? ltp = atb[0];
+                            if (price == ltp)
+                            {
+                                Int32? cell_id = GetCellidFromPricePoint(runner_id, sideEnum.BACK,  ltp.Value);
+                                if (cell_id != null)
+                                    back_ids.Add(cell_id.Value);
+                            }
+                            i++;
+                        }
+                    }
+                    if (rc.Atl != null)
+                    {
+                        int i = 0;
+                        foreach (var atl in rc.Atl)
+                        {
+                            double? ltp = atl[0];
+                            if (price == ltp)
+                            {
+                                Int32? cell_id = GetCellidFromPricePoint(runner_id, sideEnum.LAY, ltp.Value);
+                                if (cell_id != null)
+                                    lay_ids.Add(cell_id.Value);
+                            }
+                            i++;
+                        }
+                    }
+                    return new Tuple<Int32, List<Int32>, List<Int32>> (runner_id, back_ids, lay_ids);
+                }
+                runner_id++;
+            }
+            return null;
+        }
 
-			// Build lookup for speed
-			var lookup = pl.profitAndLosses.ToDictionary(x => x.selectionId);
+        void FlashTraded(List<LiveRunner> liveRunners, List<RunnerChange> Rc)
+        {
+            if (Rc == null)
+                return;
 
-			foreach (var runner in LiveRunners)
-			{
-				if (lookup.TryGetValue(runner.SelectionId, out var pnl))
-				{
-					runner.ifWin = pnl.ifWin;
-				}
-			}
-		}
-		Tuple<int, int> GetPriceID(List<LiveRunner> liveRunners, long selid, Double price)
-		{
-			int runnerid = 0;
-			foreach (var runner in liveRunners)
-			{
-				if (runner.SelectionId == selid)
-				{
-					for (int i = 0; i < 3; i++)
-					{
-						if (liveRunners[runnerid].BackValues[i].price == price)
-							return new Tuple<int, int>(runnerid, i);
-					}
-					for (int j = 0; j < 3; j++)
-					{
-						if (liveRunners[runnerid].LayValues[j].price == price)
-							return new Tuple<int, int>(runnerid, j + 3);
-					}
-				}
-				runnerid++;
-			}
-			return null;
-		}
+            try
+            {
+                foreach (var rc in Rc)
+                {
+                    if (rc.Ltp != null)
+                    {
+                    }
+                    String RunnerName = RunnerFromSelid(rc.Id.Value);
 
-		void FlashIfTraded(List<LiveRunner> liveRunners, List<Tuple<long, double>> last_traded)
-		{
-			Debug.WriteLine($"FlashIfTraded");
-			foreach (var rc in last_traded)
-			{
-				Debug.WriteLine($"last_traded: selid = {rc.Item1} : Ltp = {rc.Item2}");
-				Tuple<int, int> id = GetPriceID(LiveRunners, rc.Item1, rc.Item2);
-				if (id != null)
-				{
-					Debug.WriteLine($"selid = {rc.Item1} : Ltp = {rc.Item2} : {LiveRunners[id.Item1].Name} : price id = {id.Item2}");
-					if (id.Item2 > 2)
-						liveRunners[id.Item1].LayValues[id.Item2 - 3].CellBackgroundColor = Brushes.Yellow;
-					else
-						liveRunners[id.Item1].BackValues[id.Item2].CellBackgroundColor = Brushes.Yellow;
-				}
-			}
-		}
+                    Tuple<int, List<Int32>, List<Int32>> cell_ids = GetCellIDs(rc);
+                    if (cell_ids != null)
+                    {
+                        foreach (Int32 cell_id in cell_ids.Item2)
+                        {
+                            Debug.WriteLine($"Back: {RunnerName} : {rc.Ltp} : cell id = {cell_id}");
+                            liveRunners[cell_ids.Item1].BackValues[cell_id].CellBackgroundColor = Brushes.Yellow;
+                        }
+                        foreach (Int32 cell_id in cell_ids.Item3)
+                        {
+                            Debug.WriteLine($"Lay:  {RunnerName} : {rc.Ltp} : cell id = {cell_id}");
+                            liveRunners[cell_ids.Item1].LayValues[cell_id].CellBackgroundColor = Brushes.Yellow;
+                        }
+                        NotifyPropertyChanged("");
+                    }
+                }
 
-		public RunnersControl()
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+        }
+        private async Task<List<MarketProfitAndLoss>> GetProfitAndLossAsync(string marketId)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    return MainWindow.Betfair.listMarketProfitAndLoss(marketId);
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    return null;
+                }
+            });
+        }
+
+        public async Task UpdateRunnerPnLAsync()
+        {
+            var plList = await GetProfitAndLossAsync(MarketNode.MarketID);
+            var pl = plList?.FirstOrDefault();
+            if (pl == null || pl.profitAndLosses == null)
+                return;
+
+            // Build lookup for speed
+            var lookup = pl.profitAndLosses.ToDictionary(x => x.selectionId);
+
+            foreach (var runner in LiveRunners)
+            {
+                if (lookup.TryGetValue(runner.SelectionId, out var pnl))
+                {
+                    runner.ifWin = pnl.ifWin;
+                }
+            }
+        }
+
+        public RunnersControl()
         {
             LiveRunners = new List<LiveRunner>();
             InitializeComponent();
 
-            StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, last_traded, inplay) =>
+            StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, Rc, inplay) =>
             {
-				Debug.WriteLine("RunnersControl.Callback");
-
-				if (MarketNode != null &&  marketid == MarketNode.MarketID)
+                if (MarketNode != null && marketid == MarketNode.MarketID)
                 {
-                    FlashIfTraded(liveRunners, last_traded);
-                    double totalBack = 0;
-                    double totalLay = 0;
-                    Int32 ct = Math.Min(LiveRunners.Count, liveRunners.Count); //TOCHECK
-                    for (int i = 0; i < ct; i++)
-                    {
-                        if (liveRunners[i].BackValues[0].price > 0)
-                            totalBack += 100 / liveRunners[i].BackValues[0].price;
-                        if (liveRunners[i].LayValues[0].price > 0)
-                            totalLay += 100 / liveRunners[i].LayValues[0].price;
-                        LiveRunners[i].BackValues = liveRunners[i].BackValues;
-                        LiveRunners[i].LayValues = liveRunners[i].LayValues;
-                        LiveRunners[i].LastPriceTraded = liveRunners[i].LastPriceTraded;
-                        LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
-                        LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
-                        LiveRunners[i].NotifyPropertyChanged("");
-                    }
-                    MarketNode.LiveRunners = LiveRunners;
-                    MarketNode.CalculateLevelProfit();
-                    MarketNode.TotalMatched = tradedVolume;
-					List<Tuple<long, double>> _last_traded = last_traded;
+                    FlashTraded(liveRunners, Rc);
 
-					UpdateMarketStatus();
-                    NotifyPropertyChanged("");
-                    if (Worker.IsBusy)
-                        Worker.CancelAsync();
-                }
-				_ = UpdateRunnerPnLAsync();
-			};
-            OnMarketSelected += (node) =>
-            {
-                if (IsLoaded)
-                {
-                    MarketNode = node;
-                    try
+                    if (MarketNode != null && marketid == MarketNode.MarketID)
                     {
-                        LiveRunners = MarketNode.GetLiveRunners();
-                        //Debug.WriteLine(MarketNode.Status);
-                        if (props.UseStreaming)
+                        FlashTraded(liveRunners, Rc);
+                        double totalBack = 0;
+                        double totalLay = 0;
+                        Int32 ct = Math.Min(LiveRunners.Count, liveRunners.Count); //TOCHECK
+                        for (int i = 0; i < ct; i++)
                         {
-                            BackgroundWorker bw = new BackgroundWorker();
-                            bw.DoWork += (o, e) =>
-                            {
-                                try
-                                {
-                                    streamingAPI.Start(MarketNode.MarketID);
-                                }
-                                catch (Exception xe)
-                                {
-                                    Debug.WriteLine(xe.Message);
-                                    //Extensions.MainWindow.Status = xe.Message;
-                                }
-                            };
-                            bw.RunWorkerAsync();
-                        }
-                        else
-                        {
-                            streamingAPI.Stop();
-                        }
-                        if (!Worker.IsBusy)
-                            Worker.RunWorkerAsync();
-                    }
-                    catch (Exception xe)
-                    {
-                        Debug.WriteLine(xe.Message);
-                        Extensions.MainWindow.Status = xe.Message;
-                    }
-                }
-            };
-
-            Worker = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
-            Worker.ProgressChanged += (o, e) =>
-            {
-                List<LiveRunner> NewRunners = e.UserState as List<LiveRunner>;
-
-                if (NewRunners != null)
-                {
-                    if (LiveRunners.Count != NewRunners.Count)
-                    {
-                        LiveRunners = NewRunners;
-                    }
-                    if (LiveRunners.Count > 0) foreach (LiveRunner lr in LiveRunners)
-                        {
-                            for (int i = 0; i < 3; i++)
-                            {
-                                lr.BackValues[i] = new PriceSize();
-                                lr.LayValues[i] = new PriceSize();
-                            }
-                        }
-                    for (int i = 0; i < LiveRunners.Count; i++)
-                    {
-                        if (NewRunners[i].ngrunner != null)
-                        {
-                            LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
-                            LiveRunners[i].LevelProfit = NewRunners[i].LevelProfit;
-                            LiveRunners[i].LevelStake = NewRunners[i].LevelStake;
-                            LiveRunners[i].LevelSide = NewRunners[i].LevelSide;
+                            if (liveRunners[i].BackValues[0].price > 0)
+                                totalBack += 100 / liveRunners[i].BackValues[0].price;
+                            if (liveRunners[i].LayValues[0].price > 0)
+                                totalLay += 100 / liveRunners[i].LayValues[0].price;
+                            LiveRunners[i].BackValues = liveRunners[i].BackValues;
+                            LiveRunners[i].LayValues = liveRunners[i].LayValues;
+                            LiveRunners[i].LastPriceTraded = liveRunners[i].LastPriceTraded;
+                            LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
+                            LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
+                            LiveRunners[i].TradedVolume = liveRunners[i].TradedVolume;
                             LiveRunners[i].NotifyPropertyChanged("");
                         }
+                        MarketNode.LiveRunners = LiveRunners;
+                        MarketNode.CalculateLevelProfit();
+                        MarketNode.TotalMatched = tradedVolume;
+                        if (Worker.IsBusy)
+                            Worker.CancelAsync();
                     }
-                    MarketNode.UpdateRate = e.ProgressPercentage;
-                    NotifyPropertyChanged("");
-                }
-            };
-            Worker.DoWork += (o, ea) =>
-            {
-                BackgroundWorker sender = o as BackgroundWorker;
-                while (!sender.CancellationPending)
-                {
-                    try
-                    {
-                        if (MarketNode != null)
-                        {
-                            //var runners = streamingAPI.LiveRunners;
-                            DateTime LastUpdate = DateTime.UtcNow;
-                            var lr = MarketNode.GetLiveRunners();
-                            UpdateMarketStatus();
+                    _ = UpdateRunnerPnLAsync();
 
-                            if (OnMarketChanged != null)
+                };
+                OnMarketSelected += (node) =>
+                {
+                    if (IsLoaded)
+                    {
+                        MarketNode = node;
+                        try
+                        {
+                            LiveRunners = MarketNode.GetLiveRunners();
+                            //Debug.WriteLine(MarketNode.Status);
+                            if (props.UseStreaming)
                             {
-                                OnMarketChanged(MarketNode);
+                                BackgroundWorker bw = new BackgroundWorker();
+                                bw.DoWork += (o, e) =>
+                                {
+                                    try
+                                    {
+                                        streamingAPI.Start(MarketNode.MarketID);
+                                    }
+                                    catch (Exception xe)
+                                    {
+                                        Debug.WriteLine(xe.Message);
+                                        //Extensions.MainWindow.Status = xe.Message;
+                                    }
+                                };
+                                bw.RunWorkerAsync();
                             }
-                            NotifyPropertyChanged("");
-                            Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-                            sender.ReportProgress(rate, lr);
-                            if (stop_async)
-                                break;
+                            else
+                            {
+                                streamingAPI.Stop();
+                            }
+                            if (!Worker.IsBusy)
+                                Worker.RunWorkerAsync();
+                        }
+                        catch (Exception xe)
+                        {
+                            Debug.WriteLine(xe.Message);
+                            Extensions.MainWindow.Status = xe.Message;
                         }
                     }
-                    catch (Exception xe)
+                };
+
+                Worker = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
+                Worker.ProgressChanged += (o, e) =>
+                {
+                    List<LiveRunner> NewRunners = e.UserState as List<LiveRunner>;
+
+                    if (NewRunners != null)
                     {
-                        Debug.WriteLine(xe.Message);
-                        Dispatcher.BeginInvoke(new Action(() =>
+                        if (LiveRunners.Count != NewRunners.Count)
                         {
-                            Extensions.MainWindow.Status = xe.Message;
-                        }));
+                            LiveRunners = NewRunners;
+                        }
+                        if (LiveRunners.Count > 0) foreach (LiveRunner lr in LiveRunners)
+                            {
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    lr.BackValues[i] = new PriceSize(i);
+                                    lr.LayValues[i] = new PriceSize(i + 3);
+                                }
+                            }
+                        for (int i = 0; i < LiveRunners.Count; i++)
+                        {
+                            if (NewRunners[i].ngrunner != null)
+                            {
+                                LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
+                                LiveRunners[i].LevelProfit = NewRunners[i].LevelProfit;
+                                LiveRunners[i].LevelStake = NewRunners[i].LevelStake;
+                                LiveRunners[i].LevelSide = NewRunners[i].LevelSide;
+                                LiveRunners[i].NotifyPropertyChanged("");
+                            }
+                        }
+                        MarketNode.UpdateRate = e.ProgressPercentage;
+                        NotifyPropertyChanged("");
                     }
-                    System.Threading.Thread.Sleep(props.WaitBF);
-                }
+                };
+                Worker.DoWork += (o, ea) =>
+                {
+                    BackgroundWorker sender = o as BackgroundWorker;
+                    while (!sender.CancellationPending)
+                    {
+                        try
+                        {
+                            if (MarketNode != null)
+                            {
+                                //var runners = streamingAPI.LiveRunners;
+                                DateTime LastUpdate = DateTime.UtcNow;
+                                var lr = MarketNode.GetLiveRunners();
+                                UpdateMarketStatus();
+
+                                if (OnMarketChanged != null)
+                                {
+                                    OnMarketChanged(MarketNode);
+                                }
+                                NotifyPropertyChanged("");
+                                Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+                                sender.ReportProgress(rate, lr);
+                                if (stop_async)
+                                    break;
+                            }
+                        }
+                        catch (Exception xe)
+                        {
+                            Debug.WriteLine(xe.Message);
+                            Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                Extensions.MainWindow.Status = xe.Message;
+                            }));
+                        }
+                        System.Threading.Thread.Sleep(props.WaitBF);
+                    }
+                };
+                Worker.RunWorkerAsync();
             };
-            Worker.RunWorkerAsync();
         }
+
         public String GetRunnerName(Int64 SelectionID)
         {
             if (LiveRunners.Count > 0) foreach (LiveRunner r in LiveRunners)

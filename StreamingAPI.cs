@@ -23,14 +23,7 @@ namespace SpreadTrader
         private static Properties.Settings props = Properties.Settings.Default;
         public StreamingAPI()
         {
-            Debug.WriteLine("Streaming API ctor");
-            NewSessionProvider(
-                "identitysso-cert.betfair.com",
-                props.AppKey,
-                props.BFUser,
-                props.BFPassword,
-                MainWindow.Betfair.SessionToken);
-
+            NewSessionProvider("identitysso-cert.betfair.com", props.AppKey,props.BFUser,props.BFPassword,MainWindow.Betfair.SessionToken);
             ClientCache.Client.ConnectionStatusChanged += (o, e) =>
             {
                 if (!String.IsNullOrEmpty(e.ConnectionId))
@@ -39,6 +32,7 @@ namespace SpreadTrader
                 }
             };
         }
+
         public void NewSessionProvider(string ssohost, string appkey, string username, string password, string session_token)
         {
             AppKeyAndSessionProvider sessionProvider = new AppKeyAndSessionProvider(ssohost, appkey, username, password, props.CertFile, props.CertPassword, session_token);
@@ -64,29 +58,41 @@ namespace SpreadTrader
             Debug.WriteLine("StreamingAPI.OnMarketChanged");
             try
             {
+                var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                long unixSeconds = (long)epoch.TotalSeconds;
+                long diff = DateTime.UtcNow.Ticks - e.Snap.Time.Ticks;
+
+
+                //Debug.WriteLine($"{diff/ (double)TimeSpan.TicksPerSecond} seconds behind");
+
                 double tradedVolume = 0;
                 _LiveRunners = new List<LiveRunner>();
                 for (int i = 0; i < e.Snap.MarketRunners.Count; i++)
                 {
                     LiveRunner lr = new LiveRunner();
                     lr.SetPrices(e.Snap.MarketRunners[i]);
-                    _LiveRunners.Add(lr);
+                    lr.TradedVolume = e.Snap.MarketRunners[i].Prices.TradedVolume;
                     tradedVolume += e.Snap.MarketRunners[i].Prices.TradedVolume;
+                 
+                    _LiveRunners.Add(lr);
                 }
 
-				List<Tuple<long, double>> last_traded = new List<Tuple<long, double>>();
-				if (e.Change?.Rc != null)
-				{
-					foreach (RunnerChange rc in e.Change?.Rc)
-					{
-						if (rc.Ltp != null)
-						{
-							//Debug.WriteLine($"selid = {rc.Id} : Ltp = {rc.Ltp}");
-							last_traded.Add(new Tuple<long, double>((long)rc.Id, (double)rc.Ltp));
-						}
-					}
-				}
-				Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, last_traded, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
+                List<Tuple<long, double?, double?>> last_traded = new List<Tuple<long, double?, double?>>();
+                if (e.Change?.Rc != null)
+                {
+                    foreach (RunnerChange rc in e.Change?.Rc)  /// examine Atb abd Atl get determine correct side
+                    {
+                        if (rc.Tv != null && rc.Ltp == null)
+                        {
+                            last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
+                        }
+                        else if (rc.Ltp != null)
+                        {
+                            last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
+                        }
+                    }
+                }
+                Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, e.Change.Rc, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
             }
             catch (Exception xe)
             {

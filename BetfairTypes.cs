@@ -230,13 +230,13 @@ namespace BetfairAPI
     }
     public class KeepAliveResponse
     {
-      public String token { get; set; }
-      public String product { get; set; }
-      public String status { get; set; }
-      public String error { get; set; }
+        public String token { get; set; }
+        public String product { get; set; }
+        public String status { get; set; }
+        public String error { get; set; }
     }
 
-  public class ErrorResponse
+    public class ErrorResponse
     {
         public struct _data
         {

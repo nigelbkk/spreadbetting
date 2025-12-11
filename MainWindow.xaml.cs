@@ -16,7 +16,7 @@ namespace SpreadTrader
 	public delegate void OnShutdownDelegate();
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
-		public OnShutdownDelegate OnShutdown = null;
+		//public OnShutdownDelegate OnShutdown = null;
 		private Properties.Settings props = Properties.Settings.Default;
 		private static String _Status = "Ready";
 		private static String _Notification = "";
@@ -122,9 +122,10 @@ namespace SpreadTrader
 			Betfair = new BetfairAPI.BetfairAPI();
 			try
 			{
-				if (!props.UseProxy)
+                Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
+                if (!props.UseProxy)
 				{
-					Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
+				//	Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
 
 					System.Timers.Timer t = new System.Timers.Timer();
 					t.Elapsed += (o, e) =>
@@ -226,8 +227,7 @@ namespace SpreadTrader
 			customTabHeader.Tab = tab;
 
 			EventsTree.OnMarketSelected += tabContent.OnMarketSelected;
-			OnShutdown += tabContent.BetsManager.OnShutdown;
-			//OnMarketChanged += tabContent.OnMarketSelected;
+			//OnShutdown += tabContent.BetsManager.OnShutdown;
 
 			tab.IsSelected = true;
 			TabControl.Items.Insert(0, tab);
@@ -238,10 +238,8 @@ namespace SpreadTrader
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
 			props.Save();
-			if (OnShutdown != null)
-			{
-				OnShutdown();
-			};
+			Console.WriteLine("Exiting now...");
+			Environment.Exit(0);
 		}
 		private void OnUpdateAccount(object sender, MouseButtonEventArgs e)
 		{

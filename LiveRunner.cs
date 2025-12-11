@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -12,8 +14,8 @@ namespace SpreadTrader
     public class LiveRunner : INotifyPropertyChanged
     {
         public Runner ngrunner { get; set; }
-        private BitmapImage _colors = null;
-        public BitmapImage Colors { get { return _colors; } set { _colors = value; NotifyPropertyChanged("Colors"); } }
+        //private BitmapImage _colors = null;
+        //public BitmapImage Colors { get { return _colors; } set { _colors = value; NotifyPropertyChanged("Colors"); } }
         public String Name { get; set; }
         private double _Width { get; set; }
         public double Width { get { return _Width; } set { _Width = value; NotifyPropertyChanged("Width"); } }
@@ -67,6 +69,7 @@ namespace SpreadTrader
         public double LayStake { get; set; }
         private double _ifWin { get; set; }
         public double ifWin { get { return _ifWin; } set { _ifWin = value; NotifyPropertyChanged(""); } }
+        public Double TradedVolume { get; set; }
         private Double _LevelStake = 0;
         public Double LevelStake { get { return _LevelStake; } set { _LevelStake = value; NotifyPropertyChanged(""); } }
         public sideEnum LevelSide { get; set; }
@@ -81,7 +84,15 @@ namespace SpreadTrader
             }
         }
         public double LastPriceTraded { get; set; }
+        public double LastTradedPice { get; set; }      // this one is for partial match notifications
         public List<PriceSize> BackValues { get; set; }
+        public Brush BackColor
+        {
+            get
+            {
+                return Brushes.Yellow;
+            }
+        }
         public ObservableCollection<PriceSize> LayValues { get; set; }
         public double BackLayRatio { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -99,12 +110,12 @@ namespace SpreadTrader
             BackValues = new List<PriceSize>();
             LayValues = new ObservableCollection<PriceSize>();
 
-            BackValues.Add(new PriceSize());
-            BackValues.Add(new PriceSize());
-            BackValues.Add(new PriceSize());
-            LayValues.Add(new PriceSize());
-            LayValues.Add(new PriceSize());
-            LayValues.Add(new PriceSize());
+            BackValues.Add(new PriceSize(0));
+            BackValues.Add(new PriceSize(1));
+            BackValues.Add(new PriceSize(2));
+            LayValues.Add(new PriceSize(3));
+            LayValues.Add(new PriceSize(4));
+            LayValues.Add(new PriceSize(5));
             _Width = 160;
         }
         public LiveRunner(Runner r) : this()
@@ -137,8 +148,8 @@ namespace SpreadTrader
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    BackValues[j] = new PriceSize();
-                    LayValues[j] = new PriceSize();
+                    BackValues[j] = new PriceSize(j);
+                    LayValues[j] = new PriceSize(j+3);
                 }
                 if (r.ex.availableToBack.Count > 0) foreach (var ps in r.ex.availableToBack)
                 {

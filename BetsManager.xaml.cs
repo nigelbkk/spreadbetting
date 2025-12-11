@@ -295,16 +295,6 @@ namespace SpreadTrader
 				}
 			});
 
-			hubProxy.On<string, string, string>("marketChanged", (json1, json2, json3) =>
-			{
-				OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
-				OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json3);
-				if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
-				{
-					//Debug.WriteLine($"marketChanged: {MarketNode.FullName}");
-				}
-			});
-
 			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, last_traded, inplay) =>
 			{
 				try
@@ -820,13 +810,13 @@ namespace SpreadTrader
 									}
 									else
 									{
-										Notification = $"Cancelling {cancel_instructions.Count} bets";
-										var sw = Stopwatch.StartNew();
-										Betfair.cancelOrdersAsync(MarketNode.MarketID, cancel_instructions);
-										sw.Stop();
-										Debug.WriteLine($"==================================>  Execution time: {sw.ElapsedMilliseconds} ms");
-									}
-									Status = $"Cancellation Task completed";
+                                        Notification = $"Cancelling {cancel_instructions.Count} bets";
+                                        var sw = Stopwatch.StartNew();
+                                        Betfair.cancelOrdersAsync(MarketNode.MarketID, cancel_instructions);
+                                        sw.Stop();
+                                        Debug.WriteLine($"==================================>  Execution time: {sw.ElapsedMilliseconds} ms");
+                                    }
+									Status = "Cancellation Task completed";
 								});
 							}
 							catch(Exception xxe)
@@ -860,12 +850,11 @@ namespace SpreadTrader
                                 }
                                 else
                                 {
-									Notification = $"Cancelling {cancel_instructions.Count} bets";
-									var sw = Stopwatch.StartNew();
-									Betfair.cancelOrdersAsync(MarketNode.MarketID, cancel_instructions);
-									sw.Stop();
-									Debug.WriteLine($"==================================>  Execution time: {sw.ElapsedMilliseconds} ms");
-									Status = $"Cancellation Task completed";
+                                    Notification = $"Cancelling {cancel_instructions.Count} bets";
+                                    var sw = Stopwatch.StartNew();
+                                    Betfair.cancelOrdersAsync(MarketNode.MarketID, cancel_instructions);
+                                    sw.Stop();
+                                    Debug.WriteLine($"==================================>  Execution time: {sw.ElapsedMilliseconds} ms");
                                 }
                             });
                         }
