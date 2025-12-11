@@ -114,7 +114,6 @@
                         <ColumnDefinition Width="46"/>
                         <ColumnDefinition Width="46"/>
                         <ColumnDefinition Width="46"/>
-                        <ColumnDefinition Width="46"/>
                     </Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="{Binding Name}" FontSize="16" Background="{Binding Path=FavoritesColor}"  PreviewMouseDown="NameMouseDown" HorizontalContentAlignment="Left"/>
 

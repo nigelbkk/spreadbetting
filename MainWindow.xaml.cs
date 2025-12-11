@@ -122,9 +122,10 @@ namespace SpreadTrader
 			Betfair = new BetfairAPI.BetfairAPI();
 			try
 			{
-				if (!props.UseProxy)
+                Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
+                if (!props.UseProxy)
 				{
-					Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
+				//	Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
 
 					System.Timers.Timer t = new System.Timers.Timer();
 					t.Elapsed += (o, e) =>

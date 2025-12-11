@@ -23,7 +23,7 @@ namespace SpreadTrader
         private static Properties.Settings props = Properties.Settings.Default;
         public StreamingAPI()
         {
-            NewSessionProvider("identitysso-cert.betfair.com",props.AppKey,props.BFUser,props.BFPassword,MainWindow.Betfair.SessionToken);
+            NewSessionProvider("identitysso-cert.betfair.com", props.AppKey,props.BFUser,props.BFPassword,MainWindow.Betfair.SessionToken);
             ClientCache.Client.ConnectionStatusChanged += (o, e) =>
             {
                 if (!String.IsNullOrEmpty(e.ConnectionId))

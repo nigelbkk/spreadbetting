@@ -158,6 +158,7 @@ namespace SpreadTrader
                             Debug.WriteLine($"Lay:  {RunnerName} : {rc.Ltp} : cell id = {cell_id}");
                             liveRunners[cell_ids.Item1].LayValues[cell_id].CellBackgroundColor = Brushes.Yellow;
                         }
+                        NotifyPropertyChanged("");
                     }
                 }
 
@@ -171,7 +172,15 @@ namespace SpreadTrader
         {
             return await Task.Run(() =>
             {
-                return MainWindow.Betfair.listMarketProfitAndLoss(marketId);
+                try
+                {
+                    return MainWindow.Betfair.listMarketProfitAndLoss(marketId);
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    return null;
+                }
             });
         }
 

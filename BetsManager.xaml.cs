@@ -879,19 +879,13 @@ namespace SpreadTrader
 									}
 									else
 									{
-										Notification = $"Cancelling {cancel_instructions.Count} bets";
-										CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-
-										if (cancel_report.status != "SUCCESS")
-										{
-											Status = cancel_report.errorCode;
-										}
-										else
-										{
-											Status = cancel_report.status;
-										}
-									}
-									//Status = "Cancellation Task completed";
+                                        Notification = $"Cancelling {cancel_instructions.Count} bets";
+                                        var sw = Stopwatch.StartNew();
+                                        Betfair.cancelOrdersAsync(MarketNode.MarketID, cancel_instructions);
+                                        sw.Stop();
+                                        Debug.WriteLine($"==================================>  Execution time: {sw.ElapsedMilliseconds} ms");
+                                    }
+									Status = "Cancellation Task completed";
 								});
 							}
 							catch(Exception xxe)
@@ -925,12 +919,11 @@ namespace SpreadTrader
                                 }
                                 else
                                 {
-                                    CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-
-                                    if (cancel_report.status != "SUCCESS")
-                                    {
-                                        Status = cancel_report.status;
-                                    }
+                                    Notification = $"Cancelling {cancel_instructions.Count} bets";
+                                    var sw = Stopwatch.StartNew();
+                                    Betfair.cancelOrdersAsync(MarketNode.MarketID, cancel_instructions);
+                                    sw.Stop();
+                                    Debug.WriteLine($"==================================>  Execution time: {sw.ElapsedMilliseconds} ms");
                                 }
                             });
                         }
