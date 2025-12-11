@@ -60,6 +60,7 @@ namespace SpreadTrader
         }
         private static void OnMarketChanged(object sender, MarketChangedEventArgs e)
         {
+            Debug.WriteLine("StreamingAPI.OnMarketChanged");
             try
             {
                 double tradedVolume = 0;
@@ -71,7 +72,20 @@ namespace SpreadTrader
                     _LiveRunners.Add(lr);
                     tradedVolume += e.Snap.MarketRunners[i].Prices.TradedVolume;
                 }
-                Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, null, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
+
+				List<Tuple<long, double>> last_traded = new List<Tuple<long, double>>();
+				if (e.Change?.Rc != null)
+				{
+					foreach (RunnerChange rc in e.Change?.Rc)
+					{
+						if (rc.Ltp != null)
+						{
+							//Debug.WriteLine($"selid = {rc.Id} : Ltp = {rc.Ltp}");
+							last_traded.Add(new Tuple<long, double>((long)rc.Id, (double)rc.Ltp));
+						}
+					}
+				}
+				Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, last_traded, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
             }
             catch (Exception xe)
             {

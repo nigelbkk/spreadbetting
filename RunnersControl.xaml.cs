@@ -98,8 +98,10 @@ namespace SpreadTrader
 
 		void FlashIfTraded(List<LiveRunner> liveRunners, List<Tuple<long, double>> last_traded)
 		{
+			Debug.WriteLine($"FlashIfTraded");
 			foreach (var rc in last_traded)
 			{
+				Debug.WriteLine($"last_traded: selid = {rc.Item1} : Ltp = {rc.Item2}");
 				Tuple<int, int> id = GetPriceID(LiveRunners, rc.Item1, rc.Item2);
 				if (id != null)
 				{
@@ -119,7 +121,9 @@ namespace SpreadTrader
 
             StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, last_traded, inplay) =>
             {
-                if (MarketNode != null &&  marketid == MarketNode.MarketID)
+				Debug.WriteLine("RunnersControl.Callback");
+
+				if (MarketNode != null &&  marketid == MarketNode.MarketID)
                 {
                     FlashIfTraded(liveRunners, last_traded);
                     double totalBack = 0;
