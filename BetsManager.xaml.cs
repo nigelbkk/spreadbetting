@@ -824,14 +824,9 @@ namespace SpreadTrader
 									{
 										Notification = $"Cancelling {cancel_instructions.Count} bets";
 										var sw = Stopwatch.StartNew();
-										CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+										Betfair.cancelOrdersAsync(MarketNode.MarketID, cancel_instructions);
 										sw.Stop();
 										Debug.WriteLine($"==================================>  Execution time: {sw.ElapsedMilliseconds} ms");
-
-										foreach (Tuple<UInt64, String>  _report in report.statuses)
-										{
-											//Debug.WriteLine(_report.Item1, _report.Item2);
-										}
 									}
 									Status = $"Cancellation Task completed";
 								});

@@ -6,8 +6,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using Windows.Data.Json;
 
@@ -53,6 +55,27 @@ namespace BetfairAPI
 					Token = o.token;
 				}
 			}
+		}
+		public void RPCRequestAsync(String Method, Dictionary<String, Object> Params)
+		{
+			String[] AccountCalls = new String[] { "getAccountFunds" };
+			Dictionary<String, Object> joe = new Dictionary<string, object>();
+			joe["jsonrpc"] = "2.0";
+			joe["id"] = "1";
+			joe["method"] = "SportsAPING/v1.0/" + Method;
+			joe["params"] = Params;
+
+			String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy;
+			if (!SpreadTrader.Properties.Settings.Default.UseProxy || String.IsNullOrEmpty(SpreadTrader.Properties.Settings.Default.Proxy))
+			{
+				if (!String.IsNullOrEmpty(Token))
+				{
+					url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";
+					if (Method.Contains(AccountCalls[0]))
+						url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
+				}
+			}
+			SendRequestAsync(joe, url);
 		}
 		public Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
 		{
@@ -138,6 +161,37 @@ namespace BetfairAPI
 				return JsonConvert.DeserializeObject<T>(res);
 			}
 		}
+
+
+
+		public void SendRequestAsync(object joe, string url)
+		{
+			_ = Task.Run(async () =>
+			{
+				var client = new HttpClient();
+
+				client.DefaultRequestHeaders.Add("X-API-Key", API_KEY);
+				client.DefaultRequestHeaders.Add("X-Application", AppKey);
+				client.DefaultRequestHeaders.Add("X-Authentication", Token);
+				client.DefaultRequestHeaders.AcceptCharset.ParseAdd("ISO-8859-1, utf-8");
+
+				var json = "[" + JsonConvert.SerializeObject(joe) + "]";
+				var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+				try
+				{
+					await client.PostAsync(url, content);
+					// Response intentionally ignored
+				}
+				catch
+				{
+					// Swallow or log errors
+				}
+			});
+		}
+
+
+
 		public void login(String CertFile, String CertPassword, String appKey, String username, String password)
 		{
 			AppKey = appKey;
@@ -442,6 +496,20 @@ namespace BetfairAPI
 			return RPCRequest<PlaceExecutionReport>("placeOrders", p) as PlaceExecutionReport;
 		}
 
+		public void cancelOrdersAsync(String marketId, List<CancelInstruction> instructions)
+		{
+			CancelExecutionReport new_report = new CancelExecutionReport();
+			new_report.statuses = new List<Tuple<ulong, string>>();
+			foreach (CancelInstruction ci in instructions)
+			{
+				Dictionary<String, Object> p = new Dictionary<string, object>();
+				p["marketId"] = marketId;
+				List<CancelInstruction> new_list = new List<CancelInstruction>();
+				new_list.Add(ci); p["instructions"] = new_list;
+				RPCRequestAsync("cancelOrders", p);
+			}
+		}
+
 		public CancelExecutionReport  cancelOrders(String marketId, List<CancelInstruction> instructions)
 		{
 			CancelExecutionReport new_report = new CancelExecutionReport();
@@ -457,13 +525,6 @@ namespace BetfairAPI
 			}
 			return new_report;
 		}
-		//public CancelExecutionReport cancelOrders(String marketId, List<CancelInstruction> instructions)
-		//{
-		//	Dictionary<String, Object> p = new Dictionary<string, object>();
-		//	p["marketId"] = marketId;
-		//	p["instructions"] = instructions;
-		//	return RPCRequest<CancelExecutionReport>("cancelOrders", p) as CancelExecutionReport;
-		//}
 		public ReplaceExecutionReport replaceOrders(String marketId, List<ReplaceInstruction> instructions)
 		{
 			Dictionary<String, Object> p = new Dictionary<string, object>();
