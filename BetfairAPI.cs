@@ -162,8 +162,6 @@ namespace BetfairAPI
 			}
 		}
 
-
-
 		public void SendRequestAsync(object joe, string url)
 		{
 			_ = Task.Run(async () =>
@@ -180,17 +178,14 @@ namespace BetfairAPI
 
 				try
 				{
-					await client.PostAsync(url, content);
-					// Response intentionally ignored
+					await client.PostAsync(url, content); // Response intentionally ignored
 				}
-				catch
+				catch (Exception ex)
 				{
-					// Swallow or log errors
+					Debug.WriteLine(ex.Message);
 				}
 			});
 		}
-
-
 
 		public void login(String CertFile, String CertPassword, String appKey, String username, String password)
 		{
