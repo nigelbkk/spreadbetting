@@ -195,6 +195,7 @@ namespace SpreadTrader
 		}
 		private void ProcessIncomingNotifications(object o)
 		{
+			Debug.WriteLine("ProcessIncomingNotifications");
 			BackgroundWorker sender = o as BackgroundWorker;
 			while (!sender.CancellationPending)
 			{
@@ -215,7 +216,7 @@ namespace SpreadTrader
 						Status = xe.Message;
 					}
 				}
-				System.Threading.Thread.Sleep(10);
+				System.Threading.Thread.Sleep(1000);
 			}
 		}
 		private void ProcessCancellationQueue(object o)

@@ -23,6 +23,7 @@ namespace SpreadTrader
         private static Properties.Settings props = Properties.Settings.Default;
         public StreamingAPI()
         {
+            Debug.WriteLine("Streaming API ctor");
             NewSessionProvider(
                 "identitysso-cert.betfair.com",
                 props.AppKey,
@@ -97,7 +98,8 @@ namespace SpreadTrader
         }
         public void Start(String marketID)
         {
-            if (MarketId == marketID && ClientCache.Status == Betfair.ESAClient.Protocol.ConnectionStatus.SUBSCRIBED)
+			Debug.WriteLine("Streaming API Start");
+			if (MarketId == marketID && ClientCache.Status == Betfair.ESAClient.Protocol.ConnectionStatus.SUBSCRIBED)
             {
                 Debug.WriteLine("Already subscribed");
             }
