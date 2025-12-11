@@ -83,8 +83,6 @@ namespace SpreadTrader
             {
                 if (MarketNode != null &&  marketid == MarketNode.MarketID)
                 {
-                    //List<MarketProfitAndLoss> pl = MainWindow.Betfair.listMarketProfitAndLoss(MarketNode.MarketID);
-
                     double totalBack = 0;
                     double totalLay = 0;
                     Int32 ct = Math.Min(LiveRunners.Count, liveRunners.Count); //TOCHECK
@@ -100,19 +98,10 @@ namespace SpreadTrader
                         LiveRunners[i].LevelProfit = liveRunners[i].LevelProfit;
                         LiveRunners[i].BackLayRatio = liveRunners[i].BackLayRatio;
                         LiveRunners[i].NotifyPropertyChanged("");
-                        //if (pl.Count > 0 && pl[0].profitAndLosses.Count > 0) foreach (var p in pl[0].profitAndLosses)
-                        //    {
-                        //        if (p.selectionId == LiveRunners[i].SelectionId)
-                        //        {
-                        //            LiveRunners[i].ifWin = p.ifWin;
-                        //        }
-                        //    }
                     }
                     MarketNode.LiveRunners = LiveRunners;
                     MarketNode.CalculateLevelProfit();
                     MarketNode.TotalMatched = tradedVolume;
-                    //BackBook = totalBack;
-                    //LayBook = totalLay;
                     UpdateMarketStatus();
                     NotifyPropertyChanged("");
                     if (Worker.IsBusy)

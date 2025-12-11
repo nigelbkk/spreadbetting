@@ -53,7 +53,6 @@ namespace SpreadTrader
             timer.Interval = 1000;
             timer.Enabled = true;
             timer.Start();
-
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {

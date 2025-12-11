@@ -278,7 +278,6 @@ namespace SpreadTrader
 			{
 				Debug.WriteLine("[SignalR] Closed — manual reconnect required.");
 				Connect();
-				//StartSignalRHub();
 			};
 
 			hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
@@ -304,8 +303,6 @@ namespace SpreadTrader
 					//Debug.WriteLine($"marketChanged: {MarketNode.FullName}");
 				}
 			});
-
-			//await hubConnection.Start();
 
 			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
 			{
@@ -723,8 +720,8 @@ namespace SpreadTrader
 									CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
 									if (report != null && report.errorCode != null)
 									{
-									//throw new Exception(ErrorCodes.FaultCode(report.errorCode));
-								}
+										//throw new Exception(ErrorCodes.FaultCode(report.errorCode));
+									}
 									Status = report.errorCode != null ? report.errorCode : report.status;
 								}
 							});
@@ -862,11 +859,11 @@ namespace SpreadTrader
                                 }
                                 else
                                 {
-                                    CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-									foreach (Tuple<UInt64, String> _report in report.statuses)
-									{
-										Debug.WriteLine(_report.Item1, _report.Item2);
-									}
+									Notification = $"Cancelling {cancel_instructions.Count} bets";
+									var sw = Stopwatch.StartNew();
+									Betfair.cancelOrdersAsync(MarketNode.MarketID, cancel_instructions);
+									sw.Stop();
+									Debug.WriteLine($"==================================>  Execution time: {sw.ElapsedMilliseconds} ms");
 									Status = $"Cancellation Task completed";
                                 }
                             });
