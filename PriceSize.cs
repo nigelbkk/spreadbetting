@@ -15,7 +15,8 @@ public class PriceSize : INotifyPropertyChanged
     private Double _size { get; set; }
     public Double size { get { return _size; } set { _size = value; NotifyPropertyChanged(""); } }
     public SolidColorBrush Color { get; set; }
-    public override string ToString()
+    public Brush CellBackgroundColor { get; set; }
+	public override string ToString()
     {
         return String.Format("{0:0.00}:{1:0.00}", price, size);
     }

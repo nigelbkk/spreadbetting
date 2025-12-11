@@ -304,7 +304,7 @@ namespace SpreadTrader
 				}
 			});
 
-			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
+			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, last_traded, inplay) =>
 			{
 				try
 				{

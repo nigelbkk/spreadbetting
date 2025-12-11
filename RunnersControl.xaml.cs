@@ -13,7 +13,7 @@ using System.Linq;
 namespace SpreadTrader
 {
     public delegate void MarketChangedDelegate(NodeViewModel node);
-    public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, bool inplay);
+    public delegate void StreamUpdateDelegate(String marketid, List<LiveRunner> liveRunners, double tradedVolume, List<Tuple<long, double>> last_traded, bool inplay);
     public partial class RunnersControl : UserControl, INotifyPropertyChanged
     {
         public BetsManager betsManager = null;
@@ -73,16 +73,55 @@ namespace SpreadTrader
 				}
 			}
 		}
+		Tuple<int, int> GetPriceID(List<LiveRunner> liveRunners, long selid, Double price)
+		{
+			int runnerid = 0;
+			foreach (var runner in liveRunners)
+			{
+				if (runner.SelectionId == selid)
+				{
+					for (int i = 0; i < 3; i++)
+					{
+						if (liveRunners[runnerid].BackValues[i].price == price)
+							return new Tuple<int, int>(runnerid, i);
+					}
+					for (int j = 0; j < 3; j++)
+					{
+						if (liveRunners[runnerid].LayValues[j].price == price)
+							return new Tuple<int, int>(runnerid, j + 3);
+					}
+				}
+				runnerid++;
+			}
+			return null;
+		}
+
+		void FlashIfTraded(List<LiveRunner> liveRunners, List<Tuple<long, double>> last_traded)
+		{
+			foreach (var rc in last_traded)
+			{
+				Tuple<int, int> id = GetPriceID(LiveRunners, rc.Item1, rc.Item2);
+				if (id != null)
+				{
+					Debug.WriteLine($"selid = {rc.Item1} : Ltp = {rc.Item2} : {LiveRunners[id.Item1].Name} : price id = {id.Item2}");
+					if (id.Item2 > 2)
+						liveRunners[id.Item1].LayValues[id.Item2 - 3].CellBackgroundColor = Brushes.Yellow;
+					else
+						liveRunners[id.Item1].BackValues[id.Item2].CellBackgroundColor = Brushes.Yellow;
+				}
+			}
+		}
 
 		public RunnersControl()
         {
             LiveRunners = new List<LiveRunner>();
             InitializeComponent();
 
-            StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
+            StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, last_traded, inplay) =>
             {
                 if (MarketNode != null &&  marketid == MarketNode.MarketID)
                 {
+                    FlashIfTraded(liveRunners, last_traded);
                     double totalBack = 0;
                     double totalLay = 0;
                     Int32 ct = Math.Min(LiveRunners.Count, liveRunners.Count); //TOCHECK
@@ -102,7 +141,9 @@ namespace SpreadTrader
                     MarketNode.LiveRunners = LiveRunners;
                     MarketNode.CalculateLevelProfit();
                     MarketNode.TotalMatched = tradedVolume;
-                    UpdateMarketStatus();
+					List<Tuple<long, double>> _last_traded = last_traded;
+
+					UpdateMarketStatus();
                     NotifyPropertyChanged("");
                     if (Worker.IsBusy)
                         Worker.CancelAsync();

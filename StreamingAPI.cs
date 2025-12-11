@@ -71,7 +71,7 @@ namespace SpreadTrader
                     _LiveRunners.Add(lr);
                     tradedVolume += e.Snap.MarketRunners[i].Prices.TradedVolume;
                 }
-                Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
+                Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, null, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
             }
             catch (Exception xe)
             {
