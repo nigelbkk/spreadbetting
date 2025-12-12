@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Media;
 using System.Net.Http;
 using System.Text;
@@ -113,8 +112,8 @@ namespace SpreadTrader
 	public partial class BetsManager : UserControl, INotifyPropertyChanged
 	{
 		public OnShutdownDelegate OnShutdown;
-		private Queue<String> incomingOrdersQueue = new Queue<String>();
-		private Queue<UInt64> cancellation_queue = new Queue<UInt64>();
+		//private Queue<String> incomingOrdersQueue = new Queue<String>();
+		//private Queue<UInt64> cancellation_queue = new Queue<UInt64>();
 
 		private Properties.Settings props = Properties.Settings.Default;
 		public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
@@ -193,72 +192,102 @@ namespace SpreadTrader
 				}
 			return null;
 		}
-		private void ProcessIncomingNotifications(object o)
-		{
-			Debug.WriteLine("ProcessIncomingNotifications");
-			BackgroundWorker sender = o as BackgroundWorker;
-			while (!sender.CancellationPending)
-			{
-				while (incomingOrdersQueue.Count > 0)
-				{
-					try
-					{
-						//Debug.WriteLine("Fetch from queue");
-						//lock (incomingOrdersQueue) 
-						{ 
-							String json = incomingOrdersQueue.Dequeue();
-							OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
-							OnOrderChanged(json);
-						}
-					}
-					catch (Exception xe)
-					{
-						Status = xe.Message;
-					}
-				}
-				System.Threading.Thread.Sleep(1000);
-			}
-		}
-		private void ProcessCancellationQueue(object o)
-		{
-			BackgroundWorker sender = o as BackgroundWorker;
-			while (!sender.CancellationPending)
-			{
-				while (cancellation_queue.Count > 0)
-				{
-					try
-					{
-						//lock (cancellation_queue)
-						{
-							UInt64 betid = cancellation_queue.Dequeue();
+        public async Task ProcessIncomingOrdersAsync(String json)
+        {
+            OnOrderChanged(json);
+            //while (incomingOrdersQueue.Count > 0)
+            //{
+            //    string json = null;
 
-							//Debug.WriteLine("submit cancel {0}", betid);
-							CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid, null);
-							if (report.errorCode == null)
-							{
-								Debug.WriteLine("bet is cancelled {0}", betid);
-							}
-							Status = report.errorCode != null ? report.errorCode : report.status;
-						}
-					}
-					catch (Exception xe)
-					{
-						Debug.WriteLine(xe.Message);
-						Status = xe.Message;
-					}
-				}
-				System.Threading.Thread.Sleep(10);
-			}
-		}
+            //    try
+            //    {
+            //        // Dequeue is synchronous but cheap
+            //        json = incomingOrdersQueue.Dequeue();
+
+            //        var snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
+
+            //        // If OnOrderChanged is synchronous:
+            //        OnOrderChanged(json);
+
+            //        // If OnOrderChanged is async:
+            //        // await OnOrderChangedAsync(json);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Status = ex.Message;
+            //    }
+
+            //    // Optional: yield control to not block UI thread
+            //    await Task.Yield();
+            //}
+        }
+
+        //private void ProcessIncomingNotifications(object o)
+        //{
+        //	Debug.WriteLine("ProcessIncomingNotifications");
+        //	BackgroundWorker sender = o as BackgroundWorker;
+        //	while (!sender.CancellationPending)
+        //	{
+        //		while (incomingOrdersQueue.Count > 0)
+        //		{
+        //			try
+        //			{
+        //				//Debug.WriteLine("Fetch from queue");
+        //				//lock (incomingOrdersQueue) 
+        //				{ 
+        //					String json = incomingOrdersQueue.Dequeue();
+        //					OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
+        //					OnOrderChanged(json);
+        //				}
+        //			}
+        //			catch (Exception xe)
+        //			{
+        //				Status = xe.Message;
+        //			}
+        //		}
+        //		System.Threading.Thread.Sleep(1000);
+        //	}
+        //}
+  //      private void ProcessCancellationQueue(object o)
+		//{
+		//	BackgroundWorker sender = o as BackgroundWorker;
+		//	while (!sender.CancellationPending)
+		//	{
+		//		while (cancellation_queue.Count > 0)
+		//		{
+		//			try
+		//			{
+		//				//lock (cancellation_queue)
+		//				{
+		//					UInt64 betid = cancellation_queue.Dequeue();
+
+		//					//Debug.WriteLine("submit cancel {0}", betid);
+		//					CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid, null);
+		//					if (report.errorCode == null)
+		//					{
+		//						Debug.WriteLine("bet is cancelled {0}", betid);
+		//					}
+		//					Status = report.errorCode != null ? report.errorCode : report.status;
+		//				}
+		//			}
+		//			catch (Exception xe)
+		//			{
+		//				Debug.WriteLine(xe.Message);
+		//				Status = xe.Message;
+		//			}
+		//		}
+		//		System.Threading.Thread.Sleep(1000);
+		//	}
+		//}
 		public BetsManager()
 		{
-			BackgroundWorker bw = new BackgroundWorker();
-			bw.DoWork += (o, e) => ProcessIncomingNotifications(o);
-			bw.RunWorkerAsync();
+			//BackgroundWorker bw = new BackgroundWorker();
+			//bw.DoWork += (o, e) => ProcessIncomingNotifications(o);
+			//bw.RunWorkerAsync();
 
-			BackgroundWorker bw2 = new BackgroundWorker();
-			bw2.DoWork += (o, e) => ProcessCancellationQueue(o);
-			bw2.RunWorkerAsync();
+			//BackgroundWorker bw2 = new BackgroundWorker();
+			//bw2.DoWork += (o, e) => ProcessCancellationQueue(o);
+			//bw2.RunWorkerAsync();
 
 			hubConnection = new HubConnection("http://" + props.StreamUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
@@ -287,14 +316,17 @@ namespace SpreadTrader
 				OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
 				if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
 				{
-					lock (incomingOrdersQueue)
-					{
-						//Debug.WriteLine("Add to queue");
-						incomingOrdersQueue.Enqueue(json1);
-					}
+					_ = ProcessIncomingOrdersAsync(json1);
+					//lock (incomingOrdersQueue)
+					//{
+					//	//Debug.WriteLine("Add to queue");
+					//	incomingOrdersQueue.Enqueue(json1);
+					//}
 				}
 			});
 
+
+			///// This can be removed //////////////////////
 			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, last_traded, inplay) =>
 			{
 				try
@@ -623,12 +655,20 @@ namespace SpreadTrader
 					return;
 				}
 
-				lock (cancellation_queue)
+                List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
+				cancel_instructions.Add(new CancelInstruction(row.BetID)
 				{
-					Debug.WriteLine("enqueue cancel {0} for {1}", row.BetID, row.Runner);
-					cancellation_queue.Enqueue(row.BetID);
-					row.Hidden = true;
-				}
+					sizeReduction = null
+				});
+				Betfair.cancelOrdersAsync(MarketNode.MarketID, cancel_instructions);
+                //Debug.Assert(false);
+
+				//lock (cancellation_queue)
+				//{
+				//	Debug.WriteLine("enqueue cancel {0} for {1}", row.BetID, row.Runner);
+				//	cancellation_queue.Enqueue(row.BetID);
+				//	row.Hidden = true;
+				//}
 			}
 			else
 			{

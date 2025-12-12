@@ -25,7 +25,7 @@ namespace SpreadTrader
                 if (MainWindow.Betfair.ConnectionLost)
                     return System.Windows.Visibility.Visible;
 
-                return MarketNode == null || MarketNode?.Status == marketStatusEnum.OPEN ? System.Windows.Visibility.Hidden : System.Windows.Visibility.Visible;  
+                return System.Windows.Visibility.Visible;// MarketNode == null || MarketNode?.Status == marketStatusEnum.OPEN ? System.Windows.Visibility.Hidden : System.Windows.Visibility.Visible;  
             }  }
         public Double? TotalMatched { get { return MarketNode?.TotalMatched;  }  }
         public event PropertyChangedEventHandler PropertyChanged;

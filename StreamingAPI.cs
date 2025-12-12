@@ -58,13 +58,13 @@ namespace SpreadTrader
         }
         private static void OnMarketChanged(object sender, MarketChangedEventArgs e)
         {
-            Debug.WriteLine("StreamingAPI.OnMarketChanged");
+            //Debug.WriteLine("StreamingAPI.OnMarketChanged");
+            RunnersControl.UpdateMarketStatus();
             try
             {
                 var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
                 long unixSeconds = (long)epoch.TotalSeconds;
                 long diff = DateTime.UtcNow.Ticks - e.Snap.Time.Ticks;
-
 
                 //Debug.WriteLine($"{diff/ (double)TimeSpan.TicksPerSecond} seconds behind");
 

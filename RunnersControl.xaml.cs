@@ -24,7 +24,7 @@ namespace SpreadTrader
         public FavoriteChangedDelegate OnFavoriteChanged = null;
         public MarketChangedDelegate OnMarketChanged = null;
         private StreamingAPI streamingAPI = new StreamingAPI();
-        private BackgroundWorker Worker = null;
+        //private BackgroundWorker Worker = null;
         public NodeViewModel _MarketNode { get; set; }
         public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
         public double BackBook { get { return MarketNode == null ? 0.00 : MarketNode.BackBook; } }
@@ -39,13 +39,13 @@ namespace SpreadTrader
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
         }
-        public void UpdateMarketStatus()
+        public static void UpdateMarketStatus()
         {
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                //Overlay.Visibility = MarketNode.Status == marketStatusEnum.OPEN ? Visibility.Hidden : Visibility.Visible;
-                //OverlayText.Text = MarketNode.Status.ToString();
-            }));
+            //Dispatcher.BeginInvoke(new Action(() =>
+            //{
+            //    Overlay.Visibility = MarketNode.Status == marketStatusEnum.OPEN ? Visibility.Hidden : Visibility.Visible;
+            //    OverlayText.Text = MarketNode.Status.ToString();
+            //}));
         }
         String RunnerFromSelid(long selid)
         {
@@ -211,7 +211,7 @@ namespace SpreadTrader
             {
                 if (MarketNode != null && marketid == MarketNode.MarketID)
                 {
-                    FlashTraded(liveRunners, Rc);
+                    //FlashTraded(liveRunners, Rc);
 
                     if (MarketNode != null && marketid == MarketNode.MarketID)
                     {
@@ -236,127 +236,125 @@ namespace SpreadTrader
                         MarketNode.LiveRunners = LiveRunners;
                         MarketNode.CalculateLevelProfit();
                         MarketNode.TotalMatched = tradedVolume;
-                        if (Worker.IsBusy)
-                            Worker.CancelAsync();
+                        //if (Worker.IsBusy)
+                        //    Worker.CancelAsync();
                     }
                     _ = UpdateRunnerPnLAsync();
-
-                };
-                OnMarketSelected += (node) =>
-                {
-                    if (IsLoaded)
-                    {
-                        MarketNode = node;
-                        try
-                        {
-                            LiveRunners = MarketNode.GetLiveRunners();
-                            //Debug.WriteLine(MarketNode.Status);
-                            if (props.UseStreaming)
-                            {
-                                BackgroundWorker bw = new BackgroundWorker();
-                                bw.DoWork += (o, e) =>
-                                {
-                                    try
-                                    {
-                                        streamingAPI.Start(MarketNode.MarketID);
-                                    }
-                                    catch (Exception xe)
-                                    {
-                                        Debug.WriteLine(xe.Message);
-                                        //Extensions.MainWindow.Status = xe.Message;
-                                    }
-                                };
-                                bw.RunWorkerAsync();
-                            }
-                            else
-                            {
-                                streamingAPI.Stop();
-                            }
-                            if (!Worker.IsBusy)
-                                Worker.RunWorkerAsync();
-                        }
-                        catch (Exception xe)
-                        {
-                            Debug.WriteLine(xe.Message);
-                            Extensions.MainWindow.Status = xe.Message;
-                        }
-                    }
-                };
-
-                Worker = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
-                Worker.ProgressChanged += (o, e) =>
-                {
-                    List<LiveRunner> NewRunners = e.UserState as List<LiveRunner>;
-
-                    if (NewRunners != null)
-                    {
-                        if (LiveRunners.Count != NewRunners.Count)
-                        {
-                            LiveRunners = NewRunners;
-                        }
-                        if (LiveRunners.Count > 0) foreach (LiveRunner lr in LiveRunners)
-                            {
-                                for (int i = 0; i < 3; i++)
-                                {
-                                    lr.BackValues[i] = new PriceSize(i);
-                                    lr.LayValues[i] = new PriceSize(i + 3);
-                                }
-                            }
-                        for (int i = 0; i < LiveRunners.Count; i++)
-                        {
-                            if (NewRunners[i].ngrunner != null)
-                            {
-                                LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
-                                LiveRunners[i].LevelProfit = NewRunners[i].LevelProfit;
-                                LiveRunners[i].LevelStake = NewRunners[i].LevelStake;
-                                LiveRunners[i].LevelSide = NewRunners[i].LevelSide;
-                                LiveRunners[i].NotifyPropertyChanged("");
-                            }
-                        }
-                        MarketNode.UpdateRate = e.ProgressPercentage;
-                        NotifyPropertyChanged("");
-                    }
-                };
-                Worker.DoWork += (o, ea) =>
-                {
-                    BackgroundWorker sender = o as BackgroundWorker;
-                    while (!sender.CancellationPending)
-                    {
-                        try
-                        {
-                            if (MarketNode != null)
-                            {
-                                //var runners = streamingAPI.LiveRunners;
-                                DateTime LastUpdate = DateTime.UtcNow;
-                                var lr = MarketNode.GetLiveRunners();
-                                UpdateMarketStatus();
-
-                                if (OnMarketChanged != null)
-                                {
-                                    OnMarketChanged(MarketNode);
-                                }
-                                NotifyPropertyChanged("");
-                                Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
-                                sender.ReportProgress(rate, lr);
-                                if (stop_async)
-                                    break;
-                            }
-                        }
-                        catch (Exception xe)
-                        {
-                            Debug.WriteLine(xe.Message);
-                            Dispatcher.BeginInvoke(new Action(() =>
-                            {
-                                Extensions.MainWindow.Status = xe.Message;
-                            }));
-                        }
-                        System.Threading.Thread.Sleep(props.WaitBF);
-                    }
-                };
-                Worker.RunWorkerAsync();
+                }
             };
-        }
+            OnMarketSelected += (node) =>
+            {
+                if (IsLoaded)
+                {
+                    MarketNode = node;
+                    try
+                    {
+                        LiveRunners = MarketNode.GetLiveRunners();
+                        //Debug.WriteLine(MarketNode.Status);
+                        if (props.UseStreaming)
+                        {
+                            BackgroundWorker bw = new BackgroundWorker();
+                            bw.DoWork += (o, e) =>
+                            {
+                                try
+                                {
+                                    streamingAPI.Start(MarketNode.MarketID);
+                                }
+                                catch (Exception xe)
+                                {
+                                    Debug.WriteLine(xe.Message);
+                                    //Extensions.MainWindow.Status = xe.Message;
+                                }
+                            };
+                            bw.RunWorkerAsync();
+                        }
+                        else
+                        {
+                            streamingAPI.Stop();
+                        }
+                        //if (!Worker.IsBusy)
+                        //    Worker.RunWorkerAsync();
+                    }
+                    catch (Exception xe)
+                    {
+                        Debug.WriteLine(xe.Message);
+                        Extensions.MainWindow.Status = xe.Message;
+                    }
+                }
+            };
 
+            //Worker = new BackgroundWorker() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
+            //Worker.ProgressChanged += (o, e) =>
+            //{
+            //    List<LiveRunner> NewRunners = e.UserState as List<LiveRunner>;
+
+            //    if (NewRunners != null)
+            //    {
+            //        if (LiveRunners.Count != NewRunners.Count)
+            //        {
+            //            LiveRunners = NewRunners;
+            //        }
+            //        if (LiveRunners.Count > 0) foreach (LiveRunner lr in LiveRunners)
+            //            {
+            //                for (int i = 0; i < 3; i++)
+            //                {
+            //                    lr.BackValues[i] = new PriceSize(i);
+            //                    lr.LayValues[i] = new PriceSize(i + 3);
+            //                }
+            //            }
+            //        for (int i = 0; i < LiveRunners.Count; i++)
+            //        {
+            //            if (NewRunners[i].ngrunner != null)
+            //            {
+            //                LiveRunners[i].SetPrices(NewRunners[i].ngrunner);
+            //                LiveRunners[i].LevelProfit = NewRunners[i].LevelProfit;
+            //                LiveRunners[i].LevelStake = NewRunners[i].LevelStake;
+            //                LiveRunners[i].LevelSide = NewRunners[i].LevelSide;
+            //                LiveRunners[i].NotifyPropertyChanged("");
+            //            }
+            //        }
+            //        MarketNode.UpdateRate = e.ProgressPercentage;
+            //        NotifyPropertyChanged("");
+            //    }
+            //};
+            //Worker.DoWork += (o, ea) =>
+            //{
+            //    BackgroundWorker sender = o as BackgroundWorker;
+            //    while (!sender.CancellationPending)
+            //    {
+            //        try
+            //        {
+            //            if (MarketNode != null)
+            //            {
+            //                //var runners = streamingAPI.LiveRunners;
+            //                DateTime LastUpdate = DateTime.UtcNow;
+            //                var lr = MarketNode.GetLiveRunners();
+            //                UpdateMarketStatus();
+
+            //                if (OnMarketChanged != null)
+            //                {
+            //                    OnMarketChanged(MarketNode);
+            //                }
+            //                NotifyPropertyChanged("");
+            //                Int32 rate = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
+            //                sender.ReportProgress(rate, lr);
+            //                if (stop_async)
+            //                    break;
+            //            }
+            //        }
+            //        catch (Exception xe)
+            //        {
+            //            Debug.WriteLine(xe.Message);
+            //            Dispatcher.BeginInvoke(new Action(() =>
+            //            {
+            //                Extensions.MainWindow.Status = xe.Message;
+            //            }));
+            //        }
+            //        System.Threading.Thread.Sleep(props.WaitBF);
+            //    }
+            //};
+            //Worker.RunWorkerAsync();
+        }
         public String GetRunnerName(Int64 SelectionID)
         {
             if (LiveRunners.Count > 0) foreach (LiveRunner r in LiveRunners)
@@ -366,7 +364,7 @@ namespace SpreadTrader
                 }
             return null;
         }
-        bool stop_async = false;
+        //bool stop_async = false;
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
