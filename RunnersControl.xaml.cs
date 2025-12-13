@@ -1,9 +1,12 @@
-﻿using BetfairAPI;
+﻿using Betfair.ESAClient.Cache;
+using Betfair.ESASwagger.Model;
+using BetfairAPI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,7 +15,31 @@ using System.Windows.Media;
 
 namespace SpreadTrader
 {
-    public partial class RunnersControl : UserControl, INotifyPropertyChanged
+
+	public class MarketSnapDto
+	{
+		public bool InPlay { get; set; }
+		public DateTime Time { get; set; }
+		public List<MarketRunnerSnapDto> Runners { get; set; }
+	}
+	public class MarketRunnerSnapDto
+	{
+		public long SelectionId { get; set; }
+		public MarketRunnerPricesDto Prices { get; set; }
+	}
+	public class MarketRunnerPricesDto
+	{
+		public List<PriceDto> Back { get; set; }
+		public List<PriceDto> Lay { get; set; }
+	}
+	public class PriceDto
+	{
+		public double Price { get; set; }
+		public double Size { get; set; }
+	}
+
+
+	public partial class RunnersControl : UserControl, INotifyPropertyChanged
     {
 		private NodeViewModel _MarketNode { get; set; }
 		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
@@ -56,24 +83,121 @@ namespace SpreadTrader
                 }
             }
         }
-        private async Task PopulateNewMarket(NodeViewModel node)
+        private async Task PopulateNewMarketAsync(NodeViewModel node)
         {
             MarketNode = node;
-            LiveRunners = node.LiveRunners;
+            LiveRunners = node.GetLiveRunners();
             NotifyPropertyChanged("");
         }
-        private void OnMessageReceived(string messageName, object data)
+        private async void UpdateMarketAsync(NodeViewModel d2)
         {
-            if (messageName == "Market Selected")
-            {
-                dynamic d = data;
-                NodeViewModel d2 = d.NodeViewModel;
-
-				Debug.WriteLine(d2.MarketName);
-                PopulateNewMarket(d2);
-            }
+            MarketNode = d2;
+            MarketNode.GetLiveRunners();
+            LiveRunners = MarketNode.LiveRunners;
+            NotifyPropertyChanged("");
         }
-        public RunnersControl()
+
+        LiveRunner GetRunnerFromSelectionID(Int64 selid)
+        {
+            foreach (LiveRunner runner in LiveRunners)
+            {
+                if (runner.SelectionId == selid)
+                {
+                    return runner;
+                }
+            }
+            return null;
+        }
+        private void OnMarketChanged(MarketChange change, MarketSnapDto snap)
+		{
+			//Debug.WriteLine("StreamingAPI.OnMarketChanged");
+			//RunnersControl.UpdateMarketStatus();
+			try
+			{
+				var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+				long unixSeconds = (long)epoch.TotalSeconds;
+				long diff = DateTime.UtcNow.Ticks - snap.Time.Ticks;
+				//Debug.WriteLine($"{diff/ (double)TimeSpan.TicksPerSecond} seconds behind");
+
+                //double tradedVolume = 0;
+                //List<LiveRunner> _LiveRunners = new List<LiveRunner>();
+                if (LiveRunners != null)
+                {
+					foreach (MarketRunnerSnapDto rsnap in snap.Runners)
+                    {
+						LiveRunner lr = GetRunnerFromSelectionID(rsnap.SelectionId);
+                        if (lr == null)
+                            continue;
+
+                        //SelectionId = r.SelectionId;
+                        lr.BackValues?.Clear();
+
+                        foreach (var ps in rsnap.Prices.Back)
+                            lr.BackValues.Add(new PriceSize(ps.Price, ps.Size));
+
+                        lr.LayValues?.Clear();
+                        foreach (var ps in rsnap.Prices.Lay)
+                            lr.LayValues.Add(new PriceSize(ps.Price, ps.Size));
+
+                        while (lr.BackValues.Count < 3)
+						{
+							lr.BackValues.Add(new PriceSize(0, 0));
+						}
+						while (lr.LayValues.Count < 3)
+						{
+							lr.LayValues.Add(new PriceSize(0, 0));
+						}
+					}
+					//if (LiveRunners.Count > 0 &&  snap.Runners[0].Prices.Back.Count > 0)
+					//{
+					//	Debug.WriteLine($"{LiveRunners[0].BackValues[0].price} : {snap.Runners[0].Prices.Back[0].Price}");
+					//}
+				}
+
+				List<Tuple<long, double?, double?>> last_traded = new List<Tuple<long, double?, double?>>();
+				if (change?.Rc != null)
+				{
+					foreach (RunnerChange rc in change?.Rc)  /// examine Atb abd Atl get determine correct side
+					{
+						if (rc.Tv != null && rc.Ltp == null)
+						{
+							last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
+						}
+						else if (rc.Ltp != null)
+						{
+							last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
+						}
+					}
+				}
+                NotifyPropertyChanged("");
+				//Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, e.Change.Rc, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
+			}
+			catch (Exception xe)
+			{
+				Debug.WriteLine(xe.Message);
+			}
+		}
+		private void OnMessageReceived(string messageName, object data)
+        {
+			if (messageName == "Market Selected")
+			{
+				dynamic d = data;
+				NodeViewModel d2 = d.NodeViewModel;
+				Debug.WriteLine($"RunnersContrkL {d2.MarketName}");
+				UpdateMarketAsync(d2);
+			}
+			if (messageName == "Market Changed")
+			{
+				dynamic d = data;
+				MarketChange change = d.MarketChange;
+				MarketSnapDto snap = d.MarketSnapDto;
+
+				//Debug.WriteLine(change.MarketDefinition.Runners.Count);
+				OnMarketChanged(change, snap);
+				//_ = PopulateNewMarketAsync(d2);
+			}
+		}
+		public RunnersControl()
         {
             InitializeComponent();
             ControlMessenger.MessageSent += OnMessageReceived;

@@ -81,7 +81,7 @@ namespace SpreadTrader
             }
         }
         public double LastPriceTraded { get; set; }
-        public List<PriceSize> BackValues { get; set; }
+        public ObservableCollection<PriceSize> BackValues { get; set; }
         public ObservableCollection<PriceSize> LayValues { get; set; }
         public double BackLayRatio { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -96,7 +96,7 @@ namespace SpreadTrader
         {
             BackStake = Properties.Settings.Default.BackStake;
             LayStake = Properties.Settings.Default.LayStake;
-            BackValues = new List<PriceSize>();
+            BackValues = new ObservableCollection<PriceSize>();
             LayValues = new ObservableCollection<PriceSize>();
 
             BackValues.Add(new PriceSize());
@@ -107,58 +107,68 @@ namespace SpreadTrader
             LayValues.Add(new PriceSize());
             _Width = 160;
         }
-        public LiveRunner(Runner r) : this()
-        {
-            ngrunner = r;
-            SelectionId = r.selectionId;
-            SetPrices(r);
-        }
-        public void SetPrices(MarketRunnerSnap r)
-        {
-            int i = 0;
-            if (r.Prices.BestDisplayAvailableToBack.Count > 0) foreach (var ps in r.Prices.BestDisplayAvailableToBack)
-                {
-                    BackValues[i].price = ps.Price;
-                    BackValues[i++].size = ps.Size;
-                }
-            i = 0;
-            if (r.Prices.BestDisplayAvailableToLay.Count > 0) foreach (var ps in r.Prices.BestDisplayAvailableToLay)
-                {
-                    LayValues[i].price = ps.Price;
-                    LayValues[i++].size = ps.Size;
-                }
-            LastPriceTraded = r.Prices.LastTradedPrice;
-            NotifyPropertyChanged("");
-        }
-        public void SetPrices(Runner r)
-        {
-            int i = 0;
-            if (r.ex != null)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    BackValues[j] = new PriceSize();
-                    LayValues[j] = new PriceSize();
-                }
-                if (r.ex.availableToBack.Count > 0) foreach (var ps in r.ex.availableToBack)
-                    {
-                        BackValues[i].price = ps.price;
-                        BackValues[i++].size = ps.size;
-                    }
-                i = 0;
-                if (r.ex.availableToLay.Count > 0) foreach (var ps in r.ex.availableToLay)
-                    {
-                        LayValues[i].price = ps.price;
-                        LayValues[i++].size = ps.size;
-                    }
-            }
-            Name = String.Format("{0}{1}", r.Catalog.name, r.handicap == 0 ? "" : " " + r.handicap.ToString());
-            ifWin = r.ifWin;        ///NH
-            LastPriceTraded = r.lastPriceTraded;
-            BackLayRatio = r.BackLayRatio;
-            NotifyPropertyChanged("");
-        }
-        public override string ToString()
+		public LiveRunner(Runner r) : this()
+		{
+			ngrunner = r;
+			SelectionId = r.selectionId;
+			SetPrices(r);
+		}
+		public LiveRunner(MarketRunnerSnapDto r) : this()
+		{
+			//ngrunner = r;
+			SelectionId = r.SelectionId;
+			foreach (var ps in r.Prices.Back)
+				BackValues.Add(new PriceSize(ps.Price, ps.Size));
+
+			foreach (var ps in r.Prices.Lay)
+				LayValues.Add(new PriceSize(ps.Price, ps.Size));
+		}
+		public void SetPrices(MarketRunnerSnap r)
+		{
+			int i = 0;
+			if (r.Prices.BestDisplayAvailableToBack.Count > 0) foreach (var ps in r.Prices.BestDisplayAvailableToBack)
+				{
+					BackValues[i].price = ps.Price;
+					BackValues[i++].size = ps.Size;
+				}
+			i = 0;
+			if (r.Prices.BestDisplayAvailableToLay.Count > 0) foreach (var ps in r.Prices.BestDisplayAvailableToLay)
+				{
+					LayValues[i].price = ps.Price;
+					LayValues[i++].size = ps.Size;
+				}
+			LastPriceTraded = r.Prices.LastTradedPrice;
+			NotifyPropertyChanged("");
+		}
+		public void SetPrices(Runner r)
+		{
+			int i = 0;
+			if (r.ex != null)
+			{
+				for (int j = 0; j < 3; j++)
+				{
+					BackValues[j] = new PriceSize();
+					LayValues[j] = new PriceSize();
+				}
+				if (r.ex.availableToBack.Count > 0) foreach (var ps in r.ex.availableToBack)
+					{
+						BackValues[i].price = ps.price;
+						BackValues[i++].size = ps.size;
+					}
+				i = 0;
+				if (r.ex.availableToLay.Count > 0) foreach (var ps in r.ex.availableToLay)
+					{
+						LayValues[i].price = ps.price;
+						LayValues[i++].size = ps.size;
+					}
+			}
+			Name = String.Format("{0}{1}", r.Catalog.name, r.handicap == 0 ? "" : " " + r.handicap.ToString());
+			ifWin = r.ifWin;        ///NH
+			LastPriceTraded = r.lastPriceTraded;
+			BackLayRatio = r.BackLayRatio;
+			NotifyPropertyChanged("");
+		}
+		public override string ToString()
         {
             return String.Format("{0}, {1}", Name, SelectionId);
         }

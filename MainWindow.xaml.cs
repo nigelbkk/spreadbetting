@@ -24,6 +24,7 @@ namespace SpreadTrader
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private Properties.Settings props = Properties.Settings.Default;
+        private WebSocketsHub hub = new WebSocketsHub();
         private static String _Status = "Ready";
         private static String _Notification = "";
         public String Status
