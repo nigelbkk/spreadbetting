@@ -45,7 +45,7 @@ namespace SpreadTrader
             if (messageName == "Market Selected")
             {
                 dynamic d = data;
-                Debug.WriteLine($"BettingGrid: {d.Name}");
+                //Debug.WriteLine($"BettingGrid: {d.Name}");
             }
             if (messageName == "Execute Bets")
             {

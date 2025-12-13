@@ -171,8 +171,8 @@ namespace SpreadTrader
                         EventsTree.Refresh();
                         break;
                     case "Favourites":
-                        if (Market.Betfair == null) break;
-                        new Favourites(this, b, Market.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList()).ShowDialog(); break;
+                        if (NodeViewModel.Betfair == null) break;
+                        new Favourites(this, b, NodeViewModel.Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList()).ShowDialog(); break;
                     case "Commission":
                         UpdateAccountInformation();
                         break;

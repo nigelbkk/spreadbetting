@@ -9,7 +9,7 @@ namespace SpreadTrader
 {
     public partial class MarketHeader : UserControl, INotifyPropertyChanged
     {
-        private Market MarketNode { get { return TabContent != null && TabContent.MarketNode != null ? TabContent.MarketNode : null; } }
+        private NodeViewModel MarketNode { get { return TabContent != null && TabContent.MarketNode != null ? TabContent.MarketNode : null; } }
         public TabContent TabContent { get; set; }
         public String FullName { get { return MarketNode == null ? "No Market Selected" : MarketNode.MarketName; } }
         public String TimeToGo { get { return MarketNode == null ? "00:00:00" : MarketNode.TimeToGo; } }

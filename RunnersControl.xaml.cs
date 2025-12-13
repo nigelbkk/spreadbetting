@@ -14,11 +14,14 @@ namespace SpreadTrader
 {
     public partial class RunnersControl : UserControl, INotifyPropertyChanged
     {
-        public Market MarketNode { get; set; }
-        public double BackBook { get { return MarketNode == null ? 0.00 : MarketNode.BackBook; } }
+		private NodeViewModel _MarketNode { get; set; }
+		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
+		public double BackBook { get { return MarketNode == null ? 0.00 : MarketNode.BackBook; } }
         public double LayBook { get { return MarketNode == null ? 0.00 : MarketNode.LayBook; } }
-        public List<LiveRunner> LiveRunners { get { return MarketNode?.LiveRunners ?? new List<LiveRunner>(); } }
-        private Properties.Settings props = Properties.Settings.Default;
+        //public List<LiveRunner> LiveRunners { get { return MarketNode?.LiveRunners ?? new List<LiveRunner>(); } }
+		public List<LiveRunner> LiveRunners { get; set; }
+
+		private Properties.Settings props = Properties.Settings.Default;
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(String info)
         {
@@ -53,9 +56,10 @@ namespace SpreadTrader
                 }
             }
         }
-        private async Task PopulateNewMarket(Market node)
+        private async Task PopulateNewMarket(NodeViewModel node)
         {
             MarketNode = node;
+            LiveRunners = node.LiveRunners;
             NotifyPropertyChanged("");
         }
         private void OnMessageReceived(string messageName, object data)
@@ -63,8 +67,10 @@ namespace SpreadTrader
             if (messageName == "Market Selected")
             {
                 dynamic d = data;
-                Debug.WriteLine((String)d.Name);
-                PopulateNewMarket(d.MarketNode);
+                NodeViewModel d2 = d.NodeViewModel;
+
+				Debug.WriteLine(d2.MarketName);
+                PopulateNewMarket(d2);
             }
         }
         public RunnersControl()

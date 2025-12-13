@@ -10,7 +10,7 @@ namespace SpreadTrader
     {
         public CustomTabHeader customHeader = null;
         public MainWindow mainWindow { get; set; }
-        public Market MarketNode = null;
+        public NodeViewModel MarketNode = null;
         public string MarketName { get { return MarketNode?.MarketName; } }
         public string OverlayStatus
         {
@@ -55,8 +55,9 @@ namespace SpreadTrader
             if (messageName == "Market Selected")
             {
                 dynamic d = data;
-                Debug.WriteLine($"TabContent: {d.Name}");
-                customHeader.Title = d.Name;
+                NodeViewModel d2 = d.NodeViewModel as NodeViewModel;
+                Debug.WriteLine($"TabContent: {d2.FullName}");
+                customHeader.Title = d2.FullName;
             }
         }
     }

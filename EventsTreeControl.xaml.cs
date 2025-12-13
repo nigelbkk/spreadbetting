@@ -18,7 +18,7 @@ namespace SpreadTrader
         {
             InitializeComponent();
         }
-        public Market RootNode { get; set; }
+        public NodeViewModel RootNode { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(String info)
         {
@@ -34,7 +34,7 @@ namespace SpreadTrader
         }
         public void Populate()
         {
-            RootNode = new Market(MainWindow.Betfair);
+            RootNode = new NodeViewModel(MainWindow.Betfair);
             RootNode.PopulateEventTypes();
         }
         private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)

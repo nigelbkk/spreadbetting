@@ -118,7 +118,7 @@ namespace SpreadTrader
         public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
         public RunnersControl RunnersControl { get; set; }
         public ObservableCollection<Row> Rows { get; set; }
-        private Market MarketNode { get; set; }
+        private NodeViewModel MarketNode { get; set; }
         private DateTime _LastUpdated { get; set; }
         private BetfairAPI.BetfairAPI Betfair { get; set; }
         private bool _StreamActive { get; set; }
@@ -158,13 +158,37 @@ namespace SpreadTrader
                 //Extensions.MainWindow.Status = value;
             }
         }
-        private bool _Connected { get { return !String.IsNullOrEmpty(hubConnection?.ConnectionId); } }
-        public bool IsConnected { get { return _Connected; } }
+        //private bool _Connected { get { return !String.IsNullOrEmpty(hubConnection?.ConnectionId); } }
+        //public bool IsConnected { get { return _Connected; } }
         public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
-        public String StreamingButtonText { get { return IsConnected ? "Streaming Connected" : "Streaming Disconnected"; } }
-        private IHubProxy hubProxy = null;
-        private HubConnection hubConnection = null;
-        private Row FindUnmatchedRow(String id)
+        public String StreamingButtonText { get { return "Streaming Connected"; } }
+		//private IHubProxy hubProxy = null;
+		//private HubConnection hubConnection = null;
+
+		private void OnMessageReceived(string messageName, object data)
+		{
+			if (messageName == "Favorite Changed")
+			{
+				dynamic d = data;
+				Debug.WriteLine($"BetsManager: {messageName} : {d.Name}");
+			}
+			if (messageName == "Market Selected")
+			{
+				dynamic d = data;
+				Debug.WriteLine($"BetsManager: {messageName} : {d.NodeViewModel.Name}");
+				MarketNode = d.NodeViewModel;
+//				MarketNode = d.NodeViewModel.Market;
+			}
+			if (messageName == "Execute Bets")
+			{
+				dynamic d = data;
+				Debug.WriteLine($"BetsManager: {messageName} : {d.Favorite.Name}");
+				ExecuteBets(d.Favorite, d.LayValues, d.BackValues);
+			}
+		}
+
+
+		private Row FindUnmatchedRow(String id)
         {
             if (Rows.Count > 0) foreach (Row r in Rows)
                 {
@@ -242,27 +266,6 @@ namespace SpreadTrader
                 System.Threading.Thread.Sleep(10);
             }
         }
-        private void OnMessageReceived(string messageName, object data)
-        {
-            if (messageName == "Favorite Changed")
-            {
-                dynamic d = data;
-                Debug.WriteLine($"BetsManager: {messageName} : {d.Name}");
-            }
-            if (messageName == "Market Selected")
-            {
-                dynamic d = data;
-                Debug.WriteLine($"BetsManager: {messageName} : {d.Name}");
-                MarketNode = d.MarketNode;
-            }
-            if (messageName == "Execute Bets")
-            {
-                dynamic d = data;
-                Debug.WriteLine($"BetsManager: {messageName} : {d.Favorite.Name}");
-                ExecuteBets(d.Favorite, d.LayValues, d.BackValues);
-            }
-        }
-
         private async void ExecuteBets(LiveRunner runner, List<PriceSize> lay, List<PriceSize> back)
         {
             String MarketID = MarketNode.MarketID;
@@ -343,23 +346,26 @@ namespace SpreadTrader
             bw2.DoWork += (o, e) => ProcessCancellationQueue(o);
             bw2.RunWorkerAsync();
 
-            hubConnection = new HubConnection("http://" + props.StreamUrl);
-            hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
+            //////
+            /// hub stuff
 
-            hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
-            {
-                OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
-                OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json3);
-                if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
-                {
-                    lock (incomingOrdersQueue)
-                    {
-                        Debug.WriteLine("Add to queue");
-                        incomingOrdersQueue.Enqueue(json1);
-                    }
-                }
-            });
-            Connect();
+            //hubConnection = new HubConnection("http://" + props.StreamUrl);
+            //hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
+
+            //hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
+            //{
+            //    OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
+            //    OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json3);
+            //    if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
+            //    {
+            //        lock (incomingOrdersQueue)
+            //        {
+            //            Debug.WriteLine("Add to queue");
+            //            incomingOrdersQueue.Enqueue(json1);
+            //        }
+            //    }
+            //});
+            //Connect();
         }
 
         private object lockObj = new object();
@@ -372,11 +378,11 @@ namespace SpreadTrader
                     TabContent ct = ti.Content as TabContent;
                     CustomTabHeader header = ti.Header as CustomTabHeader;
 
-                    if (!ti.IsSelected && ct.MarketNode != null && ct.MarketNode.MarketID == MarketNode.MarketID)
-                    {
-                        header.OnMatched();                     // change the tab color
-                        break;
-                    }
+                    //if (!ti.IsSelected && ct.MarketNode != null && ct.MarketNode.MarketID == MarketNode.MarketID)
+                    //{
+                    //    header.OnMatched();                     // change the tab color
+                    //    break;
+                    //}
                 }
             }));
             if (!String.IsNullOrEmpty(props.MatchedBetAlert))
@@ -582,105 +588,40 @@ namespace SpreadTrader
                 Debug.WriteLine("null context");
             }
         }
-        private void Connect()
-        {
-            String result = "";
-            if (hubConnection != null)
-            {
-                hubConnection.Start().ContinueWith(task =>
-                {
-                    if (OnFail(task))
-                    {
-                        result = "Failed to Connect";
-                        return;
-                    }
-                    result = "Connected";
-                }).Wait(1000);
-                Status = result;
-            }
-        }
-        private void Disconnect()
-        {
-            hubConnection.Stop(new TimeSpan(2000));
-            Status = "Disconnected";
-        }
-        private bool OnFail(Task task)
-        {
-            if (task.IsFaulted)
-            {
-                Debug.WriteLine("Exception:{0}", task.Exception.GetBaseException());
-            }
-            return task.IsFaulted;
-        }
-        private Int32 newbetid = 44448880;
-        private double amount_remaining = 0;
-        private String newbet(LiveRunner lr, Order.SideEnum side)
-        {
-            Int32 new_stake = 100;
-            amount_remaining = new_stake;
-            DateTimeOffset now = DateTimeOffset.UtcNow;
-            OrderMarketChange change = new OrderMarketChange();
 
-            change.Orc = new List<OrderRunnerChange>();
-            OrderRunnerChange orc = new OrderRunnerChange();
-            orc.Uo = new List<Order>();
-            orc.Id = lr.SelectionId;
-            change.Orc.Add(orc);
-
-            Order o = new Order();
-            o.Status = Order.StatusEnum.E;
-            o.Id = newbetid++.ToString();
-
-            o.Pd = now.ToUnixTimeMilliseconds();
-            o.Side = side;
-            o.Sm = 0;
-            o.Sr = new_stake;
-            o.P = side == Order.SideEnum.B ? lr.BackValues[0].price : lr.LayValues[0].price;
-            o.S = new_stake;
-            o.Sc = 0;
-            orc.Uo.Add(o);
-
-            return JsonConvert.SerializeObject(change);
-        }
-        private String matchbet(LiveRunner lr)
-        {
-            if (Rows.Count <= 0)
-                return "";
-
-            Int32 match_stake = 10;
-            amount_remaining -= match_stake;
-
-            Row r = FindUnmatchedRow(lr);
-            if (r == null)
-                return null;
-
-            UInt64 betid = r.BetID;
-
-            DateTimeOffset now = DateTimeOffset.UtcNow;
-            OrderMarketChange change = new OrderMarketChange();
-
-            change.Orc = new List<OrderRunnerChange>();
-            OrderRunnerChange orc = new OrderRunnerChange();
-            orc.Uo = new List<Order>();
-            orc.Id = lr.SelectionId;
-            change.Orc.Add(orc);
-
-            Order o = new Order();
-            o.Status = Order.StatusEnum.E;
-            o.Id = betid.ToString();
-
-            o.Pd = now.ToUnixTimeMilliseconds();
-            o.P = r.Odds;
-            o.Avp = r.Odds;
-            o.Sm = match_stake;
-            o.Sr = amount_remaining;
-            o.S = match_stake;
-            o.Sc = 0;
-            orc.Uo.Add(o);
-            return JsonConvert.SerializeObject(change);
-        }
-        Int32 json_index = 0;
-        String[] json_rows = new String[0];
+        /// <summary>
+        /// ///// hub stuff
+        /// </summary>
+        //private void Connect()
+        //{
+        //    String result = "";
+        //    if (hubConnection != null)
+        //    {
+        //        hubConnection.Start().ContinueWith(task =>
+        //        {
+        //            if (OnFail(task))
+        //            {
+        //                result = "Failed to Connect";
+        //                return;
+        //            }
+        //            result = "Connected";
+        //        }).Wait(1000);
+        //        Status = result;
+        //    }
+        //}
+        //private void Disconnect()
+        //{
+        //    hubConnection.Stop(new TimeSpan(2000));
+        //    Status = "Disconnected";
+        //}
+        //private bool OnFail(Task task)
+        //{
+        //    if (task.IsFaulted)
+        //    {
+        //        Debug.WriteLine("Exception:{0}", task.Exception.GetBaseException());
+        //    }
+        //    return task.IsFaulted;
+        //}
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (Betfair == null)
@@ -778,42 +719,6 @@ namespace SpreadTrader
                         }
                         break;
 
-                    case "Reset":
-                        MarketNode = new Market("json") { MarketID = "1.448881" };
-                        json_rows = File.ReadAllLines(".\\notifications.json");
-                        json_index = 0;
-                        Rows.Clear();
-                        break;
-                    case "Run":
-                        MarketNode = new Market("json") { MarketID = "1.448881" };
-                        json_rows = File.ReadAllLines(".\\notifications.json");
-                        json_index = 0;
-                        foreach (String j in json_rows)
-                        {
-                            json_index++;
-                            OnOrderChanged(j);
-                        }
-                        break;
-                    case "Next":
-                        if (json_index >= json_rows.Length)
-                            break;
-                        String json_row = json_rows[json_index];
-                        OnOrderChanged(json_row);
-                        json_index++;
-                        break;
-                    case "Back1":
-                        OnOrderChanged(newbet(MarketNode.LiveRunners[0], Order.SideEnum.B)); break;
-                    case "Lay1":
-                        OnOrderChanged(newbet(MarketNode.LiveRunners[0], Order.SideEnum.L)); break;
-                    case "Match1":
-                        OnOrderChanged(matchbet(MarketNode.LiveRunners[0])); break;
-                    case "Back2":
-                        OnOrderChanged(newbet(MarketNode.LiveRunners[1], Order.SideEnum.B)); break;
-                    case "Lay2":
-                        OnOrderChanged(newbet(MarketNode.LiveRunners[1], Order.SideEnum.L)); break;
-                    case "Match2":
-                        OnOrderChanged(matchbet(MarketNode.LiveRunners[1])); break;
-                    case "Stream": if (IsConnected) Disconnect(); else Connect(); break;
                     case "CancelAll":
                         Status = "CancelAll";
                         Notification = "";
