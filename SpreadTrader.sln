@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30711.63
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11304.174 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadTrader", "SpreadTrader.csproj", "{47828AB3-3257-4E1A-9173-0F534F48831B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WSServer", "..\wsserver\WSServer.csproj", "{5020BD75-CA46-4C80-95DE-AF14FB612BF4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ESAClient", "..\Betfair.ESAClient\Betfair.ESAClient.csproj", "{C6F11E1B-DA85-41BC-9DEE-B941D3C6A805}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetfairProxy", "..\BetfairProxy\BetfairProxy.csproj", "{72188CC6-1F1A-4A50-BF54-4D33D6989FB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,14 @@ Global
 		{C6F11E1B-DA85-41BC-9DEE-B941D3C6A805}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C6F11E1B-DA85-41BC-9DEE-B941D3C6A805}.Release|x64.ActiveCfg = Release|Any CPU
 		{C6F11E1B-DA85-41BC-9DEE-B941D3C6A805}.Release|x64.Build.0 = Release|Any CPU
+		{72188CC6-1F1A-4A50-BF54-4D33D6989FB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72188CC6-1F1A-4A50-BF54-4D33D6989FB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72188CC6-1F1A-4A50-BF54-4D33D6989FB4}.Debug|x64.ActiveCfg = Debug|x64
+		{72188CC6-1F1A-4A50-BF54-4D33D6989FB4}.Debug|x64.Build.0 = Debug|x64
+		{72188CC6-1F1A-4A50-BF54-4D33D6989FB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72188CC6-1F1A-4A50-BF54-4D33D6989FB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72188CC6-1F1A-4A50-BF54-4D33D6989FB4}.Release|x64.ActiveCfg = Release|x64
+		{72188CC6-1F1A-4A50-BF54-4D33D6989FB4}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

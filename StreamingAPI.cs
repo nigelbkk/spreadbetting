@@ -28,6 +28,7 @@ namespace SpreadTrader
                 NewSessionProvider("identitysso-cert.betfair.com", props.AppKey, props.BFUser, props.BFPassword, MainWindow.Betfair.SessionToken);
                 ClientCache.Client.ConnectionStatusChanged += (o, e) =>
                 {
+                    Debug.WriteLine("==========================ConnectionStatusChanged=========================");
                     if (!String.IsNullOrEmpty(e.ConnectionId))
                     {
                         ConnectionId = e.ConnectionId;

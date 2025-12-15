@@ -149,12 +149,12 @@ namespace SpreadTrader
                     {
                         foreach (Int32 cell_id in cell_ids.Item2)
                         {
-                            Debug.WriteLine($"Back: {RunnerName} : {rc.Ltp} : cell id = {cell_id}");
+                            //Debug.WriteLine($"Back: {RunnerName} : {rc.Ltp} : cell id = {cell_id}");
                             liveRunners[cell_ids.Item1].BackValues[cell_id].CellBackgroundColor = Brushes.Yellow;
                         }
                         foreach (Int32 cell_id in cell_ids.Item3)
                         {
-                            Debug.WriteLine($"Lay:  {RunnerName} : {rc.Ltp} : cell id = {cell_id}");
+                            //Debug.WriteLine($"Lay:  {RunnerName} : {rc.Ltp} : cell id = {cell_id}");
                             liveRunners[cell_ids.Item1].LayValues[cell_id].CellBackgroundColor = Brushes.Yellow;
                         }
                         NotifyPropertyChanged("");
@@ -212,7 +212,6 @@ namespace SpreadTrader
                 if (MarketNode != null && marketid == MarketNode.MarketID)
                 {
                     //FlashTraded(liveRunners, Rc);
-
                     if (MarketNode != null && marketid == MarketNode.MarketID)
                     {
                         FlashTraded(liveRunners, Rc);

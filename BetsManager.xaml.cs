@@ -3,6 +3,7 @@ using BetfairAPI;
 using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -112,10 +113,7 @@ namespace SpreadTrader
 	public partial class BetsManager : UserControl, INotifyPropertyChanged
 	{
 		public OnShutdownDelegate OnShutdown;
-		//private Queue<String> incomingOrdersQueue = new Queue<String>();
-		//private Queue<UInt64> cancellation_queue = new Queue<UInt64>();
-
-		private Properties.Settings props = Properties.Settings.Default;
+        private Properties.Settings props = Properties.Settings.Default;
 		public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
 		public MarketSelectionDelegate OnMarketSelected;
 		public FavoriteChangedDelegate OnFavoriteChanged;
@@ -127,7 +125,7 @@ namespace SpreadTrader
 		private BetfairAPI.BetfairAPI Betfair { get; set; }
 		private bool _StreamActive { get; set; }
 		public bool StreamActive { get { return _StreamActive; } set { _StreamActive = value; NotifyPropertyChanged(""); } }
-		private Timer timer = new Timer();
+		//private Timer timer = new Timer();
 		public void NotifyPropertyChanged(String info)
 		{
 			if (PropertyChanged != null)
@@ -135,8 +133,7 @@ namespace SpreadTrader
 				Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
 			}
 		}
-		public Int32 DebugID { get; set; }
-		public double MatchAmount { get; set; }
+		//public double MatchAmount { get; set; }
 		public bool UnmatchedOnly { get; set; }
 		public String LastUpdated { get { return String.Format("Orders last updated {0}", _LastUpdated.AddHours(props.TimeOffset).ToString("HH:mm:ss")); } }
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -148,7 +145,6 @@ namespace SpreadTrader
 			{
 				_Status = value;
 				Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = value; }));
-				//Extensions.MainWindow.Status = value;
 			}
 		}
 		private String _Notification = "";
@@ -159,140 +155,62 @@ namespace SpreadTrader
 			{
 				_Notification = value;
 				Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Notification = value; }));
-				//Extensions.MainWindow.Status = value;
 			}
 		}
 		private bool _Connected { get { return !String.IsNullOrEmpty(hubConnection?.ConnectionId); } }
 		public bool IsConnected { get { return _Connected; } }
 		public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
 		public String StreamingButtonText { get { return IsConnected ? "Streaming Connected" : "Streaming Disconnected"; } }
-		private IHubProxy hubProxy = null;
+
+        /// ///////////////////////////////////////////////
+		/// ///////////////////////////////////////////////
+        /// ///////////////////////////////////////////////
+
+        //private ConcurrentQueue<String> _incomingQueue = new ConcurrentQueue<String>();
+        private readonly BlockingCollection<string> _orderQueue;
+
+        private IHubProxy hubProxy = null;
 		private HubConnection hubConnection = null;
-		private Row FindUnmatchedRow(String id)
-		{
-			if (Rows.Count > 0) foreach (Row r in Rows)
-				{
-					if (r.BetID == Convert.ToUInt64(id))
-					{
-						if (r.SizeMatched == 0)
-							return r;
-					}
-				}
-			return null;
-		}
-		private Row FindUnmatchedRow(LiveRunner lr)
-		{
-			if (Rows.Count > 0) foreach (Row r in Rows)
-				{
-					if (r.SelectionID == lr.SelectionId)
-					{
-						if (r.SizeMatched == 0)
-							return r;
-					}
-				}
-			return null;
-		}
-        public async Task ProcessIncomingOrdersAsync(String json)
+        private Task _orderProcessor;
+        private object lockObj = new object();
+
+        public void Start()
         {
-            OnOrderChanged(json);
-            //while (incomingOrdersQueue.Count > 0)
-            //{
-            //    string json = null;
-
-            //    try
-            //    {
-            //        // Dequeue is synchronous but cheap
-            //        json = incomingOrdersQueue.Dequeue();
-
-            //        var snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
-
-            //        // If OnOrderChanged is synchronous:
-            //        OnOrderChanged(json);
-
-            //        // If OnOrderChanged is async:
-            //        // await OnOrderChangedAsync(json);
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Status = ex.Message;
-            //    }
-
-            //    // Optional: yield control to not block UI thread
-            //    await Task.Yield();
-            //}
+            _orderProcessor = Task.Run(() => OrderProcessingLoop());
         }
 
-        //private void ProcessIncomingNotifications(object o)
-        //{
-        //	Debug.WriteLine("ProcessIncomingNotifications");
-        //	BackgroundWorker sender = o as BackgroundWorker;
-        //	while (!sender.CancellationPending)
-        //	{
-        //		while (incomingOrdersQueue.Count > 0)
-        //		{
-        //			try
-        //			{
-        //				//Debug.WriteLine("Fetch from queue");
-        //				//lock (incomingOrdersQueue) 
-        //				{ 
-        //					String json = incomingOrdersQueue.Dequeue();
-        //					OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
-        //					OnOrderChanged(json);
-        //				}
-        //			}
-        //			catch (Exception xe)
-        //			{
-        //				Status = xe.Message;
-        //			}
-        //		}
-        //		System.Threading.Thread.Sleep(1000);
-        //	}
-        //}
-  //      private void ProcessCancellationQueue(object o)
-		//{
-		//	BackgroundWorker sender = o as BackgroundWorker;
-		//	while (!sender.CancellationPending)
-		//	{
-		//		while (cancellation_queue.Count > 0)
-		//		{
-		//			try
-		//			{
-		//				//lock (cancellation_queue)
-		//				{
-		//					UInt64 betid = cancellation_queue.Dequeue();
+        private void OrderProcessingLoop()
+        {
+            foreach (var json in _orderQueue.GetConsumingEnumerable())
+            {
+				lock (lockObj)
+				{
+					ProcessOrder(json);
+                }
+            }
+        }
 
-		//					//Debug.WriteLine("submit cancel {0}", betid);
-		//					CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid, null);
-		//					if (report.errorCode == null)
-		//					{
-		//						Debug.WriteLine("bet is cancelled {0}", betid);
-		//					}
-		//					Status = report.errorCode != null ? report.errorCode : report.status;
-		//				}
-		//			}
-		//			catch (Exception xe)
-		//			{
-		//				Debug.WriteLine(xe.Message);
-		//				Status = xe.Message;
-		//			}
-		//		}
-		//		System.Threading.Thread.Sleep(1000);
-		//	}
-		//}
-		public BetsManager()
+        public BetsManager()
 		{
-			//BackgroundWorker bw = new BackgroundWorker();
-			//bw.DoWork += (o, e) => ProcessIncomingNotifications(o);
-			//bw.RunWorkerAsync();
-
-			//BackgroundWorker bw2 = new BackgroundWorker();
-			//bw2.DoWork += (o, e) => ProcessCancellationQueue(o);
-			//bw2.RunWorkerAsync();
+			_orderQueue = new BlockingCollection<string>(new ConcurrentQueue<string>());
 
 			hubConnection = new HubConnection("http://" + props.StreamUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
-			hubConnection.Reconnecting += () =>
+			Start();
+
+            hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
+            {
+                OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json1);
+                OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
+                if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
+                {
+                    _orderQueue.Add(json1);
+                    //_incomingQueue.Enqueue(json1);
+                }
+            });
+
+            hubConnection.Reconnecting += () =>
 			{
 				Debug.WriteLine("[SignalR] Reconnecting...");
 				Connect();
@@ -308,36 +226,6 @@ namespace SpreadTrader
 			{
 				Debug.WriteLine("[SignalR] Closed — manual reconnect required.");
 				Connect();
-			};
-
-			hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
-			{
-				OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json1);
-				OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
-				if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
-				{
-					_ = ProcessIncomingOrdersAsync(json1);
-					//lock (incomingOrdersQueue)
-					//{
-					//	//Debug.WriteLine("Add to queue");
-					//	incomingOrdersQueue.Enqueue(json1);
-					//}
-				}
-			});
-
-
-			///// This can be removed //////////////////////
-			StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, last_traded, inplay) =>
-			{
-				try
-				{
-					StreamActive = true;
-					timer.Start();
-				}
-				catch (Exception ex)
-				{
-					Debug.WriteLine(ex);
-				}
 			};
 
 			Rows = new ObservableCollection<Row>();
@@ -424,7 +312,14 @@ namespace SpreadTrader
 					Extensions.MainWindow.Commission = MarketNode.Commission;
 					PopulateDataGrid();
 					Debug.WriteLine($"Market Selected: {MarketNode.Name} : {MarketNode.MarketID}");
-					RequestMarketSelected(MarketNode.MarketID);
+					try
+					{
+						RequestMarketSelected(MarketNode.MarketID);
+					}
+					catch (Exception e)
+					{
+						Debug.WriteLine(e.Message);	
+					}
 				}
 			};
 			Connect();
@@ -447,32 +342,9 @@ namespace SpreadTrader
 			hubConnection?.Dispose();
 			hubConnection?.Stop();
 		}
-		private object lockObj = new object();
-		private void NotifyBetMatched()
+		private void ProcessOrder(String json)
 		{
-			Dispatcher.BeginInvoke(new Action(() =>
-			{
-				foreach (TabItem ti in Extensions.MainWindow.TabControl.Items)
-				{
-					TabContent ct = ti.Content as TabContent;
-					CustomTabHeader header = ti.Header as CustomTabHeader;
-
-					if (!ti.IsSelected && ct.MarketNode != null && ct.MarketNode.MarketID == MarketNode.MarketID)
-					{
-						header.OnMatched();                     // change the tab color
-						break;
-					}
-				}
-			}));
-			if (!String.IsNullOrEmpty(props.MatchedBetAlert))
-			{
-				SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
-				snd.Play();
-			}
-		}
-		private void OnOrderChanged(String json)
-		{
-			lock (lockObj)
+			//lock (lockObj)
 			{
 				if (String.IsNullOrEmpty(json))
 					return;
@@ -598,7 +470,7 @@ namespace SpreadTrader
 							}
 						}
 					}
-					NotifyPropertyChanged("");
+					//NotifyPropertyChanged("");
 				}
 				catch (Exception xe)
 				{
@@ -643,42 +515,8 @@ namespace SpreadTrader
 				}
 			}
 		}
-		private void RowButton_Click(object sender, RoutedEventArgs e)
-		{
-			Button b = sender as Button;
-			Row row = b.DataContext as Row;
-			if (row != null)
-			{
-				if (row.IsMatched || row.SizeMatched >= row.Stake)
-				{
-					Status = "Bet already matched";
-					return;
-				}
-
-                List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
-				cancel_instructions.Add(new CancelInstruction(row.BetID)
-				{
-					sizeReduction = null
-				});
-				Betfair.cancelOrdersAsync(MarketNode.MarketID, cancel_instructions);
-                //Debug.Assert(false);
-
-				//lock (cancellation_queue)
-				//{
-				//	Debug.WriteLine("enqueue cancel {0} for {1}", row.BetID, row.Runner);
-				//	cancellation_queue.Enqueue(row.BetID);
-				//	row.Hidden = true;
-				//}
-			}
-			else
-			{
-				Debug.WriteLine("null context");
-			}
-		}
 		
-		/// <summary>
 		/// HUB stuff ///////////////////////////////////
-		/// </summary>
 		private void Connect()
 		{
 			String result = "";
@@ -715,7 +553,20 @@ namespace SpreadTrader
 			string response = await client.GetStringAsync("http://88.202.230.157:8088/api/market/capture");
 			Debug.WriteLine(response);
 		}
-		private async void Button_Click(object sender, RoutedEventArgs e)
+        private Row FindUnmatchedRow(String id)
+        {
+            if (Rows.Count > 0) foreach (Row r in Rows)
+                {
+                    if (r.BetID == Convert.ToUInt64(id))
+                    {
+                        if (r.SizeMatched == 0)
+                            return r;
+                    }
+                }
+            return null;
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
 		{
 			if (Betfair == null)
 			{
@@ -906,7 +757,39 @@ namespace SpreadTrader
 				Debug.WriteLine(xe.Message);
 			}
 		}
-		private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        private void RowButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button b = sender as Button;
+            Row row = b.DataContext as Row;
+            if (row != null)
+            {
+                if (row.IsMatched || row.SizeMatched >= row.Stake)
+                {
+                    Status = "Bet already matched";
+                    return;
+                }
+
+                List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
+                cancel_instructions.Add(new CancelInstruction(row.BetID)
+                {
+                    sizeReduction = null
+                });
+                Betfair.cancelOrdersAsync(MarketNode.MarketID, cancel_instructions);
+                //Debug.Assert(false);
+
+                //lock (cancellation_queue)
+                //{
+                //	Debug.WriteLine("enqueue cancel {0} for {1}", row.BetID, row.Runner);
+                //	cancellation_queue.Enqueue(row.BetID);
+                //	row.Hidden = true;
+                //}
+            }
+            else
+            {
+                Debug.WriteLine("null context");
+            }
+        }
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
 		{
 			CheckBox cb = sender as CheckBox;
 			if (Rows.Count > 0) foreach (Row row in Rows)
@@ -914,7 +797,30 @@ namespace SpreadTrader
 					row.Hidden = cb.IsChecked == true && row.SizeMatched > 0;
 				}
 		}
-		private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        private void NotifyBetMatched()
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                foreach (TabItem ti in Extensions.MainWindow.TabControl.Items)
+                {
+                    TabContent ct = ti.Content as TabContent;
+                    CustomTabHeader header = ti.Header as CustomTabHeader;
+
+                    if (!ti.IsSelected && ct.MarketNode != null && ct.MarketNode.MarketID == MarketNode.MarketID)
+                    {
+                        header.OnMatched();                     // change the tab color
+                        break;
+                    }
+                }
+            }));
+            if (!String.IsNullOrEmpty(props.MatchedBetAlert))
+            {
+                SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
+                snd.Play();
+            }
+        }
+
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
 		{
 			CheckBox_Checked(sender, e);
 		}
