@@ -171,24 +171,39 @@ namespace SpreadTrader
                         if (lr == null)
                             continue;
 
-                        //SelectionId = r.SelectionId;
-                        lr.BackValues?.Clear();
+                        //                  lr.BackValues?.Clear();
+                        //foreach (var ps in rsnap.Prices.Back)
+                        //	lr.BackValues.Add(new PriceSize(ps.Price, ps.Size));
 
+                        Int32 i = 0;
                         foreach (var ps in rsnap.Prices.Back)
-                            lr.BackValues.Add(new PriceSize(ps.Price, ps.Size));
+                        { 
+                            lr.BackValues[i].price = ps.Price;
+                            lr.BackValues[i].size = ps.Size;
+                            i++;
+                        }
 
-                        lr.LayValues?.Clear();
-                        foreach (var ps in rsnap.Prices.Lay)
-                            lr.LayValues.Add(new PriceSize(ps.Price, ps.Size));
+						i = 0;
+						foreach (var ps in rsnap.Prices.Lay)
+						{
+							lr.LayValues[i].price = ps.Price;
+							lr.LayValues[i].size = ps.Size;
+                            i++;
+						}
 
-                        while (lr.BackValues.Count < 3)
-						{
-							lr.BackValues.Add(new PriceSize(0, 0));
-						}
-						while (lr.LayValues.Count < 3)
-						{
-							lr.LayValues.Add(new PriceSize(0, 0));
-						}
+                        NotifyPropertyChanged("");
+						//lr.LayValues?.Clear();
+						//                  foreach (var ps in rsnap.Prices.Lay)
+						//                      lr.LayValues.Add(new PriceSize(ps.Price, ps.Size));
+
+						//                  while (lr.BackValues.Count < 3)
+						//{
+						//	lr.BackValues.Add(new PriceSize(0, 0));
+						//}
+						//while (lr.LayValues.Count < 3)
+						//{
+						//	lr.LayValues.Add(new PriceSize(0, 0));
+						//}
 					}
 					//if (LiveRunners.Count > 0 &&  snap.Runners[0].Prices.Back.Count > 0)
 					//{
@@ -286,14 +301,15 @@ namespace SpreadTrader
 			if (messageName == "Market Changed")
 			{
 				dynamic d = data;
-				MarketChange change = d.MarketChange;
-				//MarketSnapDto snap = d.MarketSnapDto;
+				//MarketChange change = d.MarketChange;
+				MarketSnapDto snap = d.MarketSnapDto;
 
-				//OnMarketChanged(change, snap);
 
 
 				if (LiveRunners != null)
-                    OnMarketChangedAsync(change);
+					OnMarketChanged(snap);
+					
+                //OnMarketChangedAsync(change);
 				
                 //FlashTraded(change);
 				
