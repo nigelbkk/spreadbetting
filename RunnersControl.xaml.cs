@@ -86,16 +86,17 @@ namespace SpreadTrader
         private async Task PopulateNewMarketAsync(NodeViewModel node)
         {
             MarketNode = node;
-            LiveRunners = node.GetLiveRunners();
-            NotifyPropertyChanged("");
-        }
-        private async void UpdateMarketAsync(NodeViewModel d2)
-        {
-            MarketNode = d2;
-            MarketNode.GetLiveRunners();
-            LiveRunners = MarketNode.LiveRunners;
-            NotifyPropertyChanged("");
-        }
+			MarketNode.GetLiveRunners();
+			LiveRunners = node.GetLiveRunners();
+			NotifyPropertyChanged("");
+		}
+		//private async void UpdateMarketAsync(NodeViewModel d2)
+  //      {
+  //          MarketNode = d2;
+  //          MarketNode.GetLiveRunners();
+  //          LiveRunners = MarketNode.LiveRunners;
+  //          NotifyPropertyChanged("");
+  //      }
 
         LiveRunner GetRunnerFromSelectionID(Int64 selid)
         {
@@ -108,7 +109,48 @@ namespace SpreadTrader
             }
             return null;
         }
-        private void OnMarketChanged(MarketChange change, MarketSnapDto snap)
+
+		private async void OnMarketChangedAsync(MarketChange mc)
+        {
+			try
+			{
+				foreach (var rs in mc?.Rc)
+				{
+					if (rs == null)
+						return;
+
+					LiveRunner lr = RunnerFromSelid((long)rs?.Id.Value);
+
+					if (lr == null)
+						return;
+
+					//double? traded_volume = rs.Tv;
+					List<List<double?>> backs = rs.Batb;
+
+					if (backs != null)
+					{
+                        foreach (List<double?> back in backs)
+                        {
+                            Int32 i = (Int32)back[0].Value;
+							Debug.WriteLine($"Back: {lr.Name} : {back[1].Value} : cell id = {i}");
+
+                            lr.BackValues[i].price = back[1].Value;
+                            lr.BackValues[i].size = back[2].Value;
+                            //lr.BackValues[i].CellBackgroundColor = Brushes.Yellow;
+                            i++;
+                        }
+                    }
+				}
+			}
+			catch (Exception e)
+			{
+				Debug.WriteLine(e.Message);
+			}
+
+		}
+
+//		private void OnMarketChanged(MarketChange change, MarketSnapDto snap)
+		private void OnMarketChanged(MarketSnapDto snap)
 		{
 			//Debug.WriteLine("StreamingAPI.OnMarketChanged");
 			//RunnersControl.UpdateMarketStatus();
@@ -117,7 +159,7 @@ namespace SpreadTrader
 				var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 				long unixSeconds = (long)epoch.TotalSeconds;
 				long diff = DateTime.UtcNow.Ticks - snap.Time.Ticks;
-				//Debug.WriteLine($"{diff/ (double)TimeSpan.TicksPerSecond} seconds behind");
+				Debug.WriteLine($"{diff/ (double)TimeSpan.TicksPerSecond} seconds behind");
 
                 //double tradedVolume = 0;
                 //List<LiveRunner> _LiveRunners = new List<LiveRunner>();
@@ -154,21 +196,21 @@ namespace SpreadTrader
 					//}
 				}
 
-				List<Tuple<long, double?, double?>> last_traded = new List<Tuple<long, double?, double?>>();
-				if (change?.Rc != null)
-				{
-					foreach (RunnerChange rc in change?.Rc)  /// examine Atb abd Atl get determine correct side
-					{
-						if (rc.Tv != null && rc.Ltp == null)
-						{
-							last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
-						}
-						else if (rc.Ltp != null)
-						{
-							last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
-						}
-					}
-				}
+				//List<Tuple<long, double?, double?>> last_traded = new List<Tuple<long, double?, double?>>();
+				//if (change?.Rc != null)
+				//{
+				//	foreach (RunnerChange rc in change?.Rc)  /// examine Atb abd Atl get determine correct side
+				//	{
+				//		if (rc.Tv != null && rc.Ltp == null)
+				//		{
+				//			last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
+				//		}
+				//		else if (rc.Ltp != null)
+				//		{
+				//			last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
+				//		}
+				//	}
+				//}
                 NotifyPropertyChanged("");
 				//Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, e.Change.Rc, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
 			}
@@ -177,6 +219,60 @@ namespace SpreadTrader
 				Debug.WriteLine(xe.Message);
 			}
 		}
+
+		LiveRunner RunnerFromSelid(long selid)
+		{
+			foreach (var runner in LiveRunners)
+			{
+				if (runner.SelectionId == selid)
+				{
+					return runner;
+				}
+			}
+			return null;
+		}
+
+		/// //////////////////////////////////////////////
+		/// //////////////////////////////////////////////
+		/// //////////////////////////////////////////////
+		void FlashTraded(MarketChange mc)
+		{
+			try
+			{
+				foreach (var rs in mc?.Rc)
+				{
+                    if (rs == null)
+                        return;
+
+					LiveRunner lr = RunnerFromSelid((long) rs?.Id.Value);
+
+                    if (lr == null)
+                        return;
+
+					double? traded_volume = rs.Tv;
+					List<List<double?>> back = rs.Batb;
+
+                    if (back != null)
+                    {
+                        Int32 i = 0;
+                        foreach (List<double?> lb in back)
+                        {
+                            foreach (double? b in lb)
+                            {
+                         //       Debug.WriteLine($"Back: {lr.Name} : cell id = {i}");
+                        //        lr.BackValues[i].CellBackgroundColor = Brushes.Yellow;
+                                i++;
+                            }
+                        }
+                    }
+				}
+			}
+			catch (Exception e)
+			{
+				Debug.WriteLine(e.Message);
+			}
+		}
+
 		private void OnMessageReceived(string messageName, object data)
         {
 			if (messageName == "Market Selected")
@@ -184,17 +280,24 @@ namespace SpreadTrader
 				dynamic d = data;
 				NodeViewModel d2 = d.NodeViewModel;
 				Debug.WriteLine($"RunnersContrkL {d2.MarketName}");
-				UpdateMarketAsync(d2);
+                _ = PopulateNewMarketAsync(d2);
+				//UpdateMarketAsync(d2);
 			}
 			if (messageName == "Market Changed")
 			{
 				dynamic d = data;
 				MarketChange change = d.MarketChange;
-				MarketSnapDto snap = d.MarketSnapDto;
+				//MarketSnapDto snap = d.MarketSnapDto;
 
-				//Debug.WriteLine(change.MarketDefinition.Runners.Count);
-				OnMarketChanged(change, snap);
-				//_ = PopulateNewMarketAsync(d2);
+				//OnMarketChanged(change, snap);
+
+
+				if (LiveRunners != null)
+                    OnMarketChangedAsync(change);
+				
+                //FlashTraded(change);
+				
+                //_ = PopulateNewMarketAsync(d2);
 			}
 		}
 		public RunnersControl()

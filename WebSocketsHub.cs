@@ -4,6 +4,7 @@ using BetfairAPI;
 using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
@@ -15,38 +16,61 @@ namespace SpreadTrader
 	{
 		private IHubProxy hubProxy = null;
 		private HubConnection hubConnection = null;
+		private readonly BlockingCollection<string> _orderQueue = new BlockingCollection<string>();
+		private readonly BlockingCollection<MarketSnapDto> _marketChangeQueue = new BlockingCollection<MarketSnapDto>();
+		private object lockObj1 = new object();
+		private object lockObj2 = new object();
+		private Task _orderProcessor;
+		private Task _marketChangeProcessor;
 		private Properties.Settings props = Properties.Settings.Default;
 
+		private void OrderProcessingLoop()
+		{
+			foreach (var json in _orderQueue?.GetConsumingEnumerable())
+			{
+				lock (lockObj1)
+				{
+					//ProcessOrder(json);
+				}
+			}
+		}
+		private void MarketChangerProcessingLoop()
+		{
+			foreach (var snap in _marketChangeQueue?.GetConsumingEnumerable())
+			{
+				lock (lockObj2)
+				{
+					//MarketChange change = JsonConvert.DeserializeObject<MarketChange>(json);
+					ControlMessenger.Send("Market Changed", new { MarketSnapDto = snap});
+				}
+			}
+		}
+		public void Start()
+		{
+			_orderProcessor = Task.Run(() => OrderProcessingLoop());
+			_marketChangeProcessor = Task.Run(() => MarketChangerProcessingLoop());
+		}
 		public WebSocketsHub() 
 		{
 			ControlMessenger.MessageSent += OnMessageReceived;
 			hubConnection = new HubConnection("http://" + props.StreamUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
-			hubProxy.On<MarketChange, MarketSnapDto>("marketChanged", (mc, snap) =>
+			Start();
+
+			hubProxy.On<MarketSnapDto>("marketChanged", (snap) =>
 			{
-				//Debug.WriteLine("Hub marketChanged");
-				//MarketChangedEventArgs
-
-				//MarketChange change = JsonConvert.DeserializeObject<MarketChange>(json1);
-				//Betfair.ESAClient.Cache.Market market = JsonConvert.DeserializeObject<Betfair.ESAClient.Cache.Market>(json2);
-				//MarketSnap snapshot = JsonConvert.DeserializeObject<MarketSnap>(json3);
-
-				ControlMessenger.Send("Market Changed", new { MarketChange = mc, MarketSnapDto = snap});
+				_marketChangeQueue.Add(snap);
+				
+				//MarketChange change = JsonConvert.DeserializeObject<MarketChange>(json);
+				//ControlMessenger.Send("Market Changed", new { MarketChange = change, MarketSnapDto = snap});
 				//Debug.WriteLine(snap.Runners[0].Prices.Back[0].Price);
 			});
 			hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
 			{
-				OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json1);
-				OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
-				//if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
-				//{
-				//	lock (incomingOrdersQueue)
-				//	{
-				//		Debug.WriteLine("Add to queue");
-				//		incomingOrdersQueue.Enqueue(json1);
-				//	}
-				//}
+				//OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json1);
+				//OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
+				_orderQueue.Add(json1);
 			});
 			Connect();
 		}
@@ -58,8 +82,11 @@ namespace SpreadTrader
 				NodeViewModel d2 = d.NodeViewModel;
 				String marketId = d2.MarketID;
 				Debug.WriteLine($"WebSocketsHub: {messageName} : {d2.FullName}");
-				//				MarketNode = d.MarketNode;
 				RequestMarketSelectedAsync(d2.MarketID);
+			}
+			if (messageName == "Reconnect requested")
+			{
+				Connect();
 			}
 		}
 		private async void RequestMarketSelectedAsync(String marketid)

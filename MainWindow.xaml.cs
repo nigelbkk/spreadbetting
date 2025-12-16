@@ -20,7 +20,6 @@ namespace SpreadTrader
             MessageSent?.Invoke(messageName, data);
         }
     }
-
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private Properties.Settings props = Properties.Settings.Default;
