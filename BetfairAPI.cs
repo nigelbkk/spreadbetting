@@ -6,8 +6,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace BetfairAPI
@@ -54,7 +56,52 @@ namespace BetfairAPI
                 }
             }
         }
-        public Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
+		public void SendRequestAsync(object joe, string url)
+		{
+			_ = Task.Run(async () =>
+			{
+				var client = new HttpClient();
+
+				client.DefaultRequestHeaders.Add("X-API-Key", API_KEY);
+				client.DefaultRequestHeaders.Add("X-Application", AppKey);
+				client.DefaultRequestHeaders.Add("X-Authentication", Token);
+				client.DefaultRequestHeaders.AcceptCharset.ParseAdd("ISO-8859-1, utf-8");
+
+				var json = "[" + JsonConvert.SerializeObject(joe) + "]";
+				var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+				try
+				{
+					await client.PostAsync(url, content); // Response intentionally ignored
+				}
+				catch (Exception ex)
+				{
+					Debug.WriteLine(ex.Message);
+				}
+			});
+		}
+		public void RPCRequestAsync(String Method, Dictionary<String, Object> Params)
+		{
+			String[] AccountCalls = new String[] { "getAccountFunds" };
+			Dictionary<String, Object> joe = new Dictionary<string, object>();
+			joe["jsonrpc"] = "2.0";
+			joe["id"] = "1";
+			joe["method"] = "SportsAPING/v1.0/" + Method;
+			joe["params"] = Params;
+
+			String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy;
+			if (!SpreadTrader.Properties.Settings.Default.UseProxy || String.IsNullOrEmpty(SpreadTrader.Properties.Settings.Default.Proxy))
+			{
+				if (!String.IsNullOrEmpty(Token))
+				{
+					url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";
+					if (Method.Contains(AccountCalls[0]))
+						url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
+				}
+			}
+			SendRequestAsync(joe, url);
+		}
+		public Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
             try
             {
@@ -131,13 +178,13 @@ namespace BetfairAPI
                     //ConnectionLost = true;
 
                     var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
-                    if (err != null)
-                    {
-                        ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
-                        throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
-                    }
-                    String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
-                    return JsonConvert.DeserializeObject<T>(res);
+					if (err != null)
+					{
+						ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
+						throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
+					}
+					String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
+					return JsonConvert.DeserializeObject<T>(res);
                 }
             }
             catch (Exception xe)
@@ -145,6 +192,7 @@ namespace BetfairAPI
                 Debug.WriteLine(xe.Message);
                 return null;
             }
+            return null;
         }
         public void login(String CertFile, String CertPassword, String appKey, String username, String password)
         {

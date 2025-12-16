@@ -90,14 +90,6 @@ namespace SpreadTrader
 			LiveRunners = node.GetLiveRunners();
 			NotifyPropertyChanged("");
 		}
-		//private async void UpdateMarketAsync(NodeViewModel d2)
-  //      {
-  //          MarketNode = d2;
-  //          MarketNode.GetLiveRunners();
-  //          LiveRunners = MarketNode.LiveRunners;
-  //          NotifyPropertyChanged("");
-  //      }
-
         LiveRunner GetRunnerFromSelectionID(Int64 selid)
         {
             foreach (LiveRunner runner in LiveRunners)
@@ -110,46 +102,44 @@ namespace SpreadTrader
             return null;
         }
 
-		private async void OnMarketChangedAsync(MarketChange mc)
-        {
-			try
-			{
-				foreach (var rs in mc?.Rc)
-				{
-					if (rs == null)
-						return;
+		//private async void OnMarketChangedAsync(MarketChange mc)
+  //      {
+		//	try
+		//	{
+		//		foreach (var rs in mc?.Rc)
+		//		{
+		//			if (rs == null)
+		//				return;
 
-					LiveRunner lr = RunnerFromSelid((long)rs?.Id.Value);
+		//			LiveRunner lr = RunnerFromSelid((long)rs?.Id.Value);
 
-					if (lr == null)
-						return;
+		//			if (lr == null)
+		//				return;
 
-					//double? traded_volume = rs.Tv;
-					List<List<double?>> backs = rs.Batb;
+		//			//double? traded_volume = rs.Tv;
+		//			List<List<double?>> backs = rs.Batb;
 
-					if (backs != null)
-					{
-                        foreach (List<double?> back in backs)
-                        {
-                            Int32 i = (Int32)back[0].Value;
-							Debug.WriteLine($"Back: {lr.Name} : {back[1].Value} : cell id = {i}");
+		//			if (backs != null)
+		//			{
+  //                      foreach (List<double?> back in backs)
+  //                      {
+  //                          Int32 i = (Int32)back[0].Value;
+		//					Debug.WriteLine($"Back: {lr.Name} : {back[1].Value} : cell id = {i}");
 
-                            lr.BackValues[i].price = back[1].Value;
-                            lr.BackValues[i].size = back[2].Value;
-                            //lr.BackValues[i].CellBackgroundColor = Brushes.Yellow;
-                            i++;
-                        }
-                    }
-				}
-			}
-			catch (Exception e)
-			{
-				Debug.WriteLine(e.Message);
-			}
+  //                          lr.BackValues[i].price = back[1].Value;
+  //                          lr.BackValues[i].size = back[2].Value;
+  //                          //lr.BackValues[i].CellBackgroundColor = Brushes.Yellow;
+  //                          i++;
+  //                      }
+  //                  }
+		//		}
+		//	}
+		//	catch (Exception e)
+		//	{
+		//		Debug.WriteLine(e.Message);
+		//	}
 
-		}
-
-//		private void OnMarketChanged(MarketChange change, MarketSnapDto snap)
+		//}
 		private void OnMarketChanged(MarketSnapDto snap)
 		{
 			//Debug.WriteLine("StreamingAPI.OnMarketChanged");
@@ -174,10 +164,6 @@ namespace SpreadTrader
                         if (lr == null)
                             continue;
 
-                        //                  lr.BackValues?.Clear();
-                        //foreach (var ps in rsnap.Prices.Back)
-                        //	lr.BackValues.Add(new PriceSize(ps.Price, ps.Size));
-
                         Int32 i = 0;
                         foreach (var ps in rsnap.Prices.Back)
                         { 
@@ -193,26 +179,9 @@ namespace SpreadTrader
 							lr.LayValues[i].size = ps.Size;
                             i++;
 						}
-
-                        NotifyPropertyChanged("");
-						//lr.LayValues?.Clear();
-						//                  foreach (var ps in rsnap.Prices.Lay)
-						//                      lr.LayValues.Add(new PriceSize(ps.Price, ps.Size));
-
-						//                  while (lr.BackValues.Count < 3)
-						//{
-						//	lr.BackValues.Add(new PriceSize(0, 0));
-						//}
-						//while (lr.LayValues.Count < 3)
-						//{
-						//	lr.LayValues.Add(new PriceSize(0, 0));
-						//}
 					}
-					//if (LiveRunners.Count > 0 &&  snap.Runners[0].Prices.Back.Count > 0)
-					//{
-					//	Debug.WriteLine($"{LiveRunners[0].BackValues[0].price} : {snap.Runners[0].Prices.Back[0].Price}");
-					//}
 				}
+                _ = UpdateRunnerPnLAsync();
 
 				//List<Tuple<long, double?, double?>> last_traded = new List<Tuple<long, double?, double?>>();
 				//if (change?.Rc != null)
@@ -229,7 +198,7 @@ namespace SpreadTrader
 				//		}
 				//	}
 				//}
-                NotifyPropertyChanged("");
+				NotifyPropertyChanged("");
 				//Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, e.Change.Rc, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
 			}
 			catch (Exception xe)

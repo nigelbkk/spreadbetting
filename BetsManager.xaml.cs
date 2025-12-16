@@ -162,8 +162,6 @@ namespace SpreadTrader
         //public bool IsConnected { get { return _Connected; } }
         public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
         public String StreamingButtonText { get { return "Streaming Connected"; } }
-		//private IHubProxy hubProxy = null;
-		//private HubConnection hubConnection = null;
 
 		private void OnMessageReceived(string messageName, object data)
 		{
@@ -177,7 +175,12 @@ namespace SpreadTrader
 				dynamic d = data;
 				Debug.WriteLine($"BetsManager: {messageName} : {d.NodeViewModel.Name}");
 				MarketNode = d.NodeViewModel;
-//				MarketNode = d.NodeViewModel.Market;
+			}
+			if (messageName == "Orders Changed")
+			{
+				dynamic d = data;
+				Debug.WriteLine($"BetsManager: {messageName} : {d.String}");
+                OnOrderChanged(d.String);
 			}
 			if (messageName == "Execute Bets")
 			{
@@ -186,9 +189,7 @@ namespace SpreadTrader
 				ExecuteBets(d.Favorite, d.LayValues, d.BackValues);
 			}
 		}
-
-
-		private Row FindUnmatchedRow(String id)
+        private Row FindUnmatchedRow(String id)
         {
             if (Rows.Count > 0) foreach (Row r in Rows)
                 {
@@ -212,60 +213,60 @@ namespace SpreadTrader
                 }
             return null;
         }
-        private void ProcessIncomingNotifications(object o)
-        {
-            BackgroundWorker sender = o as BackgroundWorker;
-            while (!sender.CancellationPending)
-            {
-                while (incomingOrdersQueue.Count > 0)
-                {
-                    try
-                    {
-                        Debug.WriteLine("Fetch from queue");
-                        //                        lock (incomingOrdersQueue){}
-                        String json = incomingOrdersQueue.Dequeue();
-                        OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
-                        OnOrderChanged(json);
-                    }
-                    catch (Exception xe)
-                    {
-                        Status = xe.Message;
-                    }
-                }
-                System.Threading.Thread.Sleep(10);
-            }
-        }
-        private void ProcessCancellationQueue(object o)
-        {
-            BackgroundWorker sender = o as BackgroundWorker;
-            while (!sender.CancellationPending)
-            {
-                while (cancellation_queue.Count > 0)
-                {
-                    try
-                    {
-                        //lock (cancellation_queue)
-                        {
-                            UInt64 betid = cancellation_queue.Dequeue();
+        //private void ProcessIncomingNotifications(object o)
+        //{
+        //    BackgroundWorker sender = o as BackgroundWorker;
+        //    while (!sender.CancellationPending)
+        //    {
+        //        while (incomingOrdersQueue.Count > 0)
+        //        {
+        //            try
+        //            {
+        //                Debug.WriteLine("Fetch from queue");
+        //                //                        lock (incomingOrdersQueue){}
+        //                String json = incomingOrdersQueue.Dequeue();
+        //                OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
+        //                OnOrderChanged(json);
+        //            }
+        //            catch (Exception xe)
+        //            {
+        //                Status = xe.Message;
+        //            }
+        //        }
+        //        System.Threading.Thread.Sleep(10);
+        //    }
+        //}
+        //private void ProcessCancellationQueue(object o)
+        //{
+        //    BackgroundWorker sender = o as BackgroundWorker;
+        //    while (!sender.CancellationPending)
+        //    {
+        //        while (cancellation_queue.Count > 0)
+        //        {
+        //            try
+        //            {
+        //                //lock (cancellation_queue)
+        //                {
+        //                    UInt64 betid = cancellation_queue.Dequeue();
 
-                            Debug.WriteLine("submit cancel {0}", betid);
-                            CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid, null);
-                            if (report.errorCode == null)
-                            {
-                                Debug.WriteLine("bet is cancelled {0}", betid);
-                            }
-                            Status = report.errorCode != null ? report.errorCode : report.status;
-                        }
-                    }
-                    catch (Exception xe)
-                    {
-                        Debug.WriteLine(xe.Message);
-                        Status = xe.Message;
-                    }
-                }
-                System.Threading.Thread.Sleep(10);
-            }
-        }
+        //                    Debug.WriteLine("submit cancel {0}", betid);
+        //                    CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid, null);
+        //                    if (report.errorCode == null)
+        //                    {
+        //                        Debug.WriteLine("bet is cancelled {0}", betid);
+        //                    }
+        //                    Status = report.errorCode != null ? report.errorCode : report.status;
+        //                }
+        //            }
+        //            catch (Exception xe)
+        //            {
+        //                Debug.WriteLine(xe.Message);
+        //                Status = xe.Message;
+        //            }
+        //        }
+        //        System.Threading.Thread.Sleep(10);
+        //    }
+        //}
         private async void ExecuteBets(LiveRunner runner, List<PriceSize> lay, List<PriceSize> back)
         {
             String MarketID = MarketNode.MarketID;
@@ -337,196 +338,142 @@ namespace SpreadTrader
             Rows = new ObservableCollection<Row>();
             InitializeComponent();
             ControlMessenger.MessageSent += OnMessageReceived;
-
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += (o, e) => ProcessIncomingNotifications(o);
-            bw.RunWorkerAsync();
-
-            BackgroundWorker bw2 = new BackgroundWorker();
-            bw2.DoWork += (o, e) => ProcessCancellationQueue(o);
-            bw2.RunWorkerAsync();
-
-            //////
-            /// hub stuff
-
-            //hubConnection = new HubConnection("http://" + props.StreamUrl);
-            //hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
-
-            //hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
-            //{
-            //    OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
-            //    OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json3);
-            //    if (MarketNode != null && snapshot.MarketId == MarketNode.MarketID)
-            //    {
-            //        lock (incomingOrdersQueue)
-            //        {
-            //            Debug.WriteLine("Add to queue");
-            //            incomingOrdersQueue.Enqueue(json1);
-            //        }
-            //    }
-            //});
-            //Connect();
-        }
-
-        private object lockObj = new object();
-        private void NotifyBetMatched()
-        {
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                foreach (TabItem ti in Extensions.MainWindow.TabControl.Items)
-                {
-                    TabContent ct = ti.Content as TabContent;
-                    CustomTabHeader header = ti.Header as CustomTabHeader;
-
-                    //if (!ti.IsSelected && ct.MarketNode != null && ct.MarketNode.MarketID == MarketNode.MarketID)
-                    //{
-                    //    header.OnMatched();                     // change the tab color
-                    //    break;
-                    //}
-                }
-            }));
-            if (!String.IsNullOrEmpty(props.MatchedBetAlert))
-            {
-                SoundPlayer snd = new SoundPlayer(props.MatchedBetAlert);
-                snd.Play();
-            }
         }
         private void OnOrderChanged(String json)
         {
-            lock (lockObj)
+            if (String.IsNullOrEmpty(json))
+                return;
+
+            Debug.WriteLine(json);
+
+            OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
+
+            if (change.Orc == null)
+                return;
+
+            _LastUpdated = DateTime.UtcNow;
+            try
             {
-                if (String.IsNullOrEmpty(json))
-                    return;
-
-                Debug.WriteLine(json);
-
-                OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
-
-                if (change.Orc == null)
-                    return;
-
-                _LastUpdated = DateTime.UtcNow;
-                try
+                if (change.Closed == true)
                 {
-                    if (change.Closed == true)
-                    {
-                        Debug.WriteLine("market closed");
-                        Dispatcher.BeginInvoke(new Action(() => { Rows.Clear(); }));
-                    }
+                    Debug.WriteLine("market closed");
+                    ControlMessenger.Send("Market Status Changed", new { String = "Closed" });
+                    Dispatcher.BeginInvoke(new Action(() => { Rows.Clear(); }));
+                    return;
+                }
 
-                    if (change.Orc.Count > 0)
+                if (change.Orc.Count > 0)
+                {
+                    foreach (OrderRunnerChange orc in change.Orc)
                     {
-                        foreach (OrderRunnerChange orc in change.Orc)
+                        if (orc.Uo == null)
+                            continue;
+
+                        if (orc.Uo.Count > 0)
                         {
-                            if (orc.Uo == null)
-                                continue;
-
-                            if (orc.Uo.Count > 0)
+                            List<Row> to_remove = new List<Row>();
+                            foreach (Order o in orc.Uo)
                             {
-                                List<Row> to_remove = new List<Row>();
-                                foreach (Order o in orc.Uo)
+                                UInt64 betid = Convert.ToUInt64(o.Id);
+                                Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
+
+                                Row row = FindUnmatchedRow(o.Id);
+                                if (row == null)
                                 {
-                                    UInt64 betid = Convert.ToUInt64(o.Id);
-                                    Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
-
-                                    Row row = FindUnmatchedRow(o.Id);
-                                    if (row == null)
-                                    {
-                                        row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
-                                        Dispatcher.BeginInvoke(new Action(() =>
-                                        {
-                                            Debug.WriteLine(o.Id, "Insert into grid: ");
-                                            Rows.Insert(0, row);
-                                        }));
-                                        Debug.WriteLine(o.Id, "new bet: ");
-                                    }
-                                    row.Runner = MarketNode.GetRunnerName(row.SelectionID);
-
-                                    if (o.Sm == 0 && o.Sr > 0)                                          // unmatched
-                                    {
-                                        row.Stake = o.S.Value;
-                                        row.SizeMatched = o.Sm.Value;
-                                        row.Hidden = false;
-                                        Debug.WriteLine(o.Id, "unmatched: ");
-
-                                        Debug.WriteLine(MarketNode.MarketName);
-                                    }
-                                    if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                             // fully matched
-                                    {
-                                        foreach (Row r in Rows)
-                                        {
-                                            if (r.BetID == Convert.ToUInt64(o.Id))
-                                            {
-                                                if (r.SizeMatched > 0)
-                                                {
-                                                    to_remove.Add(r);
-                                                }
-                                            }
-                                        }
-                                        row.AvgPriceMatched = o.Avp.Value;
-                                        row.SizeMatched = row.OriginalStake;// o.Sm.Value;
-                                        row.Hidden = UnmatchedOnly;
-                                        NotifyBetMatched();
-                                        NotifyPropertyChanged("");
-                                        Debug.WriteLine(o.Id, "fully matched: ");
-                                    }
-                                    if (o.Sm > 0 && o.Sr > 0)                                           // partially matched
-                                    {
-                                        Row mrow = new Row(row);
-                                        mrow.SizeMatched = o.Sm.Value;
-                                        mrow.Odds = o.P.Value;
-                                        mrow.Stake = o.Sm.Value;
-                                        mrow.AvgPriceMatched = o.Avp.Value;
-                                        mrow.Hidden = UnmatchedOnly;
-                                        Int32 idx = Rows.IndexOf(row);
-
-                                        Dispatcher.BeginInvoke(new Action(() =>
-                                        {
-                                            Debug.WriteLine("Append to grid", mrow.BetID);
-                                            Rows.Insert(idx + 1, mrow);
-                                        }));
-                                        row.Stake = o.Sr.Value;                         // change stake for the unmatched remainder
-                                        NotifyBetMatched();
-                                        NotifyPropertyChanged("");
-                                        Debug.WriteLine(o.Id, "partial match: ");
-                                    }
-                                    if (o.Sc > 0)                                       // cancelled
-                                    {
-                                        if (o.Sr != 0)                                  // cancellation of partially matched bet
-                                        {
-                                            row.Stake = o.Sr.Value;                     // adjust unmatched remainder
-                                            Debug.WriteLine(o.Id, "Cancellation of partially matched bet: ");
-                                        }
-                                        if (o.Sr == 0)
-                                        {
-                                            Debug.WriteLine(o.Id, "Bet fully cancelled: ");
-                                            to_remove.Add(row);
-                                        }
-                                        Debug.WriteLine(o.Id, "cancelled: ");
-                                        //										NotifyBetMatched();
-                                    }
-                                }
-                                foreach (Row o in to_remove)
-                                {
+                                    row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
                                     Dispatcher.BeginInvoke(new Action(() =>
                                     {
-                                        if (Rows.Contains(o))
-                                        {
-                                            Debug.WriteLine("Remove from grid: " + o.BetID.ToString());
-                                            Rows.Remove(o);
-                                        }
+                                        Debug.WriteLine(o.Id, "Insert into grid: ");
+                                        Rows.Insert(0, row);
                                     }));
+                                    Debug.WriteLine(o.Id, "new bet: ");
+                                }
+                                row.Runner = MarketNode.GetRunnerName(row.SelectionID);
+
+                                if (o.Sm == 0 && o.Sr > 0)                                          // unmatched
+                                {
+                                    row.Stake = o.S.Value;
+                                    row.SizeMatched = o.Sm.Value;
+                                    row.Hidden = false;
+                                    Debug.WriteLine(o.Id, "unmatched: ");
+
+                                    Debug.WriteLine(MarketNode.MarketName);
+                                }
+                                if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                             // fully matched
+                                {
+                                    foreach (Row r in Rows)
+                                    {
+                                        if (r.BetID == Convert.ToUInt64(o.Id))
+                                        {
+                                            if (r.SizeMatched > 0)
+                                            {
+                                                to_remove.Add(r);
+                                            }
+                                        }
+                                    }
+                                    row.AvgPriceMatched = o.Avp.Value;
+                                    row.SizeMatched = row.OriginalStake;// o.Sm.Value;
+                                    row.Hidden = UnmatchedOnly;
+                                    //NotifyBetMatched();
+                                    NotifyPropertyChanged("");
+                                    Debug.WriteLine(o.Id, "fully matched: ");
+                                }
+                                if (o.Sm > 0 && o.Sr > 0)                                           // partially matched
+                                {
+                                    Row mrow = new Row(row);
+                                    mrow.SizeMatched = o.Sm.Value;
+                                    mrow.Odds = o.P.Value;
+                                    mrow.Stake = o.Sm.Value;
+                                    mrow.AvgPriceMatched = o.Avp.Value;
+                                    mrow.Hidden = UnmatchedOnly;
+                                    Int32 idx = Rows.IndexOf(row);
+
+                                    Dispatcher.BeginInvoke(new Action(() =>
+                                    {
+                                        Debug.WriteLine("Append to grid", mrow.BetID);
+                                        Rows.Insert(idx + 1, mrow);
+                                    }));
+                                    row.Stake = o.Sr.Value;                         // change stake for the unmatched remainder
+                                    //NotifyBetMatched();
+                                    NotifyPropertyChanged("");
+                                    Debug.WriteLine(o.Id, "partial match: ");
+                                }
+                                if (o.Sc > 0)                                       // cancelled
+                                {
+                                    if (o.Sr != 0)                                  // cancellation of partially matched bet
+                                    {
+                                        row.Stake = o.Sr.Value;                     // adjust unmatched remainder
+                                        Debug.WriteLine(o.Id, "Cancellation of partially matched bet: ");
+                                    }
+                                    if (o.Sr == 0)
+                                    {
+                                        Debug.WriteLine(o.Id, "Bet fully cancelled: ");
+                                        to_remove.Add(row);
+                                    }
+                                    Debug.WriteLine(o.Id, "cancelled: ");
+                                    //										NotifyBetMatched();
                                 }
                             }
+                            foreach (Row o in to_remove)
+                            {
+                                Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    if (Rows.Contains(o))
+                                    {
+                                        Debug.WriteLine("Remove from grid: " + o.BetID.ToString());
+                                        Rows.Remove(o);
+                                    }
+                                }));
+                            }
+                            NotifyPropertyChanged("");
                         }
                     }
-                    NotifyPropertyChanged("");
                 }
-                catch (Exception xe)
-                {
-                    Status = xe.Message;
-                    //Debug.WriteLine(xe.Message);
-                }
+            }
+            catch (Exception xe)
+            {
+                Status = xe.Message;
+                //Debug.WriteLine(xe.Message);
             }
         }
         private void PopulateDataGrid()

@@ -41,7 +41,7 @@ namespace SpreadTrader
 			if (messageName == "Update Lag")
 			{
 				dynamic d = data;
-				Debug.WriteLine($"MarketHeader {d.Lag}");
+				//Debug.WriteLine($"MarketHeader {d.Lag}");
 				Lag = d.Lag;
 			}
 		}

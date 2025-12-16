@@ -57,7 +57,7 @@ namespace SpreadTrader
 			NodeViewModel.Betfair = Betfair;
 			Nodes = new ObservableCollection<NodeViewModel>();
 			Market = new Market();
-			Market.marketId = "1.175371349";
+			//Market.marketId = "1.175371349";
 
 			OnItemSelected();
 		}

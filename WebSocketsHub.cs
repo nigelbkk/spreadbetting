@@ -30,6 +30,7 @@ namespace SpreadTrader
 			{
 				lock (lockObj1)
 				{
+					ControlMessenger.Send("Orders Changed", new { String = json });
 					//ProcessOrder(json);
 				}
 			}
@@ -40,7 +41,6 @@ namespace SpreadTrader
 			{
 				lock (lockObj2)
 				{
-					//MarketChange change = JsonConvert.DeserializeObject<MarketChange>(json);
 					ControlMessenger.Send("Market Changed", new { MarketSnapDto = snap});
 				}
 			}
@@ -61,15 +61,9 @@ namespace SpreadTrader
 			hubProxy.On<MarketSnapDto>("marketChanged", (snap) =>
 			{
 				_marketChangeQueue.Add(snap);
-				
-				//MarketChange change = JsonConvert.DeserializeObject<MarketChange>(json);
-				//ControlMessenger.Send("Market Changed", new { MarketChange = change, MarketSnapDto = snap});
-				//Debug.WriteLine(snap.Runners[0].Prices.Back[0].Price);
 			});
 			hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
 			{
-				//OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json1);
-				//OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json3);
 				_orderQueue.Add(json1);
 			});
 			Connect();
