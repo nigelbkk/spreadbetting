@@ -159,11 +159,14 @@ namespace SpreadTrader
 				var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 				long unixSeconds = (long)epoch.TotalSeconds;
 				long diff = DateTime.UtcNow.Ticks - snap.Time.Ticks;
-				Debug.WriteLine($"{diff/ (double)TimeSpan.TicksPerSecond} seconds behind");
+				String cs = $"{1000*diff / (double)TimeSpan.TicksPerSecond}ms";
+				//Debug.WriteLine(cs);
+				ControlMessenger.Send("Update Lag", new { Lag = cs});
 
-                //double tradedVolume = 0;
-                //List<LiveRunner> _LiveRunners = new List<LiveRunner>();
-                if (LiveRunners != null)
+
+				//double tradedVolume = 0;
+				//List<LiveRunner> _LiveRunners = new List<LiveRunner>();
+				if (LiveRunners != null)
                 {
 					foreach (MarketRunnerSnapDto rsnap in snap.Runners)
                     {

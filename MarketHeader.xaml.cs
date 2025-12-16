@@ -14,6 +14,7 @@ namespace SpreadTrader
 		public String ConnectButtonText { get; set; }
 		public String FullName { get { return MarketNode == null ? "No Market Selected" : MarketNode.MarketName; } }
 		public String TimeToGo { get { return MarketNode == null ? "00:00:00" : MarketNode.TimeToGo; } }
+		public String Lag { get; set; }
 		private System.Timers.Timer timer = new System.Timers.Timer();
 		public Double? TotalMatched { get { return MarketNode == null ? 0 : MarketNode.TotalMatched; } }
 		public Visibility up_visible { get; set; }
@@ -37,8 +38,14 @@ namespace SpreadTrader
 				Debug.WriteLine($"MarketHeader {d2.MarketName}");
 				MarketNode = d2;
 			}
+			if (messageName == "Update Lag")
+			{
+				dynamic d = data;
+				Debug.WriteLine($"MarketHeader {d.Lag}");
+				Lag = d.Lag;
+			}
 		}
-        public MarketHeader()
+		public MarketHeader()
 		{
 			InitializeComponent();
 			ControlMessenger.MessageSent += OnMessageReceived;
