@@ -188,9 +188,5 @@
 				</ControlTemplate>
 			</ItemsControl.Template>
 		</ItemsControl>
-        <!--<Border Name="Overlay" Background="#00000000" BorderThickness="2" BorderBrush="DarkGray" IsHitTestVisible="False" Visibility="Visible" Panel.ZIndex="1000" Width="600" Height="150">
-            <TextBlock Name="OverlayText" Foreground="DarkGray" Background="#00000000" Width="600" FontSize="100" TextAlignment="Center" FontWeight="Medium" Text="Open"></TextBlock>
-        </Border>-->
-
     </Grid>
 </UserControl>

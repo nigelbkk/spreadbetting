@@ -8,7 +8,8 @@ namespace SpreadTrader
     {
         public MainWindow mainWindow { get; set; }
         public String Title { set { TabTitle.Content = value; } }
-        public Int32 ID { get; set; }
+        public String MarketId { get; set; }
+		public Int32 ID { get; set; }
         public TabItem Tab { get; set; }
         private bool inPlay { get; set; }
         public CustomTabHeader()

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Xml.Linq;
 
 namespace SpreadTrader
 {
@@ -14,7 +15,7 @@ namespace SpreadTrader
 		public String ConnectButtonText { get; set; }
 		public String FullName { get { return MarketNode == null ? "No Market Selected" : MarketNode.MarketName; } }
 		public String TimeToGo { get { return MarketNode == null ? "00:00:00" : MarketNode.TimeToGo; } }
-		public String Lag { get; set; }
+		public String Latency { get; set; }
 		private System.Timers.Timer timer = new System.Timers.Timer();
 		public Double? TotalMatched { get { return MarketNode == null ? 0 : MarketNode.TotalMatched; } }
 		public Visibility up_visible { get; set; }
@@ -35,14 +36,19 @@ namespace SpreadTrader
 			{
 				dynamic d = data;
 				NodeViewModel d2 = d.NodeViewModel;
+				if (MarketNode != null && d2.MarketID != MarketNode.MarketID)
+				{
+					Debug.WriteLine($"Not our market: {d2.FullName}");
+					return;
+				}
 				Debug.WriteLine($"MarketHeader {d2.MarketName}");
 				MarketNode = d2;
 			}
-			if (messageName == "Update Lag")
+			if (messageName == "Update Latency")
 			{
 				dynamic d = data;
-				//Debug.WriteLine($"MarketHeader {d.Lag}");
-				Lag = d.Lag;
+				//Debug.WriteLine($"MarketHeader {d.Latency}");
+				Latency = d.Latency;
 			}
 		}
 		public MarketHeader()

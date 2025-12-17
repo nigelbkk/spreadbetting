@@ -179,7 +179,7 @@ namespace SpreadTrader
 			if (messageName == "Orders Changed")
 			{
 				dynamic d = data;
-				Debug.WriteLine($"BetsManager: {messageName} : {d.String}");
+				Debug.WriteLine($"BetsManager: {messageName}");
                 OnOrderChanged(d.String);
 			}
 			if (messageName == "Execute Bets")
@@ -344,8 +344,6 @@ namespace SpreadTrader
             if (String.IsNullOrEmpty(json))
                 return;
 
-            Debug.WriteLine(json);
-
             OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
 
             if (change.Orc == null)
@@ -450,7 +448,7 @@ namespace SpreadTrader
                                         Debug.WriteLine(o.Id, "Bet fully cancelled: ");
                                         to_remove.Add(row);
                                     }
-                                    Debug.WriteLine(o.Id, "cancelled: ");
+                                    //Debug.WriteLine(o.Id, "cancelled: ");
                                     //										NotifyBetMatched();
                                 }
                             }
@@ -460,7 +458,7 @@ namespace SpreadTrader
                                 {
                                     if (Rows.Contains(o))
                                     {
-                                        Debug.WriteLine("Remove from grid: " + o.BetID.ToString());
+                                        //Debug.WriteLine("Remove from grid: " + o.BetID.ToString());
                                         Rows.Remove(o);
                                     }
                                 }));

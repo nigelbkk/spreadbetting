@@ -35,6 +35,8 @@
 					<ColumnDefinition Width="auto"/>
 					<ColumnDefinition Width="*"/>
 					<ColumnDefinition Width="auto"/>
+					<ColumnDefinition Width="auto"/>
+					<ColumnDefinition Width="auto"/>
 				</Grid.ColumnDefinitions>
 				<Button Grid.Column="0" Tag="Sidebar Visibility" ToolTip="Show/Hide Sidebar" HorizontalAlignment="Left" Padding="4,0,4,0" Click="Button_Click_1">
 					<Image Height="30" Source="/Images/sidebar.png" />
@@ -57,7 +59,8 @@
 				</Label>
 				<Button  Tag="Connect"  Grid.Column="5" Visibility ="Hidden" HorizontalAlignment="Left" Content="{Binding Path=ConnectButtonText}" Margin="525,2,0,2" Padding="6,0,7,2" Height="28"></Button>
 				<Label Grid.Column="6" Content="{Binding Path=TimeToGo}" Foreground="{Binding Path=TimeToGoColor}" Margin="0,0,80,0" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"></Label>
-				<Label Grid.Column="7" Content="{Binding Path=Lag}" Padding="6,0,6,0" Width="80" HorizontalAlignment="Right"  BorderThickness="1"/>
+				<Label Grid.Column="7" Content="{Binding Path=Latency}" Padding="6,0,6,0" Width="80" HorizontalAlignment="Right"  Margin="0,0,10,0" BorderThickness="1" ToolTip="Stream Latency"/>
+				<Button Grid.Column="8" Tag="Connect" Content="Reconnect" Padding="6,0,6,0" Width="80" HorizontalAlignment="Right"  BorderThickness="0" ToolTip="Reconnect Websockets Stream"/>
 				<!--<Label Grid.Column="6" Padding="6,0,10,0"  HorizontalAlignment="Right">
 					<StackPanel Orientation="Horizontal">
 						<TextBox Text="Streaming" Background="{Binding Path=StreamingColor}" Margin="10,0" Padding="6,0,7,2" Height="28"/>

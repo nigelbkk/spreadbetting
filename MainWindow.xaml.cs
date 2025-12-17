@@ -218,7 +218,7 @@ namespace SpreadTrader
             tab.Header = customTabHeader;
 
             TabContent tabContent = new TabContent(customTabHeader);
-            tabContent.mainWindow = this;
+            //tabContent.mainWindow = this;
             tabContent.customHeader = customTabHeader;
             tab.Content = tabContent;
 
@@ -268,11 +268,15 @@ namespace SpreadTrader
                 if (ti != null)
                 {
                     CustomTabHeader cth = ti.Header as CustomTabHeader;
-                    if (cth != null)
-                        cth.OnSelected();
-                }
+                    //if (cth != null)
+                    //    cth.OnSelected();
 
-                TabContent content = TabControl.SelectedContent as TabContent;
+					if (cth != null)
+						ControlMessenger.Send("Tab Selected", new { MarketId = cth.MarketId});
+				}
+
+
+				TabContent content = TabControl.SelectedContent as TabContent;
                 Commission = content.MarketNode == null ? 0.00 : content.MarketNode.Commission;
 
                 //SliderControl sc = content.SliderControl;
