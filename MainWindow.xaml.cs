@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Windows.UI.Xaml.Automation;
 
 namespace SpreadTrader
 {
@@ -22,8 +23,9 @@ namespace SpreadTrader
     }
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+		#region Properties
         private Properties.Settings props = Properties.Settings.Default;
-        private WebSocketsHub hub = new WebSocketsHub();
+		private WebSocketsHub hub = new WebSocketsHub();
         private static String _Status = "Ready";
         private static String _Notification = "";
         public String Status
@@ -100,9 +102,31 @@ namespace SpreadTrader
                 Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
             }
         }
+		#endregion Properties
+		private Mutex mutex = null;
+        public static TabContent SelectedTab {get;set;}
+        public static Int32 TabID { get; set; }
 
-        private Mutex mutex = null;
-        public MainWindow()
+        private void OnMessageReceived(string messageName, object data)
+        {
+			if (messageName == "Market Selected")
+			{
+				dynamic d = data;
+				NodeViewModel d2 = d.NodeViewModel as NodeViewModel;
+				Debug.WriteLine($"MainWindow: {d2.FullName}");
+				SelectedTab.OnSelected(d2);
+			}
+			if (messageName == "Market Changed")
+			{
+				dynamic d = data;
+				MarketSnapDto snap = d.MarketSnapDto;
+				//	//if (LiveRunners != null)
+				//	//	OnMarketChanged(snap);
+				SelectedTab.OnMarketChanged(snap);
+			}
+		}
+
+		public MainWindow()
         {
             const string appName = "SpreadTrader";
             bool createdNew;
@@ -119,7 +143,9 @@ namespace SpreadTrader
             ServicePointManager.DefaultConnectionLimit = 800;
             System.Net.ServicePointManager.Expect100Continue = false;
             InitializeComponent();
-            this.Language = System.Windows.Markup.XmlLanguage.GetLanguage(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+			ControlMessenger.MessageSent += OnMessageReceived;
+
+			this.Language = System.Windows.Markup.XmlLanguage.GetLanguage(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
             this.Top = Math.Max(0, props.Top);
             this.Left = Math.Max(0, props.Left);
             this.Height = Math.Max(0, props.Height);
@@ -197,7 +223,7 @@ namespace SpreadTrader
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            AppendNewTab("first");
+           AppendNewTab("first");
         }
         public void RemoveTab(CustomTabHeader e)
         {
@@ -214,6 +240,7 @@ namespace SpreadTrader
             customTabHeader.ID = TabControl.Items.Count;
 
             TabItem tab = new TabItem();
+            tab.TabIndex = TabControl.Items.Count;
             tab.PreviewMouseDown += TabItem_PreviewMouseDown2;
             tab.Header = customTabHeader;
 
@@ -267,15 +294,19 @@ namespace SpreadTrader
                 TabItem ti = e.AddedItems[0] as TabItem;
                 if (ti != null)
                 {
-                    CustomTabHeader cth = ti.Header as CustomTabHeader;
+					SelectedTab = ti.Content as TabContent;
+
+					CustomTabHeader cth = ti.Header as CustomTabHeader;
+                    TabContent tc2 = ti.Content as TabContent;
+                    BetsManager bm = tc2.BetsManager;
+                    RunnersControl rc = tc2.RunnersControl;
+					//SelectedTab.OnSelected();
                     //if (cth != null)
                     //    cth.OnSelected();
 
-					if (cth != null)
-						ControlMessenger.Send("Tab Selected", new { MarketId = cth.MarketId});
+					//if (cth != null)
+					//	ControlMessenger.Send("Tab Selected", new { MarketId = cth.MarketId, TabID = cth.ID});
 				}
-
-
 				TabContent content = TabControl.SelectedContent as TabContent;
                 Commission = content.MarketNode == null ? 0.00 : content.MarketNode.Commission;
 

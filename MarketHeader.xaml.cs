@@ -32,18 +32,19 @@ namespace SpreadTrader
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
-			if (messageName == "Market Selected")
-			{
-				dynamic d = data;
-				NodeViewModel d2 = d.NodeViewModel;
-				if (MarketNode != null && d2.MarketID != MarketNode.MarketID)
-				{
-					Debug.WriteLine($"Not our market: {d2.FullName}");
-					return;
-				}
-				Debug.WriteLine($"MarketHeader {d2.MarketName}");
-				MarketNode = d2;
-			}
+			//if (messageName == "Market Selected")
+			//{
+			//	dynamic d = data;
+			//	NodeViewModel d2 = d.NodeViewModel;
+			//	if (MarketNode != null && d2.MarketID != MarketNode.MarketID)
+			//	{
+			//		//Debug.WriteLine($"Not our market: {d2.FullName}");
+			//		//return;
+			//	}
+			//	Debug.WriteLine($"MarketHeader {d2.FullName}");
+			//	MarketNode = d2;
+			//	_ = TabContent.RunnersControl.PopulateNewMarketAsync(d2);
+			//}
 			if (messageName == "Update Latency")
 			{
 				dynamic d = data;

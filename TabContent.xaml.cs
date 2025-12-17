@@ -33,51 +33,60 @@ namespace SpreadTrader
             InitializeComponent();
             ControlMessenger.MessageSent += OnMessageReceived;
             marketHeader.TabContent = this;
+			TabIndex = header.ID;
+			BetsManager.TabID = header.ID;
 			OverlayVisibility = Visibility.Hidden;
 			NotifyPropertyChanged("");
-
-			//market_status_timer = new System.Timers.Timer(1000);
-			//market_status_timer.Elapsed += (o, e) =>
-			//{
-			//	if (MarketNode != null && MarketStatus != MarketNode.Status)
-			//	{
-			//		if (MarketStatus != marketStatusEnum.CLOSED)
-			//		{
-			//			MarketStatus = MarketNode.Status;
-			//			NotifyPropertyChanged("");
-			//		}
-			//	}
-			//};
-			//market_status_timer.Enabled = true;
+		}
+		public void OnSelected(NodeViewModel d2)
+		{
+			customHeader.Title = d2.FullName;
+			customHeader.MarketId = d2.MarketID;
+			_ = RunnersControl.PopulateNewMarketAsync(d2);
+		}
+		public void OnMarketChanged(MarketSnapDto snap)
+		{
+			RunnersControl.OnMarketChanged(snap);
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
-			if (messageName == "Market Selected")
+			if (messageName == "dddMarket Selected")
 			{
 				dynamic d = data;
 				NodeViewModel d2 = d.NodeViewModel as NodeViewModel;
 				Debug.WriteLine($"TabContent: {d2.FullName}");
-				if (MarketNode != null && d2.MarketID != MarketNode.MarketID)
-				{
-					Debug.WriteLine($"Not our market: {d2.FullName}");
-					return;
-				}
-				MarketNode = d2;
-				customHeader.Title = d2.FullName;
-				customHeader.MarketId = d2.MarketID;
-			}
-			if (messageName == "Update Latency")
-			{
-				//dynamic d = data;
-				//if (MarketStatus != (marketStatusEnum)d.Status)
-				//{
-				//	if (MarketStatus != marketStatusEnum.CLOSED)
+
+				TabContent SelectedTab = MainWindow.SelectedTab;
+
+				Int32 tabID = customHeader.ID;
+				bool isSelected = customHeader.Tab.IsSelected;
+
+
+				//	dynamic d = data;
+				//	NodeViewModel d2 = d.NodeViewModel;
+				//	if (MarketNode != null && d2.MarketID != MarketNode.MarketID)
 				//	{
-				//		MarketStatus = MarketNode.Status;
-				//		NotifyPropertyChanged("");
+				//		//Debug.WriteLine($"Not our market: {d2.FullName}");
+				//		//return;
 				//	}
-				//	MarketStatus = (marketStatusEnum)d.Status;
+				//	Debug.WriteLine($"MarketHeader {d2.FullName}");
+				//	MarketNode = d2;
+
+				_ = RunnersControl.PopulateNewMarketAsync(d2);
+
+
+				//if (MarketNode != null && d2.MarketID != MarketNode.MarketID)
+				//{
+				//	Debug.WriteLine($"Not our market: {d2.FullName}");
+				//	return;
 				//}
+
+				//if (isSelected)
+				{
+					MarketNode = d2;
+					customHeader.Title = d2.FullName;
+					customHeader.MarketId = d2.MarketID;
+				}
 			}
 			if (messageName == "Market Changed")
 			{

@@ -82,6 +82,7 @@ namespace SpreadTrader
 			{
 				dynamic d = data;
 				Debug.WriteLine($"WebSocketsHub: {messageName} :{d.MarketId}");
+				//RequestMarketSelectedAsync(d.MarketId);
 			}
 			if (messageName == "Reconnect requested")
 			{

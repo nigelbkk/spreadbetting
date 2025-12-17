@@ -15,6 +15,7 @@ using System.Windows.Media;
 
 namespace SpreadTrader
 {
+	#region Properties
 	public class MarketSnapDto
 	{
 		public String MarketId { get; set; }
@@ -39,11 +40,12 @@ namespace SpreadTrader
 		public double Price { get; set; }
 		public double Size { get; set; }
 	}
-
+	#endregion Properties
 
 	public partial class RunnersControl : UserControl, INotifyPropertyChanged
     {
-		private NodeViewModel _MarketNode { get; set; }
+# region
+        private NodeViewModel _MarketNode { get; set; }
 		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
 		public double BackBook { get { return MarketNode == null ? 0.00 : MarketNode.BackBook; } }
         public double LayBook { get { return MarketNode == null ? 0.00 : MarketNode.LayBook; } }
@@ -58,7 +60,8 @@ namespace SpreadTrader
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
-        }
+		}
+#endregion
         private async Task<List<MarketProfitAndLoss>> GetProfitAndLossAsync(string marketId)
         {
             return await Task.Run(() =>
@@ -85,7 +88,7 @@ namespace SpreadTrader
                 }
             }
         }
-        private async Task PopulateNewMarketAsync(NodeViewModel node)
+        public async Task PopulateNewMarketAsync(NodeViewModel node)
         {
 			if (_MarketNode != null && node.MarketID != _MarketNode.MarketID)
 			{
@@ -94,7 +97,7 @@ namespace SpreadTrader
 			}
 			_MarketNode = node;
 			MarketNode.GetLiveRunners();
-			LiveRunners = node.GetLiveRunners();
+			LiveRunners = MarketNode.LiveRunners;
 			NotifyPropertyChanged("");
 		}
         LiveRunner GetRunnerFromSelectionID(Int64 selid)
@@ -147,13 +150,13 @@ namespace SpreadTrader
 		//	}
 
 		//}
-		private void OnMarketChanged(MarketSnapDto snap)
+		public void OnMarketChanged(MarketSnapDto snap)
 		{
 			try
 			{
-                if (snap.MarketId == _MarketNode.MarketID)
+                if (snap != null)
                 {
-                    Debug.WriteLine($"our market: {MarketNode.FullName}");
+                    //Debug.WriteLine($"our market: {MarketNode.FullName}");
                     //Debug.Assert(snap.MarketId == _MarketNode.MarketID);
 
                     var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -189,7 +192,7 @@ namespace SpreadTrader
                             }
                         }
                     }
-                    _ = UpdateRunnerPnLAsync();
+                    //_ = UpdateRunnerPnLAsync();
 
                     //List<Tuple<long, double?, double?>> last_traded = new List<Tuple<long, double?, double?>>();
                     //if (change?.Rc != null)
@@ -271,25 +274,25 @@ namespace SpreadTrader
 
 		private void OnMessageReceived(string messageName, object data)
         {
-			if (messageName == "Market Selected")
-			{
-				dynamic d = data;
-				NodeViewModel d2 = d.NodeViewModel;
-				if (MarketNode != null && d2.MarketID != MarketNode.MarketID)
-				{
-					Debug.WriteLine($"Not our market: {d2.FullName}");
-					return;
-				}
-				Debug.WriteLine($"RunnersContrkL {d2.MarketName}");
-				_ = PopulateNewMarketAsync(d2);
-			}
-			if (messageName == "Market Changed")
-			{
-				dynamic d = data;
-				MarketSnapDto snap = d.MarketSnapDto;
-				if (LiveRunners != null)
-					OnMarketChanged(snap);
-			}
+			//if (messageName == "Market Selected")
+			//{
+			//	dynamic d = data;
+			//	NodeViewModel d2 = d.NodeViewModel;
+			//	if (MarketNode != null && d2.MarketID != MarketNode.MarketID)
+			//	{
+			//		Debug.WriteLine($"Not our market: {d2.FullName}");
+			//		return;
+			//	}
+			//	Debug.WriteLine($"RunnersContrkL {d2.FullName}");
+			//	_ = PopulateNewMarketAsync(d2);
+			//}
+			//if (messageName == "Market Changed")
+			//{
+			//	dynamic d = data;
+			//	MarketSnapDto snap = d.MarketSnapDto;
+			//	//if (LiveRunners != null)
+			//	//	OnMarketChanged(snap);
+			//}
 		}
 		public RunnersControl()
         {

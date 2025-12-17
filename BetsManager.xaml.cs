@@ -19,6 +19,7 @@ using System.Windows.Threading;
 
 namespace SpreadTrader
 {
+#region Properties
     public class Row : INotifyPropertyChanged
     {
         private Properties.Settings props = Properties.Settings.Default;
@@ -131,8 +132,8 @@ namespace SpreadTrader
                 Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
             }
         }
-        public Int32 DebugID { get; set; }
-        public double MatchAmount { get; set; }
+		public Int32 TabID { get; set; }
+		public double MatchAmount { get; set; }
         public bool UnmatchedOnly { get; set; }
         public String LastUpdated { get { return String.Format("Orders last updated {0}", _LastUpdated.AddHours(props.TimeOffset).ToString("HH:mm:ss")); } }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -162,9 +163,10 @@ namespace SpreadTrader
         //public bool IsConnected { get { return _Connected; } }
         public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
         public String StreamingButtonText { get { return "Streaming Connected"; } }
-
-		private void OnMessageReceived(string messageName, object data)
+#endregion Properties
+        private void OnMessageReceived(string messageName, object data)
 		{
+            //Int32 selected_tab = TabControl.SelectedItemProperty;
 			if (messageName == "Favorite Changed")
 			{
 				dynamic d = data;
@@ -173,7 +175,8 @@ namespace SpreadTrader
 			if (messageName == "Market Selected")
 			{
 				dynamic d = data;
-				Debug.WriteLine($"BetsManager: {messageName} : {d.NodeViewModel.Name}");
+                Debug.WriteLine(TabID);
+				Debug.WriteLine($"BetsManager: {messageName} : {d.NodeViewModel.FullName}");
 				MarketNode = d.NodeViewModel;
 			}
 			if (messageName == "Orders Changed")
@@ -346,10 +349,15 @@ namespace SpreadTrader
 
             OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
 
-            if (change.Orc == null)
-                return;
+			if (change.Orc == null)
+				return;
 
-            _LastUpdated = DateTime.UtcNow;
+			if (change.Id != MarketNode.MarketID)
+            {
+				Debug.WriteLine("not our market");
+				return;
+			}
+			_LastUpdated = DateTime.UtcNow;
             try
             {
                 if (change.Closed == true)
@@ -701,9 +709,9 @@ namespace SpreadTrader
                                         Notification = $"Cancelling {cancel_instructions.Count} bets";
                                         CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
 
-                                        if (cancel_report.status != "SUCCESS")
+                                        if (cancel_report?.status != "SUCCESS")
                                         {
-                                            Status = cancel_report.errorCode;
+                                            Status = cancel_report?.errorCode;
                                         }
                                         else
                                         {

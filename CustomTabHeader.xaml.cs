@@ -15,17 +15,6 @@ namespace SpreadTrader
         public CustomTabHeader()
         {
             InitializeComponent();
-            //    StreamingAPI.Callback += (marketid, liveRunners, tradedVolume, inplay) =>
-            //    {
-            //        inPlay = inplay;
-            //        if (marketid != "")         //TODO
-            //        {
-            //            this.Dispatcher.Invoke(() =>
-            //            {
-            //                TabTitle.Foreground = inplay ? Brushes.LightGreen : Brushes.DarkSlateGray;
-            //            });
-            //        }
-            //    };
         }
         public void OnMatched()
         {
