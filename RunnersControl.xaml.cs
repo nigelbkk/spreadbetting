@@ -20,9 +20,8 @@ namespace SpreadTrader
 	{
 		public String MarketId { get; set; }
 		public bool InPlay { get; set; }
-		public DateTime Time { get; set; }
 		public MarketDefinition.StatusEnum Status { get; set; }
-
+		public DateTime Time { get; set; }
 		public List<MarketRunnerSnapDto> Runners { get; set; }
 	}
 	public class MarketRunnerSnapDto

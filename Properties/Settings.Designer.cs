@@ -25,30 +25,6 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string BFUser {
-            get {
-                return ((string)(this["BFUser"]));
-            }
-            set {
-                this["BFUser"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string BFPassword {
-            get {
-                return ((string)(this["BFPassword"]));
-            }
-            set {
-                this["BFPassword"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("600")]
         public double Height {
             get {
@@ -109,42 +85,6 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string AppKey {
-            get {
-                return ((string)(this["AppKey"]));
-            }
-            set {
-                this["AppKey"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("c:\\client-2048.p12")]
-        public string CertFile {
-            get {
-                return ((string)(this["CertFile"]));
-            }
-            set {
-                this["CertFile"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("zzzz2222")]
-        public string CertPassword {
-            get {
-                return ((string)(this["CertPassword"]));
-            }
-            set {
-                this["CertPassword"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool Upgraded {
             get {
@@ -176,18 +116,6 @@ namespace SpreadTrader.Properties {
             }
             set {
                 this["Favourites"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1:5055")]
-        public string Proxy {
-            get {
-                return ((string)(this["Proxy"]));
-            }
-            set {
-                this["Proxy"] = value;
             }
         }
         
@@ -289,25 +217,13 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool UseStreaming {
-            get {
-                return ((bool)(this["UseStreaming"]));
-            }
-            set {
-                this["UseStreaming"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1:8088")]
-        public string StreamUrl {
+        public string WebSocketsUrl {
             get {
-                return ((string)(this["StreamUrl"]));
+                return ((string)(this["WebSocketsUrl"]));
             }
             set {
-                this["StreamUrl"] = value;
+                this["WebSocketsUrl"] = value;
             }
         }
         
@@ -332,18 +248,6 @@ namespace SpreadTrader.Properties {
             }
             set {
                 this["StreamActive"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool UseProxy {
-            get {
-                return ((bool)(this["UseProxy"]));
-            }
-            set {
-                this["UseProxy"] = value;
             }
         }
         
@@ -505,30 +409,6 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool development {
-            get {
-                return ((bool)(this["development"]));
-            }
-            set {
-                this["development"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool production {
-            get {
-                return ((bool)(this["production"]));
-            }
-            set {
-                this["production"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string ColumnWidths {
             get {
@@ -548,6 +428,18 @@ namespace SpreadTrader.Properties {
             }
             set {
                 this["StakesPreselect"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1:5055")]
+        public string LegacyProxyUrl {
+            get {
+                return ((string)(this["LegacyProxyUrl"]));
+            }
+            set {
+                this["LegacyProxyUrl"] = value;
             }
         }
     }

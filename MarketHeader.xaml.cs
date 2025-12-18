@@ -15,13 +15,15 @@ namespace SpreadTrader
 		public String FullName { get { return MarketNode == null ? "No Market Selected" : MarketNode.MarketName; } }
 		public String TimeToGo { get { return MarketNode == null ? "00:00:00" : MarketNode.TimeToGo; } }
 		public String Latency { get; set; }
-		private System.Timers.Timer timer = new System.Timers.Timer();
+		//private System.Timers.Timer timer = new System.Timers.Timer();
 		public Double? TotalMatched { get { return MarketNode == null ? 0 : MarketNode.TotalMatched; } }
 		public Visibility up_visible { get; set; }
 		public SolidColorBrush TimeToGoColor { get { return System.Windows.Media.Brushes.DarkGray; } }
 		public Visibility down_visible { get; set; }
 		public event PropertyChangedEventHandler PropertyChanged;
-		public SolidColorBrush StreamingColor { get { return System.Windows.Media.Brushes.LightGreen; } }
+		private System.Timers.Timer timer = new System.Timers.Timer();
+
+		//public SolidColorBrush StreamingColor { get { return System.Windows.Media.Brushes.LightGreen; } }
 		public void NotifyPropertyChanged(String info)
 		{
 			if (PropertyChanged != null)
@@ -34,7 +36,6 @@ namespace SpreadTrader
 			if (messageName == "Update Latency")
 			{
 				dynamic d = data;
-				//Debug.WriteLine($"MarketHeader {d.Latency}");
 				Latency = d.Latency;
 			}
 		}

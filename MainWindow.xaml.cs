@@ -119,7 +119,7 @@ namespace SpreadTrader
 			{
 				dynamic d = data;
 				MarketSnapDto snap = d.MarketSnapDto;
-				SelectedTab.OnMarketChanged(snap);
+				//SelectedTab.OnMarketChanged(snap);
 			}
 			if (messageName == "Orders Changed")
 			{
@@ -157,20 +157,20 @@ namespace SpreadTrader
             Betfair = new BetfairAPI.BetfairAPI();
             try
             {
-                if (!props.UseProxy)
-                {
-                    Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
+                //if (!props.UseProxy)
+                //{
+                //    Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
 
-                    System.Timers.Timer t = new System.Timers.Timer();
-                    t.Elapsed += (o, e) =>
-                    {
-                        Betfair.KeepAlive();
-                        Console.WriteLine("KeepAlive");
-                    };
-                    t.Interval = 1 * 60 * 60 * 1000;
-                    t.Enabled = true;
-                    t.Start();
-                }
+                //    System.Timers.Timer t = new System.Timers.Timer();
+                //    t.Elapsed += (o, e) =>
+                //    {
+                //        Betfair.KeepAlive();
+                //        Console.WriteLine("KeepAlive");
+                //    };
+                //    t.Interval = 1 * 60 * 60 * 1000;
+                //    t.Enabled = true;
+                //    t.Start();
+                //}
                 //UpdateAccountInformation();
             }
             catch (Exception xe)

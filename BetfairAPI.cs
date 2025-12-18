@@ -89,16 +89,16 @@ namespace BetfairAPI
 			joe["method"] = "SportsAPING/v1.0/" + Method;
 			joe["params"] = Params;
 
-			String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy;
-			if (!SpreadTrader.Properties.Settings.Default.UseProxy || String.IsNullOrEmpty(SpreadTrader.Properties.Settings.Default.Proxy))
-			{
-				if (!String.IsNullOrEmpty(Token))
-				{
-					url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";
-					if (Method.Contains(AccountCalls[0]))
-						url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
-				}
-			}
+			String url = "http://" + SpreadTrader.Properties.Settings.Default.LegacyProxyUrl;
+			//if (!SpreadTrader.Properties.Settings.Default.UseProxy || String.IsNullOrEmpty(SpreadTrader.Properties.Settings.Default.Proxy))
+			//{
+			//	if (!String.IsNullOrEmpty(Token))
+			//	{
+			//		url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";
+			//		if (Method.Contains(AccountCalls[0]))
+			//			url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
+			//	}
+			//}
 			SendRequestAsync(joe, url);
 		}
 		public Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
@@ -112,16 +112,16 @@ namespace BetfairAPI
                 joe["method"] = "SportsAPING/v1.0/" + Method;
                 joe["params"] = Params;
 
-                String url = "http://" + SpreadTrader.Properties.Settings.Default.Proxy;
-                if (!SpreadTrader.Properties.Settings.Default.UseProxy || String.IsNullOrEmpty(SpreadTrader.Properties.Settings.Default.Proxy))
-                {
-                    if (!String.IsNullOrEmpty(Token))
-                    {
-                        url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";
-                        if (Method.Contains(AccountCalls[0]))
-                            url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
-                    }
-                }
+                String url = "http://" + SpreadTrader.Properties.Settings.Default.LegacyProxyUrl;
+                //if (!SpreadTrader.Properties.Settings.Default.UseProxy || String.IsNullOrEmpty(SpreadTrader.Properties.Settings.Default.ProxyUrl))
+                //{
+                //    if (!String.IsNullOrEmpty(Token))
+                //    {
+                //        url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";
+                //        if (Method.Contains(AccountCalls[0]))
+                //            url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
+                //    }
+                //}
                 if (AccountCalls.Contains(Method))
                 {
                     joe["method"] = "AccountAPING/v1.0/" + Method;

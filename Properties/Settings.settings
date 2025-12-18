@@ -2,12 +2,6 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SpreadTrader.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="BFUser" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="BFPassword" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="Height" Type="System.Double" Scope="User">
       <Value Profile="(Default)">600</Value>
     </Setting>
@@ -23,15 +17,6 @@
     <Setting Name="LayStake" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">150</Value>
     </Setting>
-    <Setting Name="AppKey" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="CertFile" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:\client-2048.p12</Value>
-    </Setting>
-    <Setting Name="CertPassword" Type="System.String" Scope="User">
-      <Value Profile="(Default)">zzzz2222</Value>
-    </Setting>
     <Setting Name="Upgraded" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -40,9 +25,6 @@
     </Setting>
     <Setting Name="Favourites" Type="System.String" Scope="User">
       <Value Profile="(Default)">1,2,3</Value>
-    </Setting>
-    <Setting Name="Proxy" Type="System.String" Scope="User">
-      <Value Profile="(Default)">127.0.0.1:5055</Value>
     </Setting>
     <Setting Name="BasePrice" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -68,19 +50,13 @@
     <Setting Name="LogFile" Type="System.String" Scope="User">
       <Value Profile="(Default)">log.csv</Value>
     </Setting>
-    <Setting Name="UseStreaming" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="StreamUrl" Type="System.String" Scope="User">
+    <Setting Name="WebSocketsUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">127.0.0.1:8088</Value>
     </Setting>
     <Setting Name="SafeBets" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="StreamActive" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="UseProxy" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="TimeOffset" Type="System.Int32" Scope="User">
@@ -122,17 +98,14 @@
     <Setting Name="CDLeft" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="development" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="production" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="ColumnWidths" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="StakesPreselect" Type="System.String" Scope="User">
       <Value Profile="(Default)">2,5,10</Value>
+    </Setting>
+    <Setting Name="LegacyProxyUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">127.0.0.1:5055</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -5,10 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SpreadTrader"
              mc:Ignorable="d" 
+             DataContext="{Binding RelativeSource={RelativeSource Self}}"
              d:DesignHeight="24" d:DesignWidth="180">
     <Grid>
         <StackPanel Orientation="Horizontal">
-            <Label Content="" Width="auto" Foreground = "DarkSlateGray" Background="Transparent" Height="23" HorizontalAlignment="Left" Margin="0,1,0,0" Name="TabTitle" VerticalAlignment="Top" FontFamily="Courier" FontSize="12"  />
+            <Label Content="" Width="auto" Foreground = "{Binding Path=ForegroundColour}" Background="Transparent" Height="23" HorizontalAlignment="Left" Margin="0,1,0,0" Name="TabTitle" VerticalAlignment="Top" FontFamily="Courier" FontSize="12"  />
 
             <Button Content="X" Click ="Button_Click" Background="Transparent" Margin="0,4,0,0" Height="19" HorizontalAlignment="Right"  VerticalAlignment="Top" Width="20" FontFamily="Courier" FontWeight="Normal" FontSize="12" Padding="0" ToolTip="Close"/>
         </StackPanel>

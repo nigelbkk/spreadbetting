@@ -49,7 +49,7 @@ namespace SpreadTrader
 		public WebSocketsHub() 
 		{
 			ControlMessenger.MessageSent += OnMessageReceived;
-			hubConnection = new HubConnection("http://" + props.StreamUrl);
+			hubConnection = new HubConnection("http://" + props.WebSocketsUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
 			Start();
@@ -85,7 +85,7 @@ namespace SpreadTrader
 		private async void RequestMarketSelectedAsync(String marketid)
 		{
 			var http = new HttpClient();
-			var url = $"http://{props.StreamUrl}/api/market/subscribe";
+			var url = $"http://{props.WebSocketsUrl}/api/market/subscribe";
 			var payload = new { MarketId = marketid, };
 			string json = JsonConvert.SerializeObject(payload);
 			var content = new StringContent(json, Encoding.UTF8, "application/json");

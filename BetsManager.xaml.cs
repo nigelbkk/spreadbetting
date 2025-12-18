@@ -1,5 +1,4 @@
-﻿using Betfair.ESAClient.Cache;
-using Betfair.ESASwagger.Model;
+﻿using Betfair.ESASwagger.Model;
 using BetfairAPI;
 using Newtonsoft.Json;
 using System;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -273,7 +273,14 @@ namespace SpreadTrader
             InitializeComponent();
             ControlMessenger.MessageSent += OnMessageReceived;
         }
-        public void OnOrderChanged(String json)
+        private async void NotifyBetMatchedAsync()
+        {
+            String path = props.MatchedBetAlert;
+			var player = new SoundPlayer(path);
+			player.Play();
+		}
+
+		public void OnOrderChanged(String json)
         {
             if (String.IsNullOrEmpty(json))
                 return;
@@ -346,7 +353,7 @@ namespace SpreadTrader
                                     row.AvgPriceMatched = o.Avp.Value;
                                     row.SizeMatched = row.OriginalStake;// o.Sm.Value;
                                     row.Hidden = UnmatchedOnly;
-                                    //NotifyBetMatched();
+									NotifyBetMatchedAsync();
                                     NotifyPropertyChanged("");
                                     Debug.WriteLine(o.Id, "fully matched: ");
                                 }
@@ -366,7 +373,7 @@ namespace SpreadTrader
                                         Rows.Insert(idx + 1, mrow);
                                     }));
                                     row.Stake = o.Sr.Value;                         // change stake for the unmatched remainder
-                                    //NotifyBetMatched();
+									NotifyBetMatchedAsync();
                                     NotifyPropertyChanged("");
                                     Debug.WriteLine(o.Id, "partial match: ");
                                 }
@@ -382,10 +389,10 @@ namespace SpreadTrader
                                         Debug.WriteLine(o.Id, "Bet fully cancelled: ");
                                         to_remove.Add(row);
                                     }
-                                    //Debug.WriteLine(o.Id, "cancelled: ");
-                                    //										NotifyBetMatched();
-                                }
-                            }
+									//Debug.WriteLine(o.Id, "cancelled: ");
+									//										NotifyBetMatchedAsync();
+								}
+							}
                             foreach (Row o in to_remove)
                             {
                                 Dispatcher.BeginInvoke(new Action(() =>
@@ -723,16 +730,16 @@ namespace SpreadTrader
             row.Override = cb.IsChecked == true;
         }
     }
-    public class OrderMarketSnap
-    {
-        public string MarketId { get; set; }
-        public bool IsClosed { get; set; }
-        public IEnumerable<OrderMarketRunnerSnap> OrderMarketRunners { get; set; }
-    }
-    public class OrderMarketRunnerSnap
-    {
-        public IList<PriceSize> MatchedLay { get; set; }
-        public IList<PriceSize> MatchedBack { get; set; }
-        public Dictionary<string, Order> UnmatchedOrders { get; set; }
-    }
+    //public class OrderMarketSnap
+    //{
+    //    public string MarketId { get; set; }
+    //    public bool IsClosed { get; set; }
+    //    public IEnumerable<OrderMarketRunnerSnap> OrderMarketRunners { get; set; }
+    //}
+    //public class OrderMarketRunnerSnap
+    //{
+    //    public IList<PriceSize> MatchedLay { get; set; }
+    //    public IList<PriceSize> MatchedBack { get; set; }
+    //    public Dictionary<string, Order> UnmatchedOrders { get; set; }
+    //}
 }

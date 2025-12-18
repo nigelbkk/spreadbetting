@@ -32,11 +32,31 @@ namespace SpreadTrader
         {
             customHeader = header;
             InitializeComponent();
+			ControlMessenger.MessageSent += OnMessageReceived;
 			marketHeader.TabContent = this;
 			TabIndex = header.ID;
 			BetsManager.TabID = header.ID;
 			OverlayVisibility = Visibility.Hidden;
 			NotifyPropertyChanged("");
+		}
+		private void OnMessageReceived(string messageName, object data)
+		{
+			if (messageName == "Market Changed")
+			{
+				dynamic d = data;
+				MarketSnapDto snap = d.MarketSnapDto;
+				if (RunnersControl != null && RunnersControl.MarketNode != null)
+				{
+					String name = RunnersControl?.MarketNode.Market.marketName;
+					String marketId = RunnersControl?.MarketNode.Market.marketId;
+
+					if (marketId == snap.MarketId)
+					{
+						OnMarketChanged(snap);
+						//Debug.WriteLine($"Status = {name} : {snap.MarketId} : {snap.Status.ToString()}");
+					}
+				}
+			}
 		}
 		public void OnSelected(NodeViewModel d2)
 		{
@@ -52,6 +72,7 @@ namespace SpreadTrader
 		public void OnMarketChanged(MarketSnapDto snap)
 		{
 			RunnersControl?.OnMarketChanged(snap);
+			customHeader.inPlay = snap.InPlay;
 
 			if (MarketStatus != snap.Status)
 			{
