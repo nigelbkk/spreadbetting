@@ -21,7 +21,7 @@ namespace SpreadTrader
 		public String MarketId { get; set; }
 		public bool InPlay { get; set; }
 		public DateTime Time { get; set; }
-		public MarketDefinition.StatusEnum? Status { get; set; }
+		public MarketDefinition.StatusEnum Status { get; set; }
 
 		public List<MarketRunnerSnapDto> Runners { get; set; }
 	}
@@ -160,6 +160,8 @@ namespace SpreadTrader
                     String cs = $"{Math.Round(1000 * diff / (double)TimeSpan.TicksPerSecond)}ms";
                     //Debug.WriteLine(cs);
                     ControlMessenger.Send("Update Latency", new { Latency = cs, Status = snap.Status });
+
+                    MarketDefinition.StatusEnum? Status = snap.Status;
 
                     //double tradedVolume = 0;
                     if (LiveRunners != null)

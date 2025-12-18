@@ -1,4 +1,5 @@
-﻿using BetfairAPI;
+﻿using Betfair.ESASwagger.Model;
+using BetfairAPI;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -11,7 +12,7 @@ namespace SpreadTrader
     {
         public CustomTabHeader customHeader = null;
         public NodeViewModel MarketNode = null;
-		public marketStatusEnum MarketStatus { get; set; }
+		public MarketDefinition.StatusEnum? MarketStatus { get; set; }
 		public Visibility OverlayVisibility { get; set; }
 		public string MarketName { get { return MarketNode?.MarketName; } }
 		//public Double? TotalMatched { get { return MarketNode?.TotalMatched; } }
@@ -31,7 +32,6 @@ namespace SpreadTrader
         {
             customHeader = header;
             InitializeComponent();
-			ControlMessenger.MessageSent += OnMessageReceived;
 			marketHeader.TabContent = this;
 			TabIndex = header.ID;
 			BetsManager.TabID = header.ID;
@@ -43,9 +43,6 @@ namespace SpreadTrader
 			marketHeader.OnSelected(d2);
 			customHeader.OnSelected(d2);
 			BetsManager.OnSelected(d2, RunnersControl);
-			//BetsManager.RunnersControl = RunnersControl;
-			//customHeader.Title = d2.FullName;
-			//customHeader.MarketId = d2.MarketID;
 			_ = RunnersControl.PopulateNewMarketAsync(d2);
 		}
 		public void OnOrdersChanged(String json)
@@ -55,14 +52,18 @@ namespace SpreadTrader
 		public void OnMarketChanged(MarketSnapDto snap)
 		{
 			RunnersControl?.OnMarketChanged(snap);
-		}
-		private void OnMessageReceived(string messageName, object data)
-		{
-			if (messageName == "Market Changed")
+
+			if (MarketStatus != snap.Status)
 			{
-			}
-			if (messageName == "Orders Changed")
-			{
+				MarketStatus = snap.Status;
+				if (MarketStatus == MarketDefinition.StatusEnum.Open)
+				{
+					OverlayVisibility = Visibility.Hidden;
+				}
+				else
+				{
+					OverlayVisibility = Visibility.Visible;
+				}
 				NotifyPropertyChanged("");
 			}
 		}

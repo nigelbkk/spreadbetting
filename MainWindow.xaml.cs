@@ -105,7 +105,6 @@ namespace SpreadTrader
 		#endregion Properties
 		private Mutex mutex = null;
         public static TabContent SelectedTab {get;set;}
-        public static Int32 TabID { get; set; }
 
         private void OnMessageReceived(string messageName, object data)
         {
@@ -304,12 +303,6 @@ namespace SpreadTrader
                     TabContent tc2 = ti.Content as TabContent;
                     BetsManager bm = tc2.BetsManager;
                     RunnersControl rc = tc2.RunnersControl;
-					//SelectedTab.OnSelected();
-                    //if (cth != null)
-                    //    cth.OnSelected();
-
-					//if (cth != null)
-					//	ControlMessenger.Send("Tab Selected", new { MarketId = cth.MarketId, TabID = cth.ID});
 				}
 				TabContent content = TabControl.SelectedContent as TabContent;
                 Commission = content.MarketNode == null ? 0.00 : content.MarketNode.Commission;

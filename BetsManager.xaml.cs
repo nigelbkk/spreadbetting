@@ -107,7 +107,6 @@ namespace SpreadTrader
             return String.Format("{0},{1},{2},{3},{4}", Runner, SelectionID, Odds, SizeMatched, BetID.ToString());
         }
     }
-
     public partial class BetsManager : UserControl, INotifyPropertyChanged
     {
         private Queue<String> incomingOrdersQueue = new Queue<String>();
@@ -143,7 +142,6 @@ namespace SpreadTrader
             {
                 _Status = value;
                 Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = value; }));
-                //Extensions.MainWindow.Status = value;
             }
         }
         private String _Notification = "";
@@ -154,11 +152,8 @@ namespace SpreadTrader
             {
                 _Notification = value;
                 Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Notification = value; }));
-                //Extensions.MainWindow.Status = value;
             }
         }
-        //private bool _Connected { get { return !String.IsNullOrEmpty(hubConnection?.ConnectionId); } }
-        //public bool IsConnected { get { return _Connected; } }
         public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
         public String StreamingButtonText { get { return "Streaming Connected"; } }
 		#endregion Properties
@@ -430,6 +425,7 @@ namespace SpreadTrader
                     {
                         CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.185904913"
 
+                        Rows.Clear();
                         if (report.currentOrders.Count > 0)
                         {
                             foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
@@ -441,10 +437,10 @@ namespace SpreadTrader
                                     Runner = RunnersControl.GetRunnerName(o.selectionId),
                                 });
                             }
-                            NotifyPropertyChanged("");
                         }
-                    }
-                    catch (Exception xe)
+						NotifyPropertyChanged("");
+					}
+					catch (Exception xe)
                     {
                         Status = xe.Message;
                     }

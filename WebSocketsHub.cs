@@ -1,7 +1,4 @@
-﻿using Betfair.ESAClient.Cache;
-using Betfair.ESASwagger.Model;
-using BetfairAPI;
-using Microsoft.AspNet.SignalR.Client;
+﻿using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;

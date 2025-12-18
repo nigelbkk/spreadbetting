@@ -192,7 +192,6 @@ namespace BetfairAPI
                 Debug.WriteLine(xe.Message);
                 return null;
             }
-            return null;
         }
         public void login(String CertFile, String CertPassword, String appKey, String username, String password)
         {
