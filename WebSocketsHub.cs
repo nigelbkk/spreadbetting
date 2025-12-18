@@ -31,7 +31,6 @@ namespace SpreadTrader
 				lock (lockObj1)
 				{
 					ControlMessenger.Send("Orders Changed", new { String = json });
-					//ProcessOrder(json);
 				}
 			}
 		}
@@ -78,15 +77,12 @@ namespace SpreadTrader
 				Debug.WriteLine($"WebSocketsHub: {messageName} : {d2.FullName}");
 				RequestMarketSelectedAsync(d2.MarketID);
 			}
-			//if (messageName == "Tab Selected")
-			//{
-			//	dynamic d = data;
-			//	Debug.WriteLine($"WebSocketsHub: {messageName} :{d.MarketId}");
-			//	//RequestMarketSelectedAsync(d.MarketId);
-			//}
-			if (messageName == "Reconnect requested")
+			if (messageName == "Reconnect")
 			{
+				dynamic d = data;
+				String marketId = d.MarketId;
 				Connect();
+				RequestMarketSelectedAsync(marketId);
 			}
 		}
 		private async void RequestMarketSelectedAsync(String marketid)

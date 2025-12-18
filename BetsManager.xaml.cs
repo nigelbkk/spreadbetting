@@ -1,14 +1,12 @@
-﻿using Betfair.ESASwagger.Model;
+﻿using Betfair.ESAClient.Cache;
+using Betfair.ESASwagger.Model;
 using BetfairAPI;
-using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -163,29 +161,21 @@ namespace SpreadTrader
         //public bool IsConnected { get { return _Connected; } }
         public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
         public String StreamingButtonText { get { return "Streaming Connected"; } }
-#endregion Properties
-        private void OnMessageReceived(string messageName, object data)
+		#endregion Properties
+		public void OnSelected(NodeViewModel d2, RunnersControl rc)
 		{
-            //Int32 selected_tab = TabControl.SelectedItemProperty;
+			MarketNode = d2;
+            RunnersControl = rc;
+            PopulateDataGrid();
+		}
+		private void OnMessageReceived(string messageName, object data)
+		{
 			if (messageName == "Favorite Changed")
 			{
 				dynamic d = data;
 				Debug.WriteLine($"BetsManager: {messageName} : {d.Name}");
 			}
-			//if (messageName == "Market Selected")
-			//{
-			//	dynamic d = data;
-   //             Debug.WriteLine(TabID);
-			//	Debug.WriteLine($"BetsManager: {messageName} : {d.NodeViewModel.FullName}");
-			//	MarketNode = d.NodeViewModel;
-			//}
-			//if (messageName == "Orders Changed")
-			//{
-			//	dynamic d = data;
-			//	Debug.WriteLine($"BetsManager: {messageName}");
-   //             OnOrderChanged(d.String);
-			//}
-			if (messageName == "Execute Bets")
+            if (messageName == "Execute Bets")
 			{
 				dynamic d = data;
 				Debug.WriteLine($"BetsManager: {messageName} : {d.Favorite.Name}");
@@ -216,60 +206,6 @@ namespace SpreadTrader
                 }
             return null;
         }
-        //private void ProcessIncomingNotifications(object o)
-        //{
-        //    BackgroundWorker sender = o as BackgroundWorker;
-        //    while (!sender.CancellationPending)
-        //    {
-        //        while (incomingOrdersQueue.Count > 0)
-        //        {
-        //            try
-        //            {
-        //                Debug.WriteLine("Fetch from queue");
-        //                //                        lock (incomingOrdersQueue){}
-        //                String json = incomingOrdersQueue.Dequeue();
-        //                OrderMarketSnap snapshot = JsonConvert.DeserializeObject<OrderMarketSnap>(json);
-        //                OnOrderChanged(json);
-        //            }
-        //            catch (Exception xe)
-        //            {
-        //                Status = xe.Message;
-        //            }
-        //        }
-        //        System.Threading.Thread.Sleep(10);
-        //    }
-        //}
-        //private void ProcessCancellationQueue(object o)
-        //{
-        //    BackgroundWorker sender = o as BackgroundWorker;
-        //    while (!sender.CancellationPending)
-        //    {
-        //        while (cancellation_queue.Count > 0)
-        //        {
-        //            try
-        //            {
-        //                //lock (cancellation_queue)
-        //                {
-        //                    UInt64 betid = cancellation_queue.Dequeue();
-
-        //                    Debug.WriteLine("submit cancel {0}", betid);
-        //                    CancelExecutionReport report = Betfair.cancelOrder(MarketNode.MarketID, betid, null);
-        //                    if (report.errorCode == null)
-        //                    {
-        //                        Debug.WriteLine("bet is cancelled {0}", betid);
-        //                    }
-        //                    Status = report.errorCode != null ? report.errorCode : report.status;
-        //                }
-        //            }
-        //            catch (Exception xe)
-        //            {
-        //                Debug.WriteLine(xe.Message);
-        //                Status = xe.Message;
-        //            }
-        //        }
-        //        System.Threading.Thread.Sleep(10);
-        //    }
-        //}
         private async void ExecuteBets(LiveRunner runner, List<PriceSize> lay, List<PriceSize> back)
         {
             String MarketID = MarketNode.MarketID;
@@ -342,7 +278,7 @@ namespace SpreadTrader
             InitializeComponent();
             ControlMessenger.MessageSent += OnMessageReceived;
         }
-        private void OnOrderChanged(String json)
+        public void OnOrderChanged(String json)
         {
             if (String.IsNullOrEmpty(json))
                 return;
@@ -352,11 +288,6 @@ namespace SpreadTrader
 			if (change.Orc == null)
 				return;
 
-			if (change.Id != MarketNode.MarketID)
-            {
-				Debug.WriteLine("not our market");
-				return;
-			}
 			_LastUpdated = DateTime.UtcNow;
             try
             {
@@ -386,7 +317,7 @@ namespace SpreadTrader
                                 Row row = FindUnmatchedRow(o.Id);
                                 if (row == null)
                                 {
-                                    row = new Row(o) { MarketID = MarketNode.MarketID, SelectionID = orc.Id.Value };
+                                    row = new Row(o) { MarketID = change.Id, SelectionID = orc.Id.Value };
                                     Dispatcher.BeginInvoke(new Action(() =>
                                     {
                                         Debug.WriteLine(o.Id, "Insert into grid: ");
@@ -499,7 +430,9 @@ namespace SpreadTrader
                     {
                         CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.185904913"
 
-                        if (report.currentOrders.Count > 0) foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
+                        if (report.currentOrders.Count > 0)
+                        {
+                            foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
                             {
                                 OrdersStatic.BetID2SelectionID[o.betId] = o.selectionId;
                                 Row.RunnerNames[o.selectionId] = RunnersControl.GetRunnerName(o.selectionId);
@@ -508,7 +441,8 @@ namespace SpreadTrader
                                     Runner = RunnersControl.GetRunnerName(o.selectionId),
                                 });
                             }
-                        NotifyPropertyChanged("");
+                            NotifyPropertyChanged("");
+                        }
                     }
                     catch (Exception xe)
                     {
@@ -541,40 +475,6 @@ namespace SpreadTrader
                 Debug.WriteLine("null context");
             }
         }
-
-        /// <summary>
-        /// ///// hub stuff
-        /// </summary>
-        //private void Connect()
-        //{
-        //    String result = "";
-        //    if (hubConnection != null)
-        //    {
-        //        hubConnection.Start().ContinueWith(task =>
-        //        {
-        //            if (OnFail(task))
-        //            {
-        //                result = "Failed to Connect";
-        //                return;
-        //            }
-        //            result = "Connected";
-        //        }).Wait(1000);
-        //        Status = result;
-        //    }
-        //}
-        //private void Disconnect()
-        //{
-        //    hubConnection.Stop(new TimeSpan(2000));
-        //    Status = "Disconnected";
-        //}
-        //private bool OnFail(Task task)
-        //{
-        //    if (task.IsFaulted)
-        //    {
-        //        Debug.WriteLine("Exception:{0}", task.Exception.GetBaseException());
-        //    }
-        //    return task.IsFaulted;
-        //}
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (Betfair == null)

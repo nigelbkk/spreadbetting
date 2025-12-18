@@ -95,7 +95,7 @@ namespace SpreadTrader
 			LiveRunners = MarketNode.LiveRunners;
 			NotifyPropertyChanged("");
 		}
-        LiveRunner GetRunnerFromSelectionID(Int64 selid)
+        public LiveRunner GetRunnerFromSelectionID(Int64 selid)
         {
             foreach (LiveRunner runner in LiveRunners)
             {
@@ -187,7 +187,7 @@ namespace SpreadTrader
                             }
                         }
                     }
-                    //_ = UpdateRunnerPnLAsync();
+            //        _ = UpdateRunnerPnLAsync();
 
                     //List<Tuple<long, double?, double?>> last_traded = new List<Tuple<long, double?, double?>>();
                     //if (change?.Rc != null)

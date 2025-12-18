@@ -31,8 +31,8 @@ namespace SpreadTrader
         {
             customHeader = header;
             InitializeComponent();
-            ControlMessenger.MessageSent += OnMessageReceived;
-            marketHeader.TabContent = this;
+			ControlMessenger.MessageSent += OnMessageReceived;
+			marketHeader.TabContent = this;
 			TabIndex = header.ID;
 			BetsManager.TabID = header.ID;
 			OverlayVisibility = Visibility.Hidden;
@@ -42,9 +42,15 @@ namespace SpreadTrader
 		{
 			marketHeader.OnSelected(d2);
 			customHeader.OnSelected(d2);
+			BetsManager.OnSelected(d2, RunnersControl);
+			//BetsManager.RunnersControl = RunnersControl;
 			//customHeader.Title = d2.FullName;
 			//customHeader.MarketId = d2.MarketID;
 			_ = RunnersControl.PopulateNewMarketAsync(d2);
+		}
+		public void OnOrdersChanged(String json)
+		{
+			BetsManager.OnOrderChanged(json);
 		}
 		public void OnMarketChanged(MarketSnapDto snap)
 		{

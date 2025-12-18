@@ -120,9 +120,13 @@ namespace SpreadTrader
 			{
 				dynamic d = data;
 				MarketSnapDto snap = d.MarketSnapDto;
-				//	//if (LiveRunners != null)
-				//	//	OnMarketChanged(snap);
 				SelectedTab.OnMarketChanged(snap);
+			}
+			if (messageName == "Orders Changed")
+			{
+				dynamic d = data;
+				String json = d.String;
+				SelectedTab.OnOrdersChanged(json);
 			}
 		}
 
