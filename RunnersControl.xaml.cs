@@ -90,11 +90,6 @@ namespace SpreadTrader
         }
         public async Task PopulateNewMarketAsync(NodeViewModel node)
         {
-			if (_MarketNode != null && node.MarketID != _MarketNode.MarketID)
-			{
-				Debug.WriteLine($"Not our market: {MarketNode.FullName}");
-                return;
-			}
 			_MarketNode = node;
 			MarketNode.GetLiveRunners();
 			LiveRunners = MarketNode.LiveRunners;
@@ -274,25 +269,6 @@ namespace SpreadTrader
 
 		private void OnMessageReceived(string messageName, object data)
         {
-			//if (messageName == "Market Selected")
-			//{
-			//	dynamic d = data;
-			//	NodeViewModel d2 = d.NodeViewModel;
-			//	if (MarketNode != null && d2.MarketID != MarketNode.MarketID)
-			//	{
-			//		Debug.WriteLine($"Not our market: {d2.FullName}");
-			//		return;
-			//	}
-			//	Debug.WriteLine($"RunnersContrkL {d2.FullName}");
-			//	_ = PopulateNewMarketAsync(d2);
-			//}
-			//if (messageName == "Market Changed")
-			//{
-			//	dynamic d = data;
-			//	MarketSnapDto snap = d.MarketSnapDto;
-			//	//if (LiveRunners != null)
-			//	//	OnMarketChanged(snap);
-			//}
 		}
 		public RunnersControl()
         {

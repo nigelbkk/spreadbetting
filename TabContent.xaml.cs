@@ -40,54 +40,18 @@ namespace SpreadTrader
 		}
 		public void OnSelected(NodeViewModel d2)
 		{
-			customHeader.Title = d2.FullName;
-			customHeader.MarketId = d2.MarketID;
+			marketHeader.OnSelected(d2);
+			customHeader.OnSelected(d2);
+			//customHeader.Title = d2.FullName;
+			//customHeader.MarketId = d2.MarketID;
 			_ = RunnersControl.PopulateNewMarketAsync(d2);
 		}
 		public void OnMarketChanged(MarketSnapDto snap)
 		{
-			RunnersControl.OnMarketChanged(snap);
+			RunnersControl?.OnMarketChanged(snap);
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
-			if (messageName == "dddMarket Selected")
-			{
-				dynamic d = data;
-				NodeViewModel d2 = d.NodeViewModel as NodeViewModel;
-				Debug.WriteLine($"TabContent: {d2.FullName}");
-
-				TabContent SelectedTab = MainWindow.SelectedTab;
-
-				Int32 tabID = customHeader.ID;
-				bool isSelected = customHeader.Tab.IsSelected;
-
-
-				//	dynamic d = data;
-				//	NodeViewModel d2 = d.NodeViewModel;
-				//	if (MarketNode != null && d2.MarketID != MarketNode.MarketID)
-				//	{
-				//		//Debug.WriteLine($"Not our market: {d2.FullName}");
-				//		//return;
-				//	}
-				//	Debug.WriteLine($"MarketHeader {d2.FullName}");
-				//	MarketNode = d2;
-
-				_ = RunnersControl.PopulateNewMarketAsync(d2);
-
-
-				//if (MarketNode != null && d2.MarketID != MarketNode.MarketID)
-				//{
-				//	Debug.WriteLine($"Not our market: {d2.FullName}");
-				//	return;
-				//}
-
-				//if (isSelected)
-				{
-					MarketNode = d2;
-					customHeader.Title = d2.FullName;
-					customHeader.MarketId = d2.MarketID;
-				}
-			}
 			if (messageName == "Market Changed")
 			{
 			}

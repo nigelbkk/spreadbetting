@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Xml.Linq;
 
 namespace SpreadTrader
 {
@@ -32,19 +31,6 @@ namespace SpreadTrader
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
-			//if (messageName == "Market Selected")
-			//{
-			//	dynamic d = data;
-			//	NodeViewModel d2 = d.NodeViewModel;
-			//	if (MarketNode != null && d2.MarketID != MarketNode.MarketID)
-			//	{
-			//		//Debug.WriteLine($"Not our market: {d2.FullName}");
-			//		//return;
-			//	}
-			//	Debug.WriteLine($"MarketHeader {d2.FullName}");
-			//	MarketNode = d2;
-			//	_ = TabContent.RunnersControl.PopulateNewMarketAsync(d2);
-			//}
 			if (messageName == "Update Latency")
 			{
 				dynamic d = data;
@@ -69,6 +55,14 @@ namespace SpreadTrader
 			timer.Enabled = true;
 			timer.Start();
 		}
+		public void OnSelected(NodeViewModel d2)
+		{
+			MarketNode = d2;
+			//Title = d2.FullName;
+			//MarketId = d2.MarketID;
+			//_ = RunnersControl.PopulateNewMarketAsync(d2);
+		}
+
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			Button b = sender as Button;

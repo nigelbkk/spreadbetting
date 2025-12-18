@@ -78,12 +78,12 @@ namespace SpreadTrader
 				Debug.WriteLine($"WebSocketsHub: {messageName} : {d2.FullName}");
 				RequestMarketSelectedAsync(d2.MarketID);
 			}
-			if (messageName == "Tab Selected")
-			{
-				dynamic d = data;
-				Debug.WriteLine($"WebSocketsHub: {messageName} :{d.MarketId}");
-				//RequestMarketSelectedAsync(d.MarketId);
-			}
+			//if (messageName == "Tab Selected")
+			//{
+			//	dynamic d = data;
+			//	Debug.WriteLine($"WebSocketsHub: {messageName} :{d.MarketId}");
+			//	//RequestMarketSelectedAsync(d.MarketId);
+			//}
 			if (messageName == "Reconnect requested")
 			{
 				Connect();

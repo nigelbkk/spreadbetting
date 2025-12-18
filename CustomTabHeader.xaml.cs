@@ -24,7 +24,15 @@ namespace SpreadTrader
                 TabTitle.Background = Brushes.Orange;
             }
         }
-        public void OnSelected()
+		public void OnSelected(NodeViewModel d2)
+		{
+			//MarketNode = d2;
+			Title = d2.FullName;
+			MarketId = d2.MarketID;
+			//_ = RunnersControl.PopulateNewMarketAsync(d2);
+		}
+
+		public void OnSelected()
         {
             TabTitle.Foreground = inPlay ? Brushes.LightGreen : Brushes.DarkSlateGray;
             TabTitle.Background = Brushes.Transparent;

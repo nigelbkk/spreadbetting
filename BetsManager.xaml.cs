@@ -172,19 +172,19 @@ namespace SpreadTrader
 				dynamic d = data;
 				Debug.WriteLine($"BetsManager: {messageName} : {d.Name}");
 			}
-			if (messageName == "Market Selected")
-			{
-				dynamic d = data;
-                Debug.WriteLine(TabID);
-				Debug.WriteLine($"BetsManager: {messageName} : {d.NodeViewModel.FullName}");
-				MarketNode = d.NodeViewModel;
-			}
-			if (messageName == "Orders Changed")
-			{
-				dynamic d = data;
-				Debug.WriteLine($"BetsManager: {messageName}");
-                OnOrderChanged(d.String);
-			}
+			//if (messageName == "Market Selected")
+			//{
+			//	dynamic d = data;
+   //             Debug.WriteLine(TabID);
+			//	Debug.WriteLine($"BetsManager: {messageName} : {d.NodeViewModel.FullName}");
+			//	MarketNode = d.NodeViewModel;
+			//}
+			//if (messageName == "Orders Changed")
+			//{
+			//	dynamic d = data;
+			//	Debug.WriteLine($"BetsManager: {messageName}");
+   //             OnOrderChanged(d.String);
+			//}
 			if (messageName == "Execute Bets")
 			{
 				dynamic d = data;
