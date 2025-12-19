@@ -105,59 +105,16 @@ namespace SpreadTrader
             }
             return null;
         }
-
-		//private async void OnMarketChangedAsync(MarketChange mc)
-  //      {
-		//	try
-		//	{
-		//		foreach (var rs in mc?.Rc)
-		//		{
-		//			if (rs == null)
-		//				return;
-
-		//			LiveRunner lr = RunnerFromSelid((long)rs?.Id.Value);
-
-		//			if (lr == null)
-		//				return;
-
-		//			//double? traded_volume = rs.Tv;
-		//			List<List<double?>> backs = rs.Batb;
-
-		//			if (backs != null)
-		//			{
-  //                      foreach (List<double?> back in backs)
-  //                      {
-  //                          Int32 i = (Int32)back[0].Value;
-		//					Debug.WriteLine($"Back: {lr.Name} : {back[1].Value} : cell id = {i}");
-
-  //                          lr.BackValues[i].price = back[1].Value;
-  //                          lr.BackValues[i].size = back[2].Value;
-  //                          //lr.BackValues[i].CellBackgroundColor = Brushes.Yellow;
-  //                          i++;
-  //                      }
-  //                  }
-		//		}
-		//	}
-		//	catch (Exception e)
-		//	{
-		//		Debug.WriteLine(e.Message);
-		//	}
-
-		//}
 		public void OnMarketChanged(MarketSnapDto snap)
 		{
 			try
 			{
                 if (snap != null)
                 {
-                    //Debug.WriteLine($"our market: {MarketNode.FullName}");
-                    //Debug.Assert(snap.MarketId == _MarketNode.MarketID);
-
                     var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
                     long unixSeconds = (long)epoch.TotalSeconds;
                     long diff = DateTime.UtcNow.Ticks - snap.Time.Ticks;
                     String cs = $"{Math.Round(1000 * diff / (double)TimeSpan.TicksPerSecond)}ms";
-                    //Debug.WriteLine(cs);
                     ControlMessenger.Send("Update Latency", new { Latency = cs, Status = snap.Status });
 
                     MarketDefinition.StatusEnum? Status = snap.Status;
@@ -214,7 +171,6 @@ namespace SpreadTrader
 				Debug.WriteLine(xe.Message);
 			}
 		}
-
 		LiveRunner RunnerFromSelid(long selid)
 		{
 			foreach (var runner in LiveRunners)
@@ -278,7 +234,7 @@ namespace SpreadTrader
         }
         public String GetRunnerName(Int64 SelectionID)
         {
-            if (LiveRunners.Count > 0) foreach (LiveRunner r in LiveRunners)
+            if (LiveRunners?.Count > 0) foreach (LiveRunner r in LiveRunners)
                 {
                     if (r.SelectionId == SelectionID)
                         return r.Name;

@@ -44,7 +44,6 @@ namespace SpreadTrader
         public double OriginalStake { get; set; }
         public double Stake { get { return _Stake; } set { _Stake = value; NotifyPropertyChanged(""); } }
         public double Odds { get; set; }
-        //        public double DisplayOdds { get { return Odds; } }// IsFullyMatched || IsPartiallyMatched ? AvgPriceMatched : Odds; } }
         public double DisplayOdds { get { return SizeMatched > 0 ? Math.Round(AvgPriceMatched, 2) : Odds; } }
         public double DisplayStake
         {
@@ -58,17 +57,10 @@ namespace SpreadTrader
         public double _SizeMatched { get; set; }
         public double SizeMatched { get { return _SizeMatched; } set { _SizeMatched = value; NotifyPropertyChanged(""); } }
         public bool IsMatched { get { return SizeMatched > 0; } }
-        public String IsMatchedString { get { return SizeMatched > 0 ? "F" : "U"; } }
-        public bool IsBack { get { return Side.ToUpper() == "BACK"; } }
         private bool _Hidden = false;
         public bool Hidden { get { return _Hidden; } set { _Hidden = value; NotifyPropertyChanged(""); } }
         public bool Override { get; set; }
         public bool NoCancel { get; set; }
-        public Row(String id)
-        {
-            BetID = Convert.ToUInt64(id);
-            Time = DateTime.Now;
-        }
         public Row(Row r)
         {
             BetID = r.BetID;
@@ -86,7 +78,6 @@ namespace SpreadTrader
             Odds = o.P.Value;
             Stake = (Int32)o.S.Value;
             OriginalStake = Stake;
-            //AmountRemaining = Stake;
             Side = o.Side == Order.SideEnum.L ? "Lay" : "Back";
             BetID = Convert.ToUInt64(o.Id);
         }
@@ -109,9 +100,6 @@ namespace SpreadTrader
     }
     public partial class BetsManager : UserControl, INotifyPropertyChanged
     {
-        private Queue<String> incomingOrdersQueue = new Queue<String>();
-        private Queue<UInt64> cancellation_queue = new Queue<UInt64>();
-
         private Properties.Settings props = Properties.Settings.Default;
         public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
         public RunnersControl RunnersControl { get; set; }
@@ -129,10 +117,7 @@ namespace SpreadTrader
                 Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
             }
         }
-		public Int32 TabID { get; set; }
-		public double MatchAmount { get; set; }
         public bool UnmatchedOnly { get; set; }
-        public String LastUpdated { get { return String.Format("Orders last updated {0}", _LastUpdated.AddHours(props.TimeOffset).ToString("HH:mm:ss")); } }
         public event PropertyChangedEventHandler PropertyChanged;
         private String _Status = "Ready";
         public String Status
@@ -465,19 +450,9 @@ namespace SpreadTrader
                     Status = "Bet already matched";
                     return;
                 }
-
-                lock (cancellation_queue)
-                {
-                    Debug.WriteLine("enqueue cancel {0} for {1}", row.BetID, row.Runner);
-                    cancellation_queue.Enqueue(row.BetID);
-                    row.Hidden = true;
-                }
+                CancelExecutionReport cancel_report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
             }
-            else
-            {
-                Debug.WriteLine("null context");
-            }
-        }
+		}
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (Betfair == null)

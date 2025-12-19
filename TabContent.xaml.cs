@@ -15,7 +15,6 @@ namespace SpreadTrader
 		public MarketDefinition.StatusEnum? MarketStatus { get; set; }
 		public Visibility OverlayVisibility { get; set; }
 		public string MarketName { get { return MarketNode?.MarketName; } }
-		//public Double? TotalMatched { get { return MarketNode?.TotalMatched; } }
 		public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(String info)
         {
@@ -34,8 +33,6 @@ namespace SpreadTrader
             InitializeComponent();
 			ControlMessenger.MessageSent += OnMessageReceived;
 			marketHeader.TabContent = this;
-			TabIndex = header.ID;
-			BetsManager.TabID = header.ID;
 			OverlayVisibility = Visibility.Hidden;
 			NotifyPropertyChanged("");
 		}
