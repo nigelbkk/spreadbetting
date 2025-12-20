@@ -284,9 +284,10 @@ namespace SpreadTrader
 			if (change.Orc == null)
 				return;
 
-			Debug.WriteLine(DateTime.UtcNow.ToLongTimeString());
+            if (MarketNode == null)
+                return;
 
-			_LastUpdated = DateTime.UtcNow;
+            _LastUpdated = DateTime.UtcNow;
             try
             {
                 if (change.Closed == true)
@@ -433,12 +434,8 @@ namespace SpreadTrader
                         {
                             foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
                             {
-                                OrdersStatic.BetID2SelectionID[o.betId] = o.selectionId;
-                                Row.RunnerNames[o.selectionId] = RunnersControl.GetRunnerName(o.selectionId);
-                                Rows.Insert(0, new Row(o)
-                                {
-                                    Runner = RunnersControl.GetRunnerName(o.selectionId),
-                                });
+								Row.RunnerNames[o.selectionId] = MarketNode.GetRunnerName(o.selectionId);
+                                Rows.Insert(0, new Row(o) { Runner = MarketNode.GetRunnerName(o.selectionId), });
                             }
                         }
 						NotifyPropertyChanged("");

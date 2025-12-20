@@ -66,9 +66,7 @@ namespace SpreadTrader
 			Name = name;
 			Nodes = new ObservableCollection<NodeViewModel>();
 		}
-		public List<LiveRunner> LiveRunners = null;// new List<LiveRunner>();
-
-		Random rnd = new Random();
+		public List<LiveRunner> LiveRunners = null;
 
 		public List<LiveRunner> GetLiveRunners()
 		{
@@ -81,7 +79,9 @@ namespace SpreadTrader
 				LayBook = Market.MarketBook.LayBook;
 				TotalMatched = Market.MarketBook.totalMatched;
 				Status = Market.MarketBook.status;
-				if (Market.MarketBook.Runners.Count > 0) foreach (Runner r in Market.MarketBook.Runners)
+				if (Market.MarketBook.Runners.Count > 0) 
+				{
+					foreach (Runner r in Market.MarketBook.Runners)
 					{
 						if (pl != null && pl.Count > 0)
 						{
@@ -89,13 +89,14 @@ namespace SpreadTrader
 								{
 									if (p.selectionId == r.selectionId)
 									{
-										r.ifWin = p.ifWin;  ///NH
-										//r.ifWin = rnd.NextDouble() * 100.00;
+										r.ifWin = p.ifWin;
 									}
 								}
 						}
+						r.Name = r.Catalog.name;
 						Runners.Add(new LiveRunner(r));
 					}
+				}
 				if (Parent != null)
 				{
 					FullName = String.Format("{0} - {1}", Parent.Name, Name);
@@ -127,12 +128,9 @@ namespace SpreadTrader
 					FullName = String.Format("{0} - {1}", Parent.Name, Name);
 					MarketName = Parent.Name;
 					MarketID = Market.marketId;
+					LiveRunners = GetLiveRunners();
 					ControlMessenger.Send("Market Selected", new { NodeViewModel = this});
 				}
-				//if (OnMarketSelected != null)
-				//{
-				//	OnMarketSelected(this);
-				//}
 			}
 		}
 		private void LevelProfitBothGreen(LiveRunner runner1, LiveRunner runner2)

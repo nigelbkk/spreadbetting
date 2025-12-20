@@ -232,16 +232,7 @@ namespace SpreadTrader
             InitializeComponent();
             ControlMessenger.MessageSent += OnMessageReceived;
         }
-        public String GetRunnerName(Int64 SelectionID)
-        {
-            if (LiveRunners?.Count > 0) foreach (LiveRunner r in LiveRunners)
-                {
-                    if (r.SelectionId == SelectionID)
-                        return r.Name;
-                }
-            return null;
-        }
-        private void Button_Click(object sender, RoutedEventArgs e)
+		private void Button_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
             try

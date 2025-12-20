@@ -116,7 +116,6 @@
     <Compile Include="CustomTabHeader.xaml.cs">
       <DependentUpon>CustomTabHeader.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IncomingPacketQueue.cs" />
     <Compile Include="ConfirmationDialog.xaml.cs">
       <DependentUpon>ConfirmationDialog.xaml</DependentUpon>
     </Compile>
@@ -137,7 +136,6 @@
       <DependentUpon>MarketHeader.xaml</DependentUpon>
     </Compile>
     <Compile Include="NodeViewModel.cs" />
-    <Compile Include="OrdersStatic.cs" />
     <Compile Include="PriceSize.cs" />
     <Compile Include="RunnersControl.xaml.cs">
       <DependentUpon>RunnersControl.xaml</DependentUpon>
@@ -259,8 +257,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="json.csv" />
-    <None Include="lines2.json" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -323,7 +319,7 @@
     <Resource Include="Images\down_arrow.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="downarrow.png" />
+    <Resource Include="Images\downarrow.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\sidebar.png" />

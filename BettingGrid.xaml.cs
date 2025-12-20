@@ -47,7 +47,6 @@ namespace SpreadTrader
             {
                 dynamic d = data;
 				NodeViewModel d2 = d.NodeViewModel;
-                //Debug.WriteLine($"BettingGrid: {d.Name}");
                 MarketNode = d2;
 
 				BackValues = sliderControl.BackValues;

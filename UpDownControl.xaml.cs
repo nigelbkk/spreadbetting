@@ -57,7 +57,6 @@ namespace SpreadTrader
         {
             tb.Text = _Value.ToString();
             tb.SelectAll();
-            Debug.WriteLine(tb.SelectedText);
         }
         private void Up_Click(object sender, RoutedEventArgs e)
         {

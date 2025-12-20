@@ -57,12 +57,12 @@ namespace SpreadTrader
 				}
 			}
 		}
-		public void OnSelected(NodeViewModel d2)
+		public async Task OnSelected(NodeViewModel d2)
 		{
 			marketHeader.OnSelected(d2);
 			customHeader.OnSelected(d2);
 			BetsManager.OnSelected(d2, RunnersControl);
-			_ = RunnersControl.PopulateNewMarketAsync(d2);
+			await RunnersControl.PopulateNewMarketAsync(d2);
 		}
 		public void OnOrdersChanged(String json)
 		{

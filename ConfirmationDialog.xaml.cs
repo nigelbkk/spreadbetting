@@ -94,7 +94,6 @@ namespace SpreadTrader
         }
         private void DockPanel_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            //            BetfairPrices betfairPrices = new BetfairPrices();
             switch (e.Key)
             {
                 case Key.Escape: Close(); break;

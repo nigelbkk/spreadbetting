@@ -165,7 +165,7 @@ namespace SpreadTrader
         }
         private void Button_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            Debug.WriteLine("Down");
+           //Debug.WriteLine("Down");
             Button b = sender as Button;
             String Tag = b.Tag as String;
             timer = new System.Timers.Timer(75);
@@ -191,7 +191,7 @@ namespace SpreadTrader
         }
         private void Button_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            Debug.WriteLine("Up");
+            //Debug.WriteLine("Up");
             timer.Enabled = false;
             timer.Stop();
         }
