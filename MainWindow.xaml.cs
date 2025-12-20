@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -113,19 +114,18 @@ namespace SpreadTrader
 				dynamic d = data;
 				NodeViewModel d2 = d.NodeViewModel as NodeViewModel;
 				Debug.WriteLine($"MainWindow: {d2.FullName}");
-				SelectedTab.OnSelected(d2);
+				Task.Run(() => SelectedTab.OnSelected(d2));
 			}
 			if (messageName == "Market Changed")
 			{
 				dynamic d = data;
 				MarketSnapDto snap = d.MarketSnapDto;
-				//SelectedTab.OnMarketChanged(snap);
 			}
 			if (messageName == "Orders Changed")
 			{
 				dynamic d = data;
 				String json = d.String;
-				SelectedTab.OnOrdersChanged(json);
+				Task.Run(() => SelectedTab.OnOrdersChanged(json));
 			}
 		}
 

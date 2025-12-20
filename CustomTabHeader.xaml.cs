@@ -8,7 +8,7 @@ namespace SpreadTrader
     public partial class CustomTabHeader : UserControl, INotifyPropertyChanged
 	{
         public MainWindow mainWindow { get; set; }
-        public String Title { set { TabTitle.Content = value; } }
+		public String Title { set { Dispatcher.BeginInvoke(new Action(() => { TabTitle.Content = value; })); } }
 		public SolidColorBrush ForegroundColour { get { return inPlay ? Brushes.Green : Brushes.Black; } }
 		public String MarketId { get; set; }
 		public Int32 ID { get; set; }

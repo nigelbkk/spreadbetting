@@ -4,7 +4,7 @@
 		xmlns:properties="clr-namespace:SpreadTrader.Properties"
         xmlns:local="clr-namespace:SpreadTrader"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="SpreadTrader" Height="598" Width="1089" Closing="Window_Closing" FontFamily="Tahoma" LocationChanged="Window_LocationChanged" SizeChanged="Window_SizeChanged" Loaded="Window_Loaded" >
+        Title="SpreadTraderV2" Height="598" Width="1089" Closing="Window_Closing" FontFamily="Tahoma" LocationChanged="Window_LocationChanged" SizeChanged="Window_SizeChanged" Loaded="Window_Loaded" >
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>

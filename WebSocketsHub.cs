@@ -52,6 +52,37 @@ namespace SpreadTrader
 			hubConnection = new HubConnection("http://" + props.WebSocketsUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
+			//hubConnection.TraceLevel = TraceLevels.All;
+			//hubConnection.TraceWriter = Console.Out;
+			hubConnection.Closed += () =>
+			{
+				Debug.WriteLine($"SignalR Closed...");
+			};
+
+			hubConnection.Error += (err) =>
+			{
+				Debug.WriteLine($"SignalR Error...{err.Message}");
+			};
+
+			hubConnection.ConnectionSlow += () =>
+			{
+				Debug.WriteLine($"SignalR ConnectionSlow...");
+			};
+
+			hubConnection.StateChanged += (state) =>
+			{
+				Debug.WriteLine($"SignalR StateChanged...{state.OldState} => {state.NewState} ");
+			};
+
+			hubConnection.Reconnecting += () =>
+			{
+				Debug.WriteLine("SignalR reconnecting...");
+			};
+			hubConnection.Reconnected += () =>
+			{
+				Debug.WriteLine("SignalR reconnected...");
+			};
+
 			Start();
 
 			hubProxy.On<MarketSnapDto>("marketChanged", (snap) =>
@@ -109,6 +140,10 @@ namespace SpreadTrader
 					//result = "Connected";
 				}).Wait(1000);
 			}
+		}
+		private void Closed()
+		{
+
 		}
 		private void Disconnect()
 		{

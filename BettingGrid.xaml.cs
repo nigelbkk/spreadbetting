@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Xml.Linq;
 
 namespace SpreadTrader
 {
@@ -30,8 +31,8 @@ namespace SpreadTrader
         }
         public PriceSize[] BackValues { get; set; }
         public PriceSize[] LayValues { get; set; }
-        //public Market MarketNode { get; set; }
-        //public SliderControl sliderControl { get; set; }
+        public NodeViewModel MarketNode { get; set; }
+        public SliderControl sliderControl { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(String info)
         {
@@ -45,8 +46,14 @@ namespace SpreadTrader
             if (messageName == "Market Selected")
             {
                 dynamic d = data;
+				NodeViewModel d2 = d.NodeViewModel;
                 //Debug.WriteLine($"BettingGrid: {d.Name}");
-            }
+                MarketNode = d2;
+
+				BackValues = sliderControl.BackValues;
+				LayValues = sliderControl.LayValues;
+				NotifyPropertyChanged("");
+			}
             if (messageName == "Execute Bets")
             {
                 dynamic d = data;

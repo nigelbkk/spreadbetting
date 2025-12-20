@@ -3,6 +3,7 @@ using BetfairAPI;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -24,7 +25,7 @@ namespace SpreadTrader
             }
         }
 
-		System.Timers.Timer market_status_timer = new System.Timers.Timer();
+		//System.Timers.Timer market_status_timer = new System.Timers.Timer();
 
 		public TabContent() { }
         public TabContent(CustomTabHeader header)
@@ -33,6 +34,7 @@ namespace SpreadTrader
             InitializeComponent();
 			ControlMessenger.MessageSent += OnMessageReceived;
 			marketHeader.TabContent = this;
+			oBettingGrid.sliderControl = SliderControl;
 			OverlayVisibility = Visibility.Hidden;
 			NotifyPropertyChanged("");
 		}
@@ -49,7 +51,7 @@ namespace SpreadTrader
 
 					if (marketId == snap.MarketId)
 					{
-						OnMarketChanged(snap);
+						Task.Run(() => OnMarketChanged(snap));
 						//Debug.WriteLine($"Status = {name} : {snap.MarketId} : {snap.Status.ToString()}");
 					}
 				}
@@ -66,7 +68,7 @@ namespace SpreadTrader
 		{
 			BetsManager.OnOrderChanged(json);
 		}
-		public void OnMarketChanged(MarketSnapDto snap)
+		void OnMarketChanged(MarketSnapDto snap)
 		{
 			RunnersControl?.OnMarketChanged(snap);
 			customHeader.inPlay = snap.InPlay;

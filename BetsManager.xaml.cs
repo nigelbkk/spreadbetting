@@ -1,6 +1,7 @@
 ﻿using Betfair.ESASwagger.Model;
 using BetfairAPI;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -57,7 +58,10 @@ namespace SpreadTrader
         public double _SizeMatched { get; set; }
         public double SizeMatched { get { return _SizeMatched; } set { _SizeMatched = value; NotifyPropertyChanged(""); } }
         public bool IsMatched { get { return SizeMatched > 0; } }
-        private bool _Hidden = false;
+		public String IsMatchedString { get { return SizeMatched > 0 ? "F" : "U"; } }
+		public bool IsBack { get { return Side.ToUpper() == "BACK"; } }
+
+		private bool _Hidden = false;
         public bool Hidden { get { return _Hidden; } set { _Hidden = value; NotifyPropertyChanged(""); } }
         public bool Override { get; set; }
         public bool NoCancel { get; set; }
@@ -106,6 +110,8 @@ namespace SpreadTrader
         public ObservableCollection<Row> Rows { get; set; }
         private NodeViewModel MarketNode { get; set; }
         private DateTime _LastUpdated { get; set; }
+		public String LastUpdated { get { return String.Format("Orders last updated {0}", _LastUpdated.AddHours(props.TimeOffset).ToString("HH:mm:ss")); } }
+
         private BetfairAPI.BetfairAPI Betfair { get; set; }
         private bool _StreamActive { get; set; }
         public bool StreamActive { get { return _StreamActive; } set { _StreamActive = value; NotifyPropertyChanged(""); } }
@@ -261,8 +267,11 @@ namespace SpreadTrader
         private async void NotifyBetMatchedAsync()
         {
             String path = props.MatchedBetAlert;
-			var player = new SoundPlayer(path);
-			player.Play();
+            if (!string.IsNullOrEmpty(path))
+            {
+                var player = new SoundPlayer(path);
+                player.Play();
+            }
 		}
 
 		public void OnOrderChanged(String json)
@@ -274,6 +283,8 @@ namespace SpreadTrader
 
 			if (change.Orc == null)
 				return;
+
+			Debug.WriteLine(DateTime.UtcNow.ToLongTimeString());
 
 			_LastUpdated = DateTime.UtcNow;
             try
@@ -465,7 +476,6 @@ namespace SpreadTrader
                 switch (b.Tag)
                 {
                     case "HalveUnmatched":
-
                         if (MarketNode != null)
                         {
                             await Task.Run(() =>
