@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Betfair.ESASwagger.Model;
 
 namespace SpreadTrader
 {
@@ -14,7 +15,7 @@ namespace SpreadTrader
 		private IHubProxy hubProxy = null;
 		private HubConnection hubConnection = null;
 		private readonly BlockingCollection<string> _orderQueue = new BlockingCollection<string>();
-		private readonly BlockingCollection<MarketSnapDto> _marketChangeQueue = new BlockingCollection<MarketSnapDto>();
+		private readonly BlockingCollection<MarketChangeDto> _marketChangeQueue = new BlockingCollection<MarketChangeDto>();
 		private object lockObj1 = new object();
 		private object lockObj2 = new object();
 		private Task _orderProcessor;
@@ -33,11 +34,11 @@ namespace SpreadTrader
 		}
 		private void MarketChangerProcessingLoop()
 		{
-			foreach (var snap in _marketChangeQueue?.GetConsumingEnumerable())
+			foreach (var change in _marketChangeQueue?.GetConsumingEnumerable())
 			{
 				lock (lockObj2)
 				{
-					ControlMessenger.Send("Market Changed", new { MarketSnapDto = snap});
+					ControlMessenger.Send("Market Changed", new { MarketChangeDto = change });
 				}
 			}
 		}
@@ -85,9 +86,13 @@ namespace SpreadTrader
 
 			Start();
 
-			hubProxy.On<MarketSnapDto>("marketChanged", (snap) =>
+			//hubProxy.On<MarketSnapDto>("marketChanged", (snap) =>
+			//{
+			//	_marketChangeQueue.Add(snap);
+			//});
+			hubProxy.On<MarketChangeDto>("marketChanged", (change) =>
 			{
-				_marketChangeQueue.Add(snap);
+				_marketChangeQueue.Add(change);
 			});
 			hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
 			{

@@ -14,7 +14,8 @@ namespace SpreadTrader
 		public String ConnectButtonText { get; set; }
 		public String FullName { get { return MarketNode == null ? "No Market Selected" : MarketNode.MarketName; } }
 		public String TimeToGo { get { return MarketNode == null ? "00:00:00" : MarketNode.TimeToGo; } }
-		public String Latency { get; set; }
+		public String MarketLatency { get; set; }
+		public String OrdersLatency { get; set; }
 		//private System.Timers.Timer timer = new System.Timers.Timer();
 		public Double? TotalMatched { get { return MarketNode == null ? 0 : MarketNode.TotalMatched; } }
 		public Visibility up_visible { get; set; }
@@ -33,10 +34,17 @@ namespace SpreadTrader
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
-			if (messageName == "Update Latency")
+			if (messageName == "Update Market Latency")
 			{
 				dynamic d = data;
-				Latency = d.Latency;
+				MarketLatency = d?.MarketLatency;
+				NotifyPropertyChanged("");
+			}
+			if (messageName == "Update Orders Latency")
+			{
+				dynamic d = data;
+				OrdersLatency = d.OrdersLatency;
+				NotifyPropertyChanged("");
 			}
 		}
 		public MarketHeader()

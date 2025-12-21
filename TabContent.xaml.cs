@@ -1,5 +1,7 @@
 ﻿using Betfair.ESASwagger.Model;
 using BetfairAPI;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -43,16 +45,14 @@ namespace SpreadTrader
 			if (messageName == "Market Changed")
 			{
 				dynamic d = data;
-				MarketSnapDto snap = d.MarketSnapDto;
+				MarketChangeDto change = d.MarketChangeDto;
 				if (RunnersControl != null && RunnersControl.MarketNode != null)
 				{
 					String name = RunnersControl?.MarketNode.Market.marketName;
-					String marketId = RunnersControl?.MarketNode.Market.marketId;
 
-					if (marketId == snap.MarketId)
+					if (RunnersControl.MarketNode.MarketID == change.MarketId)
 					{
-						Task.Run(() => OnMarketChanged(snap));
-						//Debug.WriteLine($"Status = {name} : {snap.MarketId} : {snap.Status.ToString()}");
+						Task.Run(() => OnMarketChanged(change));
 					}
 				}
 			}
@@ -68,24 +68,28 @@ namespace SpreadTrader
 		{
 			BetsManager.OnOrderChanged(json);
 		}
-		void OnMarketChanged(MarketSnapDto snap)
+		void OnMarketChanged(MarketChangeDto change)
 		{
-			RunnersControl?.OnMarketChanged(snap);
-			customHeader.inPlay = snap.InPlay;
-
-			if (MarketStatus != snap.Status)
-			{
-				MarketStatus = snap.Status;
-				if (MarketStatus == MarketDefinition.StatusEnum.Open)
-				{
-					OverlayVisibility = Visibility.Hidden;
-				}
-				else
-				{
-					OverlayVisibility = Visibility.Visible;
-				}
-				NotifyPropertyChanged("");
-			}
+			RunnersControl?.OnMarketChanged(change);
 		}
+		//void OnMarketChangedOld(MarketSnapDto snap)
+		//{
+		//	RunnersControl?.OnMarketChanged(snap);
+		//	customHeader.inPlay = snap.InPlay;
+
+		//	if (MarketStatus != snap.Status)
+		//	{
+		//		MarketStatus = snap.Status;
+		//		if (MarketStatus == MarketDefinition.StatusEnum.Open)
+		//		{
+		//			OverlayVisibility = Visibility.Hidden;
+		//		}
+		//		else
+		//		{
+		//			OverlayVisibility = Visibility.Visible;
+		//		}
+		//		NotifyPropertyChanged("");
+		//	}
+		//}
 	}
 }

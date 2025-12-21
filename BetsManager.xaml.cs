@@ -33,7 +33,8 @@ namespace SpreadTrader
             }
         }
         public DateTime _Time { get; set; }
-        public DateTime Time { get { return _Time.AddHours(props.TimeOffset); } set { _Time = value; } }
+		public DateTime Time { get { return _Time.AddHours(props.TimeOffset); } set { _Time = value; } }
+		public long? UTCTime { get; set; }
         public String MarketID { get; set; }
         public long SelectionID { get; set; }
         public UInt64 BetID { get; set; }
@@ -78,7 +79,8 @@ namespace SpreadTrader
         }
         public Row(Order o)         // new bet
         {
-            Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
+			Time = new DateTime(1970, 1, 1).AddMilliseconds(o.Pd.Value).ToLocalTime();
+			UTCTime = o.Pd.Value;
             Odds = o.P.Value;
             Stake = (Int32)o.S.Value;
             OriginalStake = Stake;
@@ -192,7 +194,16 @@ namespace SpreadTrader
                 }
             return null;
         }
-        private async void ExecuteBets(LiveRunner runner, List<PriceSize> lay, List<PriceSize> back)
+        private void SendOrdersLatency(long utc_time)
+        {
+			DateTimeOffset targetTime = DateTimeOffset.FromUnixTimeMilliseconds(utc_time);
+
+			DateTimeOffset currentUtc = DateTimeOffset.UtcNow;
+			TimeSpan difference = targetTime - currentUtc;
+			String cs = $"{Math.Round(difference.TotalMilliseconds)}ms";
+			ControlMessenger.Send("Update Orders Latency", new { OrdersLatency = cs });
+		}
+		private async void ExecuteBets(LiveRunner runner, List<PriceSize> lay, List<PriceSize> back)
         {
             String MarketID = MarketNode.MarketID;
             long Selection = runner.SelectionId;
@@ -317,9 +328,11 @@ namespace SpreadTrader
                                 if (row == null)
                                 {
                                     row = new Row(o) { MarketID = change.Id, SelectionID = orc.Id.Value };
-                                    Dispatcher.BeginInvoke(new Action(() =>
+                                    SendOrdersLatency(row.UTCTime.Value);
+
+									Dispatcher.BeginInvoke(new Action(() =>
                                     {
-                                        Debug.WriteLine(o.Id, "Insert into grid: ");
+                                        Debug.WriteLine(o.Id, $"Insert into grid: {row.UTCTime}");
                                         Rows.Insert(0, row);
                                     }));
                                     Debug.WriteLine(o.Id, "new bet: ");

@@ -1,5 +1,4 @@
-﻿using Betfair.ESAClient.Cache;
-using Betfair.ESASwagger.Model;
+﻿using Betfair.ESASwagger.Model;
 using BetfairAPI;
 using System;
 using System.Collections.Generic;
@@ -16,29 +15,29 @@ using System.Windows.Media;
 namespace SpreadTrader
 {
 	#region Properties
-	public class MarketSnapDto
-	{
-		public String MarketId { get; set; }
-		public bool InPlay { get; set; }
-		public MarketDefinition.StatusEnum Status { get; set; }
-		public DateTime Time { get; set; }
-		public List<MarketRunnerSnapDto> Runners { get; set; }
-	}
-	public class MarketRunnerSnapDto
-	{
-		public long SelectionId { get; set; }
-		public MarketRunnerPricesDto Prices { get; set; }
-	}
-	public class MarketRunnerPricesDto
-	{
-		public List<PriceDto> Back { get; set; }
-		public List<PriceDto> Lay { get; set; }
-	}
-	public class PriceDto
-	{
-		public double Price { get; set; }
-		public double Size { get; set; }
-	}
+	//public class MarketSnapDto
+	//{
+	//	public String MarketId { get; set; }
+	//	public bool InPlay { get; set; }
+	//	public MarketDefinition.StatusEnum Status { get; set; }
+	//	public DateTime Time { get; set; }
+	//	public List<MarketRunnerSnapDto> Runners { get; set; }
+	//}
+	//public class MarketRunnerSnapDto
+	//{
+	//	public long SelectionId { get; set; }
+	//	public MarketRunnerPricesDto Prices { get; set; }
+	//}
+	//public class MarketRunnerPricesDto
+	//{
+	//	public List<PriceDto> Back { get; set; }
+	//	public List<PriceDto> Lay { get; set; }
+	//}
+	//public class PriceDto
+	//{
+	//	public double Price { get; set; }
+	//	public double Size { get; set; }
+	//}
 	#endregion Properties
 
 	public partial class RunnersControl : UserControl, INotifyPropertyChanged
@@ -105,72 +104,96 @@ namespace SpreadTrader
             }
             return null;
         }
-		public void OnMarketChanged(MarketSnapDto snap)
-		{
-			try
-			{
-                if (snap != null)
+
+		public void OnMarketChanged(MarketChangeDto change)
+        {
+            try 
+            {
+                if (change.Runners == null)
+                    return;
+
+                foreach(RunnerChangeDto r in change.Runners)
                 {
-                    var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                    long unixSeconds = (long)epoch.TotalSeconds;
-                    long diff = DateTime.UtcNow.Ticks - snap.Time.Ticks;
-                    String cs = $"{Math.Round(1000 * diff / (double)TimeSpan.TicksPerSecond)}ms";
-                    ControlMessenger.Send("Update Latency", new { Latency = cs, Status = snap.Status });
+                    LiveRunner lr = GetRunnerFromSelectionID(r.Id);
+                    if (r.Ltp != null)
+                    { }
+                    if (r.Tv != null)
+                    { }
 
-                    MarketDefinition.StatusEnum? Status = snap.Status;
-
-                    //double tradedVolume = 0;
-                    if (LiveRunners != null)
-                    {
-                        foreach (MarketRunnerSnapDto rsnap in snap.Runners)
-                        {
-                            LiveRunner lr = GetRunnerFromSelectionID(rsnap.SelectionId);
-                            if (lr == null)
-                                continue;
-
-                            Int32 i = 0;
-                            foreach (var ps in rsnap.Prices.Back)
-                            {
-                                lr.BackValues[i].price = ps.Price;
-                                lr.BackValues[i].size = ps.Size;
-                                i++;
-                            }
-
-                            i = 0;
-                            foreach (var ps in rsnap.Prices.Lay)
-                            {
-                                lr.LayValues[i].price = ps.Price;
-                                lr.LayValues[i].size = ps.Size;
-                                i++;
-                            }
-                        }
-                    }
-            //        _ = UpdateRunnerPnLAsync();
-
-                    //List<Tuple<long, double?, double?>> last_traded = new List<Tuple<long, double?, double?>>();
-                    //if (change?.Rc != null)
-                    //{
-                    //	foreach (RunnerChange rc in change?.Rc)  /// examine Atb abd Atl get determine correct side
-                    //	{
-                    //		if (rc.Tv != null && rc.Ltp == null)
-                    //		{
-                    //			last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
-                    //		}
-                    //		else if (rc.Ltp != null)
-                    //		{
-                    //			last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
-                    //		}
-                    //	}
-                    //}
-                    NotifyPropertyChanged("");
-                    //Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, e.Change.Rc, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
                 }
-			}
-			catch (Exception xe)
-			{
-				Debug.WriteLine(xe.Message);
-			}
-		}
+            }
+            catch (Exception xe)
+            {
+                Debug.WriteLine(xe.Message);
+            }
+        }
+
+		//public void OnMarketChanged(MarketSnapDto snap)
+		//{
+		//	try
+		//	{
+		//              if (snap != null)
+		//              {
+		//                  var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		//                  long unixSeconds = (long)epoch.TotalSeconds;
+		//                  long diff = DateTime.UtcNow.Ticks - snap.Time.Ticks;
+		//                  String cs = $"{Math.Round(1000 * diff / (double)TimeSpan.TicksPerSecond)}ms";
+		//                  ControlMessenger.Send("Update Market Latency", new { MarketLatency = cs, Status = snap.Status });
+
+			//                  MarketDefinition.StatusEnum? Status = snap.Status;
+
+			//                  //double tradedVolume = 0;
+			//                  if (LiveRunners != null)
+			//                  {
+			//                      foreach (MarketRunnerSnapDto rsnap in snap.Runners)
+			//                      {
+			//                          LiveRunner lr = GetRunnerFromSelectionID(rsnap.SelectionId);
+			//                          if (lr == null)
+			//                              continue;
+
+			//                          Int32 i = 0;
+			//                          foreach (var ps in rsnap.Prices.Back)
+			//                          {
+			//                              lr.BackValues[i].price = ps.Price;
+			//                              lr.BackValues[i].size = ps.Size;
+			//                              i++;
+			//                          }
+
+			//                          i = 0;
+			//                          foreach (var ps in rsnap.Prices.Lay)
+			//                          {
+			//                              lr.LayValues[i].price = ps.Price;
+			//                              lr.LayValues[i].size = ps.Size;
+			//                              i++;
+			//                          }
+			//                      }
+			//                  }
+			//          //        _ = UpdateRunnerPnLAsync();
+
+			//                  //List<Tuple<long, double?, double?>> last_traded = new List<Tuple<long, double?, double?>>();
+			//                  //if (change?.Rc != null)
+			//                  //{
+			//                  //	foreach (RunnerChange rc in change?.Rc)  /// examine Atb abd Atl get determine correct side
+			//                  //	{
+			//                  //		if (rc.Tv != null && rc.Ltp == null)
+			//                  //		{
+			//                  //			last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
+			//                  //		}
+			//                  //		else if (rc.Ltp != null)
+			//                  //		{
+			//                  //			last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
+			//                  //		}
+			//                  //	}
+			//                  //}
+			//                  NotifyPropertyChanged("");
+			//                  //Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, e.Change.Rc, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
+			//              }
+			//	}
+			//	catch (Exception xe)
+			//	{
+			//		Debug.WriteLine(xe.Message);
+			//	}
+			//}
 		LiveRunner RunnerFromSelid(long selid)
 		{
 			foreach (var runner in LiveRunners)

@@ -116,11 +116,12 @@ namespace SpreadTrader
 				Debug.WriteLine($"MainWindow: {d2.FullName}");
 				Task.Run(() => SelectedTab.OnSelected(d2));
 			}
-			if (messageName == "Market Changed")
-			{
-				dynamic d = data;
-				MarketSnapDto snap = d.MarketSnapDto;
-			}
+//			if (messageName == "Market Changed")
+//			{
+//				dynamic d = data;
+////				MarketSnapDto snap = d.MarketSnapDto;
+//				MarketChange change = d.MarketChange;
+//			}
 			if (messageName == "Orders Changed")
 			{
 				dynamic d = data;
