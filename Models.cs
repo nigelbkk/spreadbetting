@@ -20,6 +20,8 @@ namespace SpreadTrader
 		public double? Tv { get; set; }
 		public List<PriceLevelDto> Batb { get; set; }
 		public List<PriceLevelDto> Batl { get; set; }
+		public List<PriceLevelDto> Bdatb { get; set; }
+		public List<PriceLevelDto> Bdatl { get; set; }
 	}
 
 	public class PriceLevelDto

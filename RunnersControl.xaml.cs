@@ -129,18 +129,18 @@ namespace SpreadTrader
                     { }
 					if (r.Tv != null)
 					{ }
-					if (r.Batb != null)
+					if (r.Bdatb != null)
 					{ 
-                        foreach(PriceLevelDto lv in r.Batb)
+                        foreach(PriceLevelDto lv in r.Bdatb)
                         {
 							lr.BackValues[lv.Level].price = lv.Price;
 							lr.BackValues[lv.Level].size = lv.Size;
                             Debug.WriteLine($"{lr.Name} {lv.Level} {lv.Price}");
                         }
                     }
-					if (r.Batl != null)
+					if (r.Bdatl != null)
 					{
-						foreach (PriceLevelDto lv in r.Batl)
+						foreach (PriceLevelDto lv in r.Bdatl)
 						{
 							lr.LayValues[lv.Level].price = lv.Price;
 							lr.LayValues[lv.Level].size = lv.Size;
