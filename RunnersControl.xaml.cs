@@ -107,21 +107,48 @@ namespace SpreadTrader
 
 		public void OnMarketChanged(MarketChangeDto change)
         {
-            try 
-            {
+			//                  var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+			//                  long unixSeconds = (long)epoch.TotalSeconds;
+			//                  long diff = DateTime.UtcNow.Ticks - snap.Time.Ticks;
+			//                  String cs = $"{Math.Round(1000 * diff / (double)TimeSpan.TicksPerSecond)}ms";
+			//                  ControlMessenger.Send("Update Market Latency", new { MarketLatency = cs, Status = snap.Status });
+
+			try
+			{
                 if (change.Runners == null)
                     return;
 
                 foreach(RunnerChangeDto r in change.Runners)
                 {
                     LiveRunner lr = GetRunnerFromSelectionID(r.Id);
+                    if (lr == null)
+                        return;
+
+                    String runner_name = lr.Name;
                     if (r.Ltp != null)
                     { }
-                    if (r.Tv != null)
-                    { }
-
-                }
-            }
+					if (r.Tv != null)
+					{ }
+					if (r.Batb != null)
+					{ 
+                        foreach(PriceLevelDto lv in r.Batb)
+                        {
+							lr.BackValues[lv.Level].price = lv.Price;
+							lr.BackValues[lv.Level].size = lv.Size;
+                            Debug.WriteLine($"{lr.Name} {lv.Level} {lv.Price}");
+                        }
+                    }
+					if (r.Batl != null)
+					{
+						foreach (PriceLevelDto lv in r.Batl)
+						{
+							lr.LayValues[lv.Level].price = lv.Price;
+							lr.LayValues[lv.Level].size = lv.Size;
+						}
+					}
+				}
+                NotifyPropertyChanged("");
+			}
             catch (Exception xe)
             {
                 Debug.WriteLine(xe.Message);
