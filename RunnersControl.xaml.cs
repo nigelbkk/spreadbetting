@@ -95,11 +95,14 @@ namespace SpreadTrader
 		}
         public LiveRunner GetRunnerFromSelectionID(Int64 selid)
         {
-            foreach (LiveRunner runner in LiveRunners)
+            if (LiveRunners != null)
             {
-                if (runner.SelectionId == selid)
+                foreach (LiveRunner runner in LiveRunners)
                 {
-                    return runner;
+                    if (runner.SelectionId == selid)
+                    {
+                        return runner;
+                    }
                 }
             }
             return null;
@@ -107,13 +110,13 @@ namespace SpreadTrader
 
 		public void OnMarketChanged(MarketChangeDto change)
         {
-			//                  var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-			//                  long unixSeconds = (long)epoch.TotalSeconds;
-			//                  long diff = DateTime.UtcNow.Ticks - snap.Time.Ticks;
-			//                  String cs = $"{Math.Round(1000 * diff / (double)TimeSpan.TicksPerSecond)}ms";
-			//                  ControlMessenger.Send("Update Market Latency", new { MarketLatency = cs, Status = snap.Status });
+            var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            long unixSeconds = (long)epoch.TotalSeconds;
+            long diff = DateTime.UtcNow.Ticks - change.Time.Ticks;
+            String cs = $"{Math.Round(1000 * diff / (double)TimeSpan.TicksPerSecond)}ms";
+            ControlMessenger.Send("Update Market Latency", new { MarketLatency = cs, Status = "" });
 
-			try
+            try
 			{
                 if (change.Runners == null)
                     return;
@@ -135,7 +138,7 @@ namespace SpreadTrader
                         {
 							lr.BackValues[lv.Level].price = lv.Price;
 							lr.BackValues[lv.Level].size = lv.Size;
-                            Debug.WriteLine($"{lr.Name} {lv.Level} {lv.Price}");
+                            //Debug.WriteLine($"{lr.Name} {lv.Level} {lv.Price}");
                         }
                     }
 					if (r.Bdatl != null)
