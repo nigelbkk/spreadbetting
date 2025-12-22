@@ -4,6 +4,8 @@
 keys.cs
 settings.xml
 notifications.json
+SpreadTrader.csproj
+.gitignore
 
 # User-specific files
 *.suo
