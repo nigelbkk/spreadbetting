@@ -10,6 +10,7 @@ namespace SpreadTrader
 	public class MarketChangeDto
 	{
 		public string MarketId { get; set; }
+		public DateTime Time { get; set; }
 		public List<RunnerChangeDto> Runners { get; set; }
 	}
 
