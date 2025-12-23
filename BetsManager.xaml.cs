@@ -196,11 +196,8 @@ namespace SpreadTrader
         }
         private void SendOrdersLatency(long utc_time)
         {
-			DateTimeOffset targetTime = DateTimeOffset.FromUnixTimeMilliseconds(utc_time);
-
-			DateTimeOffset currentUtc = DateTimeOffset.UtcNow;
-			TimeSpan difference = targetTime - currentUtc;
-			String cs = $"{Math.Round(difference.TotalMilliseconds)}ms";
+			long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+			String cs = $"{now - utc_time}ms";
 			ControlMessenger.Send("Update Orders Latency", new { OrdersLatency = cs });
 		}
 		private async void ExecuteBets(LiveRunner runner, List<PriceSize> lay, List<PriceSize> back)

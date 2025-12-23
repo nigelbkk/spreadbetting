@@ -111,9 +111,9 @@ namespace SpreadTrader
 		public void OnMarketChanged(MarketChangeDto change)
         {
             var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            long unixSeconds = (long)epoch.TotalSeconds;
             long diff = DateTime.UtcNow.Ticks - change.Time.Ticks;
-            String cs = $"{Math.Round(1000 * diff / (double)TimeSpan.TicksPerSecond)}ms";
+			//String cs = $"{Math.Round(1000 * diff / (double)TimeSpan.TicksPerSecond)}ms";
+			String cs = $"{1000 * diff / TimeSpan.TicksPerSecond}ms";
             ControlMessenger.Send("Update Market Latency", new { MarketLatency = cs, Status = "" });
 
             try

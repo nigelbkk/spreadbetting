@@ -156,28 +156,8 @@ namespace SpreadTrader
             this.Width = Math.Max(0, props.Width);
 
             Betfair = new BetfairAPI.BetfairAPI();
-            try
-            {
-                //if (!props.UseProxy)
-                //{
-                //    Betfair.login(props.CertFile, props.CertPassword, props.AppKey, props.BFUser, props.BFPassword);
-
-                //    System.Timers.Timer t = new System.Timers.Timer();
-                //    t.Elapsed += (o, e) =>
-                //    {
-                //        Betfair.KeepAlive();
-                //        Console.WriteLine("KeepAlive");
-                //    };
-                //    t.Interval = 1 * 60 * 60 * 1000;
-                //    t.Enabled = true;
-                //    t.Start();
-                //}
-                //UpdateAccountInformation();
-            }
-            catch (Exception xe)
-            {
-                Status = xe.Message;
-            }
+            //Betfair.getServerTime();
+            //UpdateAccountInformation();
         }
         public void UpdateAccountInformation()
         {

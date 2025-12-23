@@ -8,9 +8,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using Windows.Foundation;
 
 namespace BetfairAPI
 {
@@ -113,15 +116,6 @@ namespace BetfairAPI
                 joe["params"] = Params;
 
                 String url = "http://" + SpreadTrader.Properties.Settings.Default.LegacyProxyUrl;
-                //if (!SpreadTrader.Properties.Settings.Default.UseProxy || String.IsNullOrEmpty(SpreadTrader.Properties.Settings.Default.ProxyUrl))
-                //{
-                //    if (!String.IsNullOrEmpty(Token))
-                //    {
-                //        url = "https://api.betfair.com/exchange/betting/json-rpc/v1/";
-                //        if (Method.Contains(AccountCalls[0]))
-                //            url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
-                //    }
-                //}
                 if (AccountCalls.Contains(Method))
                 {
                     joe["method"] = "AccountAPING/v1.0/" + Method;
@@ -147,36 +141,6 @@ namespace BetfairAPI
                 using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
                 {
                     var jsonResponse = reader.ReadToEnd();
-
-                    if (jsonResponse.Contains("The underlying connection was closed"))
-                    {
-                        Debug.WriteLine(jsonResponse);              // let's assume this is fatal
-                        ConnectionLost = true;
-
-                        MessageBoxResult Result = MessageBoxResult.Yes;// MessageBox.Show("Press Yes to try and reconnect\nCancel to ignore it\nNo to exit the application", "The connection to Betfair was closed", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-                        switch (Result)
-                        {
-                            case MessageBoxResult.Yes:
-                                if (!String.IsNullOrEmpty(password))
-                                {
-                                    Debug.WriteLine("Trying to log in again");
-                                    login(CertFile, CertPassword, AppKey, username, password);
-                                }
-                                else
-                                {
-                                    throw new Exception("The underlying connection was closed");
-                                }
-                                break;
-                            case MessageBoxResult.No:
-                                Environment.Exit(0);
-                                break;
-                            case MessageBoxResult.Cancel:
-                                throw new Exception("The underlying connection was closed");
-                        }
-                    }
-                    ConnectionLost = false;
-                    //ConnectionLost = true;
-
                     var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
 					if (err != null)
 					{
@@ -193,60 +157,12 @@ namespace BetfairAPI
                 return null;
             }
         }
-        public void login(String CertFile, String CertPassword, String appKey, String username, String password)
+        public DateTime getServerTime()
         {
-            AppKey = appKey;
-            Token = String.Empty;
-            byte[] args = Encoding.UTF8.GetBytes(String.Format("username={0}&password={1}", username, password));
+			return (DateTime) RPCRequest<DateTime>("getServerTime", null);
+            // exchange / account / rest / v1.0 / getServerTime /
 
-            HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(" https://identitysso-cert.betfair.com/api/certlogin");
-            wr.Method = WebRequestMethods.Http.Post;
-            wr.Headers.Add("X-Application", AppKey);
-            wr.ContentType = "application/x-www-form-urlencoded";
-            wr.ContentLength = args.Length;
-
-            var cert = new X509Certificate2(CertFile, CertPassword);
-            wr.ClientCertificates.Add(cert);
-
-            using (Stream newStream = wr.GetRequestStream())
-            {
-                newStream.Write(args, 0, args.Length);
-                newStream.Close();
-            }
-            using (WebResponse response = wr.GetResponse())
-            {
-                sysTime = DateTime.Parse(response.Headers["Date"]).ToUniversalTime();
-                using (Stream ds = response.GetResponseStream())
-                {
-                    StreamReader reader = new StreamReader(ds);
-                    String rs = reader.ReadToEnd();
-
-                    LoginResponse o = JsonConvert.DeserializeObject<LoginResponse>(rs);
-                    if (!o.Status)
-                    {
-                        Console.WriteLine("Login failed. Are you running Fiddler?");
-                        throw new Exception(o.ToString());
-                    }
-                    Token = o.sessionToken;
-
-                    BetfairAPI.CertFile = CertFile;
-                    BetfairAPI.CertPassword = CertPassword;
-                    BetfairAPI.username = username;
-                    BetfairAPI.password = password;
-                }
-            }
-        }
-        public List<T> FromString<T>(String jsonResponse)
-        {
-            var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
-            if (err != null)
-            {
-                ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
-                throw new Exception(oo.ToString(), new Exception(oo.data.exception.errorCode));
-            }
-            String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
-            return JsonConvert.DeserializeObject<List<T>>(res);
-        }
+		}
         public Dictionary<String, Object> TimeRange(DateTime from, Int32 days, Int32 hours)
         {
             Dictionary<String, Object> start = new Dictionary<string, object>();
