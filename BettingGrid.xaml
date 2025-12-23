@@ -53,7 +53,7 @@
 			</Setter>
 		</Style>
 		<DataTemplate  x:Key="ButtonTemplate">
-			<Grid Background="{Binding Color}">
+			<Grid Background="{Binding CellBackgroundColor}">
 				<StackPanel>
                     <!--Tag="{Binding Path=ItemsControl.AlternationIndex}"-->
 					<StackPanel Orientation="Vertical">

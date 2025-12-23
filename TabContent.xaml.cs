@@ -43,6 +43,9 @@ namespace SpreadTrader
 			{
 				dynamic d = data;
 				MarketChangeDto change = d.MarketChangeDto;
+				OverlayVisibility = change.Status != MarketDefinition.StatusEnum.Open ? Visibility.Visible : Visibility.Hidden;
+				MarketStatus = change.Status;
+				NotifyPropertyChanged("");
 				if (RunnersControl != null && RunnersControl.MarketNode != null)
 				{
 					String name = RunnersControl?.MarketNode.Market.marketName;

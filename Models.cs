@@ -11,6 +11,7 @@ namespace SpreadTrader
 	{
 		public string MarketId { get; set; }
 		public DateTime Time { get; set; }
+		public MarketDefinition.StatusEnum? Status { get; set; }
 		public List<RunnerChangeDto> Runners { get; set; }
 	}
 
