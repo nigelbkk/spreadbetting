@@ -14,7 +14,8 @@ namespace SpreadTrader
         public Runner ngrunner { get; set; }
         private BitmapImage _colors = null;
         public BitmapImage Colors { get { return _colors; } set { _colors = value; NotifyPropertyChanged("Colors"); } }
-        public String Name { get; set; }
+		public String Name { get; set; }
+		public Int32 Index { get; set; }
         private double _Width { get; set; }
         public double Width { get { return _Width; } set { _Width = value; NotifyPropertyChanged("Width"); } }
         public Int64 SelectionId { get; set; }
@@ -99,12 +100,12 @@ namespace SpreadTrader
             BackValues = new ObservableCollection<PriceSize>();
             LayValues = new ObservableCollection<PriceSize>();
 
-            BackValues.Add(new PriceSize());
-            BackValues.Add(new PriceSize());
-            BackValues.Add(new PriceSize());
-            LayValues.Add(new PriceSize());
-            LayValues.Add(new PriceSize());
-            LayValues.Add(new PriceSize());
+            BackValues.Add(new PriceSize(0));
+            BackValues.Add(new PriceSize(1));
+            BackValues.Add(new PriceSize(2));
+            LayValues.Add(new PriceSize(3));
+            LayValues.Add(new PriceSize(4));
+            LayValues.Add(new PriceSize(5));
             _Width = 160;
         }
 		public LiveRunner(Runner r) : this()
@@ -145,11 +146,11 @@ namespace SpreadTrader
 			int i = 0;
 			if (r.ex != null)
 			{
-				for (int j = 0; j < 3; j++)
-				{
-					BackValues[j] = new PriceSize();
-					LayValues[j] = new PriceSize();
-				}
+				//for (int j = 0; j < 3; j++)
+				//{
+				//	BackValues[j] = new PriceSize();
+				//	LayValues[j] = new PriceSize();
+				//}
 				if (r.ex.availableToBack.Count > 0) foreach (var ps in r.ex.availableToBack)
 					{
 						BackValues[i].price = ps.price;

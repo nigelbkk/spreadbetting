@@ -47,8 +47,14 @@ namespace SpreadTrader
                 SyncPrices();
                 NotifyPropertyChanged("");
             }
-        }
-        public SliderControl()
+			if (messageName == "Market Selected")
+			{
+				Favorite = null;
+				NotifyPropertyChanged("");
+			}
+
+		}
+		public SliderControl()
         {
             CutStakes = 5;
             MoveBack = 10;

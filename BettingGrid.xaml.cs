@@ -73,12 +73,12 @@ namespace SpreadTrader
                 BackValues[i] = new PriceSize(betfairPrices[i], 20 + 1 * 10);
                 LayValues[i] = new PriceSize(betfairPrices[i], 20 + 1 * 10);
             }
-            for (int i = 0; i < 3; i++) BackValues[i].Color = Application.Current.FindResource("Back2Color") as SolidColorBrush;
-            for (int i = 3; i < 6; i++) BackValues[i].Color = Application.Current.FindResource("Back1Color") as SolidColorBrush;
-            for (int i = 6; i < 9; i++) BackValues[i].Color = Application.Current.FindResource("Back0Color") as SolidColorBrush;
-            for (int i = 0; i < 3; i++) LayValues[i].Color = Application.Current.FindResource("Lay0Color") as SolidColorBrush;
-            for (int i = 3; i < 6; i++) LayValues[i].Color = Application.Current.FindResource("Lay1Color") as SolidColorBrush;
-            for (int i = 6; i < 9; i++) LayValues[i].Color = Application.Current.FindResource("Lay2Color") as SolidColorBrush;
+            for (int i = 0; i < 3; i++) BackValues[i].CellDefaultColor = Application.Current.FindResource("Back2Color") as SolidColorBrush;
+            for (int i = 3; i < 6; i++) BackValues[i].CellDefaultColor = Application.Current.FindResource("Back1Color") as SolidColorBrush;
+            for (int i = 6; i < 9; i++) BackValues[i].CellDefaultColor = Application.Current.FindResource("Back0Color") as SolidColorBrush;
+            for (int i = 0; i < 3; i++) LayValues[i].CellDefaultColor = Application.Current.FindResource("Lay0Color") as SolidColorBrush;
+            for (int i = 3; i < 6; i++) LayValues[i].CellDefaultColor = Application.Current.FindResource("Lay1Color") as SolidColorBrush;
+            for (int i = 6; i < 9; i++) LayValues[i].CellDefaultColor = Application.Current.FindResource("Lay2Color") as SolidColorBrush;
 
             BackActive = LayActive = true;
         }

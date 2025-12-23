@@ -43,13 +43,13 @@
 				<Button Grid.Column="0" Tag="Sidebar Visibility" ToolTip="Show/Hide Sidebar" HorizontalAlignment="Left" Padding="4,0,4,0" Click="Button_Click_1">
 					<Image Height="30" Source="/Images/sidebar.png" />
 				</Button>
-				<Button Grid.Column="1" Tag="Market Description" ToolTip="Market Description" HorizontalAlignment="Left" Padding="24,0,4,0">
-					<Image Height="30" Source="/SpreadTrader;component/Images/info.png" />
+				<Button Grid.Column="1" Tag="Market Description" ToolTip="Market Description" HorizontalAlignment="Left" Padding="7,0,7,0">
+					<Image Height="30" Source="/Images/info.png" />
 				</Button>
-				<Button Tag="Hide Grid" Grid.Column="2" HorizontalContentAlignment="Left" ToolTip="Hide The Grid"  Padding="4,0,4,0">
+				<Button Tag="Hide Grid" Grid.Column="2" HorizontalContentAlignment="Left" ToolTip="Hide The Grid"  Padding="2,0,2,0">
 					<StackPanel Orientation="Vertical" Margin="2,0,2,0">
-						<Image Height="30" Source="/SpreadTrader;component/Images/up_arrow.png"  Visibility="{Binding up_visible}"/>
-						<Image Height="30" Source="/SpreadTrader;component/Images/down_arrow.png" Visibility="{Binding down_visible}"/>
+						<Image Height="30" Source="/Images/up_arrow.png"  Visibility="{Binding up_visible}"/>
+						<Image Height="30" Source="/Images/down_arrow.png" Visibility="{Binding down_visible}"/>
 					</StackPanel>
 				</Button>
 				<Label Grid.Column="4" Padding="6,0,10,0">

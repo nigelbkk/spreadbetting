@@ -7,19 +7,24 @@ using System.Windows;
 
 public class PriceSize : INotifyPropertyChanged
 {
-	static List<Brush> BackgroundColors = new List<Brush>
+	static List<SolidColorBrush> BackgroundColors = new List<SolidColorBrush>
 	{
-		(Brush) Application.Current.Resources["Back0Color"],
-		(Brush) Application.Current.Resources["Back1Color"],
-		(Brush) Application.Current.Resources["Back2Color"],
-		(Brush) Application.Current.Resources["Lay0Color"],
-		(Brush) Application.Current.Resources["Lay1Color"],
-		(Brush) Application.Current.Resources["Lay2Color"]
+		(SolidColorBrush) Application.Current.Resources["Back0Color"],
+		(SolidColorBrush) Application.Current.Resources["Back1Color"],
+		(SolidColorBrush) Application.Current.Resources["Back2Color"],
+		(SolidColorBrush) Application.Current.Resources["Lay0Color"],
+		(SolidColorBrush) Application.Current.Resources["Lay1Color"],
+		(SolidColorBrush) Application.Current.Resources["Lay2Color"]
 	};
 
 	public PriceSize(double price, double size) { this.price = price; this.size = size; IsChecked = true; }
-    public PriceSize() { IsChecked = true; }
-    private bool _IsChecked { get; set; }
+    public PriceSize(Int32 index) {
+        this.Index = index;
+        CellBackgroundColor = CellDefaultColor = BackgroundColors[index];
+		IsChecked = true; 
+    }
+    private Int32 Index { get; set; }
+	private bool _IsChecked { get; set; }
     private bool _ParentChecked { get; set; }
     public bool ParentChecked { get { return _ParentChecked; } set { _ParentChecked = value; NotifyPropertyChanged(""); } }
     public bool IsChecked { get { return _IsChecked; } set { _IsChecked = value; NotifyPropertyChanged(""); } }
@@ -40,8 +45,9 @@ public class PriceSize : INotifyPropertyChanged
 				NotifyPropertyChanged("");
 			}
         } }
-    public SolidColorBrush Color { get; set; }
-	public Brush CellBackgroundColor { get; set; }
+    //public SolidColorBrush Color { get { return CellDefaultColor;  } set; }
+	public SolidColorBrush CellDefaultColor { get; set; }
+	public SolidColorBrush CellBackgroundColor { get; set; }
 
 	public override string ToString()
     {

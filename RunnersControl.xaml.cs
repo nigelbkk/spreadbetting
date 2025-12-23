@@ -1,14 +1,16 @@
-﻿using Betfair.ESASwagger.Model;
+﻿using Betfair.ESAClient.Cache;
+using Betfair.ESASwagger.Model;
 using BetfairAPI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+//using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -67,7 +69,6 @@ namespace SpreadTrader
                 return MainWindow.Betfair.listMarketProfitAndLoss(marketId);
             });
         }
-
         public async Task UpdateRunnerPnLAsync()
         {
             var plList = await GetProfitAndLossAsync(MarketNode.MarketID);
@@ -97,186 +98,65 @@ namespace SpreadTrader
         {
             if (LiveRunners != null)
             {
+				Int32 i = 0;
                 foreach (LiveRunner runner in LiveRunners)
                 {
                     if (runner.SelectionId == selid)
                     {
+						runner.Index = i;
                         return runner;
                     }
+					i++;
                 }
             }
             return null;
         }
-
 		public void OnMarketChanged(MarketChangeDto change)
         {
             var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             long diff = DateTime.UtcNow.Ticks - change.Time.Ticks;
-			//String cs = $"{Math.Round(1000 * diff / (double)TimeSpan.TicksPerSecond)}ms";
 			String cs = $"{1000 * diff / TimeSpan.TicksPerSecond}ms";
             ControlMessenger.Send("Update Market Latency", new { MarketLatency = cs, Status = "" });
 
             try
 			{
-                if (change.Runners == null)
+                if (LiveRunners == null || change.Runners == null)
                     return;
 
-                foreach(RunnerChangeDto r in change.Runners)
+				foreach (RunnerChangeDto runner in change.Runners)
                 {
-                    LiveRunner lr = GetRunnerFromSelectionID(r.Id);
+                    LiveRunner lr = GetRunnerFromSelectionID(runner.Id);
                     if (lr == null)
                         return;
 
                     String runner_name = lr.Name;
-                    if (r.Ltp != null)
-                    { }
-					if (r.Tv != null)
-					{ }
-					if (r.Bdatb != null)
+
+					if (runner.Bdatb != null)
 					{ 
-                        foreach(PriceLevelDto lv in r.Bdatb)
+                        foreach(PriceLevelDto lv in runner.Bdatb)
                         {
-							lr.BackValues[lv.Level].price = lv.Price;
-							lr.BackValues[lv.Level].size = lv.Size;
-                            //Debug.WriteLine($"{lr.Name} {lv.Level} {lv.Price}");
-                        }
+							PriceSize cell = lr.BackValues[lv.Level];
+							cell.price = lv.Price;
+							cell.size = lv.Size;
+						}
                     }
-					if (r.Bdatl != null)
+					if (runner.Bdatl != null)
 					{
-						foreach (PriceLevelDto lv in r.Bdatl)
+						foreach (PriceLevelDto lv in runner.Bdatl)
 						{
-							lr.LayValues[lv.Level].price = lv.Price;
-							lr.LayValues[lv.Level].size = lv.Size;
+							PriceSize cell = lr.BackValues[lv.Level];
+							cell.price = lv.Price;
+							cell.size = lv.Size;
 						}
 					}
+					NotifyPropertyChanged("");
 				}
-                NotifyPropertyChanged("");
 			}
-            catch (Exception xe)
+			catch (Exception xe)
             {
                 Debug.WriteLine(xe.Message);
             }
         }
-
-		//public void OnMarketChanged(MarketSnapDto snap)
-		//{
-		//	try
-		//	{
-		//              if (snap != null)
-		//              {
-		//                  var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-		//                  long unixSeconds = (long)epoch.TotalSeconds;
-		//                  long diff = DateTime.UtcNow.Ticks - snap.Time.Ticks;
-		//                  String cs = $"{Math.Round(1000 * diff / (double)TimeSpan.TicksPerSecond)}ms";
-		//                  ControlMessenger.Send("Update Market Latency", new { MarketLatency = cs, Status = snap.Status });
-
-			//                  MarketDefinition.StatusEnum? Status = snap.Status;
-
-			//                  //double tradedVolume = 0;
-			//                  if (LiveRunners != null)
-			//                  {
-			//                      foreach (MarketRunnerSnapDto rsnap in snap.Runners)
-			//                      {
-			//                          LiveRunner lr = GetRunnerFromSelectionID(rsnap.SelectionId);
-			//                          if (lr == null)
-			//                              continue;
-
-			//                          Int32 i = 0;
-			//                          foreach (var ps in rsnap.Prices.Back)
-			//                          {
-			//                              lr.BackValues[i].price = ps.Price;
-			//                              lr.BackValues[i].size = ps.Size;
-			//                              i++;
-			//                          }
-
-			//                          i = 0;
-			//                          foreach (var ps in rsnap.Prices.Lay)
-			//                          {
-			//                              lr.LayValues[i].price = ps.Price;
-			//                              lr.LayValues[i].size = ps.Size;
-			//                              i++;
-			//                          }
-			//                      }
-			//                  }
-			//          //        _ = UpdateRunnerPnLAsync();
-
-			//                  //List<Tuple<long, double?, double?>> last_traded = new List<Tuple<long, double?, double?>>();
-			//                  //if (change?.Rc != null)
-			//                  //{
-			//                  //	foreach (RunnerChange rc in change?.Rc)  /// examine Atb abd Atl get determine correct side
-			//                  //	{
-			//                  //		if (rc.Tv != null && rc.Ltp == null)
-			//                  //		{
-			//                  //			last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
-			//                  //		}
-			//                  //		else if (rc.Ltp != null)
-			//                  //		{
-			//                  //			last_traded.Add(new Tuple<long, double?, double?>((long)rc.Id, rc.Ltp, rc.Tv));
-			//                  //		}
-			//                  //	}
-			//                  //}
-			//                  NotifyPropertyChanged("");
-			//                  //Callback?.Invoke(e.Snap.MarketId, _LiveRunners, tradedVolume, e.Change.Rc, !e.Market.IsClosed && e.Snap.MarketDefinition.InPlay == true);
-			//              }
-			//	}
-			//	catch (Exception xe)
-			//	{
-			//		Debug.WriteLine(xe.Message);
-			//	}
-			//}
-		LiveRunner RunnerFromSelid(long selid)
-		{
-			foreach (var runner in LiveRunners)
-			{
-				if (runner.SelectionId == selid)
-				{
-					return runner;
-				}
-			}
-			return null;
-		}
-
-		/// //////////////////////////////////////////////
-		/// //////////////////////////////////////////////
-		/// //////////////////////////////////////////////
-		void FlashTraded(MarketChange mc)
-		{
-			try
-			{
-				foreach (var rs in mc?.Rc)
-				{
-                    if (rs == null)
-                        return;
-
-					LiveRunner lr = RunnerFromSelid((long) rs?.Id.Value);
-
-                    if (lr == null)
-                        return;
-
-					double? traded_volume = rs.Tv;
-					List<List<double?>> back = rs.Batb;
-
-                    if (back != null)
-                    {
-                        Int32 i = 0;
-                        foreach (List<double?> lb in back)
-                        {
-                            foreach (double? b in lb)
-                            {
-                         //       Debug.WriteLine($"Back: {lr.Name} : cell id = {i}");
-                        //        lr.BackValues[i].CellBackgroundColor = Brushes.Yellow;
-                                i++;
-                            }
-                        }
-                    }
-				}
-			}
-			catch (Exception e)
-			{
-				Debug.WriteLine(e.Message);
-			}
-		}
-
 		private void OnMessageReceived(string messageName, object data)
         {
 		}

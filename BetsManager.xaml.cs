@@ -257,13 +257,20 @@ namespace SpreadTrader
             Debug.WriteLine("###                                             ###");
             Debug.WriteLine("###################################################");
 
-            System.Threading.Thread t = new System.Threading.Thread(() =>
-            {
-                PlaceExecutionReport report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
-                Status = report.status;
-                //Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
-            });
-            Debug.WriteLine("Execute Bets not available for development");          //t.Start();
+			await Task.Run(() =>
+			{
+				PlaceExecutionReport report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
+				Status = report.status;
+				//Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
+			});
+
+			//System.Threading.Thread t = new System.Threading.Thread(() =>
+   //         {
+   //             PlaceExecutionReport report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
+   //             Status = report.status;
+   //             //Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
+   //         });
+   //         Debug.WriteLine("Execute Bets not available for development");          //t.Start();
         }
 
         public BetsManager()

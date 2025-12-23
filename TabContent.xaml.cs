@@ -26,9 +26,6 @@ namespace SpreadTrader
                 Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
             }
         }
-
-		//System.Timers.Timer market_status_timer = new System.Timers.Timer();
-
 		public TabContent() { }
         public TabContent(CustomTabHeader header)
         {

@@ -118,22 +118,22 @@
                     </Grid.ColumnDefinitions>
 					<Label Grid.Column="0" Content="{Binding Name}" FontSize="16" Background="{Binding Path=FavoritesColor}"  PreviewMouseDown="NameMouseDown" HorizontalContentAlignment="Left"/>
 					
-					<Button Grid.Column="1" DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
+					<!--<Button Grid.Column="1" DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
 					<Button Grid.Column="2"  DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
 					<Button Grid.Column="3" DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
 					<Label Grid.Column="4"/>
 					<Button Grid.Column="5" DataContext="{Binding LayValues[0]}" Background="{StaticResource Lay0Color}"/>
 					<Button Grid.Column="6" DataContext="{Binding LayValues[1]}" Background="{StaticResource Lay1Color}"/>
-					<Button Grid.Column="7" DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
+					<Button Grid.Column="7" DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>-->
 
 
-					<!--<Button Grid.Column="1" DataContext="{Binding BackValues[2]}" Background="{Binding CellBackgroundColor}"/>
+					<Button Grid.Column="1" DataContext="{Binding BackValues[2]}" Background="{Binding CellBackgroundColor}"/>
 					<Button Grid.Column="2" DataContext="{Binding BackValues[1]}" Background="{Binding CellBackgroundColor}"/>
 					<Button Grid.Column="3" DataContext="{Binding BackValues[0]}" Background="{Binding CellBackgroundColor}"/>
 					<Label Grid.Column="4"/>
 					<Button Grid.Column="5" DataContext="{Binding LayValues[0]}" Background="{Binding CellBackgroundColor}"/>
 					<Button Grid.Column="6" DataContext="{Binding LayValues[1]}" Background="{Binding CellBackgroundColor}"/>
-					<Button Grid.Column="7" DataContext="{Binding LayValues[2]}" Background="{Binding CellBackgroundColor}"/>-->
+					<Button Grid.Column="7" DataContext="{Binding LayValues[2]}" Background="{Binding CellBackgroundColor}"/>
 
 					<Label Grid.Column="8" Content="{Binding LastPriceTraded, Converter={StaticResource obconverter} }"  FontSize="11"/>
 					<Label Grid.Column="9" Content="{Binding ifWin, Converter={StaticResource oconverter} }" Foreground="{Binding Path=ProfitColor}" FontWeight="Regular" FontSize="11"/>
