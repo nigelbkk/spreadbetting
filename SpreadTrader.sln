@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ESAClient", "..\Bet
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetfairProxy", "..\BetfairProxy\BetfairProxy.csproj", "{72188CC6-1F1A-4A50-BF54-4D33D6989FB4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ESASwagger", "..\Betfair.ESASwagger\Betfair.ESASwagger.csproj", "{05419E45-CAD4-4FB6-BC46-B93119D9F22D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,14 @@ Global
 		{72188CC6-1F1A-4A50-BF54-4D33D6989FB4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{72188CC6-1F1A-4A50-BF54-4D33D6989FB4}.Release|x64.ActiveCfg = Release|x64
 		{72188CC6-1F1A-4A50-BF54-4D33D6989FB4}.Release|x64.Build.0 = Release|x64
+		{05419E45-CAD4-4FB6-BC46-B93119D9F22D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05419E45-CAD4-4FB6-BC46-B93119D9F22D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05419E45-CAD4-4FB6-BC46-B93119D9F22D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{05419E45-CAD4-4FB6-BC46-B93119D9F22D}.Debug|x64.Build.0 = Debug|Any CPU
+		{05419E45-CAD4-4FB6-BC46-B93119D9F22D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05419E45-CAD4-4FB6-BC46-B93119D9F22D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05419E45-CAD4-4FB6-BC46-B93119D9F22D}.Release|x64.ActiveCfg = Release|Any CPU
+		{05419E45-CAD4-4FB6-BC46-B93119D9F22D}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,7 +15,8 @@ namespace SpreadTrader
     {
         public CustomTabHeader customHeader = null;
         public NodeViewModel MarketNode = null;
-		public MarketDefinition.StatusEnum? MarketStatus { get; set; }
+        private MarketDefinition.StatusEnum? _MarketStatus { get; set; }
+        public String MarketStatus { get { return _MarketStatus == null ? "" : _MarketStatus.ToString();  } }
 		public Visibility OverlayVisibility { get; set; }
 		public string MarketName { get { return MarketNode?.MarketName; } }
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -44,7 +45,7 @@ namespace SpreadTrader
 				dynamic d = data;
 				MarketChangeDto change = d.MarketChangeDto;
 				OverlayVisibility = change.Status != MarketDefinition.StatusEnum.Open ? Visibility.Visible : Visibility.Hidden;
-				MarketStatus = change.Status;
+				_MarketStatus = change.Status;
 				NotifyPropertyChanged("");
 				if (RunnersControl != null && RunnersControl.MarketNode != null)
 				{
