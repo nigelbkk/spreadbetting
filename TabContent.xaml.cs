@@ -53,7 +53,7 @@ namespace SpreadTrader
 
 					if (RunnersControl.MarketNode.MarketID == change.MarketId)
 					{
-						Task.Run(() => OnMarketChanged(change));
+						OnMarketChanged(change));
 					}
 				}
 			}
