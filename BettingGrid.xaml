@@ -58,8 +58,8 @@
                     <!--Tag="{Binding Path=ItemsControl.AlternationIndex}"-->
 					<StackPanel Orientation="Vertical">
                         <CheckBox IsChecked="{Binding Path=IsChecked}" IsEnabled="true" />
-						<TextBox Text="{Binding Path=price, Converter={StaticResource oconverter}}" IsEnabled="true"/>
-						<TextBox Text="{Binding Path=size, Converter={StaticResource sconverter}}" IsEnabled="true"/>
+						<TextBox Text="{Binding Path=price, Mode=OneWay, Converter={StaticResource oconverter}}" IsEnabled="true"/>
+						<TextBox Text="{Binding Path=size, Mode=OneWay,  Converter={StaticResource sconverter}}" IsEnabled="true"/>
 					</StackPanel>
 				</StackPanel>
 			</Grid>

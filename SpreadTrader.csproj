@@ -146,6 +146,7 @@
     <Compile Include="TabHeader.xaml.cs">
       <DependentUpon>TabHeader.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UIThread.cs" />
     <Compile Include="UpdateBet.xaml.cs">
       <DependentUpon>UpdateBet.xaml</DependentUpon>
     </Compile>

@@ -117,8 +117,9 @@ namespace SpreadTrader
             long diff = DateTime.UtcNow.Ticks - change.Time.Ticks;
 			String cs = $"{1000 * diff / TimeSpan.TicksPerSecond}ms";
             ControlMessenger.Send("Update Market Latency", new { MarketLatency = cs, Status = "" });
+            bool use_display_prices = false;
 
-            try
+			try
 			{
                 if (LiveRunners == null || change.Runners == null)
                     return;
@@ -131,24 +132,41 @@ namespace SpreadTrader
 
                     String runner_name = lr.Name;
 
-					if (runner.Bdatb != null)
-					{ 
-                        foreach(PriceLevelDto lv in runner.Bdatb)
+                    if (use_display_prices)
+                    {
+                        if (runner.Bdatb != null)
                         {
-							PriceSize cell = lr.BackValues[lv.Level];
-							cell.price = lv.Price;
-							cell.size = lv.Size;
-						}
+                            foreach (PriceLevelDto lv in runner.Bdatb)
+                            {
+                                lr.BackValues[lv.Level].Update(lv.Price, lv.Size);
+                            }
+                        }
+                        if (runner.Bdatl != null)
+                        {
+                            foreach (PriceLevelDto lv in runner.Bdatl)
+                            {
+                                lr.LayValues[lv.Level].Update(lv.Price, lv.Size);
+                            }
+                        }
                     }
-					if (runner.Bdatl != null)
-					{
-						foreach (PriceLevelDto lv in runner.Bdatl)
-						{
-							PriceSize cell = lr.BackValues[lv.Level];
-							cell.price = lv.Price;
-							cell.size = lv.Size;
-						}
-					}
+                    else
+                    {
+                        if (runner.Batb != null)
+                        {
+                            foreach (PriceLevelDto lv in runner.Batb)
+                            {
+                                lr.BackValues[lv.Level].Update(lv.Price, lv.Size);
+                            }
+                        }
+                        if (runner.Batl != null)
+                        {
+                            foreach (PriceLevelDto lv in runner.Batl)
+                            {
+                                lr.LayValues[lv.Level].Update(lv.Price, lv.Size);
+                            }
+                        }
+                    }
+
 					NotifyPropertyChanged("");
 				}
 			}
