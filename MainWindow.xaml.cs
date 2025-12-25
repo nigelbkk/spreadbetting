@@ -114,7 +114,8 @@ namespace SpreadTrader
 				dynamic d = data;
 				NodeViewModel d2 = d.NodeViewModel as NodeViewModel;
 				Debug.WriteLine($"MainWindow: {d2.FullName}");
-				Task.Run(() => SelectedTab.OnSelected(d2));
+                //Task.Run(() => SelectedTab.OnSelected(d2));
+                SelectedTab.OnSelected(d2);
 			}
 //			if (messageName == "Market Changed")
 //			{

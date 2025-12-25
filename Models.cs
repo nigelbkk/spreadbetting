@@ -24,6 +24,10 @@ namespace SpreadTrader
 		public List<PriceLevelDto> Batl { get; set; }
 		public List<PriceLevelDto> Bdatb { get; set; }
 		public List<PriceLevelDto> Bdatl { get; set; }
+        public override string ToString()
+        {
+			return $"{Id} : {Bdatb} : {Bdatb}";
+        }
 	}
 
 	public class PriceLevelDto
@@ -31,8 +35,12 @@ namespace SpreadTrader
 		public int Level { get; set; }
 		public double Price { get; set; }
 		public double Size { get; set; }
-	}
-	public class MarketSnapDto
+        public override string ToString()
+        {
+            return $"{Level} : {Price} : {Size}";
+        }
+    }
+    public class MarketSnapDto
 	{
 		public String MarketId { get; set; }
 		public bool InPlay { get; set; }
