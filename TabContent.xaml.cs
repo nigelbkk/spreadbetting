@@ -15,9 +15,30 @@ namespace SpreadTrader
     {
         public CustomTabHeader customHeader = null;
         public NodeViewModel MarketNode = null;
-        private MarketDefinition.StatusEnum? _MarketStatus { get; set; }
-        public String MarketStatus { get { return _MarketStatus == null ? "" : _MarketStatus.ToString();  } }
-		public Visibility OverlayVisibility { get; set; }
+
+        private String _MarketStatus;
+        public String MarketStatus { get => _MarketStatus;
+			
+			set {
+				if (_MarketStatus != value)
+				{
+					_MarketStatus = value;
+					NotifyPropertyChanged(nameof(MarketStatus));
+				}
+			}
+		}
+
+        private Visibility _OverlayVisibility { get; set; }
+        public Visibility OverlayVisibility { get => _OverlayVisibility;
+			set {
+                if (_OverlayVisibility != value)
+                {
+                    _OverlayVisibility = value;
+                    NotifyPropertyChanged(nameof(OverlayVisibility));
+                }
+            }
+        }
+
 		public string MarketName { get { return MarketNode?.MarketName; } }
 		public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(String info)
@@ -36,7 +57,6 @@ namespace SpreadTrader
 			marketHeader.TabContent = this;
 			oBettingGrid.sliderControl = SliderControl;
 			OverlayVisibility = Visibility.Hidden;
-			NotifyPropertyChanged("");
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
@@ -45,8 +65,9 @@ namespace SpreadTrader
 				dynamic d = data;
 				MarketChangeDto change = d.MarketChangeDto;
 				OverlayVisibility = change.Status != MarketDefinition.StatusEnum.Open ? Visibility.Visible : Visibility.Hidden;
-				_MarketStatus = change.Status;
-				NotifyPropertyChanged("");
+				_MarketStatus = change.Status.ToString();
+                NotifyPropertyChanged("MarketStatus");
+                NotifyPropertyChanged("OverlayVisibility");
 				if (RunnersControl != null && RunnersControl.MarketNode != null)
 				{
 					String name = RunnersControl?.MarketNode.Market.marketName;

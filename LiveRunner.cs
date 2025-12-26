@@ -118,20 +118,26 @@ namespace SpreadTrader
 			int i = 0;
 			if (r.ex != null)
 			{
-				if (r.ex.availableToBack.Count > 0) foreach (var ps in r.ex.availableToBack)
-					{
-                        UiThread.Run(() => BackValues[i].Update(ps.price, ps.size));
+                if (r.ex.availableToBack.Count > 0)
+                {
+                    foreach (var ps in r.ex.availableToBack)
+                    {
+                        UiThread.Run(() => BackValues[i++].Update(ps.price, ps.size));
                         //BackValues[i].price = ps.price;
-						//BackValues[i++].size = ps.size;
-					}
+                        //BackValues[i++].size = ps.size;
+                    }
+                }
 				i = 0;
-				if (r.ex.availableToLay.Count > 0) foreach (var ps in r.ex.availableToLay)
-					{
-						UiThread.Run(() => LayValues[i].Update(ps.price, ps.size));
-						//LayValues[i].Update(ps.price, ps.size);
-						//LayValues[i].price = ps.price;
-						//LayValues[i++].size = ps.size;
-					}
+				if (r.ex.availableToLay.Count > 0)
+                {
+                    foreach (var ps in r.ex.availableToLay)
+                    {
+                        UiThread.Run(() => LayValues[i++].Update(ps.price, ps.size));
+                        //LayValues[i].Update(ps.price, ps.size);
+                        //LayValues[i].price = ps.price;
+                        //LayValues[i++].size = ps.size;
+                    }
+                }
 			}
 			Name = String.Format("{0}{1}", r.Catalog.name, r.handicap == 0 ? "" : " " + r.handicap.ToString());
 			ifWin = r.ifWin;        ///NH

@@ -81,7 +81,7 @@ public sealed class PriceSize : INotifyPropertyChanged
         return String.Format("{0:0.00}:{1:0.00}", price, size);
     }
     public event PropertyChangedEventHandler PropertyChanged;
-	protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+	private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	//public void NotifyPropertyChanged(String info)
  //   {
  //       if (PropertyChanged != null)
