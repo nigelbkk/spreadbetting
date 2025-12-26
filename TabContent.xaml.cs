@@ -23,7 +23,7 @@ namespace SpreadTrader
 				if (_MarketStatus != value)
 				{
 					_MarketStatus = value;
-					NotifyPropertyChanged(nameof(MarketStatus));
+					OnPropertyChanged(nameof(MarketStatus));
 				}
 			}
 		}
@@ -34,20 +34,15 @@ namespace SpreadTrader
                 if (_OverlayVisibility != value)
                 {
                     _OverlayVisibility = value;
-                    NotifyPropertyChanged(nameof(OverlayVisibility));
+					OnPropertyChanged(nameof(OverlayVisibility));
                 }
             }
         }
 
 		public string MarketName { get { return MarketNode?.MarketName; } }
 		public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(String info)
-        {
-            if (PropertyChanged != null)
-            {
-                Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
-            }
-        }
+		private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
 		public TabContent() { }
         public TabContent(CustomTabHeader header)
         {
@@ -66,8 +61,6 @@ namespace SpreadTrader
 				MarketChangeDto change = d.MarketChangeDto;
 				OverlayVisibility = change.Status != MarketDefinition.StatusEnum.Open ? Visibility.Visible : Visibility.Hidden;
 				_MarketStatus = change.Status.ToString();
-                NotifyPropertyChanged("MarketStatus");
-                NotifyPropertyChanged("OverlayVisibility");
 				if (RunnersControl != null && RunnersControl.MarketNode != null)
 				{
 					String name = RunnersControl?.MarketNode.Market.marketName;
@@ -94,24 +87,5 @@ namespace SpreadTrader
 		{
 			RunnersControl?.OnMarketChanged(change);
 		}
-		//void OnMarketChangedOld(MarketSnapDto snap)
-		//{
-		//	RunnersControl?.OnMarketChanged(snap);
-		//	customHeader.inPlay = snap.InPlay;
-
-		//	if (MarketStatus != snap.Status)
-		//	{
-		//		MarketStatus = snap.Status;
-		//		if (MarketStatus == MarketDefinition.StatusEnum.Open)
-		//		{
-		//			OverlayVisibility = Visibility.Hidden;
-		//		}
-		//		else
-		//		{
-		//			OverlayVisibility = Visibility.Visible;
-		//		}
-		//		NotifyPropertyChanged("");
-		//	}
-		//}
 	}
 }
