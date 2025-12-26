@@ -103,6 +103,7 @@
     <Compile Include="BetsManager.xaml.cs">
       <DependentUpon>BetsManager.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BetsManagerRow.cs" />
     <Compile Include="BettingGrid.xaml.cs">
       <DependentUpon>BettingGrid.xaml</DependentUpon>
     </Compile>
@@ -256,6 +257,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="proponpc.snippet" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

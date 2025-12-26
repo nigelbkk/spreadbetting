@@ -108,16 +108,16 @@
 							</Style>
 						</DataGridTextColumn.ElementStyle>
 					</DataGridTextColumn>
-					<DataGridTextColumn Width="0.8*" Header="Stake" Binding="{Binding DisplayStake, StringFormat={}{0:N2}}" />
+					<DataGridTextColumn Width="0.8*" Header="Stake" Binding="{Binding Stake, StringFormat={}{0:N2}}" />
 					<DataGridTemplateColumn Header="Odds" CanUserSort="True" SortDirection="Ascending" SortMemberPath="DisplayOdds" >
 						<DataGridTemplateColumn.CellTemplate>
 							<DataTemplate>
-								<Label Tag="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={local:RowToIndexConverter}}"  Content="{Binding DisplayOdds, StringFormat={}{0:N2}}" MouseUp="Label_MouseUp" />
+								<Label Tag="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={local:RowToIndexConverter}}"  Content="{Binding DisplayOdds, Mode=OneWay, StringFormat={}{0:N2}}" MouseUp="Label_MouseUp" />
 							</DataTemplate>
 						</DataGridTemplateColumn.CellTemplate>
 					</DataGridTemplateColumn>
 					<DataGridTextColumn Width="1.15*" Header="Profit/Liability" Binding="{Binding Profit, StringFormat={}{0:N2}, Mode=OneWay}"/>
-					<DataGridTextColumn Width="0.6*" Header="Status" Binding="{Binding IsMatchedString }">
+					<DataGridTextColumn Width="0.6*" Header="Status" Binding="{Binding IsMatchedString, Mode=OneWay}">
 						<DataGridTextColumn.ElementStyle>
 							<Style TargetType="{x:Type TextBlock}">
 								<Setter Property="Background" Value="{Binding IsMatched, Converter={StaticResource ColorConverter}}"/>

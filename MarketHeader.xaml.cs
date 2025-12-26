@@ -14,37 +14,43 @@ namespace SpreadTrader
 		public String ConnectButtonText { get; set; }
 		public String FullName { get { return MarketNode == null ? "No Market Selected" : MarketNode.MarketName; } }
 		public String TimeToGo { get { return MarketNode == null ? "00:00:00" : MarketNode.TimeToGo; } }
-		public String MarketLatency { get; set; }
+		
+		private String _MarketLatency { get; set; }
+		private Visibility _down_visible;
+		private Visibility _up_visible;
+
+		public String MarketLatency { get => _MarketLatency;
+			set {
+				if (_MarketLatency != value)
+				{
+					_MarketLatency = value;
+					OnPropertyChanged(nameof(MarketLatency));
+				} } }
 		public String OrdersLatency { get; set; }
-		//private System.Timers.Timer timer = new System.Timers.Timer();
+		
 		public Double? TotalMatched { get { return MarketNode == null ? 0 : MarketNode.TotalMatched; } }
-		public Visibility up_visible { get; set; }
+		
+		public Visibility down_visible { get => _down_visible; set { _down_visible = value; OnPropertyChanged(nameof(down_visible)); } }
+		public Visibility up_visible { get => _up_visible; set { _up_visible = value; OnPropertyChanged(nameof(up_visible)); } }
 		public SolidColorBrush TimeToGoColor { get { return System.Windows.Media.Brushes.DarkGray; } }
-		public Visibility down_visible { get; set; }
+
 		public event PropertyChangedEventHandler PropertyChanged;
+		private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 		private System.Timers.Timer timer = new System.Timers.Timer();
 
-		//public SolidColorBrush StreamingColor { get { return System.Windows.Media.Brushes.LightGreen; } }
-		public void NotifyPropertyChanged(String info)
-		{
-			if (PropertyChanged != null)
-			{
-				PropertyChanged(this, new PropertyChangedEventArgs(info));
-			}
-		}
 		private void OnMessageReceived(string messageName, object data)
 		{
 			if (messageName == "Update Market Latency")
 			{
 				dynamic d = data;
 				MarketLatency = d?.MarketLatency;
-				NotifyPropertyChanged("");
+				//NotifyPropertyChanged("");
 			}
 			if (messageName == "Update Orders Latency")
 			{
 				dynamic d = data;
 				OrdersLatency = d.OrdersLatency;
-				NotifyPropertyChanged("");
+				//NotifyPropertyChanged("");
 			}
 		}
 		public MarketHeader()
@@ -55,10 +61,11 @@ namespace SpreadTrader
 			up_visible = Visibility.Visible;
 			down_visible = Visibility.Collapsed;
 			ConnectButtonText = "Reconnect";
-			NotifyPropertyChanged("");
+			//NotifyPropertyChanged("");
 			timer.Elapsed += (o, e) =>
 			{
-				NotifyPropertyChanged("");
+				OnPropertyChanged(nameof(TimeToGo));
+				OnPropertyChanged(nameof(TotalMatched));
 			};
 			timer.Interval = 1000;
 			timer.Enabled = true;
@@ -67,9 +74,6 @@ namespace SpreadTrader
 		public void OnSelected(NodeViewModel d2)
 		{
 			MarketNode = d2;
-			//Title = d2.FullName;
-			//MarketId = d2.MarketID;
-			//_ = RunnersControl.PopulateNewMarketAsync(d2);
 		}
 
 		private void Button_Click(object sender, RoutedEventArgs e)
@@ -88,7 +92,7 @@ namespace SpreadTrader
 					case "Hide Grid":
 						down_visible = TabContent.BettingGrid.Visibility;
 						up_visible = TabContent.BettingGrid.Visibility = TabContent.BettingGrid.Visibility == Visibility.Collapsed ? Visibility.Visible : Visibility.Collapsed;
-						NotifyPropertyChanged("");
+						//NotifyPropertyChanged("");
 						break;
 				}
 			}

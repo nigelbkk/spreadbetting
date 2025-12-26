@@ -87,7 +87,7 @@ namespace SpreadTrader
                 }
             }
         }
-        public async Task PopulateNewMarketAsync(NodeViewModel node)
+        public void PopulateNewMarket(NodeViewModel node)
         {
 			_MarketNode = node;
 			MarketNode.GetLiveRunners();

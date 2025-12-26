@@ -10,29 +10,21 @@ namespace SpreadTrader
 {
     public partial class UpDownControl : UserControl, INotifyPropertyChanged
     {
-        private String SValue { get; set; }
+        private String _stringContent { get; set; }
         public double _Value { get; set; }
         public String Value
         {
-            get
-            {
-                return SValue;
-            }
+            get => _stringContent;
             set
             {
-                SValue = value;
-                NotifyPropertyChanged("");
+				_stringContent = value;
+                OnPropertyChanged(nameof(_stringContent));
             }
         }
         public event PropertyChangedEventHandler PropertyChanged;
-        public void NotifyPropertyChanged(String info)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(info));
-            }
-        }
-        public UpDownControl()
+        private void OnPropertyChanged(String property) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+
+		public UpDownControl()
         {
             InitializeComponent();
             tb.Focus();
@@ -71,8 +63,7 @@ namespace SpreadTrader
                     break;
                 default: return;
             }
-            SValue = _Value.ToString();
-            NotifyPropertyChanged("");
+            _stringContent = _Value.ToString();
             e.Handled = true;
         }
         private void tb_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -84,8 +75,7 @@ namespace SpreadTrader
                 case Key.Down: _Value = betfairPrices.Previous(_Value); break;
                 default: return;
             }
-            SValue = _Value.ToString();
-            NotifyPropertyChanged("");
+			_stringContent = _Value.ToString();
             e.Handled = true;
             tb.CaretIndex = caret;
         }

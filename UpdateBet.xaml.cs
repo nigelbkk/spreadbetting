@@ -9,7 +9,7 @@ namespace SpreadTrader
 {
     public partial class UpdateBet : Window, INotifyPropertyChanged
     {
-        private Row Row { get; set; }
+        private BetsManagerRow Row { get; set; }
         public String BetReference { get; set; }
         public double Profit { get; set; }
         public String ProfitLiability { get { return String.Format("Profit/Liability: {0:0.00}", Profit); } }
@@ -25,7 +25,7 @@ namespace SpreadTrader
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
         }
-        public UpdateBet(Row row)
+        public UpdateBet(BetsManagerRow row)
         {
             InitializeComponent();
 
