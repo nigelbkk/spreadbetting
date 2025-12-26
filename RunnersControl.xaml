@@ -116,15 +116,15 @@
                         <ColumnDefinition Width="46"/>
                         <ColumnDefinition Width="46"/>
                     </Grid.ColumnDefinitions>
-					<Label Grid.Column="0" Content="{Binding Name}" FontSize="16" Background="{Binding Path=FavoritesColor}"  PreviewMouseDown="NameMouseDown" HorizontalContentAlignment="Left"/>
-					
-					<Button Grid.Column="1" DataContext="{Binding BackValues[2]}" Background="{StaticResource Back2Color}"/>
-					<Button Grid.Column="2"  DataContext="{Binding BackValues[1]}" Background="{StaticResource Back1Color}"/>
-					<Button Grid.Column="3" DataContext="{Binding BackValues[0]}" Background="{StaticResource Back0Color}"/>
+					<Label Grid.Column="0" Content="{Binding Name, Mode=OneWay}" FontSize="16" Background="{Binding Path=FavoritesColor}"  PreviewMouseDown="NameMouseDown" HorizontalContentAlignment="Left"/>
+
+					<Button Grid.Column="1" DataContext="{Binding BackValues[2], Mode=OneWay}" Background="{StaticResource Back2Color}"/>
+					<Button Grid.Column="2"  DataContext="{Binding BackValues[1], Mode=OneWay}" Background="{StaticResource Back1Color}"/>
+					<Button Grid.Column="3" DataContext="{Binding BackValues[0], Mode=OneWay}" Background="{StaticResource Back0Color}"/>
 					<Label Grid.Column="4"/>
-					<Button Grid.Column="5" DataContext="{Binding LayValues[0]}" Background="{StaticResource Lay0Color}"/>
-					<Button Grid.Column="6" DataContext="{Binding LayValues[1]}" Background="{StaticResource Lay1Color}"/>
-					<Button Grid.Column="7" DataContext="{Binding LayValues[2]}" Background="{StaticResource Lay2Color}"/>
+					<Button Grid.Column="5" DataContext="{Binding LayValues[0], Mode=OneWay}" Background="{StaticResource Lay0Color}"/>
+					<Button Grid.Column="6" DataContext="{Binding LayValues[1], Mode=OneWay}" Background="{StaticResource Lay1Color}"/>
+					<Button Grid.Column="7" DataContext="{Binding LayValues[2], Mode=OneWay}" Background="{StaticResource Lay2Color}"/>
 
 
 					<!--<Button Grid.Column="1" DataContext="{Binding BackValues[2]}" Background="{Binding CellBackgroundColor}"/>
@@ -135,10 +135,10 @@
 					<Button Grid.Column="6" DataContext="{Binding LayValues[1]}" Background="{Binding CellBackgroundColor}"/>
 					<Button Grid.Column="7" DataContext="{Binding LayValues[2]}" Background="{Binding CellBackgroundColor}"/>-->
 
-					<Label Grid.Column="8" Content="{Binding LastPriceTraded, Converter={StaticResource obconverter} }"  FontSize="11"/>
-					<Label Grid.Column="9" Content="{Binding ifWin, Converter={StaticResource oconverter} }" Foreground="{Binding Path=ProfitColor}" FontWeight="Regular" FontSize="11"/>
-                    <Label Grid.Column="10" Content="{Binding LevelProfit}" Foreground="{Binding Path=LevelProfitColor}" PreviewMouseDown="LevelProfitMouseDown" Background="LightGreen" FontSize="11"/>
-                    <Label Grid.Column="11" Content="{Binding LevelStake}" Background="Ivory" FontSize="11"/>
+					<Label Grid.Column="8" Content="{Binding LastPriceTraded, Mode=OneWay, Converter={StaticResource obconverter} }"  FontSize="11"/>
+					<Label Grid.Column="9" Content="{Binding ifWin, Mode=OneWay, Converter={StaticResource oconverter} }" Foreground="{Binding Path=ProfitColor}" FontWeight="Regular" FontSize="11"/>
+					<Label Grid.Column="10" Content="{Binding LevelProfit, Mode=OneWay}" Foreground="{Binding Path=LevelProfitColor}" PreviewMouseDown="LevelProfitMouseDown" Background="LightGreen" FontSize="11"/>
+					<Label Grid.Column="11" Content="{Binding LevelStake, Mode=OneWay}" Background="Ivory" FontSize="11"/>
 				</Grid>
 			</DataTemplate>
 		</ResourceDictionary>
@@ -167,9 +167,9 @@
 			<Label HorizontalAlignment="Left" Grid.Column="0" Content="Selection Name" FontSize="16" BorderBrush="Transparent"/>
 			<Label Grid.Column="1"/>
 			<Label Grid.Column="2"/>
-			<Label Content="{Binding Path=BackBook, Converter={StaticResource pconverter}}" FontSize="11" Padding ="0" Grid.Column="3"/>
+			<Label Content="{Binding Path=BackBook, Mode=OneWay, Converter={StaticResource pconverter}}" FontSize="11" Padding ="0" Grid.Column="3"/>
 			<Label Grid.Column="4"/>
-            <Label Content="{Binding Path=LayBook, Converter={StaticResource pconverter}}"  FontSize="11" Padding ="0" Grid.Column="5"/>
+            <Label Content="{Binding Path=LayBook, Mode=OneWay,Converter={StaticResource pconverter}}"  FontSize="11" Padding ="0" Grid.Column="5"/>
 			<Label Grid.Column="6"/>
 			<Label Grid.Column="7"/>
             
