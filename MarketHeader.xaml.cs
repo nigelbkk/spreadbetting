@@ -46,14 +46,20 @@ namespace SpreadTrader
 				MarketLatency = d?.MarketLatency;
 				//NotifyPropertyChanged("");
 			}
-			if (messageName == "Update Orders Latency")
-			{
-				dynamic d = data;
-				OrdersLatency = d.OrdersLatency;
-				//NotifyPropertyChanged("");
-			}
-		}
-		public MarketHeader()
+            if (messageName == "Update Orders Latency")
+            {
+                dynamic d = data;
+                OrdersLatency = d.OrdersLatency;
+                //NotifyPropertyChanged("");
+            }
+            if (messageName == "Market Selected")
+            {
+                dynamic d = data;
+				MarketNode = d.NodeViewModel;
+                OnPropertyChanged("FullName");
+            }
+        }
+        public MarketHeader()
 		{
 			InitializeComponent();
 			ControlMessenger.MessageSent += OnMessageReceived;
