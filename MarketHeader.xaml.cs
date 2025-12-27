@@ -44,13 +44,11 @@ namespace SpreadTrader
 			{
 				dynamic d = data;
 				MarketLatency = d?.MarketLatency;
-				//NotifyPropertyChanged("");
 			}
             if (messageName == "Update Orders Latency")
             {
                 dynamic d = data;
                 OrdersLatency = d.OrdersLatency;
-                //NotifyPropertyChanged("");
             }
             if (messageName == "Market Selected")
             {
@@ -67,7 +65,6 @@ namespace SpreadTrader
 			up_visible = Visibility.Visible;
 			down_visible = Visibility.Collapsed;
 			ConnectButtonText = "Reconnect";
-			//NotifyPropertyChanged("");
 			timer.Elapsed += (o, e) =>
 			{
 				OnPropertyChanged(nameof(TimeToGo));

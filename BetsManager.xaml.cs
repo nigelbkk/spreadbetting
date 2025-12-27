@@ -176,16 +176,8 @@ namespace SpreadTrader
 			{
 				PlaceExecutionReport report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
 				Status = report.status;
-				//Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
-			});
-
-			//System.Threading.Thread t = new System.Threading.Thread(() =>
-   //         {
-   //             PlaceExecutionReport report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
-   //             Status = report.status;
-   //             //Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
-   //         });
-   //         Debug.WriteLine("Execute Bets not available for development");          //t.Start();
+            });
+            ControlMessenger.Send("Update P&L");
         }
 
         public BetsManager()
@@ -196,6 +188,8 @@ namespace SpreadTrader
         }
         private async void NotifyBetMatchedAsync()
         {
+            ControlMessenger.Send("Update P&L");
+
             String path = props.MatchedBetAlert;
             if (!string.IsNullOrEmpty(path))
             {
@@ -392,8 +386,9 @@ namespace SpreadTrader
                     return;
                 }
                 CancelExecutionReport cancel_report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
+                ControlMessenger.Send("Update P&L");
             }
-		}
+        }
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (Betfair == null)
@@ -435,6 +430,7 @@ namespace SpreadTrader
                                 }
                             });
                         }
+                        ControlMessenger.Send("Update P&L");
                         break;
 
                     case "DoubleUnmatched":
@@ -488,6 +484,7 @@ namespace SpreadTrader
                                 }
                             });
                         }
+                        ControlMessenger.Send("Update P&L");
                         break;
 
                     case "CancelAll":
@@ -544,6 +541,7 @@ namespace SpreadTrader
                                 Notification = $"Cancellation Task failed with {xxe}";
                             }
                         }
+                        ControlMessenger.Send("Update P&L");
                         break;
 
                     case "AbsoluteCancelAll":
@@ -579,6 +577,7 @@ namespace SpreadTrader
                                 }
                             });
                         }
+                        ControlMessenger.Send("Update P&L");
                         break;
                 }
             }

@@ -52,7 +52,6 @@ namespace SpreadTrader
 				Favorite = null;
 				NotifyPropertyChanged("");
 			}
-
 		}
 		public SliderControl()
         {
@@ -78,23 +77,6 @@ namespace SpreadTrader
             {
 				BackValues[i].Update(BackValues[i].price, 10 * newvalue);
 				LayValues[i].Update(LayValues[i].price, 10 * newvalue);
-				
-     //           PriceSize vb = BackValues[i];
-     //           PriceSize vl = LayValues[i];
-     //           if (newvalue > oldvalue)
-     //           {
-					//vb.size = 10 * newvalue;
-     //               vl.size = 10 * newvalue;
-     //               BackValues[i] = vb;
-     //               LayValues[i] = vl;
-     //           }
-     //           else if (oldvalue > newvalue)
-     //           {
-     //               vb.size = 10 * newvalue;
-     //               vl.size = 10 * newvalue;
-     //               BackValues[i] = vb;
-     //               LayValues[i] = vl;
-     //           }
             }
         }
         public void SyncPrices()
@@ -105,14 +87,11 @@ namespace SpreadTrader
                 for (int i = 0; i < 9; i++)
                 {
                     BackValues[i].Update(betfairPrices[base_index + offset + i], BackValues[i].size);
-//					BackValues[i].price = betfairPrices[base_index + offset + i];
                 }
                 offset = Convert.ToInt32(MoveLay) - 31;
                 for (int i = 0; i < 9; i++)
                 {
 					LayValues[i].Update(betfairPrices[base_index + offset + i], LayValues[i].size);
-
-					//                    LayValues[i].price = betfairPrices[base_index + offset + i];
 				}
 				NotifyPropertyChanged("");
             }

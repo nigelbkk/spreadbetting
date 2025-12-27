@@ -177,8 +177,12 @@ namespace SpreadTrader
         }
 		private void OnMessageReceived(string messageName, object data)
         {
-		}
-		public RunnersControl()
+            if (messageName == "Update P&L")
+            {
+                _ = UpdateRunnerPnLAsync();
+            }
+        }
+        public RunnersControl()
         {
             InitializeComponent();
             ControlMessenger.MessageSent += OnMessageReceived;
@@ -299,6 +303,7 @@ namespace SpreadTrader
                     System.Threading.Thread t = new System.Threading.Thread(() =>
                     {
                         PlaceExecutionReport report = betfair.placeOrder(MarketNode.MarketID, live_runner.SelectionId, sideEnum.LAY, Math.Abs(live_runner.LevelStake), live_runner.LayValues[0].price);
+                        ControlMessenger.Send("Update P&L");
                         Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
                     });
                     t.Start();
@@ -308,6 +313,7 @@ namespace SpreadTrader
                     System.Threading.Thread t = new System.Threading.Thread(() =>
                     {
                         PlaceExecutionReport report = betfair.placeOrder(MarketNode.MarketID, live_runner.SelectionId, sideEnum.BACK, Math.Abs(live_runner.LevelStake), live_runner.BackValues[0].price);
+                        ControlMessenger.Send("Update P&L");
                         Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
                     });
                     t.Start();

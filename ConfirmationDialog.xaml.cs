@@ -75,6 +75,7 @@ namespace SpreadTrader
                     {
                         DateTime LastUpdate = DateTime.UtcNow;
                         PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
+                        ControlMessenger.Send("Update P&L");
                         //runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
                     });
                     t.Start();

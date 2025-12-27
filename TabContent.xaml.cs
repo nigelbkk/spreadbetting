@@ -1,8 +1,4 @@
-﻿using Betfair.ESAClient.Cache;
-using Betfair.ESASwagger.Model;
-using BetfairAPI;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Betfair.ESASwagger.Model;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -55,8 +51,6 @@ namespace SpreadTrader
 			ControlMessenger.MessageSent += OnMessageReceived;
 			marketHeader.TabContent = this;
 			oBettingGrid.sliderControl = SliderControl;
-            //OverlayVisibility = Visibility.Visible;
-            //OverlayVisibility = Visibility.Hidden;
             timer.Elapsed += (o, e) =>
             {
                 OnPropertyChanged(nameof(MarketStatus));
@@ -79,7 +73,7 @@ namespace SpreadTrader
             {
                 MarketStatus = status.ToString();
                 OverlayVisibility = Visibility.Visible;
-                //StatusMessage = "Market Closed";
+                ControlMessenger.Send("Update P&L");
             }
         }
         private void OnMessageReceived(string messageName, object data)
@@ -88,8 +82,8 @@ namespace SpreadTrader
 			{
 				dynamic d = data;
 				MarketChangeDto change = d.MarketChangeDto;
-                //OverlayVisibility = change.Status != MarketDefinition.StatusEnum.Open ? Visibility.Visible : Visibility.Hidden;
-                OverlayVisibility = Visibility.Visible; 
+                OverlayVisibility = change.Status != MarketDefinition.StatusEnum.Open ? Visibility.Visible : Visibility.Hidden;
+                //OverlayVisibility = Visibility.Visible; 
 				_MarketStatus = change.Status.ToString();
 				if (RunnersControl != null && RunnersControl.MarketNode != null)
 				{
