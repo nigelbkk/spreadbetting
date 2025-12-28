@@ -123,8 +123,6 @@ namespace SpreadTrader
                     foreach (var ps in r.ex.availableToBack)
                     {
                         UiThread.Run(() => BackValues[i++].Update(ps.price, ps.size));
-                        //BackValues[i].price = ps.price;
-                        //BackValues[i++].size = ps.size;
                     }
                 }
 				i = 0;
@@ -133,9 +131,6 @@ namespace SpreadTrader
                     foreach (var ps in r.ex.availableToLay)
                     {
                         UiThread.Run(() => LayValues[i++].Update(ps.price, ps.size));
-                        //LayValues[i].Update(ps.price, ps.size);
-                        //LayValues[i].price = ps.price;
-                        //LayValues[i++].size = ps.size;
                     }
                 }
 			}

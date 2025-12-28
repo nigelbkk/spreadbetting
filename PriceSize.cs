@@ -40,21 +40,7 @@ public sealed class PriceSize : INotifyPropertyChanged
 	public Double price => _price;
 	public Double size => _size;
 
-
-	//{ get { return _price; } private set {
- //           if (_price != value)
- //           {
- //               _price = value;
- //           }
- //       } }
- //   public Double size { get { return _size; } set 
- //       {
-	//		if (_size != value)
-	//		{
-	//			_size = value;
-	//		}
- //       } }
-
+	public DateTime last_flash_time;
 	public void Update(double newPrice, double newSize)
 	{
 		bool priceChanged = _price != newPrice;
@@ -82,11 +68,4 @@ public sealed class PriceSize : INotifyPropertyChanged
     }
     public event PropertyChangedEventHandler PropertyChanged;
 	private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-	//public void NotifyPropertyChanged(String info)
- //   {
- //       if (PropertyChanged != null)
- //       {
- //           PropertyChanged(this, new PropertyChangedEventArgs(info));
- //       }
- //   }
 }

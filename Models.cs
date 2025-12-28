@@ -20,9 +20,8 @@ namespace SpreadTrader
 		public long Id { get; set; }
 		public double? Ltp { get; set; }
 		public double? Tv { get; set; }
-		public List<PriceLevelDto> Batb { get; set; }
-		public List<PriceLevelDto> Batl { get; set; }
-		public List<PriceLevelDto> Bdatb { get; set; }
+        public List<List<double?>> Trd { get; set; }
+        public List<PriceLevelDto> Bdatb { get; set; }
 		public List<PriceLevelDto> Bdatl { get; set; }
         public override string ToString()
         {

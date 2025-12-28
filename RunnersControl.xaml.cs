@@ -46,7 +46,9 @@ namespace SpreadTrader
     {
 # region
         private NodeViewModel _MarketNode { get; set; }
-		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); NotifyPropertyChanged(""); } }
+		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); 
+            //    NotifyPropertyChanged("MarketNode"); 
+            } }
 		public double BackBook { get { return MarketNode == null ? 0.00 : MarketNode.BackBook; } }
         public double LayBook { get { return MarketNode == null ? 0.00 : MarketNode.LayBook; } }
         //public List<LiveRunner> LiveRunners { get { return MarketNode?.LiveRunners ?? new List<LiveRunner>(); } }
@@ -111,63 +113,67 @@ namespace SpreadTrader
             }
             return null;
         }
-		public void OnMarketChanged(MarketChangeDto change)
+        private Int32 GetCellID(double price)
+        {
+            return 0;
+        }
+
+        public void OnMarketChanged(MarketChangeDto change)
         {
             var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             long diff = DateTime.UtcNow.Ticks - change.Time.Ticks;
 			String cs = $"{1000 * diff / TimeSpan.TicksPerSecond}ms";
             ControlMessenger.Send("Update Market Latency", new { MarketLatency = cs, Status = "" });
-            bool use_display_prices = false;
 
 			try
 			{
                 if (LiveRunners == null || change.Runners == null)
                     return;
 
-				foreach (RunnerChangeDto runner in change.Runners)
+                foreach (RunnerChangeDto runner in change.Runners)
                 {
                     LiveRunner lr = GetRunnerFromSelectionID(runner.Id);
                     if (lr == null)
                         return;
 
                     String runner_name = lr.Name;
-
-                    if (use_display_prices)
+                    if (runner.Trd != null && runner.Trd.Count > 0)
                     {
-                        if (runner.Bdatb != null)
+                        foreach (var ti in runner.Trd)
                         {
-                            foreach (PriceLevelDto lv in runner.Bdatb)
+                            GetCellID(ti[0].Value);
+                            for(int i=0;i<3;i++)
                             {
-                                lr.BackValues[lv.Level].Update(lv.Price, lv.Size);
+                                PriceSize ps = lr.BackValues[i];
+                                if (ps.price == ti[0].Value)
+                                {
+                                    Debug.WriteLine($"{runner_name} match cell {i}");
+                                }
+                                ps = lr.LayValues[i];
+                                if (ps.price == ti[0].Value)
+                                {
+                                    Debug.WriteLine($"{runner_name} match cell {i+3}");
+                                }
                             }
-                        }
-                        if (runner.Bdatl != null)
-                        {
-                            foreach (PriceLevelDto lv in runner.Bdatl)
-                            {
-                                lr.LayValues[lv.Level].Update(lv.Price, lv.Size);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (runner.Batb != null)
-                        {
-                            foreach (PriceLevelDto lv in runner.Batb)
-                            {
-                                lr.BackValues[lv.Level].Update(lv.Price, lv.Size);
-                            }
-                        }
-                        if (runner.Batl != null)
-                        {
-                            foreach (PriceLevelDto lv in runner.Batl)
-                            {
-                                lr.LayValues[lv.Level].Update(lv.Price, lv.Size);
-                            }
+                            //ProcessTradedData(runner, lr);
                         }
                     }
 
-					NotifyPropertyChanged("");
+                    if (runner.Bdatb != null)
+                    {
+                        foreach (PriceLevelDto lv in runner.Bdatb)
+                        {
+                            lr.BackValues[lv.Level].Update(lv.Price, lv.Size);
+                        }
+                    }
+                    if (runner.Bdatl != null)
+                    {
+                        foreach (PriceLevelDto lv in runner.Bdatl)
+                        {
+                            lr.LayValues[lv.Level].Update(lv.Price, lv.Size);
+                        }
+                    }
+					//NotifyPropertyChanged("");
 				}
 			}
 			catch (Exception xe)
