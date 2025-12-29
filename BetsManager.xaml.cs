@@ -247,6 +247,7 @@ namespace SpreadTrader
                                     {
                                         Debug.WriteLine(o.Id, $"Insert into grid: {row.UTCTime}");
                                         Rows.Insert(0, row);
+                                        OnPropertyChanged("");
                                     }));
                                     Debug.WriteLine(o.Id, "new bet: ");
                                 }
@@ -278,7 +279,7 @@ namespace SpreadTrader
 									//row.SizeMatched = row.OriginalStake;// o.Sm.Value;
                                     row.Hidden = UnmatchedOnly;
 									NotifyBetMatchedAsync();
-                                    //NotifyPropertyChanged("");
+                                    OnPropertyChanged("");
                                     Debug.WriteLine(o.Id, "fully matched: ");
                                 }
                                 if (o.Sm > 0 && o.Sr > 0)                                           // partially matched
@@ -365,7 +366,7 @@ namespace SpreadTrader
                                 Rows.Insert(0, new BetsManagerRow(o) { Runner = MarketNode.GetRunnerName(o.selectionId), });
                             }
                         }
-						//NotifyPropertyChanged("");
+						OnPropertyChanged("");
 					}
 					catch (Exception xe)
                     {
