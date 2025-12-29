@@ -442,5 +442,17 @@ namespace SpreadTrader.Properties {
                 this["LegacyProxyUrl"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool FlashYellow {
+            get {
+                return ((bool)(this["FlashYellow"]));
+            }
+            set {
+                this["FlashYellow"] = value;
+            }
+        }
     }
 }

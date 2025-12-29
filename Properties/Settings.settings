@@ -107,5 +107,8 @@
     <Setting Name="LegacyProxyUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">127.0.0.1:5055</Value>
     </Setting>
+    <Setting Name="FlashYellow" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

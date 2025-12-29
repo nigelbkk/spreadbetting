@@ -5,7 +5,7 @@
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:p="clr-namespace:SpreadTrader.Properties"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="343" Width="369.332" Topmost="True">
+        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="374" Width="369.332" Topmost="True">
 	<Window.Resources>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
@@ -44,6 +44,7 @@
 					<Label Content="Apply Cross Match Formula" />
 					<Label Content="Hilite Unselected When matched" />
 					<Label Content="Safe Bets" Height="21" />
+					<Label Content="Flash Yellow" Height="21" />
 					<Label Content="Time Zone Offset" Height="21" />
 					<Label Content="Legacy Market Proxy URL"  />
 					<Label Content="Order Stream URL" Height="21" />
@@ -73,6 +74,7 @@
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=CrossMatchingFormula, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=HiliteUnselected, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=SafeBets, Mode=TwoWay}" />
+					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=FlashYellow, Mode=TwoWay}" />
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=TimeOffset, Mode=TwoWay}" />
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=LegacyProxyUrl, Mode=TwoWay}" />
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=WebSocketsUrl, Mode=TwoWay}" />

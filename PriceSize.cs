@@ -27,7 +27,6 @@ public sealed class PriceSize : INotifyPropertyChanged
 	}
     public PriceSize(Int32 index) {
         this.Index = index;
-        //CellBackgroundColor = 
 		CellDefaultColor = BackgroundColors[index];
 		IsChecked = true; 
     }
@@ -54,8 +53,6 @@ public sealed class PriceSize : INotifyPropertyChanged
 		_price = newPrice;
 		_size = newSize;
 
-		//Debug.WriteLine($"PS[{Index}] updating: {price}/{size}");
-
 		if (priceChanged) 
 			OnPropertyChanged(nameof(price));
 		if (sizeChanged) 
@@ -67,16 +64,15 @@ public sealed class PriceSize : INotifyPropertyChanged
 			_lastFlashTime = value;
 			OnPropertyChanged(nameof(CellBackgroundColor));
 		} }
-    private const int FLASH_DURATION_MS = 100;
+    private const int FLASH_DURATION_MS = 200;
     public SolidColorBrush CellDefaultColor { get; set; }
 	public SolidColorBrush CellBackgroundColor {
 		get {
 			if (_lastFlashTime.HasValue)
 			{
 				var elapsed = (DateTime.UtcNow - _lastFlashTime.Value).TotalMilliseconds;
-				if (elapsed != 0 && elapsed < 50)
+				if (elapsed != 0 && elapsed < FLASH_DURATION_MS)
 				{
-                    //return CellDefaultColor;
                     return Brushes.Yellow;
 				}
 				else
