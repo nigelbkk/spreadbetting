@@ -265,7 +265,7 @@
   <ItemGroup>
     <Resource Include="Images\bullet_toggle_minus.png" />
     <Resource Include="Images\up_arrow.png" />
-    <Resource Include="uparrow.png" />
+    <Resource Include="Images\uparrow.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\bullet_toggle_plus.png" />

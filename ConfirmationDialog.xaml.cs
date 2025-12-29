@@ -51,7 +51,7 @@ namespace SpreadTrader
             }
             this.MarketId = MarketId;
             InitializeComponent();
-            UpDown._Value = Odds;
+            UpDown._value = Odds;
             FocusManager.SetFocusedElement(DockPanel, Submit_button);
             IInputElement focusedElement = FocusManager.GetFocusedElement(DockPanel);
         }
@@ -60,7 +60,7 @@ namespace SpreadTrader
             BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
             Button b = sender as Button;
             String cs = b.Content as String;
-            Odds = UpDown._Value;
+            Odds = UpDown._value;
             if (cs != null)
             {
                 if (cs == "Close")
@@ -76,7 +76,6 @@ namespace SpreadTrader
                         DateTime LastUpdate = DateTime.UtcNow;
                         PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
                         ControlMessenger.Send("Update P&L");
-                        //runnersControl.MarketNode.TurnaroundTime = (Int32)((DateTime.UtcNow - LastUpdate).TotalMilliseconds);
                     });
                     t.Start();
                 }

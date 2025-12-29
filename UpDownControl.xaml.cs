@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
@@ -10,20 +11,14 @@ namespace SpreadTrader
 {
     public partial class UpDownControl : UserControl, INotifyPropertyChanged
     {
-        private String _stringContent { get; set; }
-        public double _Value { get; set; }
+        public double _value;// { get; set; }
         public String Value
         {
-            get => _stringContent;
-            set
-            {
-				_stringContent = value;
-                OnPropertyChanged(nameof(_stringContent));
-            }
+            get => $"{_value}";
+            set { }
         }
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(String property) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
-
 		public UpDownControl()
         {
             InitializeComponent();
@@ -40,14 +35,15 @@ namespace SpreadTrader
 
             if (Double.TryParse(cs, out d))
             {
-                _Value = d;
+                _value = d;
+                OnPropertyChanged(nameof(Value));
             }
         }
         private BetfairPrices betfairPrices = new BetfairPrices();
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            tb.Text = _Value.ToString();
+            tb.Text = _value.ToString();
             tb.SelectAll();
         }
         private void Up_Click(object sender, RoutedEventArgs e)
@@ -56,14 +52,15 @@ namespace SpreadTrader
             switch (b.Name)
             {
                 case "Up":
-                    _Value = betfairPrices.Next(_Value);
+                    _value = betfairPrices.Next(_value);
+                    OnPropertyChanged(nameof(Value));
                     break;
                 case "Down":
-                    _Value = betfairPrices.Previous(_Value);
+                    _value = betfairPrices.Previous(_value);
+                    OnPropertyChanged(nameof(Value));
                     break;
                 default: return;
             }
-            _stringContent = _Value.ToString();
             e.Handled = true;
         }
         private void tb_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -71,11 +68,10 @@ namespace SpreadTrader
             Int32 caret = tb.CaretIndex;
             switch (e.Key)
             {
-                case Key.Up: _Value = betfairPrices.Next(_Value); break;
-                case Key.Down: _Value = betfairPrices.Previous(_Value); break;
+                case Key.Up: _value = betfairPrices.Next(_value); break;
+                case Key.Down: _value = betfairPrices.Previous(_value); break;
                 default: return;
             }
-			_stringContent = _Value.ToString();
             e.Handled = true;
             tb.CaretIndex = caret;
         }

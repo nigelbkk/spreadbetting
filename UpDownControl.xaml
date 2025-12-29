@@ -18,15 +18,19 @@
 			<ColumnDefinition/>
 		</Grid.ColumnDefinitions>
 		<TextBox Name="tb" Grid.Column="0" Height="28" IsReadOnly="False" Focusable="True" FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" TabIndex="0" 
-				Width="60" Text="{Binding Path=Value}" TextAlignment="Center" VerticalContentAlignment="Center" TextChanged="tb_TextChanged" PreviewKeyDown="tb_PreviewKeyDown"/>
+				Width="60" Text="{Binding Path=Value, Mode=TwoWay}"
+            TextAlignment="Center" VerticalContentAlignment="Center" TextChanged="tb_TextChanged" PreviewKeyDown="tb_PreviewKeyDown"/>
 
 		<StackPanel Grid.Column="1" Height="{Binding ElementName=tb, Path=ActualHeight}"  >
 			<RepeatButton Name ="Up" Width="20" Height="13.5" Delay="750" Interval="60" Click="Up_Click">
-				<Image Height="10" Width="19" Source="uparrow.png"/>
+				<Image Height="10" Width="19" Source="/Images/uparrow.png"/>
 			</RepeatButton>
 			<RepeatButton Name ="Down" Width="20" Height="13.5"  Delay="750" Interval="60" Click="Up_Click">
-				<Image Height="11" Width="19" Source="downarrow.png"/>
+				<Image Height="11" Width="19" Source="/Images/downarrow.png"/>
 			</RepeatButton>
 		</StackPanel>
 	</Grid>
 </UserControl>
+
+<!--Text="{Binding Path=Value, Mode=TwoWay}"--> 
+    

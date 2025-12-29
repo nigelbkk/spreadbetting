@@ -39,7 +39,7 @@ namespace SpreadTrader
             OriginalStake = Stake = (Int32)row.Stake;
             Odds = row.Odds;
 
-            UpDownOdds._Value = Odds;
+            UpDownOdds._value = Odds;
             UpDownStake.Value = (short)Stake;
             FocusManager.SetFocusedElement(Grid, UpDownOdds);
             IInputElement focusedElement = FocusManager.GetFocusedElement(Grid);
@@ -50,7 +50,7 @@ namespace SpreadTrader
         }
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            Odds = UpDownOdds._Value;
+            Odds = UpDownOdds._value;
             Stake = UpDownStake.Value.Value;
 
             BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
@@ -61,31 +61,18 @@ namespace SpreadTrader
                 await Task.Run(() =>
                 {
                     CancelExecutionReport report = betfair.cancelOrder(Row.MarketID, Row.BetID, OriginalStake - Stake);
-                    //if (report != null)
-                    //{
-                    //    result = report.errorCode;
-                    //}
                     result = report.errorCode != null ? report.errorCode : report.status;
                 });
-                //            Extensions.MainWindow.Status = result;
             }
             else if (Stake > OriginalStake)
             {
                 await Task.Run(() =>
                 {
                     CancelExecutionReport report = betfair.cancelOrder(Row.MarketID, Row.BetID, null);
-                    //if (report.errorCode != null)
-                    //{
-                    //    result = report.errorCode;
-                    //}
-                    //else
-                    //{
                     PlaceExecutionReport report2 = betfair.placeOrder(Row.MarketID, Row.SelectionID, Row.Side.ToUpper() == "BACK" ? sideEnum.BACK : sideEnum.LAY, Stake, Odds);
                     ControlMessenger.Send("Update P&L");
                     result = report2.errorCode != null ? report2.errorCode : report2.status;
-                    //}
                 });
-                //              Extensions.MainWindow.Status = result;
             }
             else
             {
@@ -95,7 +82,6 @@ namespace SpreadTrader
                     ControlMessenger.Send("Update P&L");
                     result = report.status != ExecutionReportStatusEnum.SUCCESS ? report.instructionReports[0].errorCode.ToString() : report.status.ToString();
                 });
-                //                Extensions.MainWindow.Status = result;
             }
             ControlMessenger.Send("Update P&L");
             Extensions.MainWindow.Status = result;
@@ -144,7 +130,7 @@ namespace SpreadTrader
                 case Key.Return: Button_Click_1(Update, null); break;
                 case Key.Escape: Close(); break;
             }
-            UpDownOdds._Value = Odds;
+            UpDownOdds._value = Odds;
             UpDownStake.Value = Stake;
             NotifyPropertyChanged("");
         }
