@@ -115,18 +115,31 @@ namespace SpreadTrader
         }
         async Task RunLoop()
         {
-            while (props.FlashYellow)
+            while (true)
             {
-                await Task.Delay(2000);
-                if (LiveRunners != null)
+                await Task.Delay(50);
+                if (props.FlashYellow && LiveRunners != null)
                 {
                     foreach (LiveRunner lr in LiveRunners)
                     {
                         foreach (PriceSize ps in lr.BackValues)
                         {
-                            if (ps.lastFlashTime.HasValue) {
+                            if (ps.lastFlashTime.HasValue)
+                            {
                                 var elapsed = (DateTime.UtcNow - ps.lastFlashTime.Value).TotalMilliseconds;
-                                
+
+                                if (elapsed >= 200)
+                                {
+                                    ps.lastFlashTime = null;
+                                }
+                            }
+                        }
+                        foreach (PriceSize ps in lr.LayValues)
+                        {
+                            if (ps.lastFlashTime.HasValue)
+                            {
+                                var elapsed = (DateTime.UtcNow - ps.lastFlashTime.Value).TotalMilliseconds;
+
                                 if (elapsed >= 200)
                                 {
                                     ps.lastFlashTime = null;
