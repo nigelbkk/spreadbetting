@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -26,7 +27,8 @@ public sealed class PriceSize : INotifyPropertyChanged
 	}
     public PriceSize(Int32 index) {
         this.Index = index;
-        CellBackgroundColor = CellDefaultColor = BackgroundColors[index];
+        //CellBackgroundColor = 
+		CellDefaultColor = BackgroundColors[index];
 		IsChecked = true; 
     }
     private Int32 Index { get; set; }
@@ -59,10 +61,35 @@ public sealed class PriceSize : INotifyPropertyChanged
 		if (sizeChanged) 
 			OnPropertyChanged(nameof(size));
 	}
+    private DateTime? _lastFlashTime;
+    public DateTime? lastFlashTime {get { return _lastFlashTime; } 
+		set{ 
+			_lastFlashTime = value;
+			OnPropertyChanged(nameof(CellBackgroundColor));
+		} }
+    private const int FLASH_DURATION_MS = 100;
     public SolidColorBrush CellDefaultColor { get; set; }
-	public SolidColorBrush CellBackgroundColor { get; set; }
+	public SolidColorBrush CellBackgroundColor {
+		get {
+			if (_lastFlashTime.HasValue)
+			{
+				var elapsed = (DateTime.UtcNow - _lastFlashTime.Value).TotalMilliseconds;
+				if (elapsed != 0 && elapsed < 50)
+				{
+                    //return CellDefaultColor;
+                    return Brushes.Yellow;
+				}
+				else
+				{
+					_lastFlashTime = null; // Expired
+					return CellDefaultColor;
+				}
+			}
+			return CellDefaultColor;
+		}
+	}
 
-	public override string ToString()
+public override string ToString()
     {
         return String.Format("{0:0.00}:{1:0.00}", price, size);
     }

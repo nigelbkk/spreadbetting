@@ -101,6 +101,7 @@ namespace SpreadTrader
 			customHeader.OnSelected(d2);
 			BetsManager.OnSelected(d2, RunnersControl);
 			RunnersControl.PopulateNewMarket(d2);
+            OverlayVisibility = Visibility.Hidden;
             OnPropertyChanged(nameof(OverlayVisibility));
             OnPropertyChanged(nameof(MarketStatus));
         }

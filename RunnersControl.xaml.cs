@@ -8,9 +8,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using System.Windows;
 using System.Windows.Controls;
-//using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -118,6 +118,31 @@ namespace SpreadTrader
             return 0;
         }
 
+        async Task RunLoop()
+        {
+            while (true)
+            {
+                await Task.Delay(2000);
+                if (LiveRunners != null)
+                {
+                    foreach (LiveRunner lr in LiveRunners)
+                    {
+                        foreach (PriceSize ps in lr.BackValues)
+                        {
+                            if (ps.lastFlashTime.HasValue) {
+                                var elapsed = (DateTime.UtcNow - ps.lastFlashTime.Value).TotalMilliseconds;
+                                
+                                if (elapsed >= 200)
+                                {
+                                    ps.lastFlashTime = null;
+                                    //ps.CellBackgroundColor = ps.CellDefaultColor;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         public void OnMarketChanged(MarketChangeDto change)
         {
             var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -147,15 +172,14 @@ namespace SpreadTrader
                                 PriceSize ps = lr.BackValues[i];
                                 if (ps.price == ti[0].Value)
                                 {
-                                    Debug.WriteLine($"{runner_name} match cell {i}");
+                                    lr.BackValues[i].lastFlashTime = DateTime.UtcNow;
                                 }
                                 ps = lr.LayValues[i];
                                 if (ps.price == ti[0].Value)
                                 {
-                                    Debug.WriteLine($"{runner_name} match cell {i+3}");
+                                    lr.LayValues[i].lastFlashTime = DateTime.UtcNow;
                                 }
                             }
-                            //ProcessTradedData(runner, lr);
                         }
                     }
 
@@ -188,9 +212,14 @@ namespace SpreadTrader
                 _ = UpdateRunnerPnLAsync();
             }
         }
+        private async void StartRunLoop()
+        {
+            _ = RunLoop();
+        }
         public RunnersControl()
         {
             InitializeComponent();
+            StartRunLoop();
             ControlMessenger.MessageSent += OnMessageReceived;
         }
 		private void Button_Click(object sender, RoutedEventArgs e)
