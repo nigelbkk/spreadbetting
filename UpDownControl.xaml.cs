@@ -102,7 +102,8 @@ namespace SpreadTrader
                 case Key.Down: _value = betfairPrices.Previous(_value); break;
                 default: return;
             }
-            e.Handled = true;
+			OnPropertyChanged(nameof(Value));
+			e.Handled = true;
             tb.CaretIndex = caret;
         }
     }
