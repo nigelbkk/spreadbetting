@@ -39,7 +39,7 @@ namespace SpreadTrader
             OriginalStake = Stake = (Int32)row.Stake;
             Odds = row.Odds;
 
-            UpDownOdds._value = Odds;
+            UpDownOdds.NumericValue = Odds;
             UpDownStake.Value = (short)Stake;
             FocusManager.SetFocusedElement(Grid, UpDownOdds);
             IInputElement focusedElement = FocusManager.GetFocusedElement(Grid);
@@ -50,7 +50,7 @@ namespace SpreadTrader
         }
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            Odds = UpDownOdds._value;
+            Odds = UpDownOdds.NumericValue;
             Stake = UpDownStake.Value.Value;
 
             BetfairAPI.BetfairAPI betfair = MainWindow.Betfair;
@@ -130,7 +130,7 @@ namespace SpreadTrader
                 case Key.Return: Button_Click_1(Update, null); break;
                 case Key.Escape: Close(); break;
             }
-            UpDownOdds._value = Odds;
+            UpDownOdds.NumericValue = Odds;
             UpDownStake.Value = Stake;
             NotifyPropertyChanged("");
         }

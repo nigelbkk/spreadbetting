@@ -79,7 +79,7 @@
 						<ColumnDefinition Width="8*"/>
 					</Grid.ColumnDefinitions>
 					<TextBlock Grid.Column="0">Stake</TextBlock>
-					<TextBox Grid.Column="1" Name="StakeTextBox" Text="{Binding Path=Stake, Mode=OneWay}" PreviewTextInput="TextBox_PreviewTextInput" TextChanged="StakeTextBox_TextChanged" HorizontalAlignment="Right" Width="80" IsEnabled="True" />
+					<TextBox Grid.Column="1" Name="StakeTextBox" Text="{Binding Path=Stake, Mode=OneWay}" TextChanged="StakeTextBox_TextChanged" HorizontalAlignment="Right" Width="80" IsEnabled="True" />
 				</Grid>
 			</Border>
 			<Button IsDefault="False" Focusable="False" IsEnabled="True" Name="Submit_button" >Submit</Button>
@@ -87,6 +87,7 @@
 	</DockPanel>
 </Window>
 
+<!--PreviewTextInput="TextBox_PreviewTextInput"-->
 <!--Converter={StaticResource sconverter},--> 
 <!--TextChanged="StakeTextBox_TextChanged"-->
 <!--Text="{Binding Path=Stake, Mode=TwoWay, UpdateSourceTrigger=LostFocus }"-->
