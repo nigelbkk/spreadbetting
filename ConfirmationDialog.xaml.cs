@@ -1,4 +1,5 @@
 ﻿using BetfairAPI;
+using Newtonsoft.Json.Linq;
 using System;
 using System.ComponentModel;
 using System.Windows;
@@ -10,20 +11,35 @@ namespace SpreadTrader
     public partial class ConfirmationDialog : Window, INotifyPropertyChanged
     {
         private RunnersControl runnersControl = null;
-        public DependencyObject ParentObject { get; set; }
-        public String Side { get; set; }
-        public String MarketId { get; set; }
-        public String MarketName { get; set; }
+        //public DependencyObject ParentObject { get; set; }
+        public String Side;// { get; set; }
+        public String MarketId;// { get; set; }
+        public String MarketName;// { get; set; }
         public String Runner { get; set; }
-        public Int64 SelectionId { get; set; }
-        public double Stake { get; set; }
+        public Int64 SelectionId;// { get; set; }
+		private double _Stake;
+		public String Stake { get => $"{_Stake}";
+            set 
+            {
+				double d = 0;
+
+				if (Double.TryParse(value, out d))
+				{
+					if (_Stake != d)
+                    {
+                        _Stake = d;
+                        OnPropertyChanged(nameof(Stake));
+                    }
+                }
+            } 
+        }
         public double Odds { get; set; }
-        public double Liability { get; set; }
-        public double Payout { get; set; }
+        //public double Liability { get; set; }
+        //public double Payout { get; set; }
         public String Header { get { return String.Format("{0} {1} for {2}", Side, Runner, Odds); } }
         private Properties.Settings props = Properties.Settings.Default;
         public event PropertyChangedEventHandler PropertyChanged;
-        public void NotifyPropertyChanged(String info)
+        public void OnPropertyChanged(String info)
         {
             if (PropertyChanged != null)
             {
@@ -42,10 +58,10 @@ namespace SpreadTrader
             SelectionId = runner.SelectionId;
             Side = side;
             Odds = odds;
-            Stake = props.DefaultStake;
+            _Stake = props.DefaultStake;
             if (props.SafeBets)
             {
-                Stake = 2.00;
+                _Stake = 2.00;
                 Odds = 1.01;
                 Side = "Lay";
             }
@@ -68,21 +84,21 @@ namespace SpreadTrader
                     Close();
                     return;
                 }
-                Int32 stake = (int)Stake;
+                Int32 stake = Math.Max(2, (int)_Stake);
                 if (cs == "Submit")
                 {
-                    System.Threading.Thread t = new System.Threading.Thread(() =>
-                    {
-                        DateTime LastUpdate = DateTime.UtcNow;
-                        PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
-                        ControlMessenger.Send("Update P&L");
-                    });
-                    t.Start();
+                    //System.Threading.Thread t = new System.Threading.Thread(() =>
+                    //{
+                    //    DateTime LastUpdate = DateTime.UtcNow;
+                    //    PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
+                    //    ControlMessenger.Send("Update P&L");
+                    //});
+                    //t.Start();
                 }
                 else
                 {
-                    Stake = Convert.ToInt32(b.Content);
-                    NotifyPropertyChanged("");
+                    //Stake = Convert.ToInt32(b.Content);
+                    //NotifyPropertyChanged("");
                 }
             }
         }
@@ -99,13 +115,39 @@ namespace SpreadTrader
                 case Key.Escape: Close(); break;
                 case Key.Return: Submit(Submit_button, null); break;
             }
-            NotifyPropertyChanged("");
+            //NotifyPropertyChanged("");
         }
-        private void StakeTextBox_TextChanged(object sender, TextChangedEventArgs e)
+		private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+		{
+			// Allow only digits and one decimal point
+			TextBox textBox = sender as TextBox;
+
+			// Check if input is a digit
+			if (!char.IsDigit(e.Text, 0))
+			{
+				// Allow decimal point only if there isn't one already
+				if (e.Text == "." && !textBox.Text.Contains("."))
+				{
+					e.Handled = false; // Allow
+				}
+				else
+				{
+					e.Handled = true; // Block
+				}
+			}
+		}
+		private void StakeTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox tb = sender as TextBox;
-            if (!String.IsNullOrEmpty(tb.Text))
-                Stake = Convert.ToDouble(tb.Text);
-        }
+			double d = 0;
+
+			if (Double.TryParse(tb.Text, out d))
+			{
+				if (_Stake != d)
+				{
+					_Stake = d;
+				}
+			}
+		}
     }
 }

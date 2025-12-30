@@ -5,7 +5,7 @@
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:p="clr-namespace:SpreadTrader.Properties"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="374" Width="369.332" Topmost="True">
+        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="387" Width="369.332" Topmost="True">
 	<Window.Resources>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">

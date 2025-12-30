@@ -17,7 +17,7 @@
 			<ColumnDefinition Width="60"/>
 			<ColumnDefinition/>
 		</Grid.ColumnDefinitions>
-		<TextBox Name="tb" Grid.Column="0" Height="28" IsReadOnly="False" Focusable="True" FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" TabIndex="0" 
+		<TextBox Name="tb" Grid.Column="0" Height="28" PreviewTextInput="TextBox_PreviewTextInput" IsReadOnly="False" Focusable="True" FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" TabIndex="0" 
 				Width="60" Text="{Binding Path=Value, Mode=TwoWay}"
             TextAlignment="Center" VerticalContentAlignment="Center" TextChanged="tb_TextChanged" PreviewKeyDown="tb_PreviewKeyDown"/>
 

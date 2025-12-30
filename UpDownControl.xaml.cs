@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using static System.Windows.Forms.AxHost;
 
 namespace SpreadTrader
 {
@@ -15,8 +16,18 @@ namespace SpreadTrader
         public String Value
         {
             get => $"{_value}";
-            set { }
-        }
+            set {
+				double d = 0;
+				if (Double.TryParse(value, out d))
+				{
+					if (_value != d)
+					{
+						_value = d;
+						OnPropertyChanged(nameof(Value));
+					}
+				}
+			}
+		}
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(String property) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
 		public UpDownControl()
@@ -46,7 +57,26 @@ namespace SpreadTrader
             tb.Text = _value.ToString();
             tb.SelectAll();
         }
-        private void Up_Click(object sender, RoutedEventArgs e)
+		private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+		{
+			// Allow only digits and one decimal point
+			TextBox textBox = sender as TextBox;
+
+			// Check if input is a digit
+			if (!char.IsDigit(e.Text, 0))
+			{
+				// Allow decimal point only if there isn't one already
+				if (e.Text == "." && !textBox.Text.Contains("."))
+				{
+					e.Handled = false; // Allow
+				}
+				else
+				{
+					e.Handled = true; // Block
+				}
+			}
+		}
+		private void Up_Click(object sender, RoutedEventArgs e)
         {
             RepeatButton b = sender as RepeatButton;
             switch (b.Name)

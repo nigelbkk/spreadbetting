@@ -58,18 +58,19 @@
 			<Button>10</Button>
 			<Button>5</Button>
 			<Button Background="LightCyan">Close</Button>
-			<!--<Border Name="OddsBorder" BorderThickness="0.5" BorderBrush="DarkGray">-->
+
+			<Border BorderThickness="0.5" BorderBrush="DarkGray">
 				<Grid Margin="3" Background="AliceBlue">
 					<Grid>
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="50"/>
 							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
-						<TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="10,0,0,0">Odds</TextBlock>
+					<TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="10,0,0,0">Odds</TextBlock>
 						<local:UpDownControl  x:Name="UpDown" Grid.Column="1" Margin="0,3" HorizontalAlignment="Right" Focusable="True"/>
 					</Grid>
 				</Grid>
-			<!--</Border>-->
+			</Border>
 
 			<Border BorderThickness="0.5" BorderBrush="DarkGray">
 				<Grid Margin="3"  Background="AliceBlue">
@@ -78,10 +79,14 @@
 						<ColumnDefinition Width="8*"/>
 					</Grid.ColumnDefinitions>
 					<TextBlock Grid.Column="0">Stake</TextBlock>
-					<TextBox Grid.Column="1" Name="StakeTextBox" Text="{Binding Path=Stake, Converter={StaticResource sconverter}, Mode=TwoWay}" HorizontalAlignment="Right" Width="80" IsEnabled="True" TextChanged="StakeTextBox_TextChanged"/>
+					<TextBox Grid.Column="1" Name="StakeTextBox" Text="{Binding Path=Stake, Mode=OneWay}" PreviewTextInput="TextBox_PreviewTextInput" TextChanged="StakeTextBox_TextChanged" HorizontalAlignment="Right" Width="80" IsEnabled="True" />
 				</Grid>
 			</Border>
 			<Button IsDefault="False" Focusable="False" IsEnabled="True" Name="Submit_button" >Submit</Button>
 		</UniformGrid>
 	</DockPanel>
 </Window>
+
+<!--Converter={StaticResource sconverter},--> 
+<!--TextChanged="StakeTextBox_TextChanged"-->
+<!--Text="{Binding Path=Stake, Mode=TwoWay, UpdateSourceTrigger=LostFocus }"-->

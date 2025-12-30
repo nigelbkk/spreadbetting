@@ -11,7 +11,7 @@
 	<UserControl.Resources>
 		<!--<local:TimeConverter x:Key="converter" />
 		<local:OddsConverter x:Key="oconverter" />
-		<local:CurrencyConverter x:Key="cconverter" />
+		<local:CurrencyConverter x:Key="cconverter" />-->
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
             TargetType="{x:Type Button}">
 			<Setter Property="FontSize" Value="12"/>
@@ -22,7 +22,7 @@
 			<Setter Property="Width" Value="auto"/>
 			<Setter Property="BorderThickness" Value="0"/>
 			<Setter Property="HorizontalAlignment" Value="Left"/>
-		</Style>-->	
+		</Style>	
 	</UserControl.Resources>
 	<Grid  Background="Ivory">
 		<Grid Grid.Row="1" Name="RightGridBody">

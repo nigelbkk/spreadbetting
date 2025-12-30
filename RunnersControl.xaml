@@ -16,7 +16,7 @@
 			<local:OddsConverterBlank x:Key="obconverter" />
 			<local:StakeConverter x:Key="sconverter" />
 			<local:PercentConverter x:Key="pconverter" />
-			<local:CurrencyConverter x:Key="cconverter" />
+			<!--<local:CurrencyConverter x:Key="cconverter" />-->
 			<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}" >
 				<!--<Setter Property="Width" Value="240"/>-->
 				<Setter Property="HorizontalContentAlignment" Value="Left"/>
