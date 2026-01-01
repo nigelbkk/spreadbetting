@@ -193,6 +193,11 @@ namespace SpreadTrader
                         }
                     }
 
+                    if (runner.Ltp != null)
+                    {
+                        lr.LastPriceTraded = runner.Ltp.Value;
+                    }
+                    
                     if (runner.Bdatb != null)
                     {
                         foreach (PriceLevelDto lv in runner.Bdatb)

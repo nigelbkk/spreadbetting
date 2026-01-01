@@ -12,11 +12,11 @@ namespace SpreadTrader
     {
         public Runner ngrunner { get; set; }
         private BitmapImage _colors = null;
-        public BitmapImage Colors { get { return _colors; } set { _colors = value; NotifyPropertyChanged("Colors"); } }
+        public BitmapImage Colors { get { return _colors; } set { _colors = value; OnPropertyChanged("Colors"); } }
 		public String Name { get; set; }
 		public Int32 Index { get; set; }
         private double _Width { get; set; }
-        public double Width { get { return _Width; } set { _Width = value; NotifyPropertyChanged("Width"); } }
+        public double Width { get { return _Width; } set { _Width = value; OnPropertyChanged("Width"); } }
         public Int64 SelectionId { get; set; }
         public Brush OutComeColor
         {
@@ -31,7 +31,7 @@ namespace SpreadTrader
             }
         }
         private bool _IsFavorite { get; set; }
-        public bool IsFavorite { get { return _IsFavorite; } set { _IsFavorite = value; NotifyPropertyChanged(""); } }
+        public bool IsFavorite { get { return _IsFavorite; } set { _IsFavorite = value; OnPropertyChanged(""); } }
         public static LiveRunner Favorite { get; set; }
         public Brush FavoritesColor
         {
@@ -66,10 +66,11 @@ namespace SpreadTrader
         public double BackStake { get; set; }
         public double LayStake { get; set; }
         private double _ifWin { get; set; }
-        public double ifWin { get { return _ifWin; } set { _ifWin = value; NotifyPropertyChanged(""); } }
+        public double ifWin { get { return _ifWin; } set { _ifWin = value; OnPropertyChanged("ifWin"); } }
         private Double _LevelStake = 0;
-        public Double LevelStake { get { return _LevelStake; } set { _LevelStake = value; NotifyPropertyChanged(""); } }
+        public Double LevelStake { get { return _LevelStake; } set { _LevelStake = value; OnPropertyChanged("LevelStake"); } }
         public sideEnum LevelSide { get; set; }
+        
         private double _LevelProfit = 0;
         public double LevelProfit
         {
@@ -77,15 +78,27 @@ namespace SpreadTrader
             set
             {
                 _LevelProfit = value;
-                NotifyPropertyChanged("");
+				OnPropertyChanged("LevelProfit");
             }
         }
-        public double LastPriceTraded { get; set; }
+        private double _LastPriceTraded;
+		public double LastPriceTraded
+        {
+            get => _LastPriceTraded;
+            set
+            {
+                if (_LastPriceTraded != value)
+                {
+                    _LastPriceTraded = value;
+                    OnPropertyChanged(nameof(LastPriceTraded));
+                }
+            }
+        }
         public ObservableCollection<PriceSize> BackValues { get; set; }
         public ObservableCollection<PriceSize> LayValues { get; set; }
         public double BackLayRatio { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
-        public void NotifyPropertyChanged(string propName)
+        public void OnPropertyChanged(string propName)
         {
             if (this.PropertyChanged != null)
             {
@@ -112,6 +125,7 @@ namespace SpreadTrader
 			ngrunner = r;
 			SelectionId = r.selectionId;
 			SetPrices(r);
+			OnPropertyChanged("");
 		}
 		public void SetPrices(Runner r)
 		{
@@ -138,7 +152,6 @@ namespace SpreadTrader
 			ifWin = r.ifWin;        ///NH
 			LastPriceTraded = r.lastPriceTraded;
 			BackLayRatio = r.BackLayRatio;
-			NotifyPropertyChanged("");
 		}
 		public override string ToString()
         {
