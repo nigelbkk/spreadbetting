@@ -57,16 +57,21 @@ namespace SpreadTrader
         {
             get
             {
-                if (LevelProfit >= 0)
-                    return Brushes.Black;
+				if (LevelProfit >= 0)
+					return Brushes.Green;
 
-                return Brushes.Red;
+				return Brushes.Red;
             }
         }
         public double BackStake { get; set; }
         public double LayStake { get; set; }
         private double _ifWin { get; set; }
-        public double ifWin { get { return _ifWin; } set { _ifWin = value; OnPropertyChanged("ifWin"); } }
+        public double ifWin { get { return _ifWin; } set { _ifWin = value;
+				OnPropertyChanged("ifWin");
+                OnPropertyChanged("LevelProfitColor");
+				OnPropertyChanged("ProfitColor"); 
+            } 
+        }
         private Double _LevelStake = 0;
         public Double LevelStake { get { return _LevelStake; } set { _LevelStake = value; OnPropertyChanged("LevelStake"); } }
         public sideEnum LevelSide { get; set; }
