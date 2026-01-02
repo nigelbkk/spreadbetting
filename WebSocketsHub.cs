@@ -117,6 +117,24 @@ namespace SpreadTrader
 				Connect();
 				RequestMarketSelectedAsync(marketId);
 			}
+			if (messageName == "Unsubscribe")
+			{
+				dynamic d = data;
+				String marketId = d.MarketId;
+				UnsubscribeAsync(marketId);
+			}
+		}
+		private async void UnsubscribeAsync(String marketId)
+		{
+			var http = new HttpClient();
+			var url = $"http://{props.WebSocketsUrl}/api/market/unsubscribe";
+			var payload = new { MarketId = marketId, };
+			string json = JsonConvert.SerializeObject(payload);
+			var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+			HttpResponseMessage response = await http.PostAsync(url, content);
+			string responseString = await response.Content.ReadAsStringAsync();
+			Console.WriteLine(responseString);
 		}
 		private async void RequestMarketSelectedAsync(String marketid)
 		{

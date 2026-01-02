@@ -304,10 +304,10 @@ namespace BetfairAPI
 
             return RPCRequest<List<CountryCodeResult>>("listCountries", p) as List<CountryCodeResult>;
         }
-        public static async Task<marketStatusEnum> GetMarketStatusAsync(String marketId)
-        {
-            return marketStatusEnum.INACTIVE;
-        }
+        //public static async Task<marketStatusEnum> GetMarketStatusAsync(String marketId)
+        //{
+        //    return marketStatusEnum.INACTIVE;
+        //}
         public MarketBook GetMarketBook(Market m)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();

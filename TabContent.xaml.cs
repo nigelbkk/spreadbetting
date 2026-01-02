@@ -54,29 +54,39 @@ namespace SpreadTrader
             timer.Elapsed += (o, e) =>
             {
                 OnPropertyChanged(nameof(MarketStatus));
+
+                if (_MarketStatus == "Closed")
+                {
+                    UnsubscribeAsync(MarketNode.MarketID);
+                }
             };
             timer.Interval = 1000;
             timer.Enabled = true;
             timer.Start();
         }
-        private async Task<MarketDefinition.StatusEnum> GetMarketStatus(string marketId)
-        {
-            // Use Betfair's listMarketBook API
-            var status = await BetfairAPI.BetfairAPI.GetMarketStatusAsync(marketId);
-            return (MarketDefinition.StatusEnum)status;
-        }
-        private async void CheckMarketStatus()
-        {
-            var status = await GetMarketStatus(MarketNode.MarketID);
+        private async void UnsubscribeAsync(String marketId)
+		{
+			ControlMessenger.Send("Unsubscribe", new { MarketId = marketId });
 
-            if (status == MarketDefinition.StatusEnum.Closed)
-            {
-                MarketStatus = status.ToString();
-                OverlayVisibility = Visibility.Visible;
-                ControlMessenger.Send("Update P&L");
-            }
-        }
-        private void OnMessageReceived(string messageName, object data)
+		}
+		//private async Task<MarketDefinition.StatusEnum> GetMarketStatus(string marketId)
+		//{
+		//    // Use Betfair's listMarketBook API
+		//    var status = await BetfairAPI.BetfairAPI.GetMarketStatusAsync(marketId);
+		//    return (MarketDefinition.StatusEnum)status;
+		//}
+		//private async void CheckMarketStatus()
+		//{
+		//    var status = await GetMarketStatus(MarketNode.MarketID);
+
+		//    if (status == MarketDefinition.StatusEnum.Closed)
+		//    {
+		//        MarketStatus = status.ToString();
+		//        OverlayVisibility = Visibility.Visible;
+		//        ControlMessenger.Send("Update P&L");
+		//    }
+		//}
+		private void OnMessageReceived(string messageName, object data)
 		{
 			if (messageName == "Market Changed")
 			{
