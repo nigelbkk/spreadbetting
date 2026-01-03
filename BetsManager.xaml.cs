@@ -524,18 +524,23 @@ namespace SpreadTrader
                                     else
                                     {
                                         Notification = $"Cancelling {cancel_instructions.Count} bets";
-                                        CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-
-                                        if (cancel_report?.status != "SUCCESS")
-                                        {
-                                            Status = cancel_report?.errorCode;
-                                        }
-                                        else
-                                        {
-                                            Status = cancel_report.status;
-                                        }
+                                        CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+										
+                                        foreach (Tuple<UInt64, String> _report in report.statuses)
+										{
+											Debug.WriteLine(_report.Item1, _report.Item2);
+										}
+									
+                                        //if (cancel_report?.status != "SUCCESS")
+          //                              {
+          //                                  Status = cancel_report?.errorCode;
+          //                              }
+          //                              else
+          //                              {
+          //                                  Status = cancel_report.status;
+          //                              }
                                     }
-                                    //Status = "Cancellation Task completed";
+                                    Status = "Cancellation Task completed";
                                 });
                             }
                             catch (Exception xxe)
@@ -570,12 +575,17 @@ namespace SpreadTrader
                                 }
                                 else
                                 {
-                                    CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+									Notification = $"Cancelling {cancel_instructions.Count} bets";
+									CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
 
-                                    if (cancel_report.status != "SUCCESS")
-                                    {
-                                        Status = cancel_report.status;
-                                    }
+									foreach (Tuple<UInt64, String> _report in report.statuses)
+									{
+										Debug.WriteLine(_report.Item1, _report.Item2);
+									}
+									//if (cancel_report.status != "SUCCESS")
+         //                           {
+         //                               Status = cancel_report.status;
+         //                           }
                                 }
                             });
                         }

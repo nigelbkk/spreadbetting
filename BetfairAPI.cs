@@ -416,14 +416,30 @@ namespace BetfairAPI
             p["instructions"] = instructions;
             return RPCRequest<PlaceExecutionReport>("placeOrders", p) as PlaceExecutionReport;
         }
-        public CancelExecutionReport cancelOrders(String marketId, List<CancelInstruction> instructions)
-        {
-            Dictionary<String, Object> p = new Dictionary<string, object>();
-            p["marketId"] = marketId;
-            p["instructions"] = instructions;
-            return RPCRequest<CancelExecutionReport>("cancelOrders", p) as CancelExecutionReport;
-        }
-        public ReplaceExecutionReport replaceOrders(String marketId, List<ReplaceInstruction> instructions)
+		public CancelExecutionReport cancelOrders(String marketId, List<CancelInstruction> instructions)
+		{
+			CancelExecutionReport new_report = new CancelExecutionReport();
+			new_report.statuses = new List<Tuple<ulong, string>>();
+			foreach (CancelInstruction ci in instructions)
+			{
+				Dictionary<String, Object> p = new Dictionary<string, object>();
+				p["marketId"] = marketId;
+				List<CancelInstruction> new_list = new List<CancelInstruction>();
+				new_list.Add(ci); p["instructions"] = new_list;
+				CancelExecutionReport report = RPCRequest<CancelExecutionReport>("cancelOrders", p) as CancelExecutionReport;
+				new_report.statuses.Add(new Tuple<ulong, string>(ci.betId, report.status));
+			}
+			return new_report;
+		}
+
+		//public CancelExecutionReport cancelOrders(String marketId, List<CancelInstruction> instructions)
+		//{
+		//    Dictionary<String, Object> p = new Dictionary<string, object>();
+		//    p["marketId"] = marketId;
+		//    p["instructions"] = instructions;
+		//    return RPCRequest<CancelExecutionReport>("cancelOrders", p) as CancelExecutionReport;
+		//}
+		public ReplaceExecutionReport replaceOrders(String marketId, List<ReplaceInstruction> instructions)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
             p["marketId"] = marketId;
