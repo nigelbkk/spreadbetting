@@ -286,7 +286,10 @@ namespace SpreadTrader
 		}
 		public void PopulateEventTypes()
 		{
-			EventTypes = Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList();
+			//EventTypes = Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList();
+
+			EventTypes = (Betfair.GetEventTypes() ?? Enumerable.Empty<EventTypeResult>()).OrderBy(o => o.eventType.name).ToList();
+
 			if (EventTypes != null)
 			{
 				foreach (EventTypeResult ev in EventTypes)
@@ -303,7 +306,8 @@ namespace SpreadTrader
 		}
 		public void PopulateEvents()
 		{
-			List<Event> events = Betfair.GetEvents(ID, Tag as String).OrderBy(o => o.details.name).ToList();
+//			List<Event> events = Betfair.GetEvents(ID, Tag as String).OrderBy(o => o.details.name).ToList();
+			List<Event> events = (Betfair.GetEvents(ID, Tag as String) ?? Enumerable.Empty<Event>()).OrderBy(o => o.details.name).ToList();
 			foreach (Event ev in events)
 			{
 				NodeViewModel nvm = new NodeViewModel(ev.details.name) { ID = ev.details.id, Tag = this.ID.ToString() };
@@ -313,7 +317,8 @@ namespace SpreadTrader
 		}
 		public void PopulateEventsForCompetition()
 		{
-			List<Event> events = Betfair.GetEventsForCompetition(ID).OrderBy(o => o.details.name).ToList();
+			List<Event> events = (Betfair.GetEventsForCompetition(ID) ?? Enumerable.Empty<Event>()).OrderBy(o => o.details.name).ToList();
+//			List<Event> events = Betfair.GetEventsForCompetition(ID).OrderBy(o => o.details.name).ToList();
 			foreach (Event ev in events)
 			{
 				NodeViewModel nvm = new NodeViewModel(ev.details.name) { ID = ev.details.id };
@@ -323,7 +328,9 @@ namespace SpreadTrader
 		}
 		public void PopulateCompetitionsOrCountries()
 		{
-			List<CompetitionResult> competitions = Betfair.GetCompetitions(ID).OrderBy(o => o.competition.name).ToList();
+			List<CompetitionResult> competitions = (Betfair.GetCompetitions(ID) ?? Enumerable.Empty<CompetitionResult>()) .OrderBy(o => o.competition.name) .ToList();
+
+//			List<CompetitionResult> competitions = Betfair.GetCompetitions(ID).OrderBy(o => o.competition.name).ToList();
 			if (competitions.Count > 0)
 			{
 				foreach (CompetitionResult cr in competitions)
@@ -335,16 +342,20 @@ namespace SpreadTrader
 				return;
 			}
 			List<CountryCodeResult> countries = Betfair.GetCountries(ID);
-			foreach (CountryCodeResult cr in countries)
+			if (countries != null)
 			{
-				NodeViewModel nvm = new NodeViewModel(cr.countryCode) { ID = ID, Tag = cr.countryCode };
-				nvm.Populate = nvm.PopulateVenues;
-				Add(nvm);
+				foreach (CountryCodeResult cr in countries)
+				{
+					NodeViewModel nvm = new NodeViewModel(cr.countryCode) { ID = ID, Tag = cr.countryCode };
+					nvm.Populate = nvm.PopulateVenues;
+					Add(nvm);
+				}
 			}
 		}
 		public void PopulateVenues()
 		{
-			List<VenueResult> venues = Betfair.GetVenues(ID, Tag as String).OrderBy(o => o.venue).ToList();
+			List<VenueResult> venues = (Betfair.GetVenues(ID, Tag as String) ?? Enumerable.Empty<VenueResult>()).OrderBy(o => o.venue).ToList();
+//			List<VenueResult> venues = Betfair.GetVenues(ID, Tag as String).OrderBy(o => o.venue).ToList();
 			foreach (VenueResult v in venues)
 			{
 				NodeViewModel nvm = new NodeViewModel(v.venue) { ID = this.ID, Tag = v.venue };
@@ -355,7 +366,8 @@ namespace SpreadTrader
 		public void PopulateMarkets()
 		{
 			Int32 event_type = Convert.ToInt32(Tag);
-			List<Market> markets = Betfair.GetMarkets(event_type, ID).OrderBy(o => o.marketStartTime).ToList();
+			List<Market> markets = (Betfair.GetMarkets(event_type, ID) ?? Enumerable.Empty<Market>()).OrderBy(o => o.marketStartTime).ToList();
+//			List<Market> markets = Betfair.GetMarkets(event_type, ID).OrderBy(o => o.marketStartTime).ToList();
 			foreach (Market m in markets)
 			{
 				NodeViewModel nvm = new NodeViewModel(String.Format("{0:HH:mm} {1}", m.description.marketTime.AddHours(props.TimeOffset), m.marketName)) { Market = m };

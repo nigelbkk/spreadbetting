@@ -425,6 +425,7 @@ namespace SpreadTrader
                                     CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
                                     if (report != null && report.errorCode != null)
                                     {
+                                        Debug.WriteLine(report.errorCode);
                                         //throw new Exception(ErrorCodes.FaultCode(report.errorCode));
                                     }
                                     Status = report.errorCode != null ? report.errorCode : report.status;
