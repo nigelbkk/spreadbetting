@@ -55,7 +55,7 @@ namespace SpreadTrader
             {
                 OnPropertyChanged(nameof(MarketStatus));
 
-                if (_MarketStatus == "Closed")
+                if (_MarketStatus == "Closed" && MarketNode != null)
                 {
                     UnsubscribeAsync(MarketNode.MarketID);
                 }
