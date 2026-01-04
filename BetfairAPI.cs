@@ -304,10 +304,19 @@ namespace BetfairAPI
 
             return RPCRequest<List<CountryCodeResult>>("listCountries", p) as List<CountryCodeResult>;
         }
-        //public static async Task<marketStatusEnum> GetMarketStatusAsync(String marketId)
-        //{
-        //    return marketStatusEnum.INACTIVE;
-        //}
+        public async Task<marketStatusEnum> GetMarketStatusAsync(String marketId)
+        {
+			Dictionary<String, Object> p = new Dictionary<string, object>();
+			p["marketIds"] = new String[] { marketId };
+			List<MarketBook> books = RPCRequest<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
+
+            if (books.Count > 0)
+            {
+                MarketBook book = books.First();
+                return book.status;
+            }
+			return marketStatusEnum.INACTIVE;
+        }
         public MarketBook GetMarketBook(Market m)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
@@ -343,11 +352,11 @@ namespace BetfairAPI
                 }
             return book;
         }
-        public List<MarketBook> GetRunnerBook()
-        {
-            List<MarketBook> books = new List<MarketBook>();
-            return books;
-        }
+        //public List<MarketBook> GetRunnerBook()
+        //{
+        //    List<MarketBook> books = new List<MarketBook>();
+        //    return books;
+        //}
         public List<ClearedOrder> GetClearedOrders(Int32 ExchangeId, String mid, betStatusEnum status)
         {
             List<ClearedOrder> os2 = new List<ClearedOrder>();
