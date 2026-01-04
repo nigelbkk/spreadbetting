@@ -423,68 +423,6 @@ namespace SpreadTrader
                                 else
                                 {
 									Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-									//CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-         //                           if (report != null && report.errorCode != null)
-         //                           {
-         //                               Debug.WriteLine(report.errorCode);
-         //                               //throw new Exception(ErrorCodes.FaultCode(report.errorCode));
-         //                           }
-         //                           Status = report.errorCode != null ? report.errorCode : report.status;
-                                }
-                            });
-                        }
-                        ControlMessenger.Send("Update P&L");
-                        break;
-
-                    case "DoubleUnmatched":
-
-                        if (MarketNode != null)
-                        {
-                            await Task.Run(() =>
-                            {
-                                List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
-                                List<PlaceInstruction> place_instructions = new List<PlaceInstruction>();
-
-                                foreach (BetsManagerRow row in Rows)
-                                {
-                                    if (!row.IsMatched && row.Stake > 0)
-                                    {
-                                        cancel_instructions.Add(new CancelInstruction(row.BetID)
-                                        {
-                                            sizeReduction = null
-                                        });
-                                        place_instructions.Add(new PlaceInstruction()
-                                        {
-                                            selectionId = row.SelectionID,
-                                            sideEnum = row.Side == "BACK" ? sideEnum.BACK : sideEnum.LAY,
-                                            orderTypeEnum = orderTypeEnum.LIMIT,
-                                            limitOrder = new LimitOrder()
-                                            {
-                                                size = row.Stake * 2,
-                                                price = row.Odds,
-                                                persistenceTypeEnum = persistenceTypeEnum.LAPSE,
-                                            }
-                                        });
-                                    }
-                                }
-                                if (cancel_instructions.Count == 0)
-                                {
-                                    Notification = "Nothing to do";
-                                }
-                                else
-                                {
-									Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-									//CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-
-         //                           if (cancel_report.status != "SUCCESS")
-         //                           {
-         //                               Status = cancel_report.status;
-         //                           }
-         //                           else
-         //                           {
-         //                               PlaceExecutionReport place_report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
-         //                               Status = place_report.status;
-         //                           }
                                 }
                             });
                         }
