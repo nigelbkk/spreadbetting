@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -59,7 +60,7 @@ namespace BetfairAPI
                 }
             }
         }
-		public void SendRequestAsync(object joe, string url)
+		public async void SendRequestAsync(object joe, string url)
 		{
 			_ = Task.Run(async () =>
 			{
@@ -83,7 +84,7 @@ namespace BetfairAPI
 				}
 			});
 		}
-		public void RPCRequestAsync(String Method, Dictionary<String, Object> Params)
+		public async Task RPCRequestAsync(String Method, Dictionary<String, Object> Params)
 		{
 			String[] AccountCalls = new String[] { "getAccountFunds" };
 			Dictionary<String, Object> joe = new Dictionary<string, object>();
@@ -308,9 +309,15 @@ namespace BetfairAPI
         {
 			Dictionary<String, Object> p = new Dictionary<string, object>();
 			p["marketIds"] = new String[] { marketId };
+            p["priceProjection"] = new priceProjection()
+            {
+                virtualise = true,
+                priceData = new HashSet<String>()
+            };
+            
 			List<MarketBook> books = RPCRequest<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
 
-            if (books.Count > 0)
+            if (books?.Count > 0)
             {
                 MarketBook book = books.First();
                 return book.status;
@@ -425,20 +432,50 @@ namespace BetfairAPI
             p["instructions"] = instructions;
             return RPCRequest<PlaceExecutionReport>("placeOrders", p) as PlaceExecutionReport;
         }
-		public CancelExecutionReport cancelOrders(String marketId, List<CancelInstruction> instructions)
+
+
+		private readonly SemaphoreSlim _cancelLimiter = new SemaphoreSlim(5);
+
+		private async Task CancelSingleAsync(string marketId, CancelInstruction ci)
 		{
-			CancelExecutionReport new_report = new CancelExecutionReport();
-			new_report.statuses = new List<Tuple<ulong, string>>();
-			foreach (CancelInstruction ci in instructions)
+			await _cancelLimiter.WaitAsync();
+			try
 			{
-				Dictionary<String, Object> p = new Dictionary<string, object>();
-				p["marketId"] = marketId;
-				List<CancelInstruction> new_list = new List<CancelInstruction>();
-				new_list.Add(ci); p["instructions"] = new_list;
-				CancelExecutionReport report = RPCRequest<CancelExecutionReport>("cancelOrders", p) as CancelExecutionReport;
-				new_report.statuses.Add(new Tuple<ulong, string>(ci.betId, report.status));
+				var p = new Dictionary<string, object>
+				{
+					["marketId"] = marketId,
+					["instructions"] = new[] { ci }
+				};
+
+				await RPCRequestAsync("cancelOrders", p);
 			}
-			return new_report;
+			catch
+			{
+				// swallow — per your requirement
+			}
+			finally
+			{
+				_cancelLimiter.Release();
+			}
+		}
+
+		public async void cancelOrders(String marketId, List<CancelInstruction> instructions)
+		{
+			var tasks = instructions.Select(ci => CancelSingleAsync(marketId, ci)) .ToList();
+
+			await Task.WhenAll(tasks);
+
+			//CancelExecutionReport new_report = new CancelExecutionReport();
+			//new_report.statuses = new List<Tuple<ulong, string>>();
+			//foreach (CancelInstruction ci in instructions)
+			//{
+			//	Dictionary<String, Object> p = new Dictionary<string, object>();
+			//	p["marketId"] = marketId;
+			//	List<CancelInstruction> new_list = new List<CancelInstruction>();
+			//	new_list.Add(ci); p["instructions"] = new_list;
+			//	CancelExecutionReport report = RPCRequest<CancelExecutionReport>("cancelOrders", p) as CancelExecutionReport;
+			//	new_report.statuses.Add(new Tuple<ulong, string>(ci.betId, report.status));
+			//}
 		}
 
 		//public CancelExecutionReport cancelOrders(String marketId, List<CancelInstruction> instructions)
@@ -448,6 +485,18 @@ namespace BetfairAPI
 		//    p["instructions"] = instructions;
 		//    return RPCRequest<CancelExecutionReport>("cancelOrders", p) as CancelExecutionReport;
 		//}
+		public CancelExecutionReport cancelOrder(String marketId, UInt64 betId, double? sizeReduction = null)
+		{
+			//List<CancelInstruction> pis = new List<CancelInstruction>();
+			Dictionary<String, Object> p = new Dictionary<string, object>();
+			List<CancelInstruction> pis = new List<CancelInstruction>();
+
+			pis.Add(new CancelInstruction(betId));
+
+			p["marketId"] = marketId;
+            p["instructions"] = pis;
+			return RPCRequest<CancelExecutionReport>("cancelOrders", p) as CancelExecutionReport;
+		}
 		public ReplaceExecutionReport replaceOrders(String marketId, List<ReplaceInstruction> instructions)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
@@ -480,13 +529,6 @@ namespace BetfairAPI
             };
             pis.Add(pi);
             return placeOrders(marketId, pis);
-        }
-        public CancelExecutionReport cancelOrder(String marketId, UInt64 betId, double? sizeReduction=null)
-        {
-            List<CancelInstruction> pis = new List<CancelInstruction>();
-            CancelInstruction pi = new CancelInstruction(betId) { sizeReduction = sizeReduction };
-            pis.Add(pi);
-            return cancelOrders(marketId, pis);
         }
         public CurrentOrderSummaryReport listCurrentOrders(String marketId)
         {

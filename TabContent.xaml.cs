@@ -18,22 +18,25 @@ namespace SpreadTrader
         private System.Timers.Timer timer = new System.Timers.Timer();
 		private String marketID;
 
-		private String _MarketStatus;
-        public String MarketStatus { get => _MarketStatus;
-			
-			set {
-				if (_MarketStatus.ToUpper() != value)
+		private String _MarketStatus = "";
+        public String MarketStatus
+		{
+			get => _MarketStatus;
+
+			set
+			{
+				if (_MarketStatus != value)
 				{
 					Debug.WriteLine(value);
 					_MarketStatus = value;
-                    OnPropertyChanged(nameof(MarketStatus));
-                    OnPropertyChanged(nameof(OverlayVisibility));
-                }
-            }
+					OnPropertyChanged(nameof(MarketStatus));
+					OnPropertyChanged(nameof(OverlayVisibility));
+				}
+			}
 		}
 		public Visibility OverlayVisibility
 		{
-			get => (MarketStatus == "OPEN" && MarketStatus == "INACTIVE") ? Visibility.Hidden : Visibility.Visible; 
+			get => (MarketStatus.ToUpper() == "OPEN" || MarketStatus == "INACTIVE") ? Visibility.Hidden : Visibility.Visible; 
 		}
 		public string MarketName { get { return MarketNode?.MarketName; } }
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -49,29 +52,32 @@ namespace SpreadTrader
 			ControlMessenger.MessageSent += OnMessageReceived;
 			marketHeader.TabContent = this;
 			oBettingGrid.sliderControl = SliderControl;
-			_ = MarketStatusLoopAsync();
+			//_ = MarketStatusLoopAsync();
         }
         private async void UnsubscribeAsync(String marketId)
 		{
 			ControlMessenger.Send("Unsubscribe", new { MarketId = marketId });
 		}
 
-		private async Task MarketStatusLoopAsync()
-		{
-			while (true)
-			{
-				try
-				{
-					marketStatusEnum status = await betfair.GetMarketStatusAsync(marketID);
-					MarketStatus = status.ToString();
-				}
-				catch (Exception ex)
-				{
-					Debug.WriteLine(ex.Message);
-				}
-				await Task.Delay(TimeSpan.FromSeconds(1));
-			}
-		}
+		//private async Task MarketStatusLoopAsync()
+		//{
+		//	while (true)
+		//	{
+		//		if (marketID != null)
+		//		{
+		//			try
+		//			{
+		//				//marketStatusEnum status = await betfair.GetMarketStatusAsync(marketID);
+		//				//MarketStatus = status.ToString();
+		//			}
+		//			catch (Exception ex)
+		//			{
+		//				Debug.WriteLine(ex.Message);
+		//			}
+		//		}
+		//		await Task.Delay(TimeSpan.FromSeconds(2));
+		//	}
+		//}
 		private void OnMessageReceived(string messageName, object data)
 		{
 			if (messageName == "Market Changed")
@@ -105,6 +111,7 @@ namespace SpreadTrader
 		}
 		void OnMarketChanged(MarketChangeDto change)
 		{
+			MarketStatus = change.Status.ToString();
 			RunnersControl?.OnMarketChanged(change);
 		}
 	}

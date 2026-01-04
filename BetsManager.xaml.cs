@@ -422,13 +422,14 @@ namespace SpreadTrader
                                 }
                                 else
                                 {
-                                    CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-                                    if (report != null && report.errorCode != null)
-                                    {
-                                        Debug.WriteLine(report.errorCode);
-                                        //throw new Exception(ErrorCodes.FaultCode(report.errorCode));
-                                    }
-                                    Status = report.errorCode != null ? report.errorCode : report.status;
+									Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+									//CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+         //                           if (report != null && report.errorCode != null)
+         //                           {
+         //                               Debug.WriteLine(report.errorCode);
+         //                               //throw new Exception(ErrorCodes.FaultCode(report.errorCode));
+         //                           }
+         //                           Status = report.errorCode != null ? report.errorCode : report.status;
                                 }
                             });
                         }
@@ -472,17 +473,18 @@ namespace SpreadTrader
                                 }
                                 else
                                 {
-                                    CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+									Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+									//CancelExecutionReport cancel_report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
 
-                                    if (cancel_report.status != "SUCCESS")
-                                    {
-                                        Status = cancel_report.status;
-                                    }
-                                    else
-                                    {
-                                        PlaceExecutionReport place_report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
-                                        Status = place_report.status;
-                                    }
+         //                           if (cancel_report.status != "SUCCESS")
+         //                           {
+         //                               Status = cancel_report.status;
+         //                           }
+         //                           else
+         //                           {
+         //                               PlaceExecutionReport place_report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
+         //                               Status = place_report.status;
+         //                           }
                                 }
                             });
                         }
@@ -524,20 +526,25 @@ namespace SpreadTrader
                                     else
                                     {
                                         Notification = $"Cancelling {cancel_instructions.Count} bets";
-                                        CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-										
-                                        foreach (Tuple<UInt64, String> _report in report.statuses)
-										{
-											Debug.WriteLine(_report.Item1, _report.Item2);
-										}
-									
-                                        //if (cancel_report?.status != "SUCCESS")
+                                        //CancelExecutionReport report = 
+                                        Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+
+          //                              Int32 success_count = 0;
+          //                              foreach (Tuple<UInt64, String> _report in report.statuses)
+										//{
+										//	Debug.WriteLine(_report.Item1, _report.Item2);
+          //                                  if (_report.Item2 == "SUCCESS")
+          //                                  {
+          //                                      success_count++;
+          //                                  }
+										//}
+          //                              if (success_count >= cancel_instructions.Count)
           //                              {
-          //                                  Status = cancel_report?.errorCode;
+          //                                  Dispatcher.BeginInvoke(new Action(() => Rows.Clear() ));
           //                              }
           //                              else
           //                              {
-          //                                  Status = cancel_report.status;
+          //                                  // remove only cancelled bets
           //                              }
                                     }
                                     Status = "Cancellation Task completed";
@@ -576,12 +583,13 @@ namespace SpreadTrader
                                 else
                                 {
 									Notification = $"Cancelling {cancel_instructions.Count} bets";
-									CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+									Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+									//CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
 
-									foreach (Tuple<UInt64, String> _report in report.statuses)
-									{
-										Debug.WriteLine(_report.Item1, _report.Item2);
-									}
+									//foreach (Tuple<UInt64, String> _report in report.statuses)
+									//{
+									//	Debug.WriteLine(_report.Item1, _report.Item2);
+									//}
 									//if (cancel_report.status != "SUCCESS")
          //                           {
          //                               Status = cancel_report.status;
