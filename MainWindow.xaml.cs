@@ -1,4 +1,5 @@
-﻿using BetfairAPI;
+﻿using Betfair.ESAClient.Cache;
+using BetfairAPI;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -115,14 +116,8 @@ namespace SpreadTrader
 				NodeViewModel d2 = d.NodeViewModel as NodeViewModel;
 				Debug.WriteLine($"MainWindow: {d2.FullName}");
                 //Task.Run(() => SelectedTab.OnSelected(d2));
-                SelectedTab.OnSelected(d2);
+                SelectedTab.OnMarketSelected(d2);
 			}
-//			if (messageName == "Market Changed")
-//			{
-//				dynamic d = data;
-////				MarketSnapDto snap = d.MarketSnapDto;
-//				MarketChange change = d.MarketChange;
-//			}
 			if (messageName == "Orders Changed")
 			{
 				dynamic d = data;
@@ -214,7 +209,6 @@ namespace SpreadTrader
         {
             TabControl.Items.Remove(e.Tab);
             TabContent tabContent = e.Tab.Content as TabContent;
-            //EventsTree.OnMarketSelected -= tabContent.OnMarketSelected;
             e.Tab.Content = null;
         }
         private void AppendNewTab(String title)
@@ -230,15 +224,10 @@ namespace SpreadTrader
             tab.Header = customTabHeader;
 
             TabContent tabContent = new TabContent(customTabHeader);
-            //tabContent.mainWindow = this;
             tabContent.customHeader = customTabHeader;
             tab.Content = tabContent;
 
             customTabHeader.Tab = tab;
-
-            //EventsTree.OnMarketSelected += tabContent.OnMarketSelected;
-            //OnShutdown += tabContent.BetsManager.OnShutdown;
-            //OnMarketChanged += tabContent.OnMarketSelected;
 
             tab.IsSelected = true;
             TabControl.Items.Insert(0, tab);
@@ -249,10 +238,6 @@ namespace SpreadTrader
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             props.Save();
-            //if (OnShutdown != null)
-            //{
-            //	OnShutdown();
-            //};
         }
         private void OnUpdateAccount(object sender, MouseButtonEventArgs e)
         {
@@ -285,16 +270,10 @@ namespace SpreadTrader
                     TabContent tc2 = ti.Content as TabContent;
                     BetsManager bm = tc2.BetsManager;
                     RunnersControl rc = tc2.RunnersControl;
+					SelectedTab.OnTabSelected();
 				}
 				TabContent content = TabControl.SelectedContent as TabContent;
                 Commission = content.MarketNode == null ? 0.00 : content.MarketNode.Commission;
-
-                //SliderControl sc = content.SliderControl;
-                //BettingGrid bg = content.oBettingGrid;
-                //if (bg != null)
-                //{
-                //	bg.OnSelectionChanged(sender, e);
-                //}
             }
         }
         private void TabItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)

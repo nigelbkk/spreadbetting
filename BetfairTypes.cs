@@ -366,7 +366,6 @@ namespace BetfairAPI
         public List<Match> matches { get; set; }
         public Double ifWin { get; set; }
         public String Name { get; set; }
-        //public Object Tag { get; set; }
         public double BackLayRatio
         {
             get

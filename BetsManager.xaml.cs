@@ -7,12 +7,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -65,7 +67,7 @@ namespace SpreadTrader
         public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
         public String StreamingButtonText { get { return "Streaming Connected"; } }
 		#endregion Properties
-		public void OnSelected(NodeViewModel d2, RunnersControl rc)
+		public void OnMarketSelected(NodeViewModel d2, RunnersControl rc)
 		{
 			MarketNode = d2;
             RunnersControl = rc;
@@ -85,31 +87,22 @@ namespace SpreadTrader
 				ExecuteBets(d.Favorite, d.LayValues, d.BackValues);
 			}
 		}
-        private BetsManagerRow FindUnmatchedRow(String id)
-        {
-            if (Rows.Count > 0) foreach (BetsManagerRow r in Rows)
-                {
-                    if (r.BetID == Convert.ToUInt64(id))
-                    {
-                        if (r.SizeMatched == 0)
-                            return r;
-                    }
-                }
-            return null;
-        }
-        private BetsManagerRow FindUnmatchedRow(LiveRunner lr)
-        {
-            if (Rows.Count > 0) foreach (BetsManagerRow r in Rows)
-                {
-                    if (r.SelectionID == lr.SelectionId)
-                    {
-                        if (r.SizeMatched == 0)
-                            return r;
-                    }
-                }
-            return null;
-        }
-        private void SendOrdersLatency(long utc_time)
+  //      private BetsManagerRow FindUnmatchedRow(String id)
+  //      {
+  //          if (Rows.Count > 0)
+  //          {
+  //              foreach (BetsManagerRow r in Rows)
+  //              {
+  //                  if (r.BetID == Convert.ToUInt64(id))
+  //                  {
+  //                      if (r.SizeMatched == 0)
+  //                          return r;
+  //                  }
+  //              }
+  //          }
+		//	return null;
+		//}
+		private void SendOrdersLatency(long utc_time)
         {
 			long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 			String cs = $"{now - utc_time}ms";
@@ -237,8 +230,9 @@ namespace SpreadTrader
                                 UInt64 betid = Convert.ToUInt64(o.Id);
                                 Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
 
-								BetsManagerRow row = FindUnmatchedRow(o.Id);
-                                if (row == null)
+								BetsManagerRow row = Rows.FirstOrDefault(x => x.BetID.ToString() == o.Id);
+
+                                if (row == null)        // not in the grid
                                 {
                                     row = new BetsManagerRow(o) { MarketID = change.Id, SelectionID = orc.Id.Value };
                                     SendOrdersLatency(row.UTCTime.Value);
@@ -275,8 +269,7 @@ namespace SpreadTrader
                                         }
                                     }
                                     row.AvgPriceMatched = o.Avp.Value;
-									row.SizeMatched = row.Stake;// o.Sm.Value;
-									//row.SizeMatched = row.OriginalStake;// o.Sm.Value;
+									row.SizeMatched = row.Stake;
                                     row.Hidden = UnmatchedOnly;
 									NotifyBetMatchedAsync();
                                     OnPropertyChanged("");
@@ -299,7 +292,6 @@ namespace SpreadTrader
                                     }));
                                     row.Stake = o.Sr.Value;                         // change stake for the unmatched remainder
 									NotifyBetMatchedAsync();
-                                    //NotifyPropertyChanged("");
                                     Debug.WriteLine(o.Id, "partial match: ");
                                 }
                                 if (o.Sc > 0)                                       // cancelled
@@ -314,8 +306,6 @@ namespace SpreadTrader
                                         Debug.WriteLine(o.Id, "Bet fully cancelled: ");
                                         to_remove.Add(row);
                                     }
-									//Debug.WriteLine(o.Id, "cancelled: ");
-									//										NotifyBetMatchedAsync();
 								}
 							}
                             foreach (BetsManagerRow o in to_remove)
@@ -415,7 +405,6 @@ namespace SpreadTrader
                                         cancel_instructions.Add(new CancelInstruction(row.BetID) { sizeReduction = Math.Round((row.Stake / 2), 2) });
                                     }
                                 }
-
                                 if (cancel_instructions.Count == 0)
                                 {
                                     Notification = "Nothing to do";
@@ -464,26 +453,7 @@ namespace SpreadTrader
                                     else
                                     {
                                         Notification = $"Cancelling {cancel_instructions.Count} bets";
-                                        //CancelExecutionReport report = 
                                         Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-
-          //                              Int32 success_count = 0;
-          //                              foreach (Tuple<UInt64, String> _report in report.statuses)
-										//{
-										//	Debug.WriteLine(_report.Item1, _report.Item2);
-          //                                  if (_report.Item2 == "SUCCESS")
-          //                                  {
-          //                                      success_count++;
-          //                                  }
-										//}
-          //                              if (success_count >= cancel_instructions.Count)
-          //                              {
-          //                                  Dispatcher.BeginInvoke(new Action(() => Rows.Clear() ));
-          //                              }
-          //                              else
-          //                              {
-          //                                  // remove only cancelled bets
-          //                              }
                                     }
                                     Status = "Cancellation Task completed";
                                 });

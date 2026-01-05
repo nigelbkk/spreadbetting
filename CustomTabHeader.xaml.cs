@@ -36,7 +36,7 @@ namespace SpreadTrader
                 TabTitle.Background = Brushes.Orange;
             }
         }
-		public void OnSelected(NodeViewModel d2)
+		public void OnMarketSelected(NodeViewModel d2)
 		{
 			//MarketNode = d2;
 			Title = d2.FullName;

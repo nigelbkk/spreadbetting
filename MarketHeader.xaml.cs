@@ -50,12 +50,6 @@ namespace SpreadTrader
                 dynamic d = data;
                 OrdersLatency = d.OrdersLatency;
             }
-            if (messageName == "Market Selected")
-            {
-                dynamic d = data;
-				MarketNode = d.NodeViewModel;
-                OnPropertyChanged("FullName");
-            }
         }
         public MarketHeader()
 		{
@@ -68,15 +62,19 @@ namespace SpreadTrader
 			timer.Elapsed += (o, e) =>
 			{
 				OnPropertyChanged(nameof(TimeToGo));
-				OnPropertyChanged(nameof(TotalMatched));
 			};
 			timer.Interval = 1000;
 			timer.Enabled = true;
 			timer.Start();
 		}
-		public void OnSelected(NodeViewModel d2)
+		public void OnMarketSelected(NodeViewModel d2)
 		{
 			MarketNode = d2;
+		}
+		public void OnTabSelected()
+		{
+			OnPropertyChanged(nameof(TotalMatched));
+			OnPropertyChanged(nameof(FullName));
 		}
 
 		private void Button_Click(object sender, RoutedEventArgs e)
@@ -95,7 +93,6 @@ namespace SpreadTrader
 					case "Hide Grid":
 						down_visible = TabContent.BettingGrid.Visibility;
 						up_visible = TabContent.BettingGrid.Visibility = TabContent.BettingGrid.Visibility == Visibility.Collapsed ? Visibility.Visible : Visibility.Collapsed;
-						//NotifyPropertyChanged("");
 						break;
 				}
 			}
