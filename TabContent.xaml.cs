@@ -10,7 +10,7 @@ namespace SpreadTrader
     {
         public CustomTabHeader customHeader = null;
         public NodeViewModel MarketNode = null;
-        private System.Timers.Timer timer = new System.Timers.Timer();
+        //private System.Timers.Timer timer = new System.Timers.Timer();
 		private String marketID;
 
 		private String _MarketStatus = "";
@@ -94,6 +94,7 @@ namespace SpreadTrader
 		void OnMarketChanged(MarketChangeDto change)
 		{
 			MarketStatus = change.Status.ToString();
+			marketHeader.TotalMatched = change.Tv ?? 0;
 			RunnersControl?.OnMarketChanged(change);
 		}
 	}

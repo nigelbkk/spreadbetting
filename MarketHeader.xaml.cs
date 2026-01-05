@@ -27,8 +27,17 @@ namespace SpreadTrader
 					OnPropertyChanged(nameof(MarketLatency));
 				} } }
 		public String OrdersLatency { get; set; }
-		
-		public Double? TotalMatched { get { return MarketNode == null ? 0 : MarketNode.TotalMatched; } }
+
+		public Double? _TotalMatched = 0;
+		public Double? TotalMatched
+		{
+			get => _TotalMatched;
+			set { if (_TotalMatched != value){
+					_TotalMatched = value;
+					OnPropertyChanged(nameof(TotalMatched));
+				}
+			}
+		}
 		
 		public Visibility down_visible { get => _down_visible; set { _down_visible = value; OnPropertyChanged(nameof(down_visible)); } }
 		public Visibility up_visible { get => _up_visible; set { _up_visible = value; OnPropertyChanged(nameof(up_visible)); } }
@@ -62,6 +71,7 @@ namespace SpreadTrader
 			timer.Elapsed += (o, e) =>
 			{
 				OnPropertyChanged(nameof(TimeToGo));
+				OnPropertyChanged(nameof(TotalMatched));
 			};
 			timer.Interval = 1000;
 			timer.Enabled = true;
