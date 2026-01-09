@@ -247,16 +247,21 @@ namespace SpreadTrader
                                 }
                                 row.Runner = MarketNode.GetRunnerName(row.SelectionID);
 
-                                if (o.Sm == 0 && o.Sr > 0)                                          // unmatched
-                                {
-                                    row.Stake = o.S.Value;
-                                    row.SizeMatched = o.Sm.Value;
-                                    row.Hidden = false;
-                                    Debug.WriteLine(o.Id, "unmatched: ");
+								if (o.Sm == 0 && o.Sr > 0)                                          // unmatched
+								{
+									row.Stake = o.S.Value;
+									row.SizeMatched = o.Sm.Value;
+									row.Hidden = false;
+									Debug.WriteLine(o.Id, "unmatched: ");
 
-                                    Debug.WriteLine(MarketNode.MarketName);
-                                }
-                                if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                             // fully matched
+									Debug.WriteLine(MarketNode.MarketName);
+								}
+								if (o.Sm == 0 && o.Sl > 0)                                          // lapsed
+								{
+									Debug.WriteLine(o.Id, "lapsed: ");
+									to_remove.Add(row);
+								}
+								if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                             // fully matched
                                 {
                                     foreach (BetsManagerRow r in Rows)
                                     {
