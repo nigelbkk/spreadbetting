@@ -189,7 +189,7 @@ namespace SpreadTrader
 			if (change.Orc == null || MarketNode == null)
                 return;
 
-            if (MarketNode.ID.ToString() != change.Id)
+            if (MarketNode.MarketID.ToString() != change.Id)
                 return;
 
             _LastUpdated = DateTime.UtcNow;
