@@ -155,7 +155,7 @@ namespace SpreadTrader
 			if (MarketNode == null)
 				return;
 
-			if (MarketNode.ID.ToString() != change.MarketId)
+			if (MarketNode.MarketID != change.MarketId)
 				return;
 
 			var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);

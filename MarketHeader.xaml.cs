@@ -80,6 +80,7 @@ namespace SpreadTrader
 		public void OnMarketSelected(NodeViewModel d2)
 		{
 			MarketNode = d2;
+			OnPropertyChanged(nameof(FullName));
 		}
 		public void OnTabSelected()
 		{

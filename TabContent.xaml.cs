@@ -79,6 +79,7 @@ namespace SpreadTrader
 			RunnersControl.PopulateNewMarket(d2);
 			OnPropertyChanged(nameof(OverlayVisibility));
 			OnPropertyChanged(nameof(MarketStatus));
+			OnPropertyChanged(nameof(MarketName));
 		}
 		public void OnTabSelected()
 		{
