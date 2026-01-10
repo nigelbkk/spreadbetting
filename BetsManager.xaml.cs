@@ -1,4 +1,5 @@
-﻿using Betfair.ESASwagger.Model;
+﻿using Betfair.ESAClient.Cache;
+using Betfair.ESASwagger.Model;
 using BetfairAPI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -26,8 +27,10 @@ namespace SpreadTrader
         private Properties.Settings props = Properties.Settings.Default;
         public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
         public RunnersControl RunnersControl { get; set; }
-        public ObservableCollection<BetsManagerRow> Rows { get; set; }
-        private NodeViewModel MarketNode { get; set; }
+        //public ObservableCollection<BetsManagerRow> Rows { get; set; }
+		public BulkObservableCollection<BetsManagerRow> Rows { get; set; }
+        private readonly Dictionary<ulong, BetsManagerRow> _byBetId = new Dictionary<ulong, BetsManagerRow>();
+		private NodeViewModel MarketNode { get; set; }
         private DateTime _LastUpdated { get; set; }
 		public String LastUpdated { get { return String.Format("Orders last updated {0}", _LastUpdated.AddHours(props.TimeOffset).ToString("HH:mm:ss")); } }
 
@@ -87,21 +90,6 @@ namespace SpreadTrader
 				ExecuteBets(d.Favorite, d.LayValues, d.BackValues);
 			}
 		}
-  //      private BetsManagerRow FindUnmatchedRow(String id)
-  //      {
-  //          if (Rows.Count > 0)
-  //          {
-  //              foreach (BetsManagerRow r in Rows)
-  //              {
-  //                  if (r.BetID == Convert.ToUInt64(id))
-  //                  {
-  //                      if (r.SizeMatched == 0)
-  //                          return r;
-  //                  }
-  //              }
-  //          }
-		//	return null;
-		//}
 		private void SendOrdersLatency(long utc_time)
         {
 			long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -175,7 +163,7 @@ namespace SpreadTrader
 
         public BetsManager()
         {
-            Rows = new ObservableCollection<BetsManagerRow>();
+            Rows = new BulkObservableCollection<BetsManagerRow>();
             InitializeComponent();
             ControlMessenger.MessageSent += OnMessageReceived;
         }
@@ -198,15 +186,16 @@ namespace SpreadTrader
 
             OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
 
-			if (change.Orc == null)
-				return;
+			if (change.Orc == null || MarketNode == null)
+                return;
 
-            if (MarketNode == null)
+            if (MarketNode.ID.ToString() != change.Id)
                 return;
 
             _LastUpdated = DateTime.UtcNow;
             try
             {
+                long utc = 0;
                 if (change.Closed == true)
                 {
                     Debug.WriteLine("market closed");
@@ -217,67 +206,53 @@ namespace SpreadTrader
 
                 if (change.Orc.Count > 0)
                 {
-                    foreach (OrderRunnerChange orc in change.Orc)
+					var ops = new List<Action>();
+                    bool betMatched = false;
+
+					foreach (OrderRunnerChange orc in change.Orc)
                     {
                         if (orc.Uo == null)
                             continue;
 
                         if (orc.Uo.Count > 0)
                         {
-                            List<BetsManagerRow> to_remove = new List<BetsManagerRow>();
-                            foreach (Order o in orc.Uo)
+							foreach (Order o in orc.Uo)
                             {
-                                UInt64 betid = Convert.ToUInt64(o.Id);
+								utc = o.Pd.Value;
+								UInt64 betid = Convert.ToUInt64(o.Id);
                                 Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
 
-								BetsManagerRow row = Rows.FirstOrDefault(x => x.BetID.ToString() == o.Id);
+								_byBetId.TryGetValue(betid, out BetsManagerRow row);
 
-                                if (row == null)        // not in the grid
+								if (row == null)        // not in the grid
                                 {
                                     row = new BetsManagerRow(o) { MarketID = change.Id, SelectionID = orc.Id.Value };
-                                    SendOrdersLatency(row.UTCTime.Value);
-
-									Dispatcher.BeginInvoke(new Action(() =>
-                                    {
-                                        Debug.WriteLine(o.Id, $"Insert into grid: {row.UTCTime}");
-                                        Rows.Insert(0, row);
-                                        OnPropertyChanged("");
-                                    }));
+                                    ops.Add(() => { Rows.Insert(0, row); _byBetId[row.BetID] = row; });
                                     Debug.WriteLine(o.Id, "new bet: ");
-                                }
-                                row.Runner = MarketNode.GetRunnerName(row.SelectionID);
+								}
+								String runner_name = MarketNode.GetRunnerName(row.SelectionID);
+								ops.Add(() => row.Runner = runner_name);
 
 								if (o.Sm == 0 && o.Sr > 0)                                          // unmatched
 								{
-									row.Stake = o.S.Value;
-									row.SizeMatched = o.Sm.Value;
-									row.Hidden = false;
-									Debug.WriteLine(o.Id, "unmatched: ");
-
+									ops.Add(() => row.Stake = o.S.Value);
+									ops.Add(() => row.SizeMatched = o.Sm.Value);
+									ops.Add(() => row.Hidden = false);
+									
+                                    Debug.WriteLine(o.Id, "unmatched: ");
 									Debug.WriteLine(MarketNode.MarketName);
 								}
 								if (o.Sm == 0 && o.Sl > 0)                                          // lapsed
 								{
 									Debug.WriteLine(o.Id, "lapsed: ");
-									to_remove.Add(row);
+									ops.Add(() => { if (_byBetId.Remove(row.BetID)) Rows.Remove(row); });
 								}
 								if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                             // fully matched
                                 {
-                                    foreach (BetsManagerRow r in Rows)
-                                    {
-                                        if (r.BetID == Convert.ToUInt64(o.Id))
-                                        {
-                                            if (r.SizeMatched > 0)
-                                            {
-                                                to_remove.Add(r);
-                                            }
-                                        }
-                                    }
-                                    row.AvgPriceMatched = o.Avp.Value;
-									row.SizeMatched = row.Stake;
-                                    row.Hidden = UnmatchedOnly;
-									NotifyBetMatchedAsync();
-                                    OnPropertyChanged("");
+									ops.Add(() => row.AvgPriceMatched = o.Avp.Value);
+									ops.Add(() => row.SizeMatched = row.Stake);
+									ops.Add(() => row.Hidden = UnmatchedOnly);
+                                    betMatched = true;
                                     Debug.WriteLine(o.Id, "fully matched: ");
                                 }
                                 if (o.Sm > 0 && o.Sr > 0)                                           // partially matched
@@ -288,51 +263,57 @@ namespace SpreadTrader
                                     mrow.Stake = o.Sm.Value;
                                     mrow.AvgPriceMatched = o.Avp.Value;
                                     mrow.Hidden = UnmatchedOnly;
-                                    Int32 idx = Rows.IndexOf(row);
 
-                                    Dispatcher.BeginInvoke(new Action(() =>
-                                    {
-                                        Debug.WriteLine("Append to grid", mrow.BetID);
-                                        Rows.Insert(idx + 1, mrow);
-                                    }));
-                                    row.Stake = o.Sr.Value;                         // change stake for the unmatched remainder
-									NotifyBetMatchedAsync();
+									ops.Add(() =>
+									{
+										int idx = Rows.IndexOf(row);
+										Rows.Insert(idx + 1, mrow);
+									});
+
+									ops.Add(() => row.Stake = o.Sr.Value);                         // change stake for the unmatched remainder
+									betMatched = true;
+
                                     Debug.WriteLine(o.Id, "partial match: ");
                                 }
                                 if (o.Sc > 0)                                       // cancelled
                                 {
                                     if (o.Sr != 0)                                  // cancellation of partially matched bet
                                     {
-                                        row.Stake = o.Sr.Value;                     // adjust unmatched remainder
+										ops.Add(() => row.Stake = o.Sr.Value);                     // adjust unmatched remainder
                                         Debug.WriteLine(o.Id, "Cancellation of partially matched bet: ");
                                     }
                                     if (o.Sr == 0)
                                     {
                                         Debug.WriteLine(o.Id, "Bet fully cancelled: ");
-                                        to_remove.Add(row);
-                                    }
+										ops.Add(() =>
+										{
+											if (_byBetId.Remove(row.BetID))
+												Rows.Remove(row);
+										});
+									}
 								}
-							}
-                            foreach (BetsManagerRow o in to_remove)
-                            {
-                                Dispatcher.BeginInvoke(new Action(() =>
-                                {
-                                    if (Rows.Contains(o))
-                                    {
-                                        //Debug.WriteLine("Remove from grid: " + o.BetID.ToString());
-                                        Rows.Remove(o);
-                                    }
-                                }));
                             }
-                            //NotifyPropertyChanged("");
-                        }
-                    }
-                }
+						}
+					}
+					Dispatcher.BeginInvoke(new Action(() =>
+					{
+						using (Rows.SuspendNotifications())
+						{
+							foreach (var op in ops)
+								op();
+						}
+					}));
+
+					if (betMatched)
+						NotifyBetMatchedAsync();
+
+					SendOrdersLatency(utc);
+				}
             }
             catch (Exception xe)
             {
                 Status = xe.Message;
-                //Debug.WriteLine(xe.Message);
+                Debug.WriteLine(xe.Message);
             }
         }
         private void PopulateDataGrid()
@@ -344,7 +325,7 @@ namespace SpreadTrader
                 {
                     Betfair = MainWindow.Betfair;
                 }
-                Rows = new ObservableCollection<BetsManagerRow>();
+                Rows = new BulkObservableCollection<BetsManagerRow>();
 
                 if (MarketNode.MarketID != null)
                 {

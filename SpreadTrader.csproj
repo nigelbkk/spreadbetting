@@ -107,6 +107,7 @@
     <Compile Include="BettingGrid.xaml.cs">
       <DependentUpon>BettingGrid.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BulkObservableCollection.cs" />
     <Compile Include="CustomTabHeader.xaml.cs">
       <DependentUpon>CustomTabHeader.xaml</DependentUpon>
     </Compile>

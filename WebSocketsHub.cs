@@ -53,8 +53,6 @@ namespace SpreadTrader
 			hubConnection = new HubConnection("http://" + props.WebSocketsUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
-			//hubConnection.TraceLevel = TraceLevels.All;
-			//hubConnection.TraceWriter = Console.Out;
 			hubConnection.Closed += () =>
 			{
 				Debug.WriteLine($"SignalR Closed...");
@@ -86,10 +84,6 @@ namespace SpreadTrader
 
 			Start();
 
-			//hubProxy.On<MarketSnapDto>("marketChanged", (snap) =>
-			//{
-			//	_marketChangeQueue.Add(snap);
-			//});
 			hubProxy.On<MarketChangeDto>("marketChanged", (change) =>
 			{
 				_marketChangeQueue.Add(change);
