@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Media;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -27,9 +28,10 @@ namespace SpreadTrader
         private Properties.Settings props = Properties.Settings.Default;
         public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
         public RunnersControl RunnersControl { get; set; }
-        //public ObservableCollection<BetsManagerRow> Rows { get; set; }
-		public BulkObservableCollection<BetsManagerRow> Rows { get; set; }
-        private readonly Dictionary<ulong, BetsManagerRow> _byBetId = new Dictionary<ulong, BetsManagerRow>();
+        public BulkObservableCollection<BetsManagerRow> Rows { get; set; }
+		private List<BetsManagerRow> _allRows = new List<BetsManagerRow>();
+
+		private readonly Dictionary<ulong, BetsManagerRow> _byBetId = new Dictionary<ulong, BetsManagerRow>();
 		private NodeViewModel MarketNode { get; set; }
         private DateTime _LastUpdated { get; set; }
 		public String LastUpdated { get { return String.Format("Orders last updated {0}", _LastUpdated.AddHours(props.TimeOffset).ToString("HH:mm:ss")); } }
@@ -38,14 +40,29 @@ namespace SpreadTrader
         private bool _StreamActive { get; set; }
         public bool StreamActive { get => _StreamActive;  set { _StreamActive = value; OnPropertyChanged(""); } }
         private Timer timer = new Timer();
-        public void OnPropertyChanged(String info)
-        {
-            if (PropertyChanged != null)
-            {
-                Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
-            }
+
+		void OnPropertyChanged([CallerMemberName] string name = null)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+		}
+
+		//public void OnPropertyChanged(String info)
+  //      {
+  //          if (PropertyChanged != null)
+  //          {
+  //              Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
+  //          }
+  //      }
+		private bool _UnmatchedOnly;
+		public bool UnmatchedOnly { get => _UnmatchedOnly; set { if (_UnmatchedOnly != value)
+                { 
+                    _UnmatchedOnly = value;
+					//OnPropertyChanged(nameof(UnmatchedOnly));
+					OnPropertyChanged();
+					ApplyFilter();
+				} 
+            } 
         }
-        public bool UnmatchedOnly { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
         private String _Status = "Ready";
         public String Status
@@ -70,6 +87,21 @@ namespace SpreadTrader
         public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
         public String StreamingButtonText { get { return "Streaming Connected"; } }
 		#endregion Properties
+
+		private void ApplyFilter()
+		{
+            using (Rows.SuspendNotifications())
+            {
+                Rows.Clear();
+
+                foreach (var row in _allRows)
+                {
+                    if (!UnmatchedOnly || !row.IsMatched)
+                        Rows.Add(row);
+                }
+            }
+		}
+
 		public void OnMarketSelected(NodeViewModel d2, RunnersControl rc)
 		{
 			MarketNode = d2;
@@ -227,8 +259,9 @@ namespace SpreadTrader
 								if (row == null)        // not in the grid
                                 {
                                     row = new BetsManagerRow(o) { MarketID = change.Id, SelectionID = orc.Id.Value };
-                                    ops.Add(() => { Rows.Insert(0, row); _byBetId[row.BetID] = row; });
-                                    Debug.WriteLine(o.Id, "new bet: ");
+                                    ops.Add(() => { _allRows.Insert(0, row); _byBetId[row.BetID] = row; });
+									_byBetId[row.BetID] = row;
+									Debug.WriteLine(o.Id, "new bet: ");
 								}
 								String runner_name = MarketNode.GetRunnerName(row.SelectionID);
 								ops.Add(() => row.Runner = runner_name);
@@ -245,7 +278,7 @@ namespace SpreadTrader
 								if (o.Sm == 0 && o.Sl > 0)                                          // lapsed
 								{
 									Debug.WriteLine(o.Id, "lapsed: ");
-									ops.Add(() => { if (_byBetId.Remove(row.BetID)) Rows.Remove(row); });
+									ops.Add(() => { if (_byBetId.Remove(row.BetID)) _allRows.Remove(row); });
 								}
 								if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                             // fully matched
                                 {
@@ -253,7 +286,7 @@ namespace SpreadTrader
 									ops.Add(() => row.SizeMatched = row.Stake);
 									ops.Add(() => row.Hidden = UnmatchedOnly);
                                     betMatched = true;
-                                    Debug.WriteLine(o.Id, "fully matched: ");
+									Debug.WriteLine(o.Id, "fully matched: ");
                                 }
                                 if (o.Sm > 0 && o.Sr > 0)                                           // partially matched
                                 {
@@ -266,8 +299,9 @@ namespace SpreadTrader
 
 									ops.Add(() =>
 									{
-										int idx = Rows.IndexOf(row);
-										Rows.Insert(idx + 1, mrow);
+										int idx = _allRows.IndexOf(row);
+										_allRows.Insert(idx + 1, mrow);
+										//_byBetId[row.BetID] = row;                                  // DON'T DO THIS
 									});
 
 									ops.Add(() => row.Stake = o.Sr.Value);                         // change stake for the unmatched remainder
@@ -285,11 +319,8 @@ namespace SpreadTrader
                                     if (o.Sr == 0)
                                     {
                                         Debug.WriteLine(o.Id, "Bet fully cancelled: ");
-										ops.Add(() =>
-										{
-											if (_byBetId.Remove(row.BetID))
-												Rows.Remove(row);
-										});
+										ops.Add(() => { if (_byBetId.Remove(row.BetID)) _allRows.Remove(row); });
+										//_byBetId[row.BetID] = row;
 									}
 								}
                             }
@@ -297,10 +328,12 @@ namespace SpreadTrader
 					}
 					Dispatcher.BeginInvoke(new Action(() =>
 					{
+						foreach (var op in ops)
+							op();
+
 						using (Rows.SuspendNotifications())
 						{
-							foreach (var op in ops)
-								op();
+                            ApplyFilter();
 						}
 					}));
 
@@ -325,7 +358,7 @@ namespace SpreadTrader
                 {
                     Betfair = MainWindow.Betfair;
                 }
-                Rows = new BulkObservableCollection<BetsManagerRow>();
+                //Rows = new BulkObservableCollection<BetsManagerRow>();
 
                 if (MarketNode.MarketID != null)
                 {
@@ -333,16 +366,17 @@ namespace SpreadTrader
                     {
                         CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.185904913"
 
-                        Rows.Clear();
+                        _allRows.Clear();
                         if (report.currentOrders.Count > 0)
                         {
                             foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
                             {
 								BetsManagerRow.RunnerNames[o.selectionId] = MarketNode.GetRunnerName(o.selectionId);
-                                Rows.Insert(0, new BetsManagerRow(o) { Runner = MarketNode.GetRunnerName(o.selectionId), });
+								_allRows.Insert(0, new BetsManagerRow(o) { Runner = MarketNode.GetRunnerName(o.selectionId), });
                             }
                         }
-						OnPropertyChanged("");
+						//OnPropertyChanged("");
+                        ApplyFilter();
 					}
 					catch (Exception xe)
                     {
@@ -500,18 +534,18 @@ namespace SpreadTrader
                 Debug.WriteLine(xe.Message);
             }
         }
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            CheckBox cb = sender as CheckBox;
-            if (Rows.Count > 0) foreach (BetsManagerRow row in Rows)
-                {
-                    row.Hidden = cb.IsChecked == true && row.SizeMatched > 0;
-                }
-        }
-        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            CheckBox_Checked(sender, e);
-        }
+        //private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    CheckBox cb = sender as CheckBox;
+        //    if (Rows.Count > 0) foreach (BetsManagerRow row in Rows)
+        //        {
+        //            row.Hidden = cb.IsChecked == true && row.SizeMatched > 0;
+        //        }
+        //}
+        //private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        //{
+        //    CheckBox_Checked(sender, e);
+        //}
         private void Label_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             Label lb = sender as Label;
