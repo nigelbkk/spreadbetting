@@ -1,14 +1,10 @@
-﻿using Betfair.ESAClient.Cache;
-using Betfair.ESASwagger.Model;
+﻿using Betfair.ESASwagger.Model;
 using BetfairAPI;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Media;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -16,7 +12,6 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -30,6 +25,7 @@ namespace SpreadTrader
         public RunnersControl RunnersControl { get; set; }
         public BulkObservableCollection<BetsManagerRow> Rows { get; set; }
 		private List<BetsManagerRow> _allRows = new List<BetsManagerRow>();
+		private List<ulong> _cancelledBets = new List<ulong>();
 
 		private readonly Dictionary<ulong, BetsManagerRow> _byBetId = new Dictionary<ulong, BetsManagerRow>();
 		private NodeViewModel MarketNode { get; set; }
@@ -258,9 +254,14 @@ namespace SpreadTrader
 
 								if (row == null)        // not in the grid
                                 {
-                                    row = new BetsManagerRow(o) { MarketID = change.Id, SelectionID = orc.Id.Value };
-                                    ops.Add(() => { _allRows.Insert(0, row); _byBetId[row.BetID] = row; });
-									_byBetId[row.BetID] = row;
+									if (_cancelledBets.Contains(betid))
+										return; // ignore zombies
+
+									if (!_byBetId.ContainsKey(betid))
+									{
+										row = new BetsManagerRow(o) { MarketID = change.Id, SelectionID = orc.Id.Value };
+										ops.Add(() => { _allRows.Insert(0, row); _byBetId[row.BetID] = row; });
+									}
 									Debug.WriteLine(o.Id, "new bet: ");
 								}
 								String runner_name = MarketNode.GetRunnerName(row.SelectionID);
@@ -319,8 +320,8 @@ namespace SpreadTrader
                                     if (o.Sr == 0)
                                     {
                                         Debug.WriteLine(o.Id, "Bet fully cancelled: ");
+										_cancelledBets.Add(row.BetID);
 										ops.Add(() => { if (_byBetId.Remove(row.BetID)) _allRows.Remove(row); });
-										//_byBetId[row.BetID] = row;
 									}
 								}
                             }
@@ -352,30 +353,37 @@ namespace SpreadTrader
         private void PopulateDataGrid()
         {
             _LastUpdated = DateTime.UtcNow;
-            if (MarketNode != null)
+			if (MarketNode != null)
             {
                 if (Betfair == null)
                 {
                     Betfair = MainWindow.Betfair;
                 }
-                //Rows = new BulkObservableCollection<BetsManagerRow>();
-
                 if (MarketNode.MarketID != null)
                 {
                     try
                     {
-                        CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); // "1.185904913"
+						Debug.WriteLine(MarketNode.MarketID, "PopulateDataGrid: ");
+
+						CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); 
 
                         _allRows.Clear();
                         if (report.currentOrders.Count > 0)
                         {
                             foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
                             {
-								BetsManagerRow.RunnerNames[o.selectionId] = MarketNode.GetRunnerName(o.selectionId);
-								_allRows.Insert(0, new BetsManagerRow(o) { Runner = MarketNode.GetRunnerName(o.selectionId), });
-                            }
+								if (_cancelledBets.Contains(o.betId))
+									continue;   // do not resurrect
+
+								if (_byBetId.ContainsKey(o.betId))
+									continue;   // already have it from stream
+
+								BetsManagerRow newrow = new BetsManagerRow(o) { Runner = MarketNode.GetRunnerName(o.selectionId), };
+                                _allRows.Insert(0, newrow);
+								_byBetId[o.betId] = newrow;
+								Debug.WriteLine(o.betId, "insert new bet into _allRows: ");
+							}
                         }
-						//OnPropertyChanged("");
                         ApplyFilter();
 					}
 					catch (Exception xe)
