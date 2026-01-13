@@ -12,13 +12,8 @@
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="styles.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
-			<local:OddsConverter x:Key="oconverter" />
-			<local:OddsConverterBlank x:Key="obconverter" />
-			<local:StakeConverter x:Key="sconverter" />
-			<local:PercentConverter x:Key="pconverter" />
-			<!--<local:CurrencyConverter x:Key="cconverter" />-->
+
 			<Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}" >
-				<!--<Setter Property="Width" Value="240"/>-->
 				<Setter Property="HorizontalContentAlignment" Value="Left"/>
 				<Setter Property="Background" Value="#00000000"/>
 				<Setter Property="FontSize" Value="12"/>
@@ -59,9 +54,7 @@
 				<EventSetter Event="Click" Handler="Button_Click"/>
 				<Setter Property="VerticalContentAlignment" Value="Center"/>
 				<Setter Property="BorderThickness" Value="0.5"/>
-				<!--<Setter Property="Width" Value="42"/>-->
 				<Setter Property="Margin" Value="2"/>
-				<!--<Setter Property="Margin" Value="0,0,3,3"/>-->
 				<Setter Property="HorizontalContentAlignment" Value="Center"/>
 				<Setter Property="Button.Effect">
 					<Setter.Value>
@@ -90,8 +83,8 @@
 							<Grid>
 								<Grid>
 									<StackPanel Orientation="Vertical" Background="{TemplateBinding Background}" Height="35" VerticalAlignment="Center">
-										<TextBlock Text="{Binding Path=price, Mode=OneWay, Converter={StaticResource obconverter}}" FontSize="13" Margin="0,4,0,0"/>
-										<TextBlock Text="{Binding Path=size, Mode=OneWay, Converter={StaticResource sconverter}}" FontSize="11" FontWeight="Normal"/>
+										<TextBlock Text="{Binding Path=PriceText, Mode=OneWay}" FontSize="13" Margin="0,4,0,0"/>
+										<TextBlock Text="{Binding Path=SizeText, Mode=OneWay}" FontSize="11" FontWeight="Normal"/>
 									</StackPanel>
 								</Grid>
 								<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -101,7 +94,7 @@
 				</Setter>
 			</Style>
 			<DataTemplate x:Key="DataTemplate_Runner">
-				<Grid>
+				<Grid TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType" SnapsToDevicePixels="True" UseLayoutRounding="True" >
 					<Grid.ColumnDefinitions>
                         <ColumnDefinition Width="200"/>
                         <ColumnDefinition Width="46"/>
@@ -126,8 +119,8 @@
 					<Button Grid.Column="6" DataContext="{Binding LayValues[1]}" Background="{Binding CellBackgroundColor}"/>
 					<Button Grid.Column="7" DataContext="{Binding LayValues[2]}" Background="{Binding CellBackgroundColor}"/>
 
-					<Label Grid.Column="8" Content="{Binding LastPriceTraded, Mode=OneWay, Converter={StaticResource obconverter} }"  FontSize="11"/>
-					<Label Grid.Column="9" Content="{Binding ifWin, Mode=OneWay, Converter={StaticResource oconverter} }" Foreground="{Binding Path=ProfitColor}" FontWeight="Regular" FontSize="11"/>
+					<Label Grid.Column="8" Content="{Binding LastPriceTraded, Mode=OneWay}"  FontSize="11"/>
+					<Label Grid.Column="9" Content="{Binding ifWin, Mode=OneWay}" Foreground="{Binding Path=ProfitColor}" FontWeight="Regular" FontSize="11"/>
 					<Label Grid.Column="10" Content="{Binding LevelProfit, Mode=OneWay}" Foreground="{Binding Path=LevelProfitColor}" PreviewMouseDown="LevelProfitMouseDown" Background="LightGreen" FontSize="11"/>
 					<Label Grid.Column="11" Content="{Binding LevelStake, Mode=OneWay}" Background="Ivory" FontSize="11"/>
 				</Grid>
@@ -158,9 +151,9 @@
 			<Label HorizontalAlignment="Left" Grid.Column="0" Content="Selection Name" FontSize="16" BorderBrush="Transparent"/>
 			<Label Grid.Column="1"/>
 			<Label Grid.Column="2"/>
-			<Label Content="{Binding Path=BackBook, Mode=OneWay, Converter={StaticResource pconverter}}" FontSize="11" Padding ="0" Grid.Column="3"/>
+			<Label Content="{Binding Path=BackBook, Mode=OneWay}" FontSize="11" Padding ="0" Grid.Column="3"/>
 			<Label Grid.Column="4"/>
-            <Label Content="{Binding Path=LayBook, Mode=OneWay,Converter={StaticResource pconverter}}"  FontSize="11" Padding ="0" Grid.Column="5"/>
+            <Label Content="{Binding Path=LayBook, Mode=OneWay}"  FontSize="11" Padding ="0" Grid.Column="5"/>
 			<Label Grid.Column="6"/>
 			<Label Grid.Column="7"/>
             
@@ -170,7 +163,8 @@
             <Label Grid.Column="11"><TextBlock>Level<LineBreak/>Stake</TextBlock></Label>
         </Grid>
 
-        <ItemsControl Grid.Row="1" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}">
+        <ItemsControl Grid.Row="1" FontSize="9" Foreground="#FF5F4D4D" ItemTemplate="{DynamicResource DataTemplate_Runner}" ItemsSource="{Binding Path=LiveRunners}"
+			VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True"		>
 			<ItemsControl.Template>
 				<ControlTemplate>
 					<ScrollViewer>

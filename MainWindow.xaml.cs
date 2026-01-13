@@ -1,5 +1,4 @@
-﻿using Betfair.ESAClient.Cache;
-using BetfairAPI;
+﻿using BetfairAPI;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;

@@ -3,8 +3,6 @@ using BetfairAPI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Xml.Linq;
-using static System.Windows.Forms.AxHost;
 
 namespace SpreadTrader
 {

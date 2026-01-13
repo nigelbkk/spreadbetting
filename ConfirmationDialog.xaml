@@ -8,9 +8,6 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="{Binding Path=Header}" Height="239" Width="432" Topmost="True" LocationChanged="Window_LocationChanged">
 	<Window.Resources>
-		<local:CurrencyConverter x:Key="cconverter" />
-		<local:StakeConverter x:Key="sconverter" />
-		<local:OddsConverter x:Key="oconverter" />
 		<Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
 			<Setter Property="FontSize" Value="22"/>
 			<Setter Property="Foreground" Value="DarkGray"/>
@@ -87,7 +84,3 @@
 	</DockPanel>
 </Window>
 
-<!--PreviewTextInput="TextBox_PreviewTextInput"-->
-<!--Converter={StaticResource sconverter},--> 
-<!--TextChanged="StakeTextBox_TextChanged"-->
-<!--Text="{Binding Path=Stake, Mode=TwoWay, UpdateSourceTrigger=LostFocus }"-->

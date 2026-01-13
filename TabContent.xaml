@@ -9,9 +9,6 @@
 	         mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
-		<!--<local:TimeConverter x:Key="converter" />
-		<local:OddsConverter x:Key="oconverter" />
-		<local:CurrencyConverter x:Key="cconverter" />-->
 		<Style BasedOn="{StaticResource {x:Type Button}}" 
             TargetType="{x:Type Button}">
 			<Setter Property="FontSize" Value="12"/>

@@ -9,9 +9,6 @@
         mc:Ignorable="d"
         Title="Update Bet" Height="173.333" Width="320" Topmost="True" Closing="Window_Closing" PreviewKeyDown="Window_PreviewKeyDown">
 	<Window.Resources>
-		<!--<local:CurrencyConverter x:Key="cconverter" />
-		<local:StakeConverter x:Key="sconverter" />
-		<local:OddsConverter x:Key="oconverter" />-->
 		<Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
 			<Setter Property="FontSize" Value="16"/>
 			<Setter Property="HorizontalAlignment" Value="Right"/>

@@ -1,12 +1,9 @@
-﻿using Betfair.ESAClient.Cache;
-using Betfair.ESASwagger.Model;
-using BetfairAPI;
+﻿using BetfairAPI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using System.Windows;
@@ -47,11 +44,9 @@ namespace SpreadTrader
 # region
         private NodeViewModel _MarketNode { get; set; }
 		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); 
-            //    NotifyPropertyChanged("MarketNode"); 
             } }
 		public double BackBook { get { return MarketNode == null ? 0.00 : MarketNode.BackBook; } }
         public double LayBook { get { return MarketNode == null ? 0.00 : MarketNode.LayBook; } }
-        //public List<LiveRunner> LiveRunners { get { return MarketNode?.LiveRunners ?? new List<LiveRunner>(); } }
 		public List<LiveRunner> LiveRunners { get; set; }
 
 		private Properties.Settings props = Properties.Settings.Default;

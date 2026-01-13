@@ -42,18 +42,10 @@ namespace SpreadTrader
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 		}
 
-		//public void OnPropertyChanged(String info)
-  //      {
-  //          if (PropertyChanged != null)
-  //          {
-  //              Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
-  //          }
-  //      }
 		private bool _UnmatchedOnly;
 		public bool UnmatchedOnly { get => _UnmatchedOnly; set { if (_UnmatchedOnly != value)
                 { 
                     _UnmatchedOnly = value;
-					//OnPropertyChanged(nameof(UnmatchedOnly));
 					OnPropertyChanged();
 					ApplyFilter();
 				} 
@@ -206,7 +198,6 @@ namespace SpreadTrader
                 player.Play();
             }
 		}
-
 		public void OnOrderChanged(String json)
         {
             if (String.IsNullOrEmpty(json))
