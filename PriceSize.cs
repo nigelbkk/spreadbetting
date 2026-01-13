@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Threading;
-using Windows.Security.Cryptography.Certificates;
 
 
 public sealed class PriceSize : INotifyPropertyChanged
 {
+	private SpreadTrader.Properties.Settings props = SpreadTrader.Properties.Settings.Default;
 	static List<SolidColorBrush> BackgroundColors = new List<SolidColorBrush>
 	{
 		(SolidColorBrush) Application.Current.Resources["Back0Color"],
@@ -33,8 +33,14 @@ public sealed class PriceSize : INotifyPropertyChanged
     private Int32 Index { get; set; }
 	private bool _IsChecked { get; set; }
     private bool _ParentChecked { get; set; }
-    public bool ParentChecked { get { return _ParentChecked; } set { _ParentChecked = value; OnPropertyChanged(""); } }
-    public bool IsChecked { get { return _IsChecked; } set { _IsChecked = value; OnPropertyChanged(""); } }
+    public bool ParentChecked { get { return _ParentChecked; } set {
+			if (_ParentChecked == value)
+				return; 
+			_ParentChecked = value; OnPropertyChanged(); 
+		} }
+    public bool IsChecked { get { return _IsChecked; } set {
+			if (_IsChecked == value)
+				return; _IsChecked = value; OnPropertyChanged(); } }
 
 	private Double _price { get; set; }
 	private Double _size { get;  set; }
@@ -57,38 +63,82 @@ public sealed class PriceSize : INotifyPropertyChanged
 			OnPropertyChanged(nameof(price));
 		if (sizeChanged) 
 			OnPropertyChanged(nameof(size));
+
+		if (sizeChanged && props.FlashYellow)
+			Flash();
 	}
-    private DateTime? _lastFlashTime;
-    public DateTime? lastFlashTime {get { return _lastFlashTime; } 
-		set{ 
-			_lastFlashTime = value;
-			OnPropertyChanged(nameof(CellBackgroundColor));
-		} }
-    private const int FLASH_DURATION_MS = 200;
-    public SolidColorBrush CellDefaultColor { get; set; }
-	public SolidColorBrush CellBackgroundColor {
-		get {
-			if (_lastFlashTime.HasValue)
+
+	private CancellationTokenSource _flashCts;
+
+	private async void Flash()
+	{
+		_flashCts?.Cancel();
+		var cts = _flashCts = new CancellationTokenSource();
+
+		CellBackgroundColor = Brushes.Yellow;
+
+		try
+		{
+			await Task.Delay(200, cts.Token);
+			CellBackgroundColor = CellDefaultColor;
+		}
+		catch (TaskCanceledException) { }
+	}
+
+
+	//   private DateTime? _lastFlashTime;
+	//   public DateTime? lastFlashTime {get { return _lastFlashTime; } 
+	//	set{ 
+	//		_lastFlashTime = value;
+	//		OnPropertyChanged(nameof(CellBackgroundColor));
+	//	} }
+
+
+	//private const int FLASH_DURATION_MS = 200;
+	public SolidColorBrush CellDefaultColor { get; set; }
+
+	private SolidColorBrush _cellBackground;
+	public SolidColorBrush CellBackgroundColor
+	{
+		get => _cellBackground;
+		private set
+		{
+			if (_cellBackground != value)
 			{
-				var elapsed = (DateTime.UtcNow - _lastFlashTime.Value).TotalMilliseconds;
-				if (elapsed != 0 && elapsed < FLASH_DURATION_MS)
-				{
-                    return Brushes.Yellow;
-				}
-				else
-				{
-					_lastFlashTime = null; // Expired
-					return CellDefaultColor;
-				}
+				_cellBackground = value;
+				OnPropertyChanged();
 			}
-			return CellDefaultColor;
 		}
 	}
 
-public override string ToString()
+
+	//public SolidColorBrush CellBackgroundColor {
+	//	get {
+	//		if (_lastFlashTime.HasValue)
+	//		{
+	//			var elapsed = (DateTime.UtcNow - _lastFlashTime.Value).TotalMilliseconds;
+	//			if (elapsed != 0 && elapsed < FLASH_DURATION_MS)
+	//			{
+	//                   return Brushes.Yellow;
+	//			}
+	//			else
+	//			{
+	//				_lastFlashTime = null; // Expired
+	//				return CellDefaultColor;
+	//			}
+	//		}
+	//		return CellDefaultColor;
+	//	}
+	//}
+
+	public override string ToString()
     {
         return String.Format("{0:0.00}:{1:0.00}", price, size);
     }
     public event PropertyChangedEventHandler PropertyChanged;
-	private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+	void OnPropertyChanged([CallerMemberName] string name = null)
+	{
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+	}
+	//	private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

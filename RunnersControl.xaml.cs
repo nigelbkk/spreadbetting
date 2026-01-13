@@ -113,43 +113,43 @@ namespace SpreadTrader
             }
             return null;
         }
-        async Task RunLoop()
-        {
-            while (true)
-            {
-                await Task.Delay(50);
-                if (props.FlashYellow && LiveRunners != null)
-                {
-                    foreach (LiveRunner lr in LiveRunners)
-                    {
-                        foreach (PriceSize ps in lr.BackValues)
-                        {
-                            if (ps.lastFlashTime.HasValue)
-                            {
-                                var elapsed = (DateTime.UtcNow - ps.lastFlashTime.Value).TotalMilliseconds;
+        //async Task RunLoop()
+        //{
+        //    while (true)
+        //    {
+        //        await Task.Delay(50);
+        //        if (props.FlashYellow && LiveRunners != null)
+        //        {
+        //            foreach (LiveRunner lr in LiveRunners)
+        //            {
+        //                foreach (PriceSize ps in lr.BackValues)
+        //                {
+        //                    if (ps.lastFlashTime.HasValue)
+        //                    {
+        //                        var elapsed = (DateTime.UtcNow - ps.lastFlashTime.Value).TotalMilliseconds;
 
-                                if (elapsed >= 200)
-                                {
-                                    ps.lastFlashTime = null;
-                                }
-                            }
-                        }
-                        foreach (PriceSize ps in lr.LayValues)
-                        {
-                            if (ps.lastFlashTime.HasValue)
-                            {
-                                var elapsed = (DateTime.UtcNow - ps.lastFlashTime.Value).TotalMilliseconds;
+        //                        if (elapsed >= 200)
+        //                        {
+        //                            ps.lastFlashTime = null;
+        //                        }
+        //                    }
+        //                }
+        //                foreach (PriceSize ps in lr.LayValues)
+        //                {
+        //                    if (ps.lastFlashTime.HasValue)
+        //                    {
+        //                        var elapsed = (DateTime.UtcNow - ps.lastFlashTime.Value).TotalMilliseconds;
 
-                                if (elapsed >= 200)
-                                {
-                                    ps.lastFlashTime = null;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //                        if (elapsed >= 200)
+        //                        {
+        //                            ps.lastFlashTime = null;
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
         public void OnMarketChanged(MarketChangeDto change)
         {
 			if (MarketNode == null)
@@ -176,28 +176,28 @@ namespace SpreadTrader
 
                     String runner_name = lr.Name;
 
-                    if (props.FlashYellow)
-                    {
-                        if (runner.Trd != null && runner.Trd.Count > 0)
-                        {
-                            foreach (var ti in runner.Trd)
-                            {
-                                for (int i = 0; i < 3; i++)
-                                {
-                                    PriceSize ps = lr.BackValues[i];
-                                    if (ps.price == ti[0].Value)
-                                    {
-                                        lr.BackValues[i].lastFlashTime = DateTime.UtcNow;
-                                    }
-                                    ps = lr.LayValues[i];
-                                    if (ps.price == ti[0].Value)
-                                    {
-                                        lr.LayValues[i].lastFlashTime = DateTime.UtcNow;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    //if (props.FlashYellow)
+                    //{
+                    //    if (runner.Trd != null && runner.Trd.Count > 0)
+                    //    {
+                    //        foreach (var ti in runner.Trd)
+                    //        {
+                    //            for (int i = 0; i < 3; i++)
+                    //            {
+                    //                PriceSize ps = lr.BackValues[i];
+                    //                if (ps.price == ti[0].Value)
+                    //                {
+                    //                    lr.BackValues[i].lastFlashTime = DateTime.UtcNow;
+                    //                }
+                    //                ps = lr.LayValues[i];
+                    //                if (ps.price == ti[0].Value)
+                    //                {
+                    //                    lr.LayValues[i].lastFlashTime = DateTime.UtcNow;
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+                    //}
 
                     if (runner.Ltp != null)
                     {
@@ -232,14 +232,14 @@ namespace SpreadTrader
                 _ = UpdateRunnerPnLAsync();
             }
         }
-        private async void StartRunLoop()
-        {
-            _ = RunLoop();
-        }
+        //private async void StartRunLoop()
+        //{
+        //    _ = RunLoop();
+        //}
         public RunnersControl()
         {
             InitializeComponent();
-            StartRunLoop();
+            //StartRunLoop();
             ControlMessenger.MessageSent += OnMessageReceived;
         }
 		private void Button_Click(object sender, RoutedEventArgs e)
