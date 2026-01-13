@@ -21,31 +21,31 @@ public sealed class PriceSize : INotifyPropertyChanged
 		(SolidColorBrush) Application.Current.Resources["Lay2Color"]
 	};
 
-	public PriceSize(double price, double size) { 
-		Update(price, size); 
-		IsChecked = true; 
+	public PriceSize(double price, double size) {
+		Update(price, size);
+		IsChecked = true;
 	}
-    public PriceSize(Int32 index) {
-        this.Index = index;
-		CellDefaultColor = BackgroundColors[index];
-		IsChecked = true; 
-    }
-    private Int32 Index { get; set; }
+	private Int32 Index;
+	public PriceSize(Int32 index) {
+		this.Index = index;
+		_cellBackground = CellDefaultColor = BackgroundColors[index];
+		IsChecked = true;
+	}
 	private bool _IsChecked { get; set; }
-    private bool _ParentChecked { get; set; }
-    public bool ParentChecked { get { return _ParentChecked; } set {
+	private bool _ParentChecked { get; set; }
+	public bool ParentChecked { get { return _ParentChecked; } set {
 			if (_ParentChecked == value)
-				return; 
-			_ParentChecked = value; OnPropertyChanged(); 
+				return;
+			_ParentChecked = value; OnPropertyChanged();
 		} }
-    public bool IsChecked { get { return _IsChecked; } set {
-			if (_IsChecked == value)
-				return; _IsChecked = value; OnPropertyChanged(); } }
+	public bool IsChecked { get { return _IsChecked; } set { if (_IsChecked == value) return; _IsChecked = value; OnPropertyChanged(); } }
 
 	private Double _price { get; set; }
-	private Double _size { get;  set; }
+	private Double _size { get; set; }
+	private Double _traded { get; set; }
 	public Double price => _price;
 	public Double size => _size;
+	public Double traded => _traded;
 
 	public string PriceText
 	{
@@ -64,10 +64,29 @@ public sealed class PriceSize : INotifyPropertyChanged
 	public string SizeText => _size == 0 ? "" : _size.ToString("0");
 
 	public DateTime last_flash_time;
-	public void Update(double newPrice, double newSize)
+
+	private double _tradedVolume;
+	public double TradedVolume
+	{
+		get => _tradedVolume; 
+		set
+		{
+			if (_tradedVolume != value)
+			{ 
+				_tradedVolume = value;
+				OnPropertyChanged();
+				if (props.FlashYellow)
+					Flash();
+			}
+		}
+	}
+
+
+public void Update(double newPrice, double newSize)
 	{
 		bool priceChanged = _price != newPrice;
 		bool sizeChanged = _size != newSize;
+		//bool tradedChanged = _traded != newTraded;
 
 		if (!priceChanged && !sizeChanged)
 			return;
@@ -84,9 +103,11 @@ public sealed class PriceSize : INotifyPropertyChanged
 		{ 
 			OnPropertyChanged(nameof(size));
 			OnPropertyChanged(nameof(SizeText));
-			if (props.FlashYellow)
-				Flash();
 		}
+		//if (tradedChanged) OnPropertyChanged(nameof(TradedText));
+		//if (tradedChanged)
+		//	if (props.FlashYellow)
+		//		Flash();
 	}
 
 	private CancellationTokenSource _flashCts;

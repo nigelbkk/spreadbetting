@@ -61,8 +61,6 @@ namespace SpreadTrader
                 return string.Empty;
 
             UInt32 val = System.Convert.ToUInt32(Math.Abs((double)value));
-            //if (val == 0)
-            //    return string.Empty;
 
             String cs = val.ToString();
             if (cs.Length > 3)
@@ -119,12 +117,8 @@ namespace SpreadTrader
             Int32 dps = cs.Length < 2 ? 0 : cs[1].Length;
             switch (dps)
             {
-                //case 0: return String.Format("{0:0}", val);
-                //case 1: return String.Format("{0:0.0}", val);
-                //case 2: return String.Format("{0:0.00}", val);
                 default: return String.Format("{0:0.00}", val);
             }
-            //return valString;
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {

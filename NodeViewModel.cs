@@ -9,7 +9,6 @@ namespace SpreadTrader
 {
 	public class NodeViewModel : ViewModelBase
 	{
-		//public MarketSelectionDelegate OnMarketSelected;
 		public String FullName { get; set; }
 		public Market Market { get; set; }
 		public String MarketID { get; set; }
@@ -22,11 +21,7 @@ namespace SpreadTrader
 		public double LayBook { get { return _LayBook; } set { _LayBook = value; OnPropertyChanged(""); } }
 		public bool InPlay { get; set; }
 		public marketStatusEnum Status { get; set; }
-		//private Int32 _UpdateRate { get; set; }
 		public double Commission { get; set; }
-		//private double _TurnaroundTime { get; set; }
-		//public Int32 UpdateRate { get { return _UpdateRate; } set { _UpdateRate = value; OnPropertyChanged("UpdateRate"); } }
-		//public double TurnaroundTime { get { return Math.Round(_TurnaroundTime, 5); } set { _TurnaroundTime = value; OnPropertyChanged("TurnaroundTime"); } }
 		public SolidColorBrush TimeToGoColor { get { return (Market.description.marketTime - DateTime.UtcNow).TotalSeconds > 0 ? System.Windows.Media.Brushes.Blue : System.Windows.Media.Brushes.Red; } }
 		public String TimeToGo { get { return String.Format("{0}{1}", (Market.description.marketTime - DateTime.UtcNow).TotalSeconds > 0 ? "" : "-", (Market.description.marketTime - DateTime.UtcNow).ToString(@"hh\:mm\:ss")); } }
 		List<EventTypeResult> EventTypes { get; set; }
@@ -57,8 +52,6 @@ namespace SpreadTrader
 			NodeViewModel.Betfair = Betfair;
 			Nodes = new ObservableCollection<NodeViewModel>();
 			Market = new Market();
-			//Market.marketId = "1.175371349";
-
 			OnItemSelected();
 		}
 		public NodeViewModel(String name)
@@ -118,7 +111,6 @@ namespace SpreadTrader
 			CalculateLevelProfit();
 			return Runners;
 		}
-
 		private void OnItemSelected()
 		{
 			if (Market != null)
@@ -280,14 +272,11 @@ namespace SpreadTrader
 		public void Add(NodeViewModel node, bool leaf = false)
 		{
 			node.Parent = this;
-			//node.OnMarketSelected = OnMarketSelected;
 			Nodes.Add(node);
 			if (node.Populate != null) node.Nodes.Add(new NodeViewModel("x"));
 		}
 		public void PopulateEventTypes()
 		{
-			//EventTypes = Betfair.GetEventTypes().OrderBy(o => o.eventType.name).ToList();
-
 			EventTypes = (Betfair.GetEventTypes() ?? Enumerable.Empty<EventTypeResult>()).OrderBy(o => o.eventType.name).ToList();
 
 			if (EventTypes != null)
@@ -306,7 +295,6 @@ namespace SpreadTrader
 		}
 		public void PopulateEvents()
 		{
-//			List<Event> events = Betfair.GetEvents(ID, Tag as String).OrderBy(o => o.details.name).ToList();
 			List<Event> events = (Betfair.GetEvents(ID, Tag as String) ?? Enumerable.Empty<Event>()).OrderBy(o => o.details.name).ToList();
 			foreach (Event ev in events)
 			{
@@ -318,7 +306,6 @@ namespace SpreadTrader
 		public void PopulateEventsForCompetition()
 		{
 			List<Event> events = (Betfair.GetEventsForCompetition(ID) ?? Enumerable.Empty<Event>()).OrderBy(o => o.details.name).ToList();
-//			List<Event> events = Betfair.GetEventsForCompetition(ID).OrderBy(o => o.details.name).ToList();
 			foreach (Event ev in events)
 			{
 				NodeViewModel nvm = new NodeViewModel(ev.details.name) { ID = ev.details.id };
@@ -330,7 +317,6 @@ namespace SpreadTrader
 		{
 			List<CompetitionResult> competitions = (Betfair.GetCompetitions(ID) ?? Enumerable.Empty<CompetitionResult>()) .OrderBy(o => o.competition.name) .ToList();
 
-//			List<CompetitionResult> competitions = Betfair.GetCompetitions(ID).OrderBy(o => o.competition.name).ToList();
 			if (competitions.Count > 0)
 			{
 				foreach (CompetitionResult cr in competitions)
@@ -355,7 +341,6 @@ namespace SpreadTrader
 		public void PopulateVenues()
 		{
 			List<VenueResult> venues = (Betfair.GetVenues(ID, Tag as String) ?? Enumerable.Empty<VenueResult>()).OrderBy(o => o.venue).ToList();
-//			List<VenueResult> venues = Betfair.GetVenues(ID, Tag as String).OrderBy(o => o.venue).ToList();
 			foreach (VenueResult v in venues)
 			{
 				NodeViewModel nvm = new NodeViewModel(v.venue) { ID = this.ID, Tag = v.venue };
@@ -367,7 +352,6 @@ namespace SpreadTrader
 		{
 			Int32 event_type = Convert.ToInt32(Tag);
 			List<Market> markets = (Betfair.GetMarkets(event_type, ID) ?? Enumerable.Empty<Market>()).OrderBy(o => o.marketStartTime).ToList();
-//			List<Market> markets = Betfair.GetMarkets(event_type, ID).OrderBy(o => o.marketStartTime).ToList();
 			foreach (Market m in markets)
 			{
 				NodeViewModel nvm = new NodeViewModel(String.Format("{0:HH:mm} {1}", m.description.marketTime.AddHours(props.TimeOffset), m.marketName)) { Market = m };

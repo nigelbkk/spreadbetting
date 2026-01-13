@@ -1,15 +1,16 @@
-﻿using BetfairAPI;
+﻿using Betfair.ESAClient.Cache;
+using BetfairAPI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace SpreadTrader
 {
@@ -43,15 +44,39 @@ namespace SpreadTrader
     {
 # region
         private NodeViewModel _MarketNode { get; set; }
-		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); 
-            } }
-		public double BackBook { get { return MarketNode == null ? 0.00 : MarketNode.BackBook; } }
-        public double LayBook { get { return MarketNode == null ? 0.00 : MarketNode.LayBook; } }
-		public List<LiveRunner> LiveRunners { get; set; }
+		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); } }
 
-		private Properties.Settings props = Properties.Settings.Default;
+        private double _backBook;
+        private double _layBook;
+
+		public double BackBook
+        {
+            set
+            {
+                if (_backBook != value)
+                {
+                    _backBook = value;
+                    OnPropertyChanged(nameof(BackBookString));
+                }
+            }
+        }
+		public double LayBook
+        {
+            set
+            {
+                if (_layBook != value)
+                {
+                    _layBook = value;
+                    OnPropertyChanged(nameof(LayBookString));
+                }
+            }
+        }
+		public String BackBookString { get { return MarketNode == null ? "" : MarketNode.BackBook.ToString("P2"); } }
+		public String LayBookString { get { return MarketNode == null ? "" : MarketNode.LayBook.ToString("P2"); } }
+		public List<LiveRunner> LiveRunners { get; set; }
+		private Dictionary<long, LiveRunner> RunnerBySelectionId = new Dictionary<long, LiveRunner>();
         public event PropertyChangedEventHandler PropertyChanged;
-        public void NotifyPropertyChanged(String info)
+        public void OnPropertyChanged(String info)
         {
             if (PropertyChanged != null)
             {
@@ -89,7 +114,11 @@ namespace SpreadTrader
 			_MarketNode = node;
 			MarketNode.GetLiveRunners();
 			LiveRunners = MarketNode.LiveRunners;
-			NotifyPropertyChanged("");
+            foreach (var runner in LiveRunners)
+            {
+                RunnerBySelectionId[runner.SelectionId] = runner;
+            }
+			OnPropertyChanged("");
 		}
         public LiveRunner GetRunnerFromSelectionID(Int64 selid)
         {
@@ -108,43 +137,6 @@ namespace SpreadTrader
             }
             return null;
         }
-        //async Task RunLoop()
-        //{
-        //    while (true)
-        //    {
-        //        await Task.Delay(50);
-        //        if (props.FlashYellow && LiveRunners != null)
-        //        {
-        //            foreach (LiveRunner lr in LiveRunners)
-        //            {
-        //                foreach (PriceSize ps in lr.BackValues)
-        //                {
-        //                    if (ps.lastFlashTime.HasValue)
-        //                    {
-        //                        var elapsed = (DateTime.UtcNow - ps.lastFlashTime.Value).TotalMilliseconds;
-
-        //                        if (elapsed >= 200)
-        //                        {
-        //                            ps.lastFlashTime = null;
-        //                        }
-        //                    }
-        //                }
-        //                foreach (PriceSize ps in lr.LayValues)
-        //                {
-        //                    if (ps.lastFlashTime.HasValue)
-        //                    {
-        //                        var elapsed = (DateTime.UtcNow - ps.lastFlashTime.Value).TotalMilliseconds;
-
-        //                        if (elapsed >= 200)
-        //                        {
-        //                            ps.lastFlashTime = null;
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
         public void OnMarketChanged(MarketChangeDto change)
         {
 			if (MarketNode == null)
@@ -165,36 +157,31 @@ namespace SpreadTrader
 
                 foreach (RunnerChangeDto runner in change.Runners)
                 {
-                    LiveRunner lr = GetRunnerFromSelectionID(runner.Id);
+                    LiveRunner lr;
+                    RunnerBySelectionId.TryGetValue(runner.Id, out lr) ;
                     if (lr == null)
                         return;
 
                     String runner_name = lr.Name;
 
-                    //if (props.FlashYellow)
-                    //{
-                    //    if (runner.Trd != null && runner.Trd.Count > 0)
-                    //    {
-                    //        foreach (var ti in runner.Trd)
-                    //        {
-                    //            for (int i = 0; i < 3; i++)
-                    //            {
-                    //                PriceSize ps = lr.BackValues[i];
-                    //                if (ps.price == ti[0].Value)
-                    //                {
-                    //                    lr.BackValues[i].lastFlashTime = DateTime.UtcNow;
-                    //                }
-                    //                ps = lr.LayValues[i];
-                    //                if (ps.price == ti[0].Value)
-                    //                {
-                    //                    lr.LayValues[i].lastFlashTime = DateTime.UtcNow;
-                    //                }
-                    //            }
-                    //        }
-                    //    }
-                    //}
+                    if (runner.Trd != null)
+                    {
+                        foreach (var ti in runner.Trd)
+                        {
+                            for (int i = 0; i < 3; i++)
+                            {
+								if (lr.BackValues[i].price == ti[0])
+								    lr.BackValues[i].TradedVolume = ti[1].Value;
+                            }
+                            for (int i = 0; i < 3; i++)
+                            {
+								if (lr.LayValues[i].price == ti[0])
+								    lr.LayValues[i].TradedVolume = ti[1].Value;
+                            }
+                        }
+                    }
 
-                    if (runner.Ltp != null)
+					if (runner.Ltp != null)
                     {
                         lr.LastPriceTraded = runner.Ltp.Value;
                     }
@@ -227,10 +214,6 @@ namespace SpreadTrader
                 _ = UpdateRunnerPnLAsync();
             }
         }
-        //private async void StartRunLoop()
-        //{
-        //    _ = RunLoop();
-        //}
         public RunnersControl()
         {
             InitializeComponent();

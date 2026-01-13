@@ -32,13 +32,20 @@ namespace SpreadTrader
 		public Double? TotalMatched
 		{
 			get => _TotalMatched;
-			set { if (_TotalMatched != value){
+			set
+			{
+				if (_TotalMatched != value)
+				{
 					_TotalMatched = value;
-					OnPropertyChanged(nameof(TotalMatched));
+					OnPropertyChanged(nameof(TotalMatchedString));
 				}
 			}
 		}
-		
+		public String TotalMatchedString
+		{
+			get => $"£{((Int32) _TotalMatched).ToString("N0")}";
+		}
+
 		public Visibility down_visible { get => _down_visible; set { _down_visible = value; OnPropertyChanged(nameof(down_visible)); } }
 		public Visibility up_visible { get => _up_visible; set { _up_visible = value; OnPropertyChanged(nameof(up_visible)); } }
 		public SolidColorBrush TimeToGoColor { get { return System.Windows.Media.Brushes.DarkGray; } }
