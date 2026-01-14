@@ -130,6 +130,7 @@
     <Compile Include="MarketHeader.xaml.cs">
       <DependentUpon>MarketHeader.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MarketStateEngine.cs" />
     <Compile Include="Models.cs" />
     <Compile Include="NodeViewModel.cs" />
     <Compile Include="PriceSize.cs" />

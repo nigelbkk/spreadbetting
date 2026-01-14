@@ -16,8 +16,6 @@ namespace SpreadTrader
 		private HubConnection hubConnection = null;
 		private readonly BlockingCollection<string> _orderQueue = new BlockingCollection<string>();
 		private readonly BlockingCollection<MarketChangeDto> _marketChangeQueue = new BlockingCollection<MarketChangeDto>();
-		private object lockObj1 = new object();
-		private object lockObj2 = new object();
 		private Task _orderProcessor;
 		private Task _marketChangeProcessor;
 		private Properties.Settings props = Properties.Settings.Default;
@@ -26,20 +24,14 @@ namespace SpreadTrader
 		{
 			foreach (var json in _orderQueue?.GetConsumingEnumerable())
 			{
-				lock (lockObj1)
-				{
-					ControlMessenger.Send("Orders Changed", new { String = json });
-				}
+				ControlMessenger.Send("Orders Changed", new { String = json });
 			}
 		}
 		private void MarketChangerProcessingLoop()
 		{
 			foreach (var change in _marketChangeQueue?.GetConsumingEnumerable())
 			{
-				lock (lockObj2)
-				{
-					ControlMessenger.Send("Market Changed", new { MarketChangeDto = change });
-				}
+				ControlMessenger.Send("Market Changed", new { MarketChangeDto = change });
 			}
 		}
 		public void Start()

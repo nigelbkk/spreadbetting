@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using static BetfairAPI.MarketProfitAndLoss;
 
 namespace SpreadTrader
 {
@@ -14,28 +15,14 @@ namespace SpreadTrader
 		public double BackBook { get; set; }
 		public double LayBook { get; set; }
 		public double TotalMatched { get; set; }
-		public double PnL { get; set; }
-		public marketStatusEnum Status { get; set; }
+		public List<RunnerProfitAndLoss> ProfitAndLosses { get; set; }
 	}
 
 	internal class MarketStateEngine
     {
 		public event Action<MarketTelemetry> TelemetryAvailable;
-		//private Market _market;
 		private BetfairAPI.BetfairAPI _bf = MainWindow.Betfair;
 		private CancellationTokenSource _cts = new CancellationTokenSource();
-
-		void PushDiffsToUi()
-		{
-			Application.Current.Dispatcher.Invoke(() =>
-			{
-				//foreach (var d in diffs)
-				//{
-				//	var cell = _cells[d.RunnerId, d.Side, d.Level];
-				//	cell.Update(cell.price, d.NewSize, d.NewTraded);
-				//}
-			});
-		}
 		private async Task OrderBookProcessingLoop(Market _market, CancellationToken token)
 		{
 			while (!token.IsCancellationRequested)
@@ -45,7 +32,6 @@ namespace SpreadTrader
 					if (_market != null)
 					{
 						List<MarketProfitAndLoss> pnl = _bf.listMarketProfitAndLoss(_market.marketId);
-
 						MarketBook book = _bf.GetMarketBook(_market);
 
 						var telemetry = new MarketTelemetry
@@ -53,21 +39,9 @@ namespace SpreadTrader
 							BackBook = book.BackBook,
 							LayBook = book.LayBook,
 							TotalMatched = book.totalMatched,
-							Status = book.status,
-							//PnL = pnl.Sum(x => x.profit)
+							ProfitAndLosses = pnl.Count > 0 ? pnl[0].profitAndLosses : new List<RunnerProfitAndLoss>()
 						};
-
 						TelemetryAvailable?.Invoke(telemetry);
-
-
-						//Application.Current.Dispatcher.Invoke(() =>
-						//{
-						//	_backbook = book.BackBook;
-						//	_laybook = book.LayBook;
-						//	_totalMatched = book.totalMatched;
-						//	_status = book.status;
-						//	//PnL = pnl.Sum(x => x.profit);
-						//});
 					}
 				}
 				catch (Exception ex)
@@ -75,7 +49,7 @@ namespace SpreadTrader
 					Debug.WriteLine(ex.Message);
 				}
 
-				await Task.Delay(2000, token);
+				await Task.Delay(500, token);
 			}
 		}
 		public void Start(Market market)

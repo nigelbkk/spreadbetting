@@ -14,65 +14,21 @@ using System.Windows.Threading;
 
 namespace SpreadTrader
 {
-	#region Properties
-	//public class MarketSnapDto
-	//{
-	//	public String MarketId { get; set; }
-	//	public bool InPlay { get; set; }
-	//	public MarketDefinition.StatusEnum Status { get; set; }
-	//	public DateTime Time { get; set; }
-	//	public List<MarketRunnerSnapDto> Runners { get; set; }
-	//}
-	//public class MarketRunnerSnapDto
-	//{
-	//	public long SelectionId { get; set; }
-	//	public MarketRunnerPricesDto Prices { get; set; }
-	//}
-	//public class MarketRunnerPricesDto
-	//{
-	//	public List<PriceDto> Back { get; set; }
-	//	public List<PriceDto> Lay { get; set; }
-	//}
-	//public class PriceDto
-	//{
-	//	public double Price { get; set; }
-	//	public double Size { get; set; }
-	//}
-	#endregion Properties
-
 	public partial class RunnersControl : UserControl, INotifyPropertyChanged
     {
-# region
-        private NodeViewModel _MarketNode { get; set; }
+        #region
+        MarketStateEngine _marketStateEngine = new MarketStateEngine();
+		private NodeViewModel _MarketNode { get; set; }
 		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); } }
 
         private double _backBook;
         private double _layBook;
-
-		public double BackBook
-        {
-            set
-            {
-                if (_backBook != value)
-                {
-                    _backBook = value;
-                    OnPropertyChanged(nameof(BackBookString));
-                }
-            }
-        }
-		public double LayBook
-        {
-            set
-            {
-                if (_layBook != value)
-                {
-                    _layBook = value;
-                    OnPropertyChanged(nameof(LayBookString));
-                }
-            }
-        }
-		public String BackBookString { get { return MarketNode == null ? "" : MarketNode.BackBook.ToString("P2"); } }
-		public String LayBookString { get { return MarketNode == null ? "" : MarketNode.LayBook.ToString("P2"); } }
+		public double BackBook { set { if (_backBook != value) { _backBook = value; OnPropertyChanged(nameof(BackBook)); OnPropertyChanged(nameof(BackBookString)); } } }
+		public double LayBook { set { if (_layBook != value) { _layBook = value; OnPropertyChanged(nameof(LayBook)); OnPropertyChanged(nameof(LayBookString)); } } }
+		public String BackBookString { get { if (_backBook == 0)
+                    return "88";
+                return MarketNode == null ? "" : _backBook.ToString("0.00")+"%"; } }
+		public String LayBookString { get { return MarketNode == null ? "" : _layBook.ToString("0.00")+"%"; } }
 		public List<LiveRunner> LiveRunners { get; set; }
 		private Dictionary<long, LiveRunner> RunnerBySelectionId = new Dictionary<long, LiveRunner>();
         public event PropertyChangedEventHandler PropertyChanged;
@@ -84,31 +40,6 @@ namespace SpreadTrader
             }
 		}
 #endregion
-        private async Task<List<MarketProfitAndLoss>> GetProfitAndLossAsync(string marketId)
-        {
-            return await Task.Run(() =>
-            {
-                return MainWindow.Betfair.listMarketProfitAndLoss(marketId);
-            });
-        }
-        public async Task UpdateRunnerPnLAsync()
-        {
-            var plList = await GetProfitAndLossAsync(MarketNode.MarketID);
-            var pl = plList?.FirstOrDefault();
-            if (pl == null || pl.profitAndLosses == null)
-                return;
-
-            // Build lookup for speed
-            var lookup = pl.profitAndLosses.ToDictionary(x => x.selectionId);
-
-            foreach (var runner in LiveRunners)
-            {
-                if (lookup.TryGetValue(runner.SelectionId, out var pnl))
-                {
-                    runner.ifWin = pnl.ifWin;
-                }
-            }
-        }
         public void PopulateNewMarket(NodeViewModel node)
         {
 			_MarketNode = node;
@@ -119,24 +50,22 @@ namespace SpreadTrader
                 RunnerBySelectionId[runner.SelectionId] = runner;
             }
 			OnPropertyChanged("");
-		}
-        public LiveRunner GetRunnerFromSelectionID(Int64 selid)
-        {
-            if (LiveRunners != null)
-            {
-				Int32 i = 0;
-                foreach (LiveRunner runner in LiveRunners)
-                {
-                    if (runner.SelectionId == selid)
+
+			_marketStateEngine.Start(_MarketNode.Market);
+
+			_marketStateEngine.TelemetryAvailable += telemetry =>
+			{
+				Dispatcher.Invoke(() =>
+				{
+					BackBook = telemetry.BackBook;
+					LayBook = telemetry.LayBook;
+                    foreach(var pnl in telemetry.ProfitAndLosses)
                     {
-						runner.Index = i;
-                        return runner;
+                        RunnerBySelectionId[pnl.selectionId].ifWin = pnl.ifWin;
                     }
-					i++;
-                }
-            }
-            return null;
-        }
+				});
+			};
+		}
         public void OnMarketChanged(MarketChangeDto change)
         {
 			if (MarketNode == null)
@@ -209,15 +138,10 @@ namespace SpreadTrader
         }
 		private void OnMessageReceived(string messageName, object data)
         {
-            if (messageName == "Update P&L")
-            {
-                _ = UpdateRunnerPnLAsync();
-            }
         }
         public RunnersControl()
         {
             InitializeComponent();
-            //StartRunLoop();
             ControlMessenger.MessageSent += OnMessageReceived;
         }
 		private void Button_Click(object sender, RoutedEventArgs e)

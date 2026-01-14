@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BetfairAPI;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
@@ -77,8 +78,9 @@ namespace SpreadTrader
 			customHeader.OnMarketSelected(d2);
 			BetsManager.OnMarketSelected(d2, RunnersControl);
 			RunnersControl.PopulateNewMarket(d2);
-			OnPropertyChanged(nameof(OverlayVisibility));
-			OnPropertyChanged(nameof(MarketStatus));
+			MarketStatus = marketStatusEnum.INACTIVE.ToString();
+			//OnPropertyChanged(nameof(OverlayVisibility));
+			//OnPropertyChanged(nameof(MarketStatus));
 			OnPropertyChanged(nameof(MarketName));
 		}
 		public void OnTabSelected()

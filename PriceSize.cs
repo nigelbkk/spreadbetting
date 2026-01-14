@@ -26,18 +26,10 @@ public sealed class PriceSize : INotifyPropertyChanged
 		IsChecked = true;
 	}
 	private Int32 Index;
-	public PriceSize(Int32 index) {
-		this.Index = index;
-		_cellBackground = CellDefaultColor = BackgroundColors[index];
-		IsChecked = true;
-	}
+	public PriceSize(Int32 index) { this.Index = index; _cellBackground = CellDefaultColor = BackgroundColors[index]; IsChecked = true; }
 	private bool _IsChecked { get; set; }
 	private bool _ParentChecked { get; set; }
-	public bool ParentChecked { get { return _ParentChecked; } set {
-			if (_ParentChecked == value)
-				return;
-			_ParentChecked = value; OnPropertyChanged();
-		} }
+	public bool ParentChecked { get { return _ParentChecked; } set { if (_ParentChecked == value) return; _ParentChecked = value; OnPropertyChanged(); } }
 	public bool IsChecked { get { return _IsChecked; } set { if (_IsChecked == value) return; _IsChecked = value; OnPropertyChanged(); } }
 
 	private Double _price { get; set; }
@@ -80,13 +72,10 @@ public sealed class PriceSize : INotifyPropertyChanged
 			}
 		}
 	}
-
-
-public void Update(double newPrice, double newSize)
+	public void Update(double newPrice, double newSize)
 	{
 		bool priceChanged = _price != newPrice;
 		bool sizeChanged = _size != newSize;
-		//bool tradedChanged = _traded != newTraded;
 
 		if (!priceChanged && !sizeChanged)
 			return;
@@ -104,29 +93,38 @@ public void Update(double newPrice, double newSize)
 			OnPropertyChanged(nameof(size));
 			OnPropertyChanged(nameof(SizeText));
 		}
-		//if (tradedChanged) OnPropertyChanged(nameof(TradedText));
-		//if (tradedChanged)
-		//	if (props.FlashYellow)
-		//		Flash();
 	}
 
-	private CancellationTokenSource _flashCts;
+	//private CancellationTokenSource _flashCts;
+
+	//private async void Flash()
+	//{
+	//	_flashCts?.Cancel();
+	//	var cts = _flashCts = new CancellationTokenSource();
+
+	//	CellBackgroundColor = Brushes.Yellow;
+
+	//	try
+	//	{
+	//		await Task.Delay(FLASH_DURATION_MS, cts.Token);
+	//		CellBackgroundColor = CellDefaultColor;
+	//	}
+	//	catch (TaskCanceledException) { }
+	//}
+
+	private int _flashGeneration;
 
 	private async void Flash()
 	{
-		_flashCts?.Cancel();
-		var cts = _flashCts = new CancellationTokenSource();
+		var gen = ++_flashGeneration;
 
 		CellBackgroundColor = Brushes.Yellow;
 
-		try
-		{
-			await Task.Delay(FLASH_DURATION_MS, cts.Token);
-			CellBackgroundColor = CellDefaultColor;
-		}
-		catch (TaskCanceledException) { }
-	}
+		await Task.Delay(FLASH_DURATION_MS);
 
+		if (gen == _flashGeneration)
+			CellBackgroundColor = CellDefaultColor;
+	}
 	private const int FLASH_DURATION_MS = 200;
 	public SolidColorBrush CellDefaultColor { get; set; }
 
