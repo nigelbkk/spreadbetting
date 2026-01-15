@@ -276,7 +276,7 @@ namespace SpreadTrader
                                 {
 									ops.Add(() => row.AvgPriceMatched = o.Avp.Value);
 									ops.Add(() => row.SizeMatched = row.Stake);
-									ops.Add(() => row.Hidden = UnmatchedOnly);
+									//ops.Add(() => row.Hidden = UnmatchedOnly);                    // bad 
                                     betMatched = true;
 									Debug.WriteLine(o.Id, "fully matched: ");
                                 }

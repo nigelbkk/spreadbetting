@@ -59,6 +59,7 @@ namespace SpreadTrader
 		public void Stop()
 		{
 			_cts.Cancel();
+			TelemetryAvailable = null;
 		}
 	}
 }

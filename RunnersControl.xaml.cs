@@ -25,9 +25,7 @@ namespace SpreadTrader
         private double _layBook;
 		public double BackBook { set { if (_backBook != value) { _backBook = value; OnPropertyChanged(nameof(BackBook)); OnPropertyChanged(nameof(BackBookString)); } } }
 		public double LayBook { set { if (_layBook != value) { _layBook = value; OnPropertyChanged(nameof(LayBook)); OnPropertyChanged(nameof(LayBookString)); } } }
-		public String BackBookString { get { if (_backBook == 0)
-                    return "88";
-                return MarketNode == null ? "" : _backBook.ToString("0.00")+"%"; } }
+		public String BackBookString { get { return MarketNode == null ? "" : _backBook.ToString("0.00")+"%"; } }
 		public String LayBookString { get { return MarketNode == null ? "" : _layBook.ToString("0.00")+"%"; } }
 		public List<LiveRunner> LiveRunners { get; set; }
 		private Dictionary<long, LiveRunner> RunnerBySelectionId = new Dictionary<long, LiveRunner>();
@@ -51,6 +49,8 @@ namespace SpreadTrader
             }
 			OnPropertyChanged("");
 
+            _marketStateEngine.Stop();
+			_marketStateEngine = new MarketStateEngine();
 			_marketStateEngine.Start(_MarketNode.Market);
 
 			_marketStateEngine.TelemetryAvailable += telemetry =>
