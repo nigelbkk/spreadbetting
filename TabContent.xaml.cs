@@ -1,4 +1,5 @@
-﻿using BetfairAPI;
+﻿using Betfair.ESASwagger.Model;
+using BetfairAPI;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -99,6 +100,9 @@ namespace SpreadTrader
 			MarketStatus = change.Status.ToString();
 			marketHeader.TotalMatched = change.Tv ?? 0;
 			RunnersControl?.OnMarketChanged(change);
+
+			if (change.Status == MarketDefinition.StatusEnum.Closed)
+				UnsubscribeAsync(change.MarketId);
 		}
 	}
 }
