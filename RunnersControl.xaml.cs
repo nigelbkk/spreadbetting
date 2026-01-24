@@ -66,7 +66,13 @@ namespace SpreadTrader
 				});
 			};
 		}
-        public void OnMarketChanged(MarketChangeDto change)
+		public void OnMarketClosed()
+        {
+            Debug.WriteLine($"Market closed {MarketNode.FullName}");
+			_marketStateEngine.Stop();
+		}
+
+		public void OnMarketChanged(MarketChangeDto change)
         {
 			if (MarketNode == null)
 				return;
@@ -78,6 +84,12 @@ namespace SpreadTrader
             long diff = DateTime.UtcNow.Ticks - change.Time.Ticks;
 			String cs = $"{1000 * diff / TimeSpan.TicksPerSecond}ms";
             ControlMessenger.Send("Update Market Latency", new { MarketLatency = cs, Status = "" });
+
+            if (change.Status == Betfair.ESASwagger.Model.MarketDefinition.StatusEnum.Closed)
+            {
+                OnMarketClosed();
+				//_marketStateEngine.Stop();
+			}
 
             try
             {

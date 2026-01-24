@@ -208,7 +208,8 @@ namespace SpreadTrader
         {
             TabControl.Items.Remove(e.Tab);
             TabContent tabContent = e.Tab.Content as TabContent;
-            e.Tab.Content = null;
+			tabContent.OnTabRemoved();
+			e.Tab.Content = null;
         }
         private void AppendNewTab(String title)
         {
@@ -258,7 +259,7 @@ namespace SpreadTrader
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             TabControl tc = sender as TabControl;
-            if (e.AddedItems.Count > 0)
+			if (e.AddedItems.Count > 0)
             {
                 TabItem ti = e.AddedItems[0] as TabItem;
                 if (ti != null)

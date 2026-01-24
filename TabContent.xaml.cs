@@ -84,6 +84,14 @@ namespace SpreadTrader
 			//OnPropertyChanged(nameof(MarketStatus));
 			OnPropertyChanged(nameof(MarketName));
 		}
+		public void OnTabRemoved()
+		{
+			RunnersControl?.OnMarketClosed();
+			//OnPropertyChanged(nameof(OverlayVisibility));
+			//OnPropertyChanged(nameof(MarketStatus));
+
+			//marketHeader?.OnTabSelected();
+		}
 		public void OnTabSelected()
 		{
 			OnPropertyChanged(nameof(OverlayVisibility));

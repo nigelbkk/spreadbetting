@@ -49,7 +49,7 @@ namespace SpreadTrader
 					Debug.WriteLine(ex.Message);
 				}
 
-				await Task.Delay(500, token);
+				await Task.Delay(4000, token);
 			}
 		}
 		public void Start(Market market)
