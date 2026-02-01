@@ -39,7 +39,9 @@ namespace SpreadTrader
 							BackBook = book.BackBook,
 							LayBook = book.LayBook,
 							TotalMatched = book.totalMatched,
-							ProfitAndLosses = pnl.Count > 0 ? pnl[0].profitAndLosses : new List<RunnerProfitAndLoss>()
+							//ProfitAndLosses = pnl.Count > 0 ? pnl[0].profitAndLosses : new List<RunnerProfitAndLoss>()
+
+							ProfitAndLosses = pnl?.FirstOrDefault()?.profitAndLosses?.ToList() ?? new List<RunnerProfitAndLoss>()
 						};
 						TelemetryAvailable?.Invoke(telemetry);
 					}

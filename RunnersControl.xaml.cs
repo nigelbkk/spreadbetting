@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using static BetfairAPI.MarketProfitAndLoss;
 
 namespace SpreadTrader
 {
@@ -59,10 +60,21 @@ namespace SpreadTrader
 				{
 					BackBook = telemetry.BackBook;
 					LayBook = telemetry.LayBook;
-                    foreach(var pnl in telemetry.ProfitAndLosses)
-                    {
-                        RunnerBySelectionId[pnl.selectionId].ifWin = pnl.ifWin;
-                    }
+
+					var pnlSnapshot = telemetry.ProfitAndLosses?.ToList() ?? new List<RunnerProfitAndLoss>();
+
+					foreach (var pnl in pnlSnapshot)
+					{
+						if (RunnerBySelectionId.ContainsKey(pnl.selectionId)) // ✅ Also add this check
+						{
+							RunnerBySelectionId[pnl.selectionId].ifWin = pnl.ifWin;
+						}
+					}
+
+					//foreach(var pnl in telemetry.ProfitAndLosses)
+					//{
+					//    RunnerBySelectionId[pnl.selectionId].ifWin = pnl.ifWin;
+					//}
 				});
 			};
 		}
