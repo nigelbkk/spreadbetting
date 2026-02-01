@@ -75,7 +75,6 @@ namespace SpreadTrader
 					{
 						DateTime LastUpdate = DateTime.UtcNow;
 						PlaceExecutionReport report = betfair.placeOrder(MarketId, SelectionId, Side == "Lay" ? sideEnum.LAY : sideEnum.BACK, Stake, Odds);
-						ControlMessenger.Send("Update P&L");
 					});
 					t.Start();
 				}

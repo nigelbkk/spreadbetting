@@ -70,7 +70,6 @@ namespace SpreadTrader
                 {
                     CancelExecutionReport report = betfair.cancelOrder(Row.MarketID, Row.BetID, null);
                     PlaceExecutionReport report2 = betfair.placeOrder(Row.MarketID, Row.SelectionID, Row.Side.ToUpper() == "BACK" ? sideEnum.BACK : sideEnum.LAY, Stake, Odds);
-                    ControlMessenger.Send("Update P&L");
                     result = report2.errorCode != null ? report2.errorCode : report2.status;
                 });
             }
@@ -79,11 +78,9 @@ namespace SpreadTrader
                 await Task.Run(() =>
                 {
                     ReplaceExecutionReport report = betfair.replaceOrder(Row.MarketID, Row.BetID.ToString(), Odds, Stake);
-                    ControlMessenger.Send("Update P&L");
                     result = report.status != ExecutionReportStatusEnum.SUCCESS ? report.instructionReports[0].errorCode.ToString() : report.status.ToString();
                 });
             }
-            ControlMessenger.Send("Update P&L");
             Extensions.MainWindow.Status = result;
         }
         private void Window_Closing(object sender, CancelEventArgs e)

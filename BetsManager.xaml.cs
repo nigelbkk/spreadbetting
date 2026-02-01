@@ -178,7 +178,6 @@ namespace SpreadTrader
 				PlaceExecutionReport report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
 				Status = report.status;
             });
-            ControlMessenger.Send("Update P&L");
         }
 
         public BetsManager()
@@ -189,8 +188,6 @@ namespace SpreadTrader
         }
         private async void NotifyBetMatchedAsync()
         {
-            ControlMessenger.Send("Update P&L");
-
             String path = props.MatchedBetAlert;
             if (!string.IsNullOrEmpty(path))
             {
@@ -396,7 +393,6 @@ namespace SpreadTrader
                     return;
                 }
                 CancelExecutionReport cancel_report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
-                ControlMessenger.Send("Update P&L");
             }
         }
         private async void Button_Click(object sender, RoutedEventArgs e)
@@ -434,7 +430,6 @@ namespace SpreadTrader
                                 }
                             });
                         }
-                        ControlMessenger.Send("Update P&L");
                         break;
 
                     case "CancelAll":
@@ -482,7 +477,6 @@ namespace SpreadTrader
                                 Notification = $"Cancellation Task failed with {xxe}";
                             }
                         }
-                        ControlMessenger.Send("Update P&L");
                         break;
 
                     case "AbsoluteCancelAll":
@@ -511,20 +505,9 @@ namespace SpreadTrader
                                 {
 									Notification = $"Cancelling {cancel_instructions.Count} bets";
 									Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-									//CancelExecutionReport report = Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-
-									//foreach (Tuple<UInt64, String> _report in report.statuses)
-									//{
-									//	Debug.WriteLine(_report.Item1, _report.Item2);
-									//}
-									//if (cancel_report.status != "SUCCESS")
-         //                           {
-         //                               Status = cancel_report.status;
-         //                           }
                                 }
                             });
                         }
-                        ControlMessenger.Send("Update P&L");
                         break;
                 }
             }
