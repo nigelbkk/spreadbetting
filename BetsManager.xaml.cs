@@ -28,6 +28,8 @@ namespace SpreadTrader
 		private List<ulong> _cancelledBets = new List<ulong>();
 
 		private readonly Dictionary<ulong, BetsManagerRow> _byBetId = new Dictionary<ulong, BetsManagerRow>();
+		private readonly HashSet<ulong> _byBetIdImmediate = new HashSet<ulong>(); // Track processed IDs
+		private readonly object _lock = new object();
 		private NodeViewModel MarketNode { get; set; }
         private DateTime _LastUpdated { get; set; }
 		public String LastUpdated { get { return String.Format("Orders last updated {0}", _LastUpdated.AddHours(props.TimeOffset).ToString("HH:mm:ss")); } }
@@ -245,11 +247,22 @@ namespace SpreadTrader
 									if (_cancelledBets.Contains(betid))
 										return; // ignore zombies
 
-									if (!_byBetId.ContainsKey(betid))
+									lock (_lock)
 									{
-										row = new BetsManagerRow(o) { MarketID = change.Id, SelectionID = orc.Id.Value };
-										ops.Add(() => { _allRows.Insert(0, row); _byBetId[row.BetID] = row; });
+										if (_byBetIdImmediate.Contains(betid))
+										{
+											Debug.WriteLine($"skipping possible dupe: {betid}");
+											continue;
+										}
+										if (_byBetIdImmediate.Count > 1000) // or some threshold
+										{
+											_byBetIdImmediate.Clear(); // Clear if needed, but be careful about timing
+										}
+										_byBetIdImmediate.Add(betid);
 									}
+
+									row = new BetsManagerRow(o) { MarketID = change.Id, SelectionID = orc.Id.Value };
+									ops.Add(() => { _allRows.Insert(0, row); _byBetId[row.BetID] = row; });
 									Debug.WriteLine(o.Id, "new bet: ");
 								}
 								String runner_name = MarketNode.GetRunnerName(row.SelectionID);
@@ -273,7 +286,6 @@ namespace SpreadTrader
                                 {
 									ops.Add(() => row.AvgPriceMatched = o.Avp.Value);
 									ops.Add(() => row.SizeMatched = row.Stake);
-									//ops.Add(() => row.Hidden = UnmatchedOnly);                    // bad 
                                     betMatched = true;
 									Debug.WriteLine(o.Id, "fully matched: ");
                                 }
@@ -290,7 +302,6 @@ namespace SpreadTrader
 									{
 										int idx = _allRows.IndexOf(row);
 										_allRows.Insert(idx + 1, mrow);
-										//_byBetId[row.BetID] = row;                                  // DON'T DO THIS
 									});
 
 									ops.Add(() => row.Stake = o.Sr.Value);                         // change stake for the unmatched remainder
@@ -574,16 +585,4 @@ namespace SpreadTrader
             row.Override = cb.IsChecked == true;
         }
     }
-    //public class OrderMarketSnap
-    //{
-    //    public string MarketId { get; set; }
-    //    public bool IsClosed { get; set; }
-    //    public IEnumerable<OrderMarketRunnerSnap> OrderMarketRunners { get; set; }
-    //}
-    //public class OrderMarketRunnerSnap
-    //{
-    //    public IList<PriceSize> MatchedLay { get; set; }
-    //    public IList<PriceSize> MatchedBack { get; set; }
-    //    public Dictionary<string, Order> UnmatchedOrders { get; set; }
-    //}
 }
