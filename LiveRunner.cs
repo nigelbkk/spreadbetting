@@ -66,7 +66,7 @@ namespace SpreadTrader
         public double BackStake { get; set; }
         public double LayStake { get; set; }
         private double _ifWin { get; set; }
-        public double ifWin { get { return _ifWin; } set { _ifWin = value;
+        public double ifWin { get { return Math.Round(_ifWin); } set { _ifWin = value;
 				OnPropertyChanged("ifWin");
                 OnPropertyChanged("LevelProfitColor");
 				OnPropertyChanged("ProfitColor"); 
