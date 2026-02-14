@@ -79,7 +79,7 @@ namespace SpreadTrader
         private double _LevelProfit = 0;
         public double LevelProfit
         {
-            get { return _LevelProfit; }
+            get { return Math.Round(_LevelProfit); }
             set
             {
                 _LevelProfit = value;

@@ -119,10 +119,10 @@
 					<Button Grid.Column="6" DataContext="{Binding LayValues[1]}" Background="{Binding CellBackgroundColor}"/>
 					<Button Grid.Column="7" DataContext="{Binding LayValues[2]}" Background="{Binding CellBackgroundColor}"/>
 
-					<TextBox Grid.Column="8" Text="{Binding LastPriceTraded, Mode=OneWay}"  FontSize="12"/>
-					<TextBox Grid.Column="9" Text="{Binding ifWin, Mode=OneWay}" Foreground="{Binding Path=ProfitColor}" FontWeight="Regular" FontSize="12"/>
-					<TextBox Grid.Column="10" Text="{Binding LevelProfit, Mode=OneWay}" Foreground="{Binding Path=LevelProfitColor}" PreviewMouseDown="LevelProfitMouseDown" Background="LightGreen" FontSize="12"/>
-					<TextBox Grid.Column="11" Text="{Binding LevelStake, Mode=OneWay}" Background="Ivory" FontSize="12"/>
+					<TextBox Grid.Column="8" Text="{Binding LastPriceTraded, Mode=OneWay}"  FontSize="14"/>
+					<TextBox Grid.Column="9" Text="{Binding ifWin, Mode=OneWay}" Foreground="{Binding Path=ProfitColor}" FontWeight="Regular" FontSize="14"/>
+					<TextBox Grid.Column="10" Text="{Binding LevelProfit, Mode=OneWay}" Foreground="{Binding Path=LevelProfitColor}" PreviewMouseDown="LevelProfitMouseDown" Background="LightGreen" FontSize="14"/>
+					<TextBox Grid.Column="11" Text="{Binding LevelStake, Mode=OneWay}" Background="Ivory" FontSize="14"/>
 				</Grid>
 			</DataTemplate>
 		</ResourceDictionary>
