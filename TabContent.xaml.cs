@@ -105,14 +105,14 @@ namespace SpreadTrader
 		}
 		void OnMarketChanged(MarketChangeDto change)
 		{
+			MarketStatus = change.Status.ToString();
+			marketHeader.TotalMatched = change.Tv ?? 0;
+			RunnersControl?.OnMarketChanged(change);
+
 			if (change.Status.ToString() != MarketStatus)
 			{
 				if (change.Status == MarketDefinition.StatusEnum.Closed)
 					UnsubscribeAsync(change.MarketId);
-
-				MarketStatus = change.Status.ToString();
-				marketHeader.TotalMatched = change.Tv ?? 0;
-				RunnersControl?.OnMarketChanged(change);
 			}
 		}
 	}

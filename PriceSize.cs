@@ -50,7 +50,7 @@ public sealed class PriceSize : INotifyPropertyChanged
 			else if (_price < 10)
 				format = "0.0";
 
-			return _price == 0 ? "" : _price.ToString(format).TrimEnd('0').TrimEnd('.');
+			return _price == 0 ? "" : _price.ToString(format).TrimEnd('.');
 		}
 	}
 	public string SizeText => _size == 0 ? "" : _size.ToString("0");
