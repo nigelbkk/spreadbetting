@@ -21,77 +21,78 @@ namespace SpreadTrader
 		private Task _orderProcessor;
 		private Task _marketChangeProcessor;
 		private Properties.Settings props = Properties.Settings.Default;
-		private readonly Dictionary<string, BetsManager> _marketHandlers = new Dictionary<string, BetsManager>();
+		private readonly Dictionary<string, BetsManager> _ordersHandlers = new Dictionary<string, BetsManager>();
+		private readonly Dictionary<string, RunnersControl> _marketHandlers = new Dictionary<string, RunnersControl>();
 
-		public void RegisterMarket(string marketId, BetsManager manager)
+		public void RegisterBetsManager(string marketId, BetsManager manager)
+		{
+			_ordersHandlers[marketId] = manager;
+		}
+		public void UnregisterBetsManager(string marketId, BetsManager manager)
+		{
+			if (_ordersHandlers.TryGetValue(marketId, out var existing) && existing == manager)
+			{
+				_ordersHandlers.Remove(marketId);
+			}
+		}
+		public void RegisterRunnersControl(string marketId, RunnersControl manager)
 		{
 			_marketHandlers[marketId] = manager;
+			SubscribeAsync(marketId);
 		}
-		public void UnregisterMarket(string marketId, BetsManager manager)
+
+		/// NH make sure this gets called
+		public void UnregisterRunnersControl(string marketId, RunnersControl manager)
 		{
 			if (_marketHandlers.TryGetValue(marketId, out var existing) && existing == manager)
 			{
 				_marketHandlers.Remove(marketId);
+				UnsubscribeAsync(marketId);
 			}
 		}
-
 		private void OrderProcessingLoop()
 		{
 			foreach (var json in _orderQueue.GetConsumingEnumerable())
 			{
-				//_betsManager?.OnOrderChanged(json); // direct, synchronous
+				var change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
+
+				if (change?.Id == null)
+					continue;
+
+				if (_ordersHandlers.TryGetValue(change.Id, out var manager))
+				{
+					manager.OnOrderChanged(change); // better: pass object, not json
+				}
 			}
-			//foreach (var json in _orderQueue?.GetConsumingEnumerable())
-			//{
-			//	ControlMessenger.Send("Orders Changed", new { String = json });
-			//}
 		}
-		private void MarketChangerProcessingLoop()
+		private void MarketChangeProcessingLoop()
 		{
 			foreach (var change in _marketChangeQueue?.GetConsumingEnumerable())
 			{
+				if (_marketHandlers.TryGetValue(change.MarketId, out var manager))
+				{
+					manager.OnMarketChanged(change); // better: pass object, not json
+				}
 				//ControlMessenger.Send("Market Changed", new { MarketChangeDto = change });
 			}
 		}
 		public void Start()
 		{
 			_orderProcessor = Task.Run(() => OrderProcessingLoop());
-			_marketChangeProcessor = Task.Run(() => MarketChangerProcessingLoop());
+			_marketChangeProcessor = Task.Run(() => MarketChangeProcessingLoop());
 		}
 		private WebSocketsHub() 
 		{
-			//ControlMessenger.MessageSent += OnMessageReceived;
+			ControlMessenger.MessageSent += OnMessageReceived;
 			hubConnection = new HubConnection("http://" + props.WebSocketsUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 
-			hubConnection.Closed += () =>
-			{
-				Debug.WriteLine($"SignalR Closed...");
-			};
-
-			hubConnection.Error += (err) =>
-			{
-				Debug.WriteLine($"SignalR Error...{err.Message}");
-			};
-
-			hubConnection.ConnectionSlow += () =>
-			{
-				Debug.WriteLine($"SignalR ConnectionSlow...");
-			};
-
-			hubConnection.StateChanged += (state) =>
-			{
-				Debug.WriteLine($"SignalR StateChanged...{state.OldState} => {state.NewState} ");
-			};
-
-			hubConnection.Reconnecting += () =>
-			{
-				Debug.WriteLine("SignalR reconnecting...");
-			};
-			hubConnection.Reconnected += () =>
-			{
-				Debug.WriteLine("SignalR reconnected...");
-			};
+			hubConnection.Closed += () => { Debug.WriteLine($"SignalR Closed..."); }; 
+			hubConnection.Error += (err) => { Debug.WriteLine($"SignalR Error...{err.Message}"); }; 
+			hubConnection.ConnectionSlow += () => { Debug.WriteLine($"SignalR ConnectionSlow..."); }; 
+			hubConnection.StateChanged += (state) => { Debug.WriteLine($"SignalR StateChanged...{state.OldState} => {state.NewState} "); }; 
+			hubConnection.Reconnecting += () => { Debug.WriteLine("SignalR reconnecting..."); };
+			hubConnection.Reconnected += () => { Debug.WriteLine("SignalR reconnected..."); };
 
 			Start();
 
@@ -107,27 +108,27 @@ namespace SpreadTrader
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
-			if (messageName == "Market Selected")
-			{
-				dynamic d = data;
-				NodeViewModel d2 = d.NodeViewModel;
-				String marketId = d2.MarketID;
-				Debug.WriteLine($"WebSocketsHub: {messageName} : {d2.FullName}");
-				RequestMarketSelectedAsync(d2.MarketID);
-			}
+			//if (messageName == "Market Selected")
+			//{
+			//	dynamic d = data;
+			//	NodeViewModel d2 = d.NodeViewModel;
+			//	String marketId = d2.MarketID;
+			//	Debug.WriteLine($"WebSocketsHub: {messageName} : {d2.FullName}");
+			//	RequestMarketSelectedAsync(d2.MarketID);
+			//}
 			if (messageName == "Reconnect")
 			{
 				dynamic d = data;
 				String marketId = d.MarketId;
 				Connect();
-				RequestMarketSelectedAsync(marketId);
+				SubscribeAsync(marketId);
 			}
-			if (messageName == "Unsubscribe")
-			{
-				dynamic d = data;
-				String marketId = d.MarketId;
-				UnsubscribeAsync(marketId);
-			}
+			//if (messageName == "Unsubscribe")
+			//{
+			//	dynamic d = data;
+			//	String marketId = d.MarketId;
+			//	UnsubscribeAsync(marketId);
+			//}
 		}
 		private async void UnsubscribeAsync(String marketId)
 		{
@@ -141,7 +142,7 @@ namespace SpreadTrader
 			string responseString = await response.Content.ReadAsStringAsync();
 			Console.WriteLine(responseString);
 		}
-		private async void RequestMarketSelectedAsync(String marketid)
+		private async void SubscribeAsync(String marketid)
 		{
 			var http = new HttpClient();
 			var url = $"http://{props.WebSocketsUrl}/api/market/subscribe";

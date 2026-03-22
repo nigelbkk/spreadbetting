@@ -49,10 +49,13 @@ namespace SpreadTrader
                 RunnerBySelectionId[runner.SelectionId] = runner;
             }
 			OnPropertyChanged("");
+            WebSocketsHub.Instance.RegisterRunnersControl(MarketNode.MarketID, this);
 
-            _marketStateEngine.Stop();
+			_marketStateEngine.Stop();
 			_marketStateEngine = new MarketStateEngine();
-			_marketStateEngine.Start(_MarketNode.Market);
+            //_marketStateEngine.Start(_MarketNode.Market);
+
+            Debug.WriteLine("P&L IS DISABLED");
 
 			_marketStateEngine.TelemetryAvailable += telemetry =>
 			{
@@ -141,7 +144,7 @@ namespace SpreadTrader
                     
                     if (runner.Bdatb != null)
                     {
-                        foreach (PriceLevelDto lv in runner.Bdatb)
+                        foreach (PriceLevelDto lv in runner.Bdatb.Take(3))
                         {
                             lr.BackValues[lv.Level].Update(lv.Price, lv.Size);
                         }
@@ -160,13 +163,9 @@ namespace SpreadTrader
                 Debug.WriteLine(xe.Message);
             }
         }
-		private void OnMessageReceived(string messageName, object data)
-        {
-        }
         public RunnersControl()
         {
             InitializeComponent();
-            ControlMessenger.MessageSent += OnMessageReceived;
         }
 		private void Button_Click(object sender, RoutedEventArgs e)
         {

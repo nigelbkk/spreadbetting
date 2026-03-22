@@ -97,7 +97,7 @@ namespace SpreadTrader
 		{
 			if (MarketNode != null)
 			{
-				WebSocketsHub.Instance.UnregisterMarket(MarketNode.MarketID, this);
+				WebSocketsHub.Instance.UnregisterBetsManager(MarketNode.MarketID, this);
 			}
 
 			MarketNode = d2;
@@ -106,7 +106,7 @@ namespace SpreadTrader
 
 			if (MarketNode != null)
 			{
-				WebSocketsHub.Instance.RegisterMarket(MarketNode.MarketID, this);
+				WebSocketsHub.Instance.RegisterBetsManager(MarketNode.MarketID, this);
 			}
 		}
 		private void OnMessageReceived(string messageName, object data)
@@ -209,24 +209,14 @@ namespace SpreadTrader
             }
 		}
 
-		private void OnLoaded(object sender, RoutedEventArgs e)
-		{
-	//		WebSocketsHub.Instance.RegisterMarket("MarketId", this);
-		}
-
-		private void OnUnloaded(object sender, RoutedEventArgs e)
-		{
-			WebSocketsHub.Instance.UnregisterMarket("MarketId", this);
-		}
-
-		public void OnOrderChanged(String json)
+		public void OnOrderChanged(OrderMarketChange change)
         {
-            if (String.IsNullOrEmpty(json))
-                return;
+            //if (String.IsNullOrEmpty(json))
+            //    return;
 
-            OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
+            //OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
 
-			if (change.Orc == null || MarketNode == null)
+			if (change?.Orc == null || MarketNode == null)
                 return;
 
             if (MarketNode.MarketID.ToString() != change.Id)

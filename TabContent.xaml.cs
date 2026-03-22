@@ -99,10 +99,10 @@ namespace SpreadTrader
 
 			marketHeader?.OnTabSelected();
 		}
-		public void OnOrdersChanged(String json)
-		{
-			BetsManager.OnOrderChanged(json);
-		}
+		//public void OnOrdersChanged(String json)
+		//{
+		//	BetsManager.OnOrderChanged(json);
+		//}
 		void OnMarketChanged(MarketChangeDto change)
 		{
 			MarketStatus = change.Status.ToString();

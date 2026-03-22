@@ -150,11 +150,6 @@ namespace SpreadTrader
             this.Width = Math.Max(0, props.Width);
 
             Betfair = new BetfairAPI.BetfairAPI();
-			WebSocketsHub.Instance.Start();
-
-			//hub = new WebSocketsHub();
-			//Betfair.getServerTime();
-			//UpdateAccountInformation();
 		}
         public void UpdateAccountInformation()
         {
