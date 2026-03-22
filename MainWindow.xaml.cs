@@ -5,11 +5,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Windows.UI.Xaml.Automation;
 
 namespace SpreadTrader
 {
@@ -24,10 +22,11 @@ namespace SpreadTrader
     }
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-		#region Properties
+#region Properties
         private Properties.Settings props = Properties.Settings.Default;
-		private WebSocketsHub hub = new WebSocketsHub();
-        private static String _Status = "Ready";
+		//private WebSocketsHub hub = new WebSocketsHub();
+		//private WebSocketsHub hub;
+		private static String _Status = "Ready";
         private static String _Notification = "";
         public String Status
         {
@@ -103,11 +102,11 @@ namespace SpreadTrader
                 Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
             }
         }
-		#endregion Properties
 		private Mutex mutex = null;
         public static TabContent SelectedTab {get;set;}
+#endregion Properties
 
-        private void OnMessageReceived(string messageName, object data)
+		private void OnMessageReceived(string messageName, object data)
         {
 			if (messageName == "Market Selected")
 			{
@@ -117,12 +116,12 @@ namespace SpreadTrader
                 //Task.Run(() => SelectedTab.OnSelected(d2));
                 SelectedTab.OnMarketSelected(d2);
 			}
-			if (messageName == "Orders Changed")
-			{
-				dynamic d = data;
-				String json = d.String;
-				Task.Run(() => SelectedTab.OnOrdersChanged(json));
-			}
+			//if (messageName == "Orders Changed")
+			//{
+			//	dynamic d = data;
+			//	String json = d.String;
+			//	Task.Run(() => SelectedTab.OnOrdersChanged(json));
+			//}
 		}
 
 		public MainWindow()
@@ -151,9 +150,12 @@ namespace SpreadTrader
             this.Width = Math.Max(0, props.Width);
 
             Betfair = new BetfairAPI.BetfairAPI();
-            //Betfair.getServerTime();
-            //UpdateAccountInformation();
-        }
+			WebSocketsHub.Instance.Start();
+
+			//hub = new WebSocketsHub();
+			//Betfair.getServerTime();
+			//UpdateAccountInformation();
+		}
         public void UpdateAccountInformation()
         {
             AccountFundsResponse response = Betfair.getAccountFunds(1);

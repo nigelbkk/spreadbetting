@@ -1,17 +1,19 @@
-﻿using Microsoft.AspNet.SignalR.Client;
+﻿using Betfair.ESASwagger.Model;
+using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Betfair.ESASwagger.Model;
 
 namespace SpreadTrader
 {
 	internal class WebSocketsHub
 	{
+		public static WebSocketsHub Instance { get; } = new WebSocketsHub();
 		private IHubProxy hubProxy = null;
 		private HubConnection hubConnection = null;
 		private readonly BlockingCollection<string> _orderQueue = new BlockingCollection<string>();
@@ -19,19 +21,36 @@ namespace SpreadTrader
 		private Task _orderProcessor;
 		private Task _marketChangeProcessor;
 		private Properties.Settings props = Properties.Settings.Default;
+		private readonly Dictionary<string, BetsManager> _marketHandlers = new Dictionary<string, BetsManager>();
+
+		public void RegisterMarket(string marketId, BetsManager manager)
+		{
+			_marketHandlers[marketId] = manager;
+		}
+		public void UnregisterMarket(string marketId, BetsManager manager)
+		{
+			if (_marketHandlers.TryGetValue(marketId, out var existing) && existing == manager)
+			{
+				_marketHandlers.Remove(marketId);
+			}
+		}
 
 		private void OrderProcessingLoop()
 		{
-			foreach (var json in _orderQueue?.GetConsumingEnumerable())
+			foreach (var json in _orderQueue.GetConsumingEnumerable())
 			{
-				ControlMessenger.Send("Orders Changed", new { String = json });
+				//_betsManager?.OnOrderChanged(json); // direct, synchronous
 			}
+			//foreach (var json in _orderQueue?.GetConsumingEnumerable())
+			//{
+			//	ControlMessenger.Send("Orders Changed", new { String = json });
+			//}
 		}
 		private void MarketChangerProcessingLoop()
 		{
 			foreach (var change in _marketChangeQueue?.GetConsumingEnumerable())
 			{
-				ControlMessenger.Send("Market Changed", new { MarketChangeDto = change });
+				//ControlMessenger.Send("Market Changed", new { MarketChangeDto = change });
 			}
 		}
 		public void Start()
@@ -39,9 +58,9 @@ namespace SpreadTrader
 			_orderProcessor = Task.Run(() => OrderProcessingLoop());
 			_marketChangeProcessor = Task.Run(() => MarketChangerProcessingLoop());
 		}
-		public WebSocketsHub() 
+		private WebSocketsHub() 
 		{
-			ControlMessenger.MessageSent += OnMessageReceived;
+			//ControlMessenger.MessageSent += OnMessageReceived;
 			hubConnection = new HubConnection("http://" + props.WebSocketsUrl);
 			hubProxy = hubConnection.CreateHubProxy("WebSocketsHub");
 

@@ -10,6 +10,7 @@ namespace SpreadTrader
 {
 	public class NodeViewModel : ViewModelBase
 	{
+#region Properties
 		public String FullName { get; set; }
 		public Market Market { get; set; }
 		public String MarketID { get; set; }
@@ -61,6 +62,7 @@ namespace SpreadTrader
 			Nodes = new ObservableCollection<NodeViewModel>();
 		}
 		public List<LiveRunner> LiveRunners = null;
+#endregion Properties
 
 		public List<LiveRunner> GetLiveRunners()
 		{

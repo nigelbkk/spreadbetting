@@ -1,4 +1,5 @@
-﻿using Betfair.ESASwagger.Model;
+﻿using Betfair.ESAClient.Cache;
+using Betfair.ESASwagger.Model;
 using BetfairAPI;
 using Newtonsoft.Json;
 using System;
@@ -17,10 +18,10 @@ using System.Windows.Threading;
 
 namespace SpreadTrader
 {
-#region Properties
     public partial class BetsManager : UserControl, INotifyPropertyChanged
     {
-        private Properties.Settings props = Properties.Settings.Default;
+#region Properties
+		private Properties.Settings props = Properties.Settings.Default;
         public static Dictionary<UInt64, Order> Orders = new Dictionary<ulong, Order>();
         public RunnersControl RunnersControl { get; set; }
         public BulkObservableCollection<BetsManagerRow> Rows { get; set; }
@@ -94,9 +95,19 @@ namespace SpreadTrader
 
 		public void OnMarketSelected(NodeViewModel d2, RunnersControl rc)
 		{
+			if (MarketNode != null)
+			{
+				WebSocketsHub.Instance.UnregisterMarket(MarketNode.MarketID, this);
+			}
+
 			MarketNode = d2;
             RunnersControl = rc;
             PopulateDataGrid();
+
+			if (MarketNode != null)
+			{
+				WebSocketsHub.Instance.RegisterMarket(MarketNode.MarketID, this);
+			}
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
@@ -197,6 +208,17 @@ namespace SpreadTrader
                 player.Play();
             }
 		}
+
+		private void OnLoaded(object sender, RoutedEventArgs e)
+		{
+	//		WebSocketsHub.Instance.RegisterMarket("MarketId", this);
+		}
+
+		private void OnUnloaded(object sender, RoutedEventArgs e)
+		{
+			WebSocketsHub.Instance.UnregisterMarket("MarketId", this);
+		}
+
 		public void OnOrderChanged(String json)
         {
             if (String.IsNullOrEmpty(json))
