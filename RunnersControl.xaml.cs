@@ -41,6 +41,9 @@ namespace SpreadTrader
 #endregion
         public void PopulateNewMarket(NodeViewModel node)
         {
+            if (MarketNode != null)
+			    WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
+
 			_MarketNode = node;
 			MarketNode.GetLiveRunners();
 			LiveRunners = MarketNode.LiveRunners;
@@ -49,7 +52,7 @@ namespace SpreadTrader
                 RunnerBySelectionId[runner.SelectionId] = runner;
             }
 			OnPropertyChanged("");
-            WebSocketsHub.Instance.RegisterRunnersControl(MarketNode.MarketID, this);
+            WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
 
 			_marketStateEngine.Stop();
 			_marketStateEngine = new MarketStateEngine();
@@ -85,6 +88,7 @@ namespace SpreadTrader
         {
             Debug.WriteLine($"Market closed {MarketNode.FullName}");
 			_marketStateEngine.Stop();
+			WebSocketsHub.Instance.Detach(MarketNode?.MarketID, this);
 		}
 
 		public void OnMarketChanged(MarketChangeDto change)
@@ -146,14 +150,16 @@ namespace SpreadTrader
                     {
                         foreach (PriceLevelDto lv in runner.Bdatb.Take(3))
                         {
-                            lr.BackValues[lv.Level].Update(lv.Price, lv.Size);
+							if (lv.Level <= 2)
+								lr.BackValues[lv.Level].Update(lv.Price, lv.Size);
                         }
                     }
                     if (runner.Bdatl != null)
                     {
-                        foreach (PriceLevelDto lv in runner.Bdatl)
+                        foreach (PriceLevelDto lv in runner.Bdatl.Take(3))
                         {
-                            lr.LayValues[lv.Level].Update(lv.Price, lv.Size);
+                            if (lv.Level <= 2)
+                                lr.LayValues[lv.Level].Update(lv.Price, lv.Size);
                         }
                     }
                 }
@@ -298,5 +304,16 @@ namespace SpreadTrader
                 }
             }
         }
-    }
+
+		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+		{
+            Debug.WriteLine("RunnersControl Unloaded");
+			//WebSocketsHub.Instance.UnregisterRunnersControl(MarketNode?.MarketID, this);
+			if (MarketNode != null)
+			{
+				WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
+				MarketNode = null;
+			}
+		}
+	}
 }

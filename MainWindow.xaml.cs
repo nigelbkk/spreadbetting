@@ -24,8 +24,6 @@ namespace SpreadTrader
     {
 #region Properties
         private Properties.Settings props = Properties.Settings.Default;
-		//private WebSocketsHub hub = new WebSocketsHub();
-		//private WebSocketsHub hub;
 		private static String _Status = "Ready";
         private static String _Notification = "";
         public String Status
@@ -41,7 +39,6 @@ namespace SpreadTrader
                 }));
             }
         }
-
         public String Notification
         {
             get { return _Notification; }
@@ -55,38 +52,8 @@ namespace SpreadTrader
                 }));
             }
         }
-
-        public String StakesPreselectTooltip0
-        {
-            get { return $"Set default stake to ${StakesPreselect0}"; }
-        }
-
-        public String StakesPreselectTooltip1
-        {
-            get { return $"Set default stake to ${StakesPreselect1}"; }
-        }
-
-        public String StakesPreselectTooltip2
-        {
-            get { return $"Set default stake to ${StakesPreselect2}"; }
-        }
-
-        public double StakesPreselect0
-        {
-            get { return Convert.ToDouble(props.StakesPreselect.Split(',')[0]); }
-        }
-
-        public double StakesPreselect1
-        {
-            get { return Convert.ToDouble(props.StakesPreselect.Split(',')[1]); }
-        }
-
-        public double StakesPreselect2
-        {
-            get { return Convert.ToDouble(props.StakesPreselect.Split(',')[2]); }
-        }
-
-        public double Balance { get; set; }
+        public double[] StakesPreselects { get => props.StakesPreselect.Split(',').Select(double.Parse).ToArray(); }
+		public double Balance { get; set; }
         public double Exposure { get; set; }
         private double _DiscountRate { get; set; }
         public double DiscountRate { get { return _DiscountRate; } set { _DiscountRate = value; NotifyPropertyChanged("NetCommission"); } }

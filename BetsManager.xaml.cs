@@ -97,7 +97,7 @@ namespace SpreadTrader
 		{
 			if (MarketNode != null)
 			{
-				WebSocketsHub.Instance.UnregisterBetsManager(MarketNode.MarketID, this);
+				WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
 			}
 
 			MarketNode = d2;
@@ -106,7 +106,7 @@ namespace SpreadTrader
 
 			if (MarketNode != null)
 			{
-				WebSocketsHub.Instance.RegisterBetsManager(MarketNode.MarketID, this);
+				WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
 			}
 		}
 		private void OnMessageReceived(string messageName, object data)
@@ -596,5 +596,16 @@ namespace SpreadTrader
 			BetsManagerRow row = cb.DataContext as BetsManagerRow;
             row.Override = cb.IsChecked == true;
         }
-    }
+
+		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+		{
+			Debug.WriteLine("BetsManager Unloaded");
+			
+            if (MarketNode != null)
+			{
+				WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
+				MarketNode = null;
+			}
+		}
+	}
 }

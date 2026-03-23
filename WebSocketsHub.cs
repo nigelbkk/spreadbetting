@@ -24,25 +24,41 @@ namespace SpreadTrader
 		private readonly Dictionary<string, BetsManager> _ordersHandlers = new Dictionary<string, BetsManager>();
 		private readonly Dictionary<string, RunnersControl> _marketHandlers = new Dictionary<string, RunnersControl>();
 
-		public void RegisterBetsManager(string marketId, BetsManager manager)
+		public void Attach(string marketId, BetsManager manager)
 		{
+			if (_ordersHandlers.TryGetValue(marketId, out var existing))
+			{
+				if (!ReferenceEquals(existing, manager))
+				{
+					Debug.WriteLine($"Handler already registered for market {marketId}. " + $"Existing: {existing.GetHashCode()}, New: {manager.GetHashCode()}");
+				}
+				// already registered, no-op
+				return;
+			}
 			_ordersHandlers[marketId] = manager;
 		}
-		public void UnregisterBetsManager(string marketId, BetsManager manager)
+		public void Detach(string marketId, BetsManager manager)
 		{
 			if (_ordersHandlers.TryGetValue(marketId, out var existing) && existing == manager)
 			{
 				_ordersHandlers.Remove(marketId);
 			}
 		}
-		public void RegisterRunnersControl(string marketId, RunnersControl manager)
+		public void Attach(string marketId, RunnersControl manager)
 		{
+			if (_marketHandlers.TryGetValue(marketId, out var existing))
+			{
+				if (!ReferenceEquals(existing, manager))
+				{
+					Debug.WriteLine( $"Handler already registered for market {marketId}. " + $"Existing: {existing.GetHashCode()}, New: {manager.GetHashCode()}");
+				}
+				// already registered, no-op
+				return;
+			}
 			_marketHandlers[marketId] = manager;
 			SubscribeAsync(marketId);
 		}
-
-		/// NH make sure this gets called
-		public void UnregisterRunnersControl(string marketId, RunnersControl manager)
+		public void Detach(string marketId, RunnersControl manager)
 		{
 			if (_marketHandlers.TryGetValue(marketId, out var existing) && existing == manager)
 			{
@@ -108,14 +124,6 @@ namespace SpreadTrader
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
-			//if (messageName == "Market Selected")
-			//{
-			//	dynamic d = data;
-			//	NodeViewModel d2 = d.NodeViewModel;
-			//	String marketId = d2.MarketID;
-			//	Debug.WriteLine($"WebSocketsHub: {messageName} : {d2.FullName}");
-			//	RequestMarketSelectedAsync(d2.MarketID);
-			//}
 			if (messageName == "Reconnect")
 			{
 				dynamic d = data;
@@ -123,12 +131,6 @@ namespace SpreadTrader
 				Connect();
 				SubscribeAsync(marketId);
 			}
-			//if (messageName == "Unsubscribe")
-			//{
-			//	dynamic d = data;
-			//	String marketId = d.MarketId;
-			//	UnsubscribeAsync(marketId);
-			//}
 		}
 		private async void UnsubscribeAsync(String marketId)
 		{
@@ -169,10 +171,6 @@ namespace SpreadTrader
 					//result = "Connected";
 				}).Wait(1000);
 			}
-		}
-		private void Closed()
-		{
-
 		}
 		private void Disconnect()
 		{
