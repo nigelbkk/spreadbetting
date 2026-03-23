@@ -143,6 +143,7 @@
     <Compile Include="SliderControl.xaml.cs">
       <DependentUpon>SliderControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="StreamRecorder.cs" />
     <Compile Include="TabContent.xaml.cs">
       <DependentUpon>TabContent.xaml</DependentUpon>
     </Compile>

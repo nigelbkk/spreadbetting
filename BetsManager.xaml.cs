@@ -95,19 +95,16 @@ namespace SpreadTrader
 
 		public void OnMarketSelected(NodeViewModel d2, RunnersControl rc)
 		{
+			String _marketId = "";
 			if (MarketNode != null)
-			{
-				WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
-			}
-
+				_marketId = MarketNode.MarketID; 
+                
 			MarketNode = d2;
             RunnersControl = rc;
             PopulateDataGrid();
 
-			if (MarketNode != null)
-			{
-				WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
-			}
+			WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
+			WebSocketsHub.Instance.Detach(_marketId, this);
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
@@ -564,18 +561,6 @@ namespace SpreadTrader
                 Debug.WriteLine(xe.Message);
             }
         }
-        //private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        //{
-        //    CheckBox cb = sender as CheckBox;
-        //    if (Rows.Count > 0) foreach (BetsManagerRow row in Rows)
-        //        {
-        //            row.Hidden = cb.IsChecked == true && row.SizeMatched > 0;
-        //        }
-        //}
-        //private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
-        //{
-        //    CheckBox_Checked(sender, e);
-        //}
         private void Label_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             Label lb = sender as Label;
@@ -624,13 +609,13 @@ namespace SpreadTrader
 
 		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
 		{
-			Debug.WriteLine("BetsManager Unloaded");
+			//Debug.WriteLine("BetsManager Unloaded");
 			
-            if (MarketNode != null)
-			{
-				WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
-				MarketNode = null;
-			}
+   //         if (MarketNode != null)
+			//{
+			//	WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
+			//	MarketNode = null;
+			//}
 		}
 	}
 }

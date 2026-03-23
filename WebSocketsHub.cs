@@ -70,6 +70,9 @@ namespace SpreadTrader
 		{
 			foreach (var json in _orderQueue.GetConsumingEnumerable())
 			{
+				if (props.RecordOrders)
+					StreamRecorder.Record(json);
+
 				var change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
 
 				if (change?.Id == null)
@@ -89,7 +92,6 @@ namespace SpreadTrader
 				{
 					manager.OnMarketChanged(change); // better: pass object, not json
 				}
-				//ControlMessenger.Send("Market Changed", new { MarketChangeDto = change });
 			}
 		}
 		public void Start()

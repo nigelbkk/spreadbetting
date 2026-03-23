@@ -41,8 +41,9 @@ namespace SpreadTrader
 #endregion
         public void PopulateNewMarket(NodeViewModel node)
         {
+            String _marketId = "";
             if (MarketNode != null)
-			    WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
+				_marketId = MarketNode.MarketID;
 
 			_MarketNode = node;
 			MarketNode.GetLiveRunners();
@@ -52,7 +53,9 @@ namespace SpreadTrader
                 RunnerBySelectionId[runner.SelectionId] = runner;
             }
 			OnPropertyChanged("");
+
             WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
+			WebSocketsHub.Instance.Detach(_marketId, this);
 
 			_marketStateEngine.Stop();
 			_marketStateEngine = new MarketStateEngine();
@@ -307,13 +310,13 @@ namespace SpreadTrader
 
 		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
 		{
-            Debug.WriteLine("RunnersControl Unloaded");
-			//WebSocketsHub.Instance.UnregisterRunnersControl(MarketNode?.MarketID, this);
-			if (MarketNode != null)
-			{
-				WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
-				MarketNode = null;
-			}
+   //         Debug.WriteLine("RunnersControl Unloaded");
+			////WebSocketsHub.Instance.UnregisterRunnersControl(MarketNode?.MarketID, this);
+			//if (MarketNode != null)
+			//{
+			//	WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
+			//	MarketNode = null;
+			//}
 		}
 	}
 }
