@@ -209,13 +209,34 @@ namespace SpreadTrader
             }
 		}
 
+		private void ApplyPartialMatch(BetsManagerRow row, Order o)
+		{
+			// clone row
+			var mrow = new BetsManagerRow(row)
+			{
+				SizeMatched = o.Sm.Value,
+				Odds = o.P.Value,
+				Stake = o.Sm.Value,
+				AvgPriceMatched = o.Avp.Value,
+				Hidden = UnmatchedOnly
+			};
+
+			int idx = _allRows.IndexOf(row);
+
+			if (idx >= 0)
+			{
+				_allRows.Insert(idx + 1, mrow);
+			}
+			else
+			{
+				Debug.WriteLine("Row not found during partial match");
+			}
+
+			// update unmatched remainder
+			row.Stake = o.Sr.Value;
+		}
 		public void OnOrderChanged(OrderMarketChange change)
         {
-            //if (String.IsNullOrEmpty(json))
-            //    return;
-
-            //OrderMarketChange change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
-
 			if (change?.Orc == null || MarketNode == null)
                 return;
 
@@ -303,20 +324,24 @@ namespace SpreadTrader
                                 }
                                 if (o.Sm > 0 && o.Sr > 0)                                           // partially matched
                                 {
-									BetsManagerRow mrow = new BetsManagerRow(row);
-                                    mrow.SizeMatched = o.Sm.Value;
-                                    mrow.Odds = o.P.Value;
-                                    mrow.Stake = o.Sm.Value;
-                                    mrow.AvgPriceMatched = o.Avp.Value;
-                                    mrow.Hidden = UnmatchedOnly;
+									//BetsManagerRow mrow = new BetsManagerRow(row);
+									//                           mrow.SizeMatched = o.Sm.Value;
+									//                           mrow.Odds = o.P.Value;
+									//                           mrow.Stake = o.Sm.Value;
+									//                           mrow.AvgPriceMatched = o.Avp.Value;
+									//                           mrow.Hidden = UnmatchedOnly;
 
-									ops.Add(() =>
+									//ops.Add(() =>
+									//{
+									//	int idx = _allRows.IndexOf(row);
+									//	_allRows.Insert(idx + 1, mrow);
+									//});
+
+									//ops.Add(() => row.Stake = o.Sr.Value);                         // change stake for the unmatched remainder
+									Dispatcher.Invoke(() =>
 									{
-										int idx = _allRows.IndexOf(row);
-										_allRows.Insert(idx + 1, mrow);
+										ApplyPartialMatch(row, o);
 									});
-
-									ops.Add(() => row.Stake = o.Sr.Value);                         // change stake for the unmatched remainder
 									betMatched = true;
 
                                     Debug.WriteLine(o.Id, "partial match: ");

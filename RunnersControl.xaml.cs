@@ -86,9 +86,9 @@ namespace SpreadTrader
 		}
 		public void OnMarketClosed()
         {
-            Debug.WriteLine($"Market closed {MarketNode.FullName}");
+            Debug.WriteLine($"Market closed ");
 			_marketStateEngine.Stop();
-			WebSocketsHub.Instance.Detach(MarketNode?.MarketID, this);
+			//WebSocketsHub.Instance.Detach(MarketNode?.MarketID, this);
 		}
 
 		public void OnMarketChanged(MarketChangeDto change)
