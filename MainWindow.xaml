@@ -56,9 +56,9 @@
 							</StackPanel>
 						</Label>
 
-                        <Button Tag="25" Content="{Binding StakesPreselect0, Mode=OneWay}" Click="Button_Click" BorderThickness="0.0" ToolTip="{Binding StakesPreselectTooltip0}" />
-                        <Button Tag="50" Content="{Binding StakesPreselect1, Mode=OneWay}" Click="Button_Click" BorderThickness="0.0" ToolTip="{Binding StakesPreselectTooltip1}" />
-                        <Button Tag="100" Content="{Binding StakesPreselect2, Mode=OneWay}" Click="Button_Click" BorderThickness="0.0" ToolTip="{Binding StakesPreselectTooltip2}"/>
+						<Button Tag="25" Content="{Binding StakesPreselects[0], Mode=OneWay}" Click="Button_Click" BorderThickness="0.0" />
+						<Button Tag="50" Content="{Binding StakesPreselects[1], Mode=OneWay}" Click="Button_Click" BorderThickness="0.0" />
+						<Button Tag="100" Content="{Binding StakesPreselects[2], Mode=OneWay}" Click="Button_Click" BorderThickness="0.0"/>
                     </StackPanel>
 				</Grid>
 				<Grid Grid.Row="1" Name="InnerGrid" >
