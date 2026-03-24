@@ -72,8 +72,9 @@ namespace SpreadTrader
 			}
 			if (messageName == "Telemetry Available")
 			{
-				dynamic d = data;
-				var telemtry = d.telemetry;
+				dynamic d = data as MarketTelemetry;
+				double totalMatched = d?.TotalMatched;
+				marketHeader.TotalMatched = totalMatched;
 			}
 		}
 		public void OnMarketSelected(NodeViewModel d2)
