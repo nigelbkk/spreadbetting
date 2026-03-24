@@ -116,5 +116,8 @@
     <Setting Name="RecordPrices" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="PNLFrequency" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">4000</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

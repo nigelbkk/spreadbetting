@@ -80,17 +80,12 @@ namespace SpreadTrader
 			BetsManager.OnMarketSelected(d2, RunnersControl);
 			RunnersControl.PopulateNewMarket(d2);
 			MarketStatus = marketStatusEnum.INACTIVE.ToString();
-			//OnPropertyChanged(nameof(OverlayVisibility));
-			//OnPropertyChanged(nameof(MarketStatus));
+
 			OnPropertyChanged(nameof(MarketName));
 		}
 		public void OnTabRemoved()
 		{
 			RunnersControl?.OnMarketClosed();
-			//OnPropertyChanged(nameof(OverlayVisibility));
-			//OnPropertyChanged(nameof(MarketStatus));
-
-			//marketHeader?.OnTabSelected();
 		}
 		public void OnTabSelected()
 		{

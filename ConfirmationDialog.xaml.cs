@@ -30,7 +30,7 @@ namespace SpreadTrader
 				PropertyChanged(this, new PropertyChangedEventArgs(info));
 			}
 		}
-		public ConfirmationDialog(RunnersControl runnersControl, String MarketId, LiveRunner runner, String side, double odds)
+		public ConfirmationDialog(RunnersControl runnersControl, NodeViewModel marketNode, LiveRunner runner, String side, double odds)
 		{
 			this.runnersControl = runnersControl;
 			if (props.CDLeft > 0 && props.CDTop > 0)
@@ -43,7 +43,8 @@ namespace SpreadTrader
 			Side = side;
 			Odds = odds;
 			Stake = props.DefaultStake;
-			if (props.SafeBets)
+
+			if (marketNode.EventType == 7 || props.SafeBets)		// Horses!
 			{
 				Stake = 2.00;
 				Odds = 1.01;

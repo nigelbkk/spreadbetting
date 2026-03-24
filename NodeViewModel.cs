@@ -1,4 +1,5 @@
 ﻿using BetfairAPI;
+using Microsoft.AspNet.SignalR.Client.Transports.ServerSentEvents;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -48,6 +49,7 @@ namespace SpreadTrader
 		public Int32 ID { get; set; }
 		public string Name { get; set; }
 		public string Tag { get; set; }
+		public Int32 EventType { get => Convert.ToInt32(Tag);  }
 		public ObservableCollection<NodeViewModel> Nodes { get; set; }
 		public NodeViewModel(BetfairAPI.BetfairAPI Betfair)
 		{

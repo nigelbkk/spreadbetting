@@ -38,8 +38,9 @@ namespace SpreadTrader
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
 		}
-#endregion
-        public void PopulateNewMarket(NodeViewModel node)
+		private Properties.Settings props = Properties.Settings.Default;
+		#endregion
+		public void PopulateNewMarket(NodeViewModel node)
         {
             String _marketId = "";
             if (MarketNode != null)
@@ -59,9 +60,11 @@ namespace SpreadTrader
 
 			_marketStateEngine.Stop();
 			_marketStateEngine = new MarketStateEngine();
-            //_marketStateEngine.Start(_MarketNode.Market);
-
-            Debug.WriteLine("P&L IS DISABLED");
+            
+            if (props.PNLFrequency > 1000)
+                _marketStateEngine.Start(_MarketNode.Market);
+            else
+                Debug.WriteLine("P&L IS DISABLED");
 
 			_marketStateEngine.TelemetryAvailable += telemetry =>
 			{
@@ -214,7 +217,7 @@ namespace SpreadTrader
                             break;
                         }
                     }
-                    ConfirmationDialog dlg = new ConfirmationDialog(this, MarketNode.MarketID, live_runner, side, odds);
+                    ConfirmationDialog dlg = new ConfirmationDialog(this, MarketNode, live_runner, side, odds);
                     dlg.ShowDialog();
                 }
             }

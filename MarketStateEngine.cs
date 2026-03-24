@@ -51,7 +51,7 @@ namespace SpreadTrader
 					Debug.WriteLine(ex.Message);
 				}
 
-				await Task.Delay(4000, token);
+				await Task.Delay(Props.props.PNLFrequency, token);
 			}
 		}
 		public void Start(Market market)

@@ -8,9 +8,14 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SpreadTrader.Properties;
 
 namespace SpreadTrader
 {
+	internal static class Props
+    {
+        public static SpreadTrader.Properties.Settings props {get => SpreadTrader.Properties.Settings.Default;  }
+	}
     public static class ControlMessenger
     {
         public static event Action<string, object> MessageSent;

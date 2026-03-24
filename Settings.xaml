@@ -5,7 +5,7 @@
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:p="clr-namespace:SpreadTrader.Properties"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="425" Width="369.332" Topmost="True">
+        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="450" Width="369.332" Topmost="True">
 	<Window.Resources>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
@@ -48,6 +48,7 @@
 					<Label Content="Record Orders" Height="21" />
 					<Label Content="Record Prices" Height="21" />
 					<Label Content="Time Zone Offset" Height="21" />
+					<Label Content="P&amp;L Scan Frequency (ms)" Height="21" />
 					<Label Content="Legacy Market Proxy URL"  />
 					<Label Content="Order Stream URL" Height="21" />
 				</StackPanel>
@@ -79,8 +80,9 @@
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=FlashYellow, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=RecordOrders, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=RecordPrices, Mode=TwoWay}" />
-					
+
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=TimeOffset, Mode=TwoWay}" />
+					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=PNLFrequency, Mode=TwoWay}" />
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=LegacyProxyUrl, Mode=TwoWay}" />
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=WebSocketsUrl, Mode=TwoWay}" />
 				</StackPanel>

@@ -478,5 +478,17 @@ namespace SpreadTrader.Properties {
                 this["RecordPrices"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4000")]
+        public int PNLFrequency {
+            get {
+                return ((int)(this["PNLFrequency"]));
+            }
+            set {
+                this["PNLFrequency"] = value;
+            }
+        }
     }
 }
