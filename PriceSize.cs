@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 
 public sealed class PriceSize : INotifyPropertyChanged
@@ -72,6 +73,7 @@ public sealed class PriceSize : INotifyPropertyChanged
 			}
 		}
 	}
+	private bool _uiUpdatePending;
 	public void Update(double newPrice, double newSize)
 	{
 		bool priceChanged = _price != newPrice;
@@ -83,33 +85,45 @@ public sealed class PriceSize : INotifyPropertyChanged
 		_price = newPrice;
 		_size = newSize;
 
-		if (priceChanged)
+		// Instead of firing immediately:
+		if (!_uiUpdatePending)
 		{
-			OnPropertyChanged(nameof(price));
-			OnPropertyChanged(nameof(PriceText));
-		}
-		if (sizeChanged) 
-		{ 
-			OnPropertyChanged(nameof(size));
-			OnPropertyChanged(nameof(SizeText));
+			_uiUpdatePending = true;
+
+			Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+			{
+				_uiUpdatePending = false;
+
+				// 🔥 THIS replaces "RaiseAll"
+				OnPropertyChanged(nameof(price));
+				OnPropertyChanged(nameof(PriceText));
+				OnPropertyChanged(nameof(size));
+				OnPropertyChanged(nameof(SizeText));
+			}));
 		}
 	}
 
-	//private CancellationTokenSource _flashCts;
-
-	//private async void Flash()
+	//public void Update(double newPrice, double newSize)
 	//{
-	//	_flashCts?.Cancel();
-	//	var cts = _flashCts = new CancellationTokenSource();
+	//	bool priceChanged = _price != newPrice;
+	//	bool sizeChanged = _size != newSize;
 
-	//	CellBackgroundColor = Brushes.Yellow;
+	//	if (!priceChanged && !sizeChanged)
+	//		return;
 
-	//	try
+	//	_price = newPrice;
+	//	_size = newSize;
+
+	//	if (priceChanged)
 	//	{
-	//		await Task.Delay(FLASH_DURATION_MS, cts.Token);
-	//		CellBackgroundColor = CellDefaultColor;
+	//		OnPropertyChanged(nameof(price));
+	//		OnPropertyChanged(nameof(PriceText));
 	//	}
-	//	catch (TaskCanceledException) { }
+	//	if (sizeChanged) 
+	//	{ 
+	//		OnPropertyChanged(nameof(size));
+	//		OnPropertyChanged(nameof(SizeText));
+	//	}
 	//}
 
 	private int _flashGeneration;

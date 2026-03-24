@@ -88,10 +88,22 @@ namespace SpreadTrader
 		{
 			foreach (var change in _marketChangeQueue?.GetConsumingEnumerable())
 			{
-				if (_marketHandlers.TryGetValue(change.MarketId, out var manager))
+				var latest = change;
+
+				// 🔥 Drain queue — keep only most recent
+				while (_marketChangeQueue.TryTake(out var next))
 				{
-					manager.OnMarketChanged(change); // better: pass object, not json
+					latest = next;
 				}
+
+				if (_marketHandlers.TryGetValue(latest.MarketId, out var manager))
+				{
+					manager.OnMarketChanged(latest);
+				}
+				//if (_marketHandlers.TryGetValue(change.MarketId, out var manager))
+				//{
+				//	manager.OnMarketChanged(change); // better: pass object, not json
+				//}
 			}
 		}
 		public void Start()

@@ -82,11 +82,7 @@ namespace SpreadTrader
 							RunnerBySelectionId[pnl.selectionId].ifWin = pnl.ifWin;
 						}
 					}
-
-					//foreach(var pnl in telemetry.ProfitAndLosses)
-					//{
-					//    RunnerBySelectionId[pnl.selectionId].ifWin = pnl.ifWin;
-					//}
+                    ControlMessenger.Send("Telemetry Available", telemetry);
 				});
 			};
 		}
@@ -94,7 +90,6 @@ namespace SpreadTrader
         {
             Debug.WriteLine($"Market closed ");
 			_marketStateEngine.Stop();
-			//WebSocketsHub.Instance.Detach(MarketNode?.MarketID, this);
 		}
 
 		public void OnMarketChanged(MarketChangeDto change)
@@ -126,7 +121,7 @@ namespace SpreadTrader
                     LiveRunner lr;
                     RunnerBySelectionId.TryGetValue(runner.Id, out lr) ;
                     if (lr == null)
-                        return;
+                        continue;
 
                     String runner_name = lr.Name;
 

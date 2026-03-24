@@ -63,12 +63,17 @@ namespace SpreadTrader
 				if (RunnersControl != null && RunnersControl.MarketNode != null)
 				{
 					String name = RunnersControl?.MarketNode.Market.marketName;
-                    
+
 					if (RunnersControl.MarketNode.MarketID == change.MarketId)
 					{
 						OnMarketChanged(change);
 					}
 				}
+			}
+			if (messageName == "Telemetry Available")
+			{
+				dynamic d = data;
+				var telemtry = d.telemetry;
 			}
 		}
 		public void OnMarketSelected(NodeViewModel d2)

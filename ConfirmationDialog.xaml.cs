@@ -44,7 +44,7 @@ namespace SpreadTrader
 			Odds = odds;
 			Stake = props.DefaultStake;
 
-			if (marketNode.EventType == 7 || props.SafeBets)		// Horses!
+			if (marketNode.Parent.EventType == 7 || props.SafeBets)		// Horses!
 			{
 				Stake = 2.00;
 				Odds = 1.01;
