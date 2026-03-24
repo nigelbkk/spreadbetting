@@ -149,7 +149,7 @@ namespace SpreadTrader
                     
                     if (runner.Bdatb != null)
                     {
-                        foreach (PriceLevelDto lv in runner.Bdatb.Take(3))
+                        foreach (PriceLevelDto lv in runner.Bdatb)
                         {
 							if (lv.Level <= 2)
 								lr.BackValues[lv.Level].Update(lv.Price, lv.Size);
@@ -157,7 +157,7 @@ namespace SpreadTrader
                     }
                     if (runner.Bdatl != null)
                     {
-                        foreach (PriceLevelDto lv in runner.Bdatl.Take(3))
+                        foreach (PriceLevelDto lv in runner.Bdatl)
                         {
                             if (lv.Level <= 2)
                                 lr.LayValues[lv.Level].Update(lv.Price, lv.Size);
