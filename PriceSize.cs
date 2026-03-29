@@ -48,7 +48,7 @@ public sealed class PriceSize : INotifyPropertyChanged
 
 			if (_price < 4)
 				format = "0.00";
-			else if (_price < 10)
+			else if (_price < 20)
 				format = "0.0";
 
 			return _price == 0 ? "" : _price.ToString(format).TrimEnd('.');

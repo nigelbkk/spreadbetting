@@ -17,7 +17,7 @@ namespace SpreadTrader
 {
 	public partial class RunnersControl : UserControl, INotifyPropertyChanged
     {
-        #region
+		#region
         MarketStateEngine _marketStateEngine = new MarketStateEngine();
 		private NodeViewModel _MarketNode { get; set; }
 		public NodeViewModel MarketNode { get { return _MarketNode; } set { _MarketNode = value; LiveRunners = new List<LiveRunner>(); } }
@@ -88,7 +88,7 @@ namespace SpreadTrader
 		}
 		public void OnMarketClosed()
         {
-            Debug.WriteLine($"Market closed ");
+            //Debug.WriteLine($"Market closed ");
 			_marketStateEngine.Stop();
 		}
 
