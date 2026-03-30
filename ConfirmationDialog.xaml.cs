@@ -50,7 +50,7 @@ namespace SpreadTrader
 				Odds = 1.01;
 				Side = "Lay";
 			}
-			this.MarketId = MarketId;
+			this.MarketId = marketNode?.MarketID;
 			InitializeComponent();
 			UpDown.NumericValue = Odds;
 			FocusManager.SetFocusedElement(DockPanel, Submit_button);

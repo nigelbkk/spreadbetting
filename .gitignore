@@ -15,6 +15,9 @@ SpreadTrader.csproj
 *.sublime-settings
 *.zip
 
+BetfairPnlTest/
+pnl_look/
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
