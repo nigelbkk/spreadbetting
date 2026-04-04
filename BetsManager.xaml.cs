@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Media;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -206,19 +207,30 @@ namespace SpreadTrader
             }
 		}
 
-		private void ApplyPartialMatch(BetsManagerRow row, Order o)
+		private void ApplyPartialMatch(Order o)
 		{
+			UInt64 betid = Convert.ToUInt64(o.Id);
+			var actualRow = _allRows.FirstOrDefault(r => r.BetID == betid && !r.IsMatchedFragment);
+
+			//var existingMatch = _allRows.FirstOrDefault(r => r.ParentBetID == actualRow.BetID);
+
+			if (actualRow == null)
+			{
+				Debug.WriteLine($"Row not found for BetID {o.Id}");
+				return;
+			}
 			// clone row
-			var mrow = new BetsManagerRow(row)
+			var mrow = new BetsManagerRow(actualRow)
 			{
 				SizeMatched = o.Sm.Value,
 				Odds = o.P.Value,
 				Stake = o.Sm.Value,
 				AvgPriceMatched = o.Avp.Value,
-				Hidden = UnmatchedOnly
+				Hidden = UnmatchedOnly,
+				IsMatchedFragment = true
 			};
 
-			int idx = _allRows.IndexOf(row);
+			int idx = _allRows.IndexOf(actualRow);
 
 			if (idx >= 0)
 			{
@@ -226,11 +238,10 @@ namespace SpreadTrader
 			}
 			else
 			{
-				Debug.WriteLine("Row not found during partial match");
+				Debug.WriteLine($"Index failure for BetID {o.Id} : {actualRow}");
 			}
-
 			// update unmatched remainder
-			row.Stake = o.Sr.Value;
+			actualRow.Stake = o.Sr.Value;
 		}
 		public void OnOrderChanged(OrderMarketChange change)
         {
@@ -335,9 +346,15 @@ namespace SpreadTrader
 									//});
 
 									//ops.Add(() => row.Stake = o.Sr.Value);                         // change stake for the unmatched remainder
+
+									if (!_allRows.Any(r => r.BetID == row.BetID))
+									{
+										Debug.WriteLine($"INCONSISTENCY: row {row.BetID} not in _allRows");
+									}
+
 									Dispatcher.Invoke(() =>
 									{
-										ApplyPartialMatch(row, o);
+										ApplyPartialMatch(o);
 									});
 									betMatched = true;
 

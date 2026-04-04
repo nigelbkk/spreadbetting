@@ -15,35 +15,36 @@ namespace SpreadTrader
 		public event PropertyChangedEventHandler PropertyChanged;
 		public void OnPropertyChanged(String name)
 		{
-			if (_suspend > 0)
-			{
-				_dirty = true;
-				return;
-			}
+			//if (_suspend > 0)
+			//{
+			//	_dirty = true;
+			//	return;
+			//}
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 		}
 
 		private int _suspend;
 		private bool _dirty;
 
-		public void BeginUpdate()
-		{
-			_suspend++;
-		}
+		//public void BeginUpdate()
+		//{
+		//	_suspend++;
+		//}
 
-		public void EndUpdate()
-		{
-			if (--_suspend == 0 && _dirty)
-			{
-				_dirty = false;
-				OnPropertyChanged("");
-			}
-		}
+		//public void EndUpdate()
+		//{
+		//	if (--_suspend == 0 && _dirty)
+		//	{
+		//		_dirty = false;
+		//		OnPropertyChanged("");
+		//	}
+		//}
 		private DateTime _Time;
 		public DateTime Time { get => _Time.AddHours(props.TimeOffset); set { _Time = value; } }
 		public long? UTCTime;
 		public String MarketID;
 		public long SelectionID;
+		public bool IsMatchedFragment { get; set; }
 
 		public UInt64 BetID { get; set; }
 		private String _Runner;
