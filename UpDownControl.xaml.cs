@@ -55,7 +55,7 @@ namespace SpreadTrader
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            tb.Text = _value.ToString();
+            tb.Text = _value?.ToString();
             tb.SelectAll();
         }
 		private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)

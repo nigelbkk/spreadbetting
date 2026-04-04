@@ -12,6 +12,7 @@ namespace SpreadTrader
 {
 	public sealed class MarketTelemetry
 	{
+		public String MarketId { get; set; }
 		public double BackBook { get; set; }
 		public double LayBook { get; set; }
 		public double TotalMatched { get; set; }
@@ -36,6 +37,7 @@ namespace SpreadTrader
 
 						var telemetry = new MarketTelemetry
 						{
+							MarketId = book.marketId,
 							BackBook = book.BackBook,
 							LayBook = book.LayBook,
 							TotalMatched = book.totalMatched,

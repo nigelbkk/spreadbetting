@@ -56,25 +56,28 @@ namespace SpreadTrader
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
-			if (messageName == "Market Changed")
-			{
-				dynamic d = data;
-				MarketChangeDto change = d.MarketChangeDto;
-				if (RunnersControl != null && RunnersControl.MarketNode != null)
-				{
-					String name = RunnersControl?.MarketNode.Market.marketName;
+			//if (messageName == "Market Changed")
+			//{
+			//	dynamic d = data;
+			//	MarketChangeDto change = d.MarketChangeDto;
+			//	if (RunnersControl != null && RunnersControl.MarketNode != null)
+			//	{
+			//		String name = RunnersControl?.MarketNode.Market.marketName;
 
-					if (RunnersControl.MarketNode.MarketID == change.MarketId)
-					{
-						OnMarketChanged(change);
-					}
-				}
-			}
+			//		if (RunnersControl.MarketNode.MarketID == change.MarketId)
+			//		{
+			//			OnMarketChanged(change);
+			//		}
+			//	}
+			//}
 			if (messageName == "Telemetry Available")
 			{
 				dynamic d = data as MarketTelemetry;
+				String marketid = d?.MarketId;
 				double totalMatched = d?.TotalMatched;
-				marketHeader.TotalMatched = totalMatched;
+
+				if (marketid == this.marketID)
+					marketHeader.TotalMatched = totalMatched;
 			}
 		}
 		public void OnMarketSelected(NodeViewModel d2)
