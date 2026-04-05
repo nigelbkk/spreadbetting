@@ -948,6 +948,10 @@ namespace BetfairAPI
             public long selectionId { get; set; }
             public Double ifWin { get; set; }
             public Double ifLose { get; set; }
+			public override string ToString()
+			{
+				return $"{selectionId} : {ifWin} : {ifLose}";
+			}
         }
         public String marketId { get; set; }
         public Double commissionApplied { get; set; }

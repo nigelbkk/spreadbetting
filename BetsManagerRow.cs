@@ -23,8 +23,8 @@ namespace SpreadTrader
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 		}
 
-		private int _suspend;
-		private bool _dirty;
+		//private int _suspend;
+		//private bool _dirty;
 
 		//public void BeginUpdate()
 		//{

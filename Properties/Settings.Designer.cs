@@ -490,5 +490,17 @@ namespace SpreadTrader.Properties {
                 this["PNLFrequency"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int TotalMatchedFrequency {
+            get {
+                return ((int)(this["TotalMatchedFrequency"]));
+            }
+            set {
+                this["TotalMatchedFrequency"] = value;
+            }
+        }
     }
 }

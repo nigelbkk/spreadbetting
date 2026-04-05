@@ -73,7 +73,7 @@ namespace SpreadTrader
 			if (messageName == "Telemetry Available")
 			{
 				dynamic d = data as MarketTelemetry;
-				String marketid = d?.MarketId;
+				String marketid = d.MarketId;
 				double totalMatched = d?.TotalMatched;
 
 				if (marketid == this.marketID)

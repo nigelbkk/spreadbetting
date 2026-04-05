@@ -5,7 +5,7 @@
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:p="clr-namespace:SpreadTrader.Properties"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="450" Width="369.332" Topmost="True">
+        Title="Settings" ResizeMode="NoResize" Closing="Window_Closing" Height="370" Width="369.332" Topmost="True">
 	<Window.Resources>
 		<Style BasedOn="{StaticResource {x:Type Label}}" 
             TargetType="{x:Type Label}">
@@ -39,16 +39,17 @@
 					<Label Content="Preselect Stakes" />
 					<Label Content="Matched Bet Alert" />
 					<Label Content="Default Action" />
-					<Label Content="Net of Commissions" />
+					<!--<Label Content="Net of Commissions" />
 					<Label Content="Show Cross Matched" />
 					<Label Content="Apply Cross Match Formula" />
-					<Label Content="Hilite Unselected When matched" />
+					<Label Content="Hilite Unselected When matched" />-->
 					<Label Content="Safe Bets" Height="21" />
 					<Label Content="Flash Yellow" Height="21" />
 					<Label Content="Record Orders" Height="21" />
 					<Label Content="Record Prices" Height="21" />
-					<Label Content="Time Zone Offset" Height="21" />
+					<!--<Label Content="Time Zone Offset" Height="21" />-->
 					<Label Content="P&amp;L Scan Frequency (ms)" Height="21" />
+					<Label Content="Total Matched Frequency (secs)" Height="21" />
 					<Label Content="Legacy Market Proxy URL"  />
 					<Label Content="Order Stream URL" Height="21" />
 				</StackPanel>
@@ -72,17 +73,19 @@
 						<ComboBoxItem>Keep Offset in Play</ComboBoxItem>
 						<ComboBoxItem>Keep Offset at SP</ComboBoxItem>
 					</ComboBox>
-					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=NetOfCommission, Mode=TwoWay}" />
+					<!--<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=NetOfCommission, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=CrossMatched, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=CrossMatchingFormula, Mode=TwoWay}" />
-					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=HiliteUnselected, Mode=TwoWay}" />
+					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=HiliteUnselected, Mode=TwoWay}" />-->
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=SafeBets, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=FlashYellow, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=RecordOrders, Mode=TwoWay}" />
 					<CheckBox IsChecked="{Binding Source={x:Static p:Settings.Default}, Path=RecordPrices, Mode=TwoWay}" />
 
-					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=TimeOffset, Mode=TwoWay}" />
+					<!--<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=TimeOffset, Mode=TwoWay}" />-->
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=PNLFrequency, Mode=TwoWay}" />
+					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=TotalMatchedFrequency, Mode=TwoWay}" />
+
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=LegacyProxyUrl, Mode=TwoWay}" />
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=WebSocketsUrl, Mode=TwoWay}" />
 				</StackPanel>

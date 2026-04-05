@@ -26,8 +26,14 @@ namespace SpreadTrader
         private double _layBook;
 		public double BackBook { set { if (_backBook != value) { _backBook = value; OnPropertyChanged(nameof(BackBook)); OnPropertyChanged(nameof(BackBookString)); } } }
 		public double LayBook { set { if (_layBook != value) { _layBook = value; OnPropertyChanged(nameof(LayBook)); OnPropertyChanged(nameof(LayBookString)); } } }
-		public String BackBookString { get { return MarketNode == null ? "" : _backBook.ToString("0.00")+"%"; } }
-		public String LayBookString { get { return MarketNode == null ? "" : _layBook.ToString("0.00")+"%"; } }
+		public String BackBookString { get { return MarketNode == null ? "" : _backBook.ToString("0.00") + "%"; } }
+		public String LayBookString { get 
+            { 
+                if (MarketNode != null)
+                    return _layBook.ToString("0.00")+"%";
+                return null;
+            } 
+        }
 		public List<LiveRunner> LiveRunners { get; set; }
 		private Dictionary<long, LiveRunner> RunnerBySelectionId = new Dictionary<long, LiveRunner>();
         public event PropertyChangedEventHandler PropertyChanged;
@@ -61,7 +67,7 @@ namespace SpreadTrader
 			_marketStateEngine.Stop();
 			_marketStateEngine = new MarketStateEngine();
             
-            if (props.PNLFrequency > 1000)
+            if (props.PNLFrequency >= 400)
                 _marketStateEngine.Start(_MarketNode.Market);
             else
                 Debug.WriteLine("P&L IS DISABLED");
@@ -70,19 +76,24 @@ namespace SpreadTrader
 			{
 				Dispatcher.Invoke(() =>
 				{
-					BackBook = telemetry.BackBook;
-					LayBook = telemetry.LayBook;
+                    if (telemetry.ProfitAndLosses != null)
+                    {
+                        var pnlSnapshot = telemetry.ProfitAndLosses?.ToList() ?? new List<RunnerProfitAndLoss>();
 
-					var pnlSnapshot = telemetry.ProfitAndLosses?.ToList() ?? new List<RunnerProfitAndLoss>();
-
-					foreach (var pnl in pnlSnapshot)
-					{
-						if (RunnerBySelectionId.ContainsKey(pnl.selectionId)) // ✅ Also add this check
-						{
-							RunnerBySelectionId[pnl.selectionId].ifWin = pnl.ifWin;
-						}
+                        foreach (var pnl in pnlSnapshot)
+                        {
+                            if (RunnerBySelectionId.ContainsKey(pnl.selectionId)) // ✅ Also add this check
+                            {
+                                RunnerBySelectionId[pnl.selectionId].ifWin = pnl.ifWin;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        BackBook = telemetry.BackBook;
+                        LayBook = telemetry.LayBook;
+						ControlMessenger.Send("Telemetry Available", telemetry);
 					}
-                    ControlMessenger.Send("Telemetry Available", telemetry);
 				});
 			};
 		}

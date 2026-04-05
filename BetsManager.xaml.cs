@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Media;
@@ -30,7 +31,7 @@ namespace SpreadTrader
 		private List<ulong> _cancelledBets = new List<ulong>();
 
 		private readonly Dictionary<ulong, BetsManagerRow> _byBetId = new Dictionary<ulong, BetsManagerRow>();
-		private readonly HashSet<ulong> _byBetIdImmediate = new HashSet<ulong>(); // Track processed IDs
+		//private readonly HashSet<ulong> _byBetIdImmediate = new HashSet<ulong>(); // Track processed IDs
 		private readonly object _lock = new object();
 		private NodeViewModel MarketNode { get; set; }
         private DateTime _LastUpdated { get; set; }
@@ -212,8 +213,6 @@ namespace SpreadTrader
 			UInt64 betid = Convert.ToUInt64(o.Id);
 			var actualRow = _allRows.FirstOrDefault(r => r.BetID == betid && !r.IsMatchedFragment);
 
-			//var existingMatch = _allRows.FirstOrDefault(r => r.ParentBetID == actualRow.BetID);
-
 			if (actualRow == null)
 			{
 				Debug.WriteLine($"Row not found for BetID {o.Id}");
@@ -283,29 +282,52 @@ namespace SpreadTrader
 
 								_byBetId.TryGetValue(betid, out BetsManagerRow row);
 
-								if (row == null)        // not in the grid
-                                {
+								if (row == null)
+								{
 									if (_cancelledBets.Contains(betid))
-										return; // ignore zombies
+										continue;
 
-									lock (_lock)
+									Dispatcher.Invoke(() =>
 									{
-										if (_byBetIdImmediate.Contains(betid))
+										var newRow = new BetsManagerRow(o)
 										{
-											Debug.WriteLine($"skipping possible dupe: {betid}");
-											continue;
-										}
-										if (_byBetIdImmediate.Count > 1000) // or some threshold
-										{
-											_byBetIdImmediate.Clear(); // Clear if needed, but be careful about timing
-										}
-										_byBetIdImmediate.Add(betid);
-									}
+											IsMatchedFragment = false,
+											MarketID = change.Id,
+											SelectionID = orc.Id.Value
+										};
 
-									row = new BetsManagerRow(o) { MarketID = change.Id, SelectionID = orc.Id.Value };
-									ops.Add(() => { _allRows.Insert(0, row); _byBetId[row.BetID] = row; });
-									Debug.WriteLine(o.Id, "new bet: ");
+										_allRows.Insert(0, newRow);
+										_byBetId[betid] = newRow;
+                                        row = newRow;
+									});
+
+									Debug.WriteLine($"CREATED base row {betid}");
 								}
+
+								//if (row == null)        // not in the grid
+								//                        {
+								//	if (_cancelledBets.Contains(betid))
+								//		continue; // ignore zombies
+
+								//	lock (_lock)
+								//	{
+								//		// TEMPORARILY REMOVE
+								//		//if (_byBetIdImmediate.Contains(betid))
+								//		//{
+								//		//	Debug.WriteLine($"skipping possible dupe: {betid}");
+								//		//	continue;
+								//		//}
+								//		if (_byBetIdImmediate.Count > 1000) // or some threshold
+								//		{
+								//			_byBetIdImmediate.Clear(); // Clear if needed, but be careful about timing
+								//		}
+								//		_byBetIdImmediate.Add(betid);
+								//	}
+
+								//	row = new BetsManagerRow(o) { MarketID = change.Id, SelectionID = orc.Id.Value };
+								//	ops.Add(() => { _allRows.Insert(0, row); _byBetId[row.BetID] = row; });
+								//	Debug.WriteLine(o.Id, "new bet: ");
+								//}
 								String runner_name = MarketNode.GetRunnerName(row.SelectionID);
 								ops.Add(() => row.Runner = runner_name);
 
@@ -350,6 +372,8 @@ namespace SpreadTrader
 									if (!_allRows.Any(r => r.BetID == row.BetID))
 									{
 										Debug.WriteLine($"INCONSISTENCY: row {row.BetID} not in _allRows");
+										Debug.WriteLine($"_byBetId contains: {_byBetId.ContainsKey(betid)}");
+										Debug.WriteLine($"_allRows contains: {_allRows.Any(r => r.BetID == betid)}");
 									}
 
 									Dispatcher.Invoke(() =>
