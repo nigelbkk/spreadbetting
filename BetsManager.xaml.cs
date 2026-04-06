@@ -303,31 +303,7 @@ namespace SpreadTrader
 
 									Debug.WriteLine($"CREATED base row {betid}");
 								}
-
-								//if (row == null)        // not in the grid
-								//                        {
-								//	if (_cancelledBets.Contains(betid))
-								//		continue; // ignore zombies
-
-								//	lock (_lock)
-								//	{
-								//		// TEMPORARILY REMOVE
-								//		//if (_byBetIdImmediate.Contains(betid))
-								//		//{
-								//		//	Debug.WriteLine($"skipping possible dupe: {betid}");
-								//		//	continue;
-								//		//}
-								//		if (_byBetIdImmediate.Count > 1000) // or some threshold
-								//		{
-								//			_byBetIdImmediate.Clear(); // Clear if needed, but be careful about timing
-								//		}
-								//		_byBetIdImmediate.Add(betid);
-								//	}
-
-								//	row = new BetsManagerRow(o) { MarketID = change.Id, SelectionID = orc.Id.Value };
-								//	ops.Add(() => { _allRows.Insert(0, row); _byBetId[row.BetID] = row; });
-								//	Debug.WriteLine(o.Id, "new bet: ");
-								//}
+                                								
 								String runner_name = MarketNode.GetRunnerName(row.SelectionID);
 								ops.Add(() => row.Runner = runner_name);
 
@@ -354,21 +330,6 @@ namespace SpreadTrader
                                 }
                                 if (o.Sm > 0 && o.Sr > 0)                                           // partially matched
                                 {
-									//BetsManagerRow mrow = new BetsManagerRow(row);
-									//                           mrow.SizeMatched = o.Sm.Value;
-									//                           mrow.Odds = o.P.Value;
-									//                           mrow.Stake = o.Sm.Value;
-									//                           mrow.AvgPriceMatched = o.Avp.Value;
-									//                           mrow.Hidden = UnmatchedOnly;
-
-									//ops.Add(() =>
-									//{
-									//	int idx = _allRows.IndexOf(row);
-									//	_allRows.Insert(idx + 1, mrow);
-									//});
-
-									//ops.Add(() => row.Stake = o.Sr.Value);                         // change stake for the unmatched remainder
-
 									if (!_allRows.Any(r => r.BetID == row.BetID))
 									{
 										Debug.WriteLine($"INCONSISTENCY: row {row.BetID} not in _allRows");
@@ -384,21 +345,36 @@ namespace SpreadTrader
 
                                     Debug.WriteLine(o.Id, "partial match: ");
                                 }
-                                if (o.Sc > 0)                                       // cancelled
-                                {
-                                    if (o.Sr != 0)                                  // cancellation of partially matched bet
-                                    {
-										ops.Add(() => row.Stake = o.Sr.Value);                     // adjust unmatched remainder
-                                        Debug.WriteLine(o.Id, "Cancellation of partially matched bet: ");
-                                    }
-                                    if (o.Sr == 0)
-                                    {
-                                        Debug.WriteLine(o.Id, "Bet fully cancelled: ");
-										_cancelledBets.Add(row.BetID);
-										ops.Add(() => { if (_byBetId.Remove(row.BetID)) _allRows.Remove(row); });
-									}
+								if (o.Sr > 0)
+								{
+									// cancellation of unmatched portion (partial cancel)
+									ops.Add(() => row.Stake = o.Sr.Value);
+									Debug.WriteLine(o.Id, "Cancellation of partially matched bet");
 								}
-                            }
+								else if (o.Sr == 0 && o.Sm == 0)
+								{
+									// fully cancelled (no match ever happened)
+									_cancelledBets.Add(row.BetID);
+
+									ops.Add(() =>
+									{
+										if (_byBetId.Remove(row.BetID))
+											_allRows.Remove(row);
+									});
+
+									Debug.WriteLine(o.Id, "Bet fully cancelled");
+								}
+								else
+								{
+									// THIS is your case:
+									// Sr == 0 but Sm > 0 → matched + cancelled remainder
+
+									Debug.WriteLine(o.Id, "Cancel after partial match");
+
+									// do NOT remove row
+									ops.Add(() => row.Stake = 0);
+								}
+							}
 						}
 					}
 					Dispatcher.BeginInvoke(new Action(() =>
