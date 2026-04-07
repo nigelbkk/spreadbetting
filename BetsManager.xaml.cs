@@ -73,6 +73,9 @@ namespace SpreadTrader
             get { return _Notification; }
             set
             {
+                if (String.IsNullOrEmpty(value))
+                    return;
+
                 _Notification = value;
                 Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Notification = value; }));
             }
@@ -439,7 +442,8 @@ namespace SpreadTrader
 					catch (Exception xe)
                     {
                         Status = xe.Message;
-                    }
+                        Debug.WriteLine(xe);
+					}
                 }
             }
         }
@@ -536,7 +540,8 @@ namespace SpreadTrader
                             }
                             catch (Exception xxe)
                             {
-                                Notification = $"Cancellation Task failed with {xxe}";
+								Debug.WriteLine($"Cancellation Task failed with {xxe}");
+								Notification = $"Cancellation Task failed with {xxe}";
                             }
                         }
                         break;

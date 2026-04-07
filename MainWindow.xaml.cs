@@ -1,14 +1,15 @@
 ﻿using BetfairAPI;
+using SpreadTrader.Properties;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using SpreadTrader.Properties;
 
 namespace SpreadTrader
 {
@@ -37,7 +38,7 @@ namespace SpreadTrader
             set
             {
                 _Status = value;
-                Debug.WriteLine(value);
+                //Debug.WriteLine(value);
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     NotifyPropertyChanged("");
@@ -50,7 +51,7 @@ namespace SpreadTrader
             set
             {
                 _Notification = value;
-                Debug.WriteLine(value);
+                //Debug.WriteLine(value);
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     NotifyPropertyChanged("");
@@ -98,21 +99,19 @@ namespace SpreadTrader
 
 		public MainWindow()
         {
-            const string appName = "SpreadTrader";
-            bool createdNew;
+			Directory.CreateDirectory(@"C:\Temp");
+			var listener = new TextWriterTraceListener(@"C:\Temp\trace.log");
 
-            mutex = new Mutex(true, appName, out createdNew);
+			Trace.Listeners.Add(listener);
+			Trace.AutoFlush = true;
+			Trace.Flush();
 
-            if (!createdNew)
-            {
-                Debug.WriteLine(appName + " already running Exiting now");
-                Environment.Exit(0);
-            }
-
-            Debug.WriteLine("Continuing with the application");
-            ServicePointManager.DefaultConnectionLimit = 800;
+			ServicePointManager.DefaultConnectionLimit = 800;
             System.Net.ServicePointManager.Expect100Continue = false;
-            InitializeComponent();
+
+			InitializeComponent();
+			Debug.WriteLine("Continuing with the application");
+
 			ControlMessenger.MessageSent += OnMessageReceived;
 
 			this.Language = System.Windows.Markup.XmlLanguage.GetLanguage(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
