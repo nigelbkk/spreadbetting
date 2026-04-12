@@ -83,11 +83,20 @@ namespace SpreadTrader
 
 				if (_ordersHandlers.TryGetValue(change.Id, out var manager))
 				{
-					Debug.WriteLine($"{DateTime.UtcNow:HH:mm:ss.fff} [T{Thread.CurrentThread.ManagedThreadId}] Before OnOrderChanged {change.Id}");
+					var sw = Stopwatch.StartNew();
 
 					manager.OnOrderChanged(change);
 
-					Debug.WriteLine($"{DateTime.UtcNow:HH:mm:ss.fff} [T{Thread.CurrentThread.ManagedThreadId}] After OnOrderChanged {change.Id}");
+					sw.Stop();
+
+					if (sw.ElapsedMilliseconds > 50)
+					{
+						Debug.WriteLine($"SLOW OnOrderChanged {change.Id}: {sw.ElapsedMilliseconds} ms");
+					}
+
+					//Debug.WriteLine($"{DateTime.UtcNow:HH:mm:ss.fff} [T{Thread.CurrentThread.ManagedThreadId}] Before OnOrderChanged {change.Id}");
+					//manager.OnOrderChanged(change);
+					//Debug.WriteLine($"{DateTime.UtcNow:HH:mm:ss.fff} [T{Thread.CurrentThread.ManagedThreadId}] After OnOrderChanged {change.Id}");
 				}
 				else
 				{
