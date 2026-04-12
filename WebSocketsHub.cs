@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SpreadTrader
@@ -16,7 +17,7 @@ namespace SpreadTrader
 		public static WebSocketsHub Instance { get; } = new WebSocketsHub();
 		private IHubProxy hubProxy = null;
 		private HubConnection hubConnection = null;
-		private readonly BlockingCollection<string> _orderQueue = new BlockingCollection<string>();
+		private readonly BlockingCollection<string> _orderQueue = new BlockingCollection<string>(10000);
 		private readonly BlockingCollection<MarketChangeDto> _marketChangeQueue = new BlockingCollection<MarketChangeDto>();
 		private Task _orderProcessor;
 		private Task _marketChangeProcessor;
@@ -70,6 +71,8 @@ namespace SpreadTrader
 		{
 			foreach (var json in _orderQueue.GetConsumingEnumerable())
 			{
+				Debug.WriteLine($"{DateTime.UtcNow:HH:mm:ss.fff} [T{Thread.CurrentThread.ManagedThreadId}] Dequeue. Queue={_orderQueue.Count}");
+
 				if (props.RecordOrders)
 					StreamRecorder.Record(json);
 
@@ -80,10 +83,36 @@ namespace SpreadTrader
 
 				if (_ordersHandlers.TryGetValue(change.Id, out var manager))
 				{
-					manager.OnOrderChanged(change); // better: pass object, not json
+					Debug.WriteLine($"{DateTime.UtcNow:HH:mm:ss.fff} [T{Thread.CurrentThread.ManagedThreadId}] Before OnOrderChanged {change.Id}");
+
+					manager.OnOrderChanged(change);
+
+					Debug.WriteLine($"{DateTime.UtcNow:HH:mm:ss.fff} [T{Thread.CurrentThread.ManagedThreadId}] After OnOrderChanged {change.Id}");
+				}
+				else
+				{
+					Debug.WriteLine($"{DateTime.UtcNow:HH:mm:ss.fff} No handler for {change.Id}");
 				}
 			}
 		}
+		//private void OrderProcessingLoop()
+		//{
+		//	foreach (var json in _orderQueue.GetConsumingEnumerable())
+		//	{
+		//		if (props.RecordOrders)
+		//			StreamRecorder.Record(json);
+
+		//		var change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
+
+		//		if (change?.Id == null)
+		//			continue;
+
+		//		if (_ordersHandlers.TryGetValue(change.Id, out var manager))
+		//		{
+		//			manager.OnOrderChanged(change); // better: pass object, not json
+		//		}
+		//	}
+		//}
 		private void MarketChangeProcessingLoop()
 		{
 			foreach (var change in _marketChangeQueue?.GetConsumingEnumerable())
