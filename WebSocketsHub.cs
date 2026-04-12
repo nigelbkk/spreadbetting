@@ -168,7 +168,7 @@ namespace SpreadTrader
 			{
 				_marketChangeQueue.Add(change);
 			});
-			hubProxy.On<string, string, string>("ordersChanged", (json1, json2, json3) =>
+			hubProxy.On<string, string>("ordersChanged", (json1, json3) =>
 			{
 				_orderQueue.Add(json1);
 			});
