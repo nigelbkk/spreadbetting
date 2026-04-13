@@ -1,22 +1,18 @@
-﻿using Betfair.ESAClient.Cache;
-using Betfair.ESASwagger.Model;
+﻿using Betfair.ESASwagger.Model;
 using BetfairAPI;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Media;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace SpreadTrader
 {
@@ -40,7 +36,6 @@ namespace SpreadTrader
         private BetfairAPI.BetfairAPI Betfair { get; set; }
         private bool _StreamActive { get; set; }
         public bool StreamActive { get => _StreamActive;  set { _StreamActive = value; OnPropertyChanged(""); } }
-        private Timer timer = new Timer();
 
 		void OnPropertyChanged([CallerMemberName] string name = null)
 		{
@@ -84,6 +79,13 @@ namespace SpreadTrader
         public String StreamingButtonText { get { return "Streaming Connected"; } }
 		#endregion Properties
 
+		public BetsManager()
+		{
+			Rows = new BulkObservableCollection<BetsManagerRow>();
+			InitializeComponent();
+			ControlMessenger.MessageSent += OnMessageReceived;
+		}
+
 		private void ApplyFilter()
 		{
             using (Rows.SuspendNotifications())
@@ -97,7 +99,6 @@ namespace SpreadTrader
                 }
             }
 		}
-
 		public void OnMarketSelected(NodeViewModel d2, RunnersControl rc)
 		{
 			String _marketId = "";
@@ -194,13 +195,6 @@ namespace SpreadTrader
 				Status = report.status;
             });
         }
-
-        public BetsManager()
-        {
-            Rows = new BulkObservableCollection<BetsManagerRow>();
-            InitializeComponent();
-            ControlMessenger.MessageSent += OnMessageReceived;
-        }
         private async void NotifyBetMatchedAsync()
         {
             String path = props.MatchedBetAlert;
@@ -210,7 +204,6 @@ namespace SpreadTrader
                 player.Play();
             }
 		}
-
 		private void ApplyPartialMatch(Order o)
 		{
 			UInt64 betid = Convert.ToUInt64(o.Id);

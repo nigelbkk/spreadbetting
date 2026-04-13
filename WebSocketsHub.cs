@@ -1,6 +1,7 @@
 ﻿using Betfair.ESASwagger.Model;
 using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
+using StreamSimulator.Recorder;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace SpreadTrader
 		private readonly BlockingCollection<MarketChangeDto> _marketChangeQueue = new BlockingCollection<MarketChangeDto>();
 		private Task _orderProcessor;
 		private Task _marketChangeProcessor;
+		private StreamRecorder recorder = new StreamRecorder(@"recordings\test_bets.json");
 		private Properties.Settings props = Properties.Settings.Default;
 		private readonly Dictionary<string, BetsManager> _ordersHandlers = new Dictionary<string, BetsManager>();
 		private readonly Dictionary<string, RunnersControl> _marketHandlers = new Dictionary<string, RunnersControl>();
@@ -67,15 +69,12 @@ namespace SpreadTrader
 				UnsubscribeAsync(marketId);
 			}
 		}
+
 		private void OrderProcessingLoop()
 		{
 			foreach (var json in _orderQueue.GetConsumingEnumerable())
 			{
 				Debug.WriteLine($"{DateTime.UtcNow:HH:mm:ss.fff} [T{Thread.CurrentThread.ManagedThreadId}] Dequeue. Queue={_orderQueue.Count}");
-
-				if (props.RecordOrders)
-					StreamRecorder.Record(json);
-
 				var change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
 
 				if (change?.Id == null)
@@ -86,6 +85,9 @@ namespace SpreadTrader
 					var sw = Stopwatch.StartNew();
 
 					manager.OnOrderChanged(change);
+
+					if (props.RecordOrders)
+						recorder.Record(change);
 
 					sw.Stop();
 
@@ -104,24 +106,6 @@ namespace SpreadTrader
 				}
 			}
 		}
-		//private void OrderProcessingLoop()
-		//{
-		//	foreach (var json in _orderQueue.GetConsumingEnumerable())
-		//	{
-		//		if (props.RecordOrders)
-		//			StreamRecorder.Record(json);
-
-		//		var change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
-
-		//		if (change?.Id == null)
-		//			continue;
-
-		//		if (_ordersHandlers.TryGetValue(change.Id, out var manager))
-		//		{
-		//			manager.OnOrderChanged(change); // better: pass object, not json
-		//		}
-		//	}
-		//}
 		private void MarketChangeProcessingLoop()
 		{
 			foreach (var change in _marketChangeQueue?.GetConsumingEnumerable())
@@ -148,6 +132,7 @@ namespace SpreadTrader
 		{
 			_orderProcessor = Task.Run(() => OrderProcessingLoop());
 			_marketChangeProcessor = Task.Run(() => MarketChangeProcessingLoop());
+			recorder.Start();
 		}
 		private WebSocketsHub() 
 		{
@@ -168,7 +153,7 @@ namespace SpreadTrader
 			{
 				_marketChangeQueue.Add(change);
 			});
-			hubProxy.On<string, string>("ordersChanged", (json1, json3) =>
+			hubProxy.On<string>("ordersChanged", (json1) =>
 			{
 				_orderQueue.Add(json1);
 			});

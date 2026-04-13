@@ -1,12 +1,10 @@
 ﻿using BetfairAPI;
-using SpreadTrader.Properties;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -75,28 +73,9 @@ namespace SpreadTrader
                 Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
             }
         }
-		private Mutex mutex = null;
         public static TabContent SelectedTab {get;set;}
 #endregion Properties
-
-		private void OnMessageReceived(string messageName, object data)
-        {
-			if (messageName == "Market Selected")
-			{
-				dynamic d = data;
-				NodeViewModel d2 = d.NodeViewModel as NodeViewModel;
-				Debug.WriteLine($"MainWindow: {d2.FullName}");
-                //Task.Run(() => SelectedTab.OnSelected(d2));
-                SelectedTab.OnMarketSelected(d2);
-			}
-			//if (messageName == "Orders Changed")
-			//{
-			//	dynamic d = data;
-			//	String json = d.String;
-			//	Task.Run(() => SelectedTab.OnOrdersChanged(json));
-			//}
-		}
-
+	
 		public MainWindow()
         {
 			Directory.CreateDirectory(@"C:\Temp");
@@ -121,8 +100,23 @@ namespace SpreadTrader
             this.Width = Math.Max(0, props.Width);
 
             Betfair = new BetfairAPI.BetfairAPI();
+
+			Loaded += async (s, e) =>
+			{
+			};
 		}
-        public void UpdateAccountInformation()
+	    private void OnMessageReceived(string messageName, object data)
+        {
+			if (messageName == "Market Selected")
+			{
+				dynamic d = data;
+				NodeViewModel d2 = d.NodeViewModel as NodeViewModel;
+				Debug.WriteLine($"MainWindow: {d2.FullName}");
+                //Task.Run(() => SelectedTab.OnSelected(d2));
+                SelectedTab.OnMarketSelected(d2);
+			}
+		}
+		public void UpdateAccountInformation()
         {
             AccountFundsResponse response = Betfair.getAccountFunds(1);
             Balance = response.availableToBetBalance;
