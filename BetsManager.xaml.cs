@@ -130,6 +130,22 @@ namespace SpreadTrader
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
+            if (messageName == "Simulate")
+            {
+                SimulatedFill();
+            }
+            if (messageName == "Stop Simulation")
+            {
+                _simulatedStream.Stop();
+            }             
+            if (messageName == "New")
+            {
+                _simulatedStream.ReplayNew(MarketNode.MarketID, MarketNode.LiveRunners[0].SelectionId, 25);
+			}
+            if (messageName == "Single Shot")
+            {
+                _simulatedStream.ReplaySingleShot(MarketNode.MarketID);
+            } 
 			if (messageName == "Favorite Changed")
 			{
 				dynamic d = data;
@@ -542,8 +558,9 @@ namespace SpreadTrader
                     return;
                 }
                 CancelExecutionReport cancel_report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
-            }
-        }
+				SimulatedStream.Cancel(MarketNode.MarketID, row.SelectionID, row.BetID.ToString());
+			}
+		}
 		private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (Betfair == null)
@@ -555,12 +572,6 @@ namespace SpreadTrader
             {
                 switch (b.Tag)
                 {
-                    case "Fill":
-                        Debug.WriteLine("Fill");
-                        if (MarketNode != null)
-						    SimulatedFill();
-						break;
-
                     case "HalveUnmatched":
                         if (MarketNode != null)
                         {
@@ -573,8 +584,9 @@ namespace SpreadTrader
                                     if (!row.IsMatched && row.Stake >= 4)
                                     {
                                         cancel_instructions.Add(new CancelInstruction(row.BetID) { sizeReduction = Math.Round((row.Stake / 2), 2) });
-                                    }
-                                }
+										SimulatedStream.Cancel(MarketNode.MarketID, row.SelectionID, row.BetID.ToString());
+									}
+								}
                                 if (cancel_instructions.Count == 0)
                                 {
                                     Notification = "Nothing to do";
@@ -582,8 +594,8 @@ namespace SpreadTrader
                                 else
                                 {
 									Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-                                }
-                            });
+								}
+							});
                         }
                         break;
 
@@ -613,8 +625,9 @@ namespace SpreadTrader
                                             {
                                                 sizeReduction = null
                                             });
-                                        }
-                                    }
+                                            SimulatedStream.Cancel(MarketNode.MarketID, row.SelectionID, row.BetID.ToString());
+										}
+									}
                                     if (cancel_instructions.Count == 0)
                                     {
                                         Notification = "Nothing to do";
@@ -651,8 +664,9 @@ namespace SpreadTrader
                                         {
                                             sizeReduction = null
                                         });
-                                    }
-                                }
+										SimulatedStream.Cancel(MarketNode.MarketID, row.SelectionID, row.BetID.ToString());
+									}
+								}
                                 if (cancel_instructions.Count == 0)
                                 {
                                     Status = "Nothing to do";

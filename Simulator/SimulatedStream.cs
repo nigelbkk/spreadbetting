@@ -1,4 +1,5 @@
 using Betfair.ESASwagger.Model;
+using Newtonsoft.Json.Linq;
 using SpreadTrader;
 using StreamSimulator.Synthetic;
 using System;
@@ -7,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Xceed.Wpf.Toolkit;
 
 namespace StreamSimulator
 {
@@ -22,25 +24,14 @@ namespace StreamSimulator
         Burst,
     }
 
-    /// <summary>
-    /// Replays OrderMarketChange sequences through WebSocketsHub.Instance.Simulate()
-    /// so BetsManager receives identical input to the live case.
-    ///
-    /// Three sources:
-    ///   1. Recorded .jsonl files (from StreamRecorder)
-    ///   2. Synthetic sequences (from SequenceBuilder)
-    ///   3. Mixed: recorded file with synthetic burst injected at a named market
-    /// </summary>
     public class SimulatedStream
     {
-        /// <summary>
-        /// Called for every replayed change. Wire this to WebSocketsHub.Instance.Simulate:
-        ///   sim.OnChange = (change) => WebSocketsHub.Instance.Simulate(change);
-        /// Or call manager.OnOrderChanged directly if you want to bypass hub routing.
-        /// </summary>
         public Action<OrderMarketChange> OnChange { get; set; }
+        private MarketSnapshot _marketSnapshot;
+        private CancellationTokenSource cts = new CancellationTokenSource();
+		private static readonly Dictionary<string, (double price, double size, double matched, Order.SideEnum side)> _orders = new Dictionary<string, (double price, double size, double matched, Order.SideEnum side)>();
 
-        private readonly ReplayMode _mode;
+		private readonly ReplayMode _mode;
         private readonly int _iterations;
         private readonly double _speedMultiplier;
         private const double SpinThresholdMs = 2.0;
@@ -49,53 +40,197 @@ namespace StreamSimulator
 
         public long MessagesDispatched { get; private set; }
         public TimeSpan TotalElapsed { get; private set; }
-
-        // ── Events ───────────────────────────────────────────────────────────
-
         public event EventHandler<MessageDispatchedEventArgs> MessageDispatched;
         public event EventHandler<SimulationCompleteEventArgs> SimulationComplete;
 
-        // ── Constructor ──────────────────────────────────────────────────────
-
-        public SimulatedStream( ReplayMode mode = ReplayMode.PtAccurate, int iterations = 1, double speedMultiplier = 1.0)
+        public SimulatedStream(ReplayMode mode = ReplayMode.PtAccurate, int iterations = 1, double speedMultiplier = 1.0)
         {
             _mode = mode;
             _iterations = iterations;
             _speedMultiplier = speedMultiplier;
         }
 
-        // ── Mapping ─────────────────────────────────────────────────────
-
-        MarketSnapshot _marketSnapshot;
-
-		public void MapRealMarket(SpreadTrader.NodeViewModel nvm)
+        public void MapRealMarket(SpreadTrader.NodeViewModel nvm)
         {
-			_marketSnapshot = new MarketSnapshot
-			{
-				MarketId = nvm.MarketID,
-				Runners = nvm.LiveRunners
-						.Select(r => new RunnerSnapshot
-						{
-							SelectionId = r.SelectionId,
-							Name = r.Name // if available
-						})
-						.ToList()
-			};
-		}
+            _marketSnapshot = new MarketSnapshot
+            {
+                MarketId = nvm.MarketID,
+                Runners = nvm.LiveRunners
+                        .Select(r => new RunnerSnapshot
+                        {
+                            SelectionId = r.SelectionId,
+                            Name = r.Name // if available
+                        })
+                        .ToList()
+            };
+        }
 
 		// ── Entry points ─────────────────────────────────────────────────────
 
-		/// <summary>Replay a synthetic sequence from SequenceBuilder.</summary>
+		public static List<SequenceEntry> NewRandom( string marketId, long selectionId, double stake)
+		{
+            var rng = new Random();
+            var builder = new SequenceBuilder(marketId, selectionId);
+
+            var betId = Guid.NewGuid().ToString("N");
+
+            var price = Math.Round(1.01 + rng.NextDouble() * 5, 2);
+            var side = rng.Next(2) == 0 ? Order.SideEnum.L : Order.SideEnum.B;
+
+            // 1. submit
+            builder.SubImage(betId, side, price, stake);
+
+            builder.DelayMs(rng.NextDouble() * 20);
+
+            var roll = rng.NextDouble();
+
+            if (roll < 0.4)
+            {
+                // partial → full
+                var partial = Math.Round(stake * rng.NextDouble(), 2);
+                var remaining = stake - partial;
+
+                builder.PartialFill(betId, side, price, stake, partial, remaining);
+
+                builder.DelayMs(rng.NextDouble() * 20);
+
+                builder.FullMatch(betId, side, price, stake);
+            }
+            else if (roll < 0.7)
+            {
+                // straight full
+                builder.FullMatch(betId, side, price, stake);
+            }
+            else
+            {
+                // cancel (maybe after partial)
+                var partial = Math.Round(stake * rng.NextDouble() * 0.5, 2);
+
+                if (partial > 0)
+                {
+                    builder.PartialFill(betId, side, price, stake, partial, stake - partial);
+                    builder.DelayMs(rng.NextDouble() * 20);
+                }
+
+                builder.Cancelled(betId, side, price, stake, partial);
+            }
+
+            return builder.Build();
+		}
+
+		public static List<SequenceEntry> Cancel(string marketId, long selectionId, string betId)
+        {
+            if (!_orders.TryGetValue(betId, out var o))
+                return new List<SequenceEntry>(); // or throw if you prefer
+
+            var builder = new SequenceBuilder(marketId, selectionId);
+
+            builder.Cancelled(betId, o.side, o.price, o.size, o.matched);
+
+            _orders.Remove(betId);
+
+            return builder.Build();
+        }
+        public static List<SequenceEntry> Partial(string marketId, long selectionId, string betId, double fillSize)
+        {
+            if (!_orders.TryGetValue(betId, out var o))
+                return new List<SequenceEntry>();
+
+            var newMatched = Math.Min(o.size, o.matched + fillSize);
+            var remaining = o.size - newMatched;
+
+            var builder = new SequenceBuilder(marketId, selectionId);
+
+            builder.PartialFill(betId, o.side, o.price, o.size, newMatched, remaining);
+
+            _orders[betId] = (o.price, o.size, newMatched, o.side);
+
+            return builder.Build();
+        }
+        public static List<SequenceEntry> SingleShotRandom(string marketId, long selectionId, int seed = 0)
+        {
+            var rng = seed == 0 ? new Random() : new Random(seed);
+
+            var builder = new SequenceBuilder(marketId, selectionId);
+
+            var betId = rng.Next(100000, 999999).ToString();
+            var price = Math.Round(1.01 + rng.NextDouble() * 5, 2);
+            var size = Math.Round(1 + rng.NextDouble() * 10, 2);
+            var side = rng.Next(2) == 0 ? Order.SideEnum.L : Order.SideEnum.B;
+
+            _orders[betId] = (price, size, 0, side);
+
+            // 1. submit
+            builder.SubImage(betId, side, price, size);
+
+            builder.DelayMs(rng.NextDouble() * 50); // optional visible delay
+
+            var roll = rng.NextDouble();
+
+            if (roll < 0.4)
+            {
+                // partial then full
+                var partial = Math.Round(size * rng.NextDouble(), 2);
+                var remaining = size - partial;
+
+                builder.PartialFill(betId, side, price, size, partial, remaining);
+                builder.DelayMs(rng.NextDouble() * 50);
+
+                builder.FullMatch(betId, side, price, size);
+            }
+            else if (roll < 0.7)
+            {
+                // straight full match
+                builder.FullMatch(betId, side, price, size);
+            }
+            else
+            {
+                // cancel (maybe after partial)
+                var partial = Math.Round(size * rng.NextDouble() * 0.5, 2);
+
+                if (partial > 0)
+                {
+                    builder.PartialFill(betId, side, price, size, partial, size - partial);
+                    builder.DelayMs(rng.NextDouble() * 50);
+                }
+
+                builder.Cancelled(betId, side, price, size, partial);
+            }
+
+            return builder.Build();
+        }
+		public static List<SequenceEntry> Full(string marketId, long selectionId, string betId)
+		{
+			if (!_orders.TryGetValue(betId, out var o))
+				return new List<SequenceEntry>();
+
+			var builder = new SequenceBuilder(marketId, selectionId);
+
+			builder.FullMatch(betId, o.side, o.price, o.size);
+
+			_orders.Remove(betId);
+
+			return builder.Build();
+		}
+		public Task ReplayNew(String marketId, long selectionId, double stake)
+		{
+            List<SequenceEntry> sequence = NewRandom(marketId, selectionId, stake);
+            return RunAsync(FromSynthetic(sequence), cts.Token);
+        }
+		public Task ReplaySingleShot(String marketId)
+		{
+			List<SequenceEntry> sequence = SingleShotRandom(marketId, 59497577);
+			return RunAsync(FromSynthetic(sequence), cts.Token);
+		}
 		public Task ReplaySyntheticAsync(String marketId, long selectionId, CancellationToken ct = default(CancellationToken))
         {
-			List<SequenceEntry> sequence = SequenceBuilder.BuildRandom(marketId, selectionId, messageCount: 10000);
-
-			//WebSocketsHub.Instance.Simulate(seq);
-
-			return RunAsync(FromSynthetic(sequence), ct);
+            List<SequenceEntry> sequence = SequenceBuilder.BuildRandom(marketId, selectionId, messageCount: 10);
+            return RunAsync(FromSynthetic(sequence), cts.Token);
         }
-
-        // ── Core loop ────────────────────────────────────────────────────────
+        public void Stop()
+        {
+            cts.Cancel();
+        }
 
         private async Task RunAsync(List<ReplayEntry> entries, CancellationToken ct)
         {
@@ -138,9 +273,7 @@ namespace StreamSimulator
                 completeHandler(this, new SimulationCompleteEventArgs(MessagesDispatched, TotalElapsed));
         }
 
-        // ── Timing ───────────────────────────────────────────────────────────
-
-        private async Task DelayAsync( ReplayEntry entry, long lastPt, long lastWallClockMs, CancellationToken ct)
+        private async Task DelayAsync(ReplayEntry entry, long lastPt, long lastWallClockMs, CancellationToken ct)
         {
             double rawDelayMs;
 
@@ -177,8 +310,6 @@ namespace StreamSimulator
             }
         }
 
-        // ── Synthetic conversion ─────────────────────────────────────────────
-
         private static List<ReplayEntry> FromSynthetic(List<SequenceEntry> seq)
         {
             var entries = new List<ReplayEntry>();
@@ -202,84 +333,63 @@ namespace StreamSimulator
                     IsSynthetic = true,
                     DelayMsFromPrior = accumulatedDelayMs
                 });
-
                 runningPt = s.Pt > 0 ? s.Pt : runningPt;
                 accumulatedDelayMs = 0;
             }
-
             return entries;
         }
 
-        // ── Mixed merge ──────────────────────────────────────────────────────
+        // ── Supporting types ─────────────────────────────────────────────────────
 
-        private static List<ReplayEntry> Merge( List<ReplayEntry> recorded, string triggerMarketId, List<ReplayEntry> injection) {
-            var result = new List<ReplayEntry>();
-            var injected = false;
+        public class ReplayEntry
+        {
+            public OrderMarketChange Change { get; set; }
+            public long Pt { get; set; }
+            public long WallClockMs { get; set; }
+            public bool IsSynthetic { get; set; }
+            public double DelayMsFromPrior { get; set; }
+        }
 
-            foreach (var entry in recorded)
+        public class MessageDispatchedEventArgs : EventArgs
+        {
+            public ReplayEntry Entry { get; }
+            public int Iteration { get; }
+
+            public MessageDispatchedEventArgs(ReplayEntry entry, int iteration)
             {
-                result.Add(entry);
-
-                if (!injected && entry.Change != null && entry.Change.Id == triggerMarketId)
-                {
-                    result.AddRange(injection);
-                    injected = true;
-                }
+                Entry = entry;
+                Iteration = iteration;
             }
-
-            return result;
         }
-    }
 
-	// ── Supporting types ─────────────────────────────────────────────────────
-
-	public class ReplayEntry
-    {
-        public OrderMarketChange Change { get; set; }
-        public long Pt { get; set; }
-        public long WallClockMs { get; set; }
-        public bool IsSynthetic { get; set; }
-        public double DelayMsFromPrior { get; set; }
-    }
-
-    public class MessageDispatchedEventArgs : EventArgs
-    {
-        public ReplayEntry Entry { get; }
-        public int Iteration { get; }
-
-        public MessageDispatchedEventArgs(ReplayEntry entry, int iteration)
+        public class SimulationCompleteEventArgs : EventArgs
         {
-            Entry = entry;
-            Iteration = iteration;
+            public long TotalMessages { get; }
+            public TimeSpan Elapsed { get; }
+
+            public SimulationCompleteEventArgs(long totalMessages, TimeSpan elapsed)
+            {
+                TotalMessages = totalMessages;
+                Elapsed = elapsed;
+            }
         }
-    }
 
-    public class SimulationCompleteEventArgs : EventArgs
-    {
-        public long TotalMessages { get; }
-        public TimeSpan Elapsed { get; }
-
-        public SimulationCompleteEventArgs(long totalMessages, TimeSpan elapsed)
+        class MarketSnapshot
         {
-            TotalMessages = totalMessages;
-            Elapsed = elapsed;
+            public string MarketId { get; set; }
+            public List<RunnerSnapshot> Runners { get; set; } = new List<RunnerSnapshot>();
+        }
+
+        class RunnerSnapshot
+        {
+            public long SelectionId { get; set; }
+            public string Name { get; set; }   // optional but useful for logs
+
+            public override string ToString()
+            {
+                return $"{Name} : {SelectionId}";
+            }
         }
     }
 
-	class MarketSnapshot
-	{
-		public string MarketId { get; set; }
-		public List<RunnerSnapshot> Runners { get; set; } = new List<RunnerSnapshot>();
-	}
-
-	class RunnerSnapshot
-	{
-		public long SelectionId { get; set; }
-		public string Name { get; set; }   // optional but useful for logs
-
-		public override string ToString()
-		{
-			return $"{Name} : {SelectionId}";
-		}
-	}
 }

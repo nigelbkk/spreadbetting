@@ -25,7 +25,6 @@
         <StackPanel Orientation="Horizontal" Grid.Row="0" Background="Ivory">
 			<TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="{Binding Path=LastUpdated}"/>
 
-			<Button Margin="30,0,0,0" Tag="Fill"  Click="Button_Click">Fill</Button>
 			<Button Margin="30,0,0,0" Tag="AbsoluteCancelAll"  Click="Button_Click">Absolute Cancel All</Button>
             <Button Margin="30,0,0,0" Tag="CancelAll"  Click="Button_Click">Cancel All</Button>
             <Button Margin="30,0,0,0" Tag="HalveUnmatched"  Click="Button_Click" FontSize="14">&#x00BD;</Button>

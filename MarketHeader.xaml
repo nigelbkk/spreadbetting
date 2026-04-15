@@ -36,6 +36,12 @@
 					<ColumnDefinition Width="auto"/>
 					<ColumnDefinition Width="auto"/>
 					<ColumnDefinition Width="auto"/>
+					<ColumnDefinition Width="auto"/>
+					<ColumnDefinition Width="auto"/>
+					<ColumnDefinition Width="auto"/>
+					<ColumnDefinition Width="auto"/>
+					<ColumnDefinition Width="auto"/>
+
 				</Grid.ColumnDefinitions>
 				<Button Grid.Column="0" Tag="Sidebar Visibility" ToolTip="Show/Hide Sidebar" HorizontalAlignment="Left" Padding="4,0,4,0" Click="Button_Click_1">
 					<Image Height="30" Source="/Images/sidebar.png" />
@@ -60,7 +66,13 @@
 				<Label Grid.Column="6" Content="{Binding Path=TimeToGo}" Foreground="{Binding Path=TimeToGoColor}" Margin="0,0,80,0" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"></Label>
 				<Label Grid.Column="7" Content="{Binding Path=OrdersLatency}" Padding="6,0,6,0" Width="80" HorizontalAlignment="Right"  Margin="0,4,10,4" BorderThickness="1" ToolTip="Orders Stream Latency"/>
 				<Label Grid.Column="8" Content="{Binding Path=MarketLatency}" Padding="6,0,6,0" Width="80" HorizontalAlignment="Right"  Margin="0,4,10,4" BorderThickness="1" ToolTip="Market Stream Latency"/>
-				<Button Grid.Column="9" Tag="Connect" Content="Reconnect" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0" ToolTip="Reconnect Websockets Stream"/>
+				<Button Grid.Column="9" Tag="New" Content="New" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0"/>
+				<Button Grid.Column="10" Tag="Partial" Content="Partial" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0"/>
+				<Button Grid.Column="11" Tag="Full" Content="Full" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0"/>
+				<Button Grid.Column="12" Tag="Single Shot" Content="Single Shot" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0"/>
+				<Button Grid.Column="13" Tag="Simulate" Content="Simulate" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0"/>
+				<Button Grid.Column="14" Tag="Stop" Content="Stop" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0"/>
+				<Button Grid.Column="15" Tag="Connect" Content="Reconnect" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0" ToolTip="Reconnect Websockets Stream"/>
 			</Grid>
 		</Border>
 	</Grid>
