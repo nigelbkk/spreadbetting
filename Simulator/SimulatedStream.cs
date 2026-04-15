@@ -1,11 +1,12 @@
+using Betfair.ESASwagger.Model;
+using SpreadTrader;
+using StreamSimulator.Synthetic;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using StreamSimulator.Synthetic;
-using Betfair.ESASwagger.Model;
-using System.Linq;
 
 namespace StreamSimulator
 {
@@ -84,27 +85,14 @@ namespace StreamSimulator
 
 		// ── Entry points ─────────────────────────────────────────────────────
 
-		/// <summary>Replay a .jsonl file produced by StreamRecorder.</summary>
-		public Task ReplayFileAsync( string path, CancellationToken ct = default(CancellationToken))
-        {
-            return null;
-			//return RunAsync(LoadFile(path), ct);
-		}
-
 		/// <summary>Replay a synthetic sequence from SequenceBuilder.</summary>
-		public Task ReplaySyntheticAsync( List<SequenceEntry> sequence, CancellationToken ct = default(CancellationToken))
+		public Task ReplaySyntheticAsync(String marketId, long selectionId, CancellationToken ct = default(CancellationToken))
         {
-            return RunAsync(FromSynthetic(sequence), ct);
-        }
+			List<SequenceEntry> sequence = SequenceBuilder.BuildRandom(marketId, selectionId, messageCount: 10000);
 
-        /// <summary>
-        /// Replay a recorded file, injecting a synthetic burst immediately after
-        /// the first message seen for triggerMarketId.
-        /// </summary>
-        public Task ReplayMixedAsync( string triggerMarketId, List<SequenceEntry> injection, CancellationToken ct = default(CancellationToken))
-        {
-            return null;
-            //return RunAsync(Merge(LoadFile(recordedPath), triggerMarketId, FromSynthetic(injection)), ct);
+			//WebSocketsHub.Instance.Simulate(seq);
+
+			return RunAsync(FromSynthetic(sequence), ct);
         }
 
         // ── Core loop ────────────────────────────────────────────────────────
@@ -188,37 +176,6 @@ namespace StreamSimulator
                     Thread.SpinWait(1);
             }
         }
-
-        // ── File loading ─────────────────────────────────────────────────────
-
-        //private static List<ReplayEntry> LoadFile(string path)
-        //{
-        //    var entries = new List<ReplayEntry>();
-
-        //    foreach (var line in File.ReadLines(path, Encoding.UTF8))
-        //    {
-        //        if (string.IsNullOrWhiteSpace(line)) continue;
-
-        //        RecordedMessage recorded;
-        //        try
-        //        {
-        //            recorded = JsonConvert.DeserializeObject<RecordedMessage>(line);
-        //        }
-        //        catch { continue; }
-
-        //        if (recorded == null || recorded.Payload == null) continue;
-
-        //        entries.Add(new ReplayEntry
-        //        {
-        //            Change = recorded.Payload,
-        //            WallClockMs = recorded.WallClockMs,
-        //            Pt = recorded.WallClockMs,  // no pt in proxy DTO, use wall-clock
-        //            IsSynthetic = false
-        //        });
-        //    }
-
-        //    return entries;
-        //}
 
         // ── Synthetic conversion ─────────────────────────────────────────────
 
@@ -319,5 +276,10 @@ namespace StreamSimulator
 	{
 		public long SelectionId { get; set; }
 		public string Name { get; set; }   // optional but useful for logs
+
+		public override string ToString()
+		{
+			return $"{Name} : {SelectionId}";
+		}
 	}
 }

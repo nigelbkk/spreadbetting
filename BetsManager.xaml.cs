@@ -1,7 +1,9 @@
-﻿using Betfair.ESASwagger.Model;
+﻿using Betfair.ESAClient.Cache;
+using Betfair.ESASwagger.Model;
 using BetfairAPI;
 using Newtonsoft.Json;
 using StreamSimulator;
+using StreamSimulator.Synthetic;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -123,7 +125,6 @@ namespace SpreadTrader
 
             _simulatedStream.MapRealMarket(d2);
 
-			WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
 			WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
 			WebSocketsHub.Instance.Detach(_marketId, this);
 		}
@@ -255,14 +256,14 @@ namespace SpreadTrader
 		}
 		private async void SimulatedFill()
 		{
-			await _simulatedStream.ReplayFileAsync(@"recordings\test_bets.json");
+			await _simulatedStream.ReplaySyntheticAsync(MarketNode.MarketID, MarketNode.LiveRunners[0].SelectionId);
 		}
 		public void OnOrderChanged(OrderMarketChange change)
         {
-			if (change?.Orc == null) //  || MarketNode == null)
+			if (change?.Orc == null || MarketNode == null)
                 return;
 
-            if (change.Id != "1.256684056" && MarketNode.MarketID.ToString() != change.Id)
+            if (MarketNode.MarketID.ToString() != change.Id)
                 return;
 
             _LastUpdated = DateTime.UtcNow;
@@ -376,7 +377,7 @@ namespace SpreadTrader
 								else if (o.Sm > 0 && o.Sr == 0)                                                                     // fully matched
 								{
 									Debug.WriteLine(o.Id, "fully matched");
-									ops.Add(() => row.AvgPriceMatched = o.Avp.Value);
+									ops.Add(() => row.AvgPriceMatched = o.Avp ?? 0);
 									ops.Add(() => row.SizeMatched = row.Stake);
 									betMatched = true;
 								}
@@ -556,7 +557,8 @@ namespace SpreadTrader
                 {
                     case "Fill":
                         Debug.WriteLine("Fill");
-						SimulatedFill();
+                        if (MarketNode != null)
+						    SimulatedFill();
 						break;
 
                     case "HalveUnmatched":
