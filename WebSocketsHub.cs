@@ -1,7 +1,6 @@
 ﻿using Betfair.ESASwagger.Model;
 using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
-using StreamSimulator.Recorder;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -22,7 +21,6 @@ namespace SpreadTrader
 		private readonly BlockingCollection<MarketChangeDto> _marketChangeQueue = new BlockingCollection<MarketChangeDto>();
 		private Task _orderProcessor;
 		private Task _marketChangeProcessor;
-		private StreamRecorder recorder = new StreamRecorder(@"recordings\test_bets.json");
 		private Properties.Settings props = Properties.Settings.Default;
 		private readonly Dictionary<string, BetsManager> _ordersHandlers = new Dictionary<string, BetsManager>();
 		private readonly Dictionary<string, RunnersControl> _marketHandlers = new Dictionary<string, RunnersControl>();
@@ -86,9 +84,6 @@ namespace SpreadTrader
 
 					manager.OnOrderChanged(change);
 
-					if (props.RecordOrders)
-						recorder.Record(change);
-
 					sw.Stop();
 
 					if (sw.ElapsedMilliseconds > 50)
@@ -132,7 +127,6 @@ namespace SpreadTrader
 		{
 			_orderProcessor = Task.Run(() => OrderProcessingLoop());
 			_marketChangeProcessor = Task.Run(() => MarketChangeProcessingLoop());
-			recorder.Start();
 		}
 		private WebSocketsHub() 
 		{
@@ -159,6 +153,15 @@ namespace SpreadTrader
 			});
 			Connect();
 		}
+		public void Simulate(OrderMarketChange change)
+		{
+			if (_ordersHandlers.TryGetValue(change.Id, out var manager))
+			{
+				var sw = Stopwatch.StartNew();
+				manager.OnOrderChanged(change);
+			}
+		}
+
 		private void OnMessageReceived(string messageName, object data)
 		{
 			if (messageName == "Reconnect")

@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using StreamSimulator.Recorder;
 using StreamSimulator.Synthetic;
 using Betfair.ESASwagger.Model;
+using System.Linq;
 
 namespace StreamSimulator
 {
@@ -45,7 +42,6 @@ namespace StreamSimulator
         private readonly ReplayMode _mode;
         private readonly int _iterations;
         private readonly double _speedMultiplier;
-
         private const double SpinThresholdMs = 2.0;
 
         // ── Stats ────────────────────────────────────────────────────────────
@@ -60,30 +56,43 @@ namespace StreamSimulator
 
         // ── Constructor ──────────────────────────────────────────────────────
 
-        public SimulatedStream(
-            ReplayMode mode = ReplayMode.PtAccurate,
-            int iterations = 1,
-            double speedMultiplier = 1.0)
+        public SimulatedStream( ReplayMode mode = ReplayMode.PtAccurate, int iterations = 1, double speedMultiplier = 1.0)
         {
             _mode = mode;
             _iterations = iterations;
             _speedMultiplier = speedMultiplier;
         }
 
-        // ── Entry points ─────────────────────────────────────────────────────
+        // ── Mapping ─────────────────────────────────────────────────────
 
-        /// <summary>Replay a .jsonl file produced by StreamRecorder.</summary>
-        public Task ReplayFileAsync(
-            string path,
-            CancellationToken ct = default(CancellationToken))
+        MarketSnapshot _marketSnapshot;
+
+		public void MapRealMarket(SpreadTrader.NodeViewModel nvm)
         {
-            return RunAsync(LoadFile(path), ct);
-        }
+			_marketSnapshot = new MarketSnapshot
+			{
+				MarketId = nvm.MarketID,
+				Runners = nvm.LiveRunners
+						.Select(r => new RunnerSnapshot
+						{
+							SelectionId = r.SelectionId,
+							Name = r.Name // if available
+						})
+						.ToList()
+			};
+		}
 
-        /// <summary>Replay a synthetic sequence from SequenceBuilder.</summary>
-        public Task ReplaySyntheticAsync(
-            List<SequenceEntry> sequence,
-            CancellationToken ct = default(CancellationToken))
+		// ── Entry points ─────────────────────────────────────────────────────
+
+		/// <summary>Replay a .jsonl file produced by StreamRecorder.</summary>
+		public Task ReplayFileAsync( string path, CancellationToken ct = default(CancellationToken))
+        {
+            return null;
+			//return RunAsync(LoadFile(path), ct);
+		}
+
+		/// <summary>Replay a synthetic sequence from SequenceBuilder.</summary>
+		public Task ReplaySyntheticAsync( List<SequenceEntry> sequence, CancellationToken ct = default(CancellationToken))
         {
             return RunAsync(FromSynthetic(sequence), ct);
         }
@@ -92,13 +101,10 @@ namespace StreamSimulator
         /// Replay a recorded file, injecting a synthetic burst immediately after
         /// the first message seen for triggerMarketId.
         /// </summary>
-        public Task ReplayMixedAsync(
-            string recordedPath,
-            string triggerMarketId,
-            List<SequenceEntry> injection,
-            CancellationToken ct = default(CancellationToken))
+        public Task ReplayMixedAsync( string triggerMarketId, List<SequenceEntry> injection, CancellationToken ct = default(CancellationToken))
         {
-            return RunAsync(Merge(LoadFile(recordedPath), triggerMarketId, FromSynthetic(injection)), ct);
+            return null;
+            //return RunAsync(Merge(LoadFile(recordedPath), triggerMarketId, FromSynthetic(injection)), ct);
         }
 
         // ── Core loop ────────────────────────────────────────────────────────
@@ -146,11 +152,7 @@ namespace StreamSimulator
 
         // ── Timing ───────────────────────────────────────────────────────────
 
-        private async Task DelayAsync(
-            ReplayEntry entry,
-            long lastPt,
-            long lastWallClockMs,
-            CancellationToken ct)
+        private async Task DelayAsync( ReplayEntry entry, long lastPt, long lastWallClockMs, CancellationToken ct)
         {
             double rawDelayMs;
 
@@ -189,34 +191,34 @@ namespace StreamSimulator
 
         // ── File loading ─────────────────────────────────────────────────────
 
-        private static List<ReplayEntry> LoadFile(string path)
-        {
-            var entries = new List<ReplayEntry>();
+        //private static List<ReplayEntry> LoadFile(string path)
+        //{
+        //    var entries = new List<ReplayEntry>();
 
-            foreach (var line in File.ReadLines(path, Encoding.UTF8))
-            {
-                if (string.IsNullOrWhiteSpace(line)) continue;
+        //    foreach (var line in File.ReadLines(path, Encoding.UTF8))
+        //    {
+        //        if (string.IsNullOrWhiteSpace(line)) continue;
 
-                RecordedMessage recorded;
-                try
-                {
-                    recorded = JsonConvert.DeserializeObject<RecordedMessage>(line);
-                }
-                catch { continue; }
+        //        RecordedMessage recorded;
+        //        try
+        //        {
+        //            recorded = JsonConvert.DeserializeObject<RecordedMessage>(line);
+        //        }
+        //        catch { continue; }
 
-                if (recorded == null || recorded.Payload == null) continue;
+        //        if (recorded == null || recorded.Payload == null) continue;
 
-                entries.Add(new ReplayEntry
-                {
-                    Change = recorded.Payload,
-                    WallClockMs = recorded.WallClockMs,
-                    Pt = recorded.WallClockMs,  // no pt in proxy DTO, use wall-clock
-                    IsSynthetic = false
-                });
-            }
+        //        entries.Add(new ReplayEntry
+        //        {
+        //            Change = recorded.Payload,
+        //            WallClockMs = recorded.WallClockMs,
+        //            Pt = recorded.WallClockMs,  // no pt in proxy DTO, use wall-clock
+        //            IsSynthetic = false
+        //        });
+        //    }
 
-            return entries;
-        }
+        //    return entries;
+        //}
 
         // ── Synthetic conversion ─────────────────────────────────────────────
 
@@ -253,11 +255,7 @@ namespace StreamSimulator
 
         // ── Mixed merge ──────────────────────────────────────────────────────
 
-        private static List<ReplayEntry> Merge(
-            List<ReplayEntry> recorded,
-            string triggerMarketId,
-            List<ReplayEntry> injection)
-        {
+        private static List<ReplayEntry> Merge( List<ReplayEntry> recorded, string triggerMarketId, List<ReplayEntry> injection) {
             var result = new List<ReplayEntry>();
             var injected = false;
 
@@ -276,9 +274,9 @@ namespace StreamSimulator
         }
     }
 
-    // ── Supporting types ─────────────────────────────────────────────────────
+	// ── Supporting types ─────────────────────────────────────────────────────
 
-    public class ReplayEntry
+	public class ReplayEntry
     {
         public OrderMarketChange Change { get; set; }
         public long Pt { get; set; }
@@ -310,4 +308,16 @@ namespace StreamSimulator
             Elapsed = elapsed;
         }
     }
+
+	class MarketSnapshot
+	{
+		public string MarketId { get; set; }
+		public List<RunnerSnapshot> Runners { get; set; } = new List<RunnerSnapshot>();
+	}
+
+	class RunnerSnapshot
+	{
+		public long SelectionId { get; set; }
+		public string Name { get; set; }   // optional but useful for logs
+	}
 }

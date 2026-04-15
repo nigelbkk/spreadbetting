@@ -28,9 +28,8 @@ namespace StreamSimulator.Recorder
         private readonly string _outputPath;
         private StreamWriter    _writer;
 
-        public StreamRecorder(string outputPath)
+        public StreamRecorder()
         {
-            _outputPath = outputPath;
         }
 
         public void Start()

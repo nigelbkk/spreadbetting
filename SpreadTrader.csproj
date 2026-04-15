@@ -142,7 +142,6 @@
     </Compile>
     <Compile Include="Simulator\SequenceBuilder.cs" />
     <Compile Include="Simulator\SimulatedStream.cs" />
-    <Compile Include="Simulator\StreamRecorder.cs" />
     <Compile Include="SliderControl.xaml.cs">
       <DependentUpon>SliderControl.xaml</DependentUpon>
     </Compile>

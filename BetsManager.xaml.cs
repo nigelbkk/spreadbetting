@@ -1,6 +1,7 @@
 ﻿using Betfair.ESASwagger.Model;
 using BetfairAPI;
 using Newtonsoft.Json;
+using StreamSimulator;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Windows.Networking.NetworkOperators;
 
 namespace SpreadTrader
 {
@@ -27,7 +29,6 @@ namespace SpreadTrader
 		private List<ulong> _cancelledBets = new List<ulong>();
 
 		private readonly Dictionary<ulong, BetsManagerRow> _byBetId = new Dictionary<ulong, BetsManagerRow>();
-		//private readonly HashSet<ulong> _byBetIdImmediate = new HashSet<ulong>(); // Track processed IDs
 		private readonly object _lock = new object();
 		private NodeViewModel MarketNode { get; set; }
         private DateTime _LastUpdated { get; set; }
@@ -79,11 +80,22 @@ namespace SpreadTrader
         public String StreamingButtonText { get { return "Streaming Connected"; } }
 		#endregion Properties
 
+		private SimulatedStream _simulatedStream;
+
 		public BetsManager()
 		{
 			Rows = new BulkObservableCollection<BetsManagerRow>();
 			InitializeComponent();
 			ControlMessenger.MessageSent += OnMessageReceived;
+            
+            /////////// SIMULATOR STUFF
+
+            _simulatedStream = new SimulatedStream(ReplayMode.WallClockAccurate, 1, 1.0);
+
+			_simulatedStream.OnChange = (change) => WebSocketsHub.Instance.Simulate(change);
+			//WebSocketsHub.Instance.Attach("1.256684056", this);
+
+            ///////////////////////////
 		}
 
 		private void ApplyFilter()
@@ -109,6 +121,9 @@ namespace SpreadTrader
             RunnersControl = rc;
             PopulateDataGrid();
 
+            _simulatedStream.MapRealMarket(d2);
+
+			WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
 			WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
 			WebSocketsHub.Instance.Detach(_marketId, this);
 		}
@@ -238,12 +253,16 @@ namespace SpreadTrader
 			// update unmatched remainder
 			actualRow.Stake = o.Sr.Value;
 		}
+		private async void SimulatedFill()
+		{
+			await _simulatedStream.ReplayFileAsync(@"recordings\test_bets.json");
+		}
 		public void OnOrderChanged(OrderMarketChange change)
         {
-			if (change?.Orc == null || MarketNode == null)
+			if (change?.Orc == null) //  || MarketNode == null)
                 return;
 
-            if (MarketNode.MarketID.ToString() != change.Id)
+            if (change.Id != "1.256684056" && MarketNode.MarketID.ToString() != change.Id)
                 return;
 
             _LastUpdated = DateTime.UtcNow;
@@ -524,7 +543,7 @@ namespace SpreadTrader
                 CancelExecutionReport cancel_report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
             }
         }
-        private async void Button_Click(object sender, RoutedEventArgs e)
+		private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (Betfair == null)
             {
@@ -535,6 +554,11 @@ namespace SpreadTrader
             {
                 switch (b.Tag)
                 {
+                    case "Fill":
+                        Debug.WriteLine("Fill");
+						SimulatedFill();
+						break;
+
                     case "HalveUnmatched":
                         if (MarketNode != null)
                         {
