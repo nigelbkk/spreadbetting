@@ -41,6 +41,7 @@
 					<ColumnDefinition Width="auto"/>
 					<ColumnDefinition Width="auto"/>
 					<ColumnDefinition Width="auto"/>
+					<ColumnDefinition Width="auto"/>
 
 				</Grid.ColumnDefinitions>
 				<Button Grid.Column="0" Tag="Sidebar Visibility" ToolTip="Show/Hide Sidebar" HorizontalAlignment="Left" Padding="4,0,4,0" Click="Button_Click_1">
@@ -72,7 +73,8 @@
 				<Button Grid.Column="12" Tag="Single Shot" Content="Single Shot" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0"/>
 				<Button Grid.Column="13" Tag="Simulate" Content="Simulate" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0"/>
 				<Button Grid.Column="14" Tag="Stop" Content="Stop" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0"/>
-				<Button Grid.Column="15" Tag="Connect" Content="Reconnect" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0" ToolTip="Reconnect Websockets Stream"/>
+				<Button Grid.Column="15" Tag="Clear" Content="Clear" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0" />
+				<Button Grid.Column="16" Tag="Connect" Content="Reconnect" Padding="6,0,6,0" Width="80"  Margin="0,4,10,4" HorizontalAlignment="Right"  BorderThickness="0" ToolTip="Reconnect Websockets Stream"/>
 			</Grid>
 		</Border>
 	</Grid>

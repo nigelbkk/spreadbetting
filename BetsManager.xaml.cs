@@ -89,15 +89,18 @@ namespace SpreadTrader
 			Rows = new BulkObservableCollection<BetsManagerRow>();
 			InitializeComponent();
 			ControlMessenger.MessageSent += OnMessageReceived;
-            
+
             /////////// SIMULATOR STUFF
 
-            _simulatedStream = new SimulatedStream(ReplayMode.WallClockAccurate, 1, 1.0);
-
-			_simulatedStream.OnChange = (change) => WebSocketsHub.Instance.Simulate(change);
-			//WebSocketsHub.Instance.Attach("1.256684056", this);
+            InitSimulator();
 
             ///////////////////////////
+		}
+
+        void InitSimulator()
+        {
+			_simulatedStream = new SimulatedStream(ReplayMode.WallClockAccurate, 1, 1.0);
+			_simulatedStream.OnChange = (change) => WebSocketsHub.Instance.Simulate(change);
 		}
 
 		private void ApplyFilter()
@@ -137,15 +140,34 @@ namespace SpreadTrader
             if (messageName == "Stop Simulation")
             {
                 _simulatedStream.Stop();
-            }             
-            if (messageName == "New")
-            {
-                _simulatedStream.ReplayNew(MarketNode.MarketID, MarketNode.LiveRunners[0].SelectionId, 25);
+            }
+			if (messageName == "New")
+			{
+				_simulatedStream.SimulateNewBet(MarketNode.MarketID, MarketNode.LiveRunners[0].SelectionId, 25);
 			}
-            if (messageName == "Single Shot")
-            {
-                _simulatedStream.ReplaySingleShot(MarketNode.MarketID);
-            } 
+			if (messageName == "Full")
+			{
+				if (SelectedRow != null)
+					_simulatedStream.SimulateFull(SelectedRow.BetID.ToString());
+			}
+			if (messageName == "Partial")
+			{
+                if (SelectedRow != null)
+				    _simulatedStream.SimulatePartial(SelectedRow.BetID.ToString(), 5);
+			}
+
+			if (messageName == "Single Shot")
+			{
+				_simulatedStream.SimulateSingleShot(MarketNode.MarketID);
+			}
+			if (messageName == "Clear")
+			{
+                Rows.Clear();
+                _byBetId.Clear();
+                _allRows.Clear();
+				InitSimulator();
+			}
+
 			if (messageName == "Favorite Changed")
 			{
 				dynamic d = data;
@@ -558,7 +580,7 @@ namespace SpreadTrader
                     return;
                 }
                 CancelExecutionReport cancel_report = Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
-				SimulatedStream.Cancel(MarketNode.MarketID, row.SelectionID, row.BetID.ToString());
+				_simulatedStream.SimulateCancel(row.BetID.ToString());
 			}
 		}
 		private async void Button_Click(object sender, RoutedEventArgs e)
@@ -584,7 +606,7 @@ namespace SpreadTrader
                                     if (!row.IsMatched && row.Stake >= 4)
                                     {
                                         cancel_instructions.Add(new CancelInstruction(row.BetID) { sizeReduction = Math.Round((row.Stake / 2), 2) });
-										SimulatedStream.Cancel(MarketNode.MarketID, row.SelectionID, row.BetID.ToString());
+										_simulatedStream.SimulateCancel(row.BetID.ToString());
 									}
 								}
                                 if (cancel_instructions.Count == 0)
@@ -625,7 +647,7 @@ namespace SpreadTrader
                                             {
                                                 sizeReduction = null
                                             });
-                                            SimulatedStream.Cancel(MarketNode.MarketID, row.SelectionID, row.BetID.ToString());
+											_simulatedStream.SimulateCancel(row.BetID.ToString());
 										}
 									}
                                     if (cancel_instructions.Count == 0)
@@ -664,7 +686,7 @@ namespace SpreadTrader
                                         {
                                             sizeReduction = null
                                         });
-										SimulatedStream.Cancel(MarketNode.MarketID, row.SelectionID, row.BetID.ToString());
+										_simulatedStream.SimulateCancel(row.BetID.ToString());
 									}
 								}
                                 if (cancel_instructions.Count == 0)
@@ -705,8 +727,18 @@ namespace SpreadTrader
                 }
             }
         }
+        private BetsManagerRow SelectedRow;
         private void dataGrid_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            DataGrid dg = sender as DataGrid;
+
+            var row = dg.SelectedItem as BetsManagerRow;
+
+            if (row != null)
+            {
+                SelectedRow = row;
+            }
+
             List<double> widths = new List<double>();
 
             foreach (DataGridColumn col in dataGrid.Columns)

@@ -1,7 +1,8 @@
+using Betfair.ESASwagger.Model;
 using System;
 using System.Collections.Generic;
-using Betfair.ESASwagger.Model;
 using System.Linq;
+using static StreamSimulator.SimulatedStream;
 
 namespace StreamSimulator.Synthetic
 {
@@ -71,6 +72,12 @@ namespace StreamSimulator.Synthetic
 					var (price, size, matched, side) = kv.Value;
 
 					var roll = rng.NextDouble();
+					SimOrder o = new SimOrder()
+					{
+						marketId = marketId,
+						selectionId = selectionId
+					};
+
 
 					if (roll < 0.5) // partial
 					{
@@ -81,16 +88,16 @@ namespace StreamSimulator.Synthetic
 
 						active[betId] = (price, size, matched, side);
 
-						builder.PartialFill(betId, side, price, size, matched, remaining);
+						builder.PartialFill(o, matched, remaining);
 					}
 					else if (roll < 0.8) // full
 					{
-						builder.FullMatch(betId, side, price, size);
+						builder.FullMatch(o);
 						active.Remove(betId);
 					}
 					else // cancel
 					{
-						builder.Cancelled(betId, side, price, size, matched);
+						builder.Cancelled(o);
 						active.Remove(betId);
 					}
 				}
@@ -111,21 +118,21 @@ namespace StreamSimulator.Synthetic
 		}
 
 		/// <summary>Partial fill — pass cumulative sm/sr values.</summary>
-		public SequenceBuilder PartialFill( string betId, Order.SideEnum side, double price, double size, double sm, double sr)
+		public SequenceBuilder PartialFill(SimOrder so, double sm, double sr)
 		{
-			return AddEntry(betId, side, price, size, sm, sr, sc: 0, fullImage: false);
+			return AddEntry(so, sm, sr, sc: 0, fullImage: false);
 		}
 
 		/// <summary>Order fully matched — sr == 0, sm == size.</summary>
-		public SequenceBuilder FullMatch( string betId, Order.SideEnum side, double price, double size)
+		public SequenceBuilder FullMatch(SimOrder so)
 		{
-			return AddEntry(betId, side, price, size, sm: size, sr: 0, sc: 0, fullImage: false);
+			return AddEntry(so, sm: so.Size, sr: 0, sc: 0, fullImage: false);
 		}
 
 		/// <summary>Order cancelled — sc == cancelled amount, sr == 0.</summary>
-		public SequenceBuilder Cancelled( string betId, Order.SideEnum side, double price, double size, double smBeforeCancel = 0)
+		public SequenceBuilder Cancelled(SimOrder so)
 		{
-			return AddEntry(betId, side, price, size, sm: smBeforeCancel, sr: 0, sc: size - smBeforeCancel, fullImage: false);
+			return AddEntry(so, sm: so.Matched, sr: 0, sc: so.Size - so.Matched, fullImage: false);
 		}
 
 		// ── Timing ───────────────────────────────────────────────────────────
@@ -145,9 +152,36 @@ namespace StreamSimulator.Synthetic
 
 		// ── Private ──────────────────────────────────────────────────────────
 
+		private SequenceBuilder AddEntry( SimOrder so, double sm, double sr, double sc, bool fullImage) {
+			return AddEntry( so.BetId, so.Side, so.Price, so.Size, sm, sr, sc, fullImage);
+		}
 		private SequenceBuilder AddEntry( string betId, Order.SideEnum side, double price, double size, double sm, double sr, double sc, bool fullImage)
 		{
 			_pt++;
+
+			if (!_orders.ContainsKey(betId))
+			{
+				// new order
+				_orders[betId] = new SimOrder()
+				{ 
+					BetId = betId,
+					Price = price,
+					Size = size,
+					Matched = sm, 
+					Side = side
+				};
+			}
+			else
+			{
+				// update matched
+				var o = _orders[betId];
+				o.Matched = sm;
+				_orders[betId] = o;
+
+				// remove if complete
+				if (sr == 0 && (sm == size || sc > 0))
+					_orders.Remove(betId);
+			}
 
 			var order = new Order( Side: side, Pt: Order.PtEnum.L, Ot: Order.OtEnum.L, Status: Order.StatusEnum.E, Id: betId, P: price, S: size, Sm: sm, Sr: sr, Sc: sc, Sl: 0.0, Sv: 0.0, Pd: _pt, Rc: "REG_GGC", Rac: "" );
 			var orc = new OrderRunnerChange( Id: _selectionId, FullImage: fullImage, Uo: new List<Order> { order } );

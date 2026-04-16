@@ -103,19 +103,21 @@ namespace SpreadTrader
 				switch (b.Tag)
 				{
 					case "New":
-						ControlMessenger.Send("Simulate");//, new { MarketId = MarketNode?.MarketID });
-						break;
+					case "Full":
 					case "Simulate":
-						ControlMessenger.Send("Simulate");//, new { MarketId = MarketNode?.MarketID });
-						break;
 					case "Single Shot":
+					case "Clear":
+					case "Stop":
 						ControlMessenger.Send(b.Tag.ToString());
 						break;
-					case "Stop":
-						ControlMessenger.Send("Stop Simulation");//, new { MarketId = MarketNode?.MarketID });
+
+					case "Partial":
+						String betId = "0";
+						ControlMessenger.Send(b.Tag.ToString(), betId);
 						break;
+
 					case "Connect":
-						ControlMessenger.Send("Reconnect");//, new { MarketId = MarketNode?.MarketID });
+						ControlMessenger.Send("Reconnect");
 						break;
 					case "Market Description":
 						new MarketDescription(this, b, TabContent.MarketNode).ShowDialog();
