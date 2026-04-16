@@ -51,37 +51,9 @@ namespace StreamSimulator
 			_orders = new Dictionary<string, SimOrder>();
 		}
 
-		private static List<SequenceEntry> NewPartial(string marketId, long selectionId)
-		{
-			var rng = new Random();
-			var builder = new SequenceBuilder(marketId, selectionId);
+		// ── Sequence generators ─────────────────────────────────────────────────────
 
-			var betId = rng.Next(100000, 999999).ToString();
-
-			var price = Math.Round(1.01 + rng.NextDouble() * 5, 2);
-			var side = rng.Next(2) == 0 ? Order.SideEnum.L : Order.SideEnum.B;
-
-			double stake = Math.Round(1 + rng.NextDouble() * 5, 2);/////////////////
-
-			builder.SubImage(betId, side, price, stake);
-
-			return builder.Build();
-		}
-
-		//private static List<SequenceEntry> SimulateFull(string betId)
-		//{
-		//	if (!_orders.TryGetValue(betId, out var o))
-		//		return new List<SequenceEntry>();
-
-		//	var builder = new SequenceBuilder(o.marketId, o.selectionId);
-
-		//	builder.FullMatch(o);
-
-		//	_orders.Remove(betId);
-
-		//	return builder.Build();
-		//}
-		private static List<SequenceEntry> NewFullyMatchedSequence(string betId)		// needs work
+		private static List<SequenceEntry> BuildFullyMatchedSequence(string betId)		// needs work
 		{
 			var rng = new Random();
 
@@ -100,7 +72,7 @@ namespace StreamSimulator
 			return builder.Build();
 		}
 
-		private static List<SequenceEntry> NewBetSequence(string marketId, long selectionId, double stake)
+		private static List<SequenceEntry> BuildNewBetSequence(string marketId, long selectionId, double stake)
 		{
 			var rng = new Random();
 			var builder = new SequenceBuilder(marketId, selectionId);
@@ -125,7 +97,7 @@ namespace StreamSimulator
 			return builder.Build();
 		}
 
-		private static List<SequenceEntry> NewCancelSequence(string betId)
+		private static List<SequenceEntry> BuildCancelSequence(string betId)
 		{
 			if (!_orders.TryGetValue(betId, out var o))
 				return new List<SequenceEntry>(); // or throw if you prefer
@@ -138,62 +110,7 @@ namespace StreamSimulator
 			return builder.Build();
 		}
 
-		private static List<SequenceEntry> NewSingleShotSequence(string marketId, long selectionId, int seed = 0)
-		{
-			var rng = seed == 0 ? new Random() : new Random(seed);
-
-			var builder = new SequenceBuilder(marketId, selectionId);
-
-			var betId = rng.Next(100000, 999999).ToString();
-			SimOrder o = new SimOrder()
-			{
-				Price = Math.Round(1.01 + rng.NextDouble() * 5, 2),
-				Size = Math.Round(1 + rng.NextDouble() * 10, 2),
-				Side = rng.Next(2) == 0 ? Order.SideEnum.L : Order.SideEnum.B
-			};
-			_orders[betId] = o;
-
-			// 1. submit
-			builder.SubImage(o.BetId, o.Side, o.Price, o.Size);
-
-			builder.DelayMs(rng.NextDouble() * 50); // optional visible delay
-
-			var roll = rng.NextDouble();
-
-			if (roll < 0.4)
-			{
-				// partial then full
-				var partial = Math.Round(o.Size * rng.NextDouble(), 2);
-				var remaining = o.Size - partial;
-
-				builder.PartialFill(o, partial, remaining);
-				builder.DelayMs(rng.NextDouble() * 50);
-
-				builder.FullMatch(o);
-			}
-			else if (roll < 0.7)
-			{
-				// straight full match
-				builder.FullMatch(o);
-			}
-			else
-			{
-				// cancel (maybe after partial)
-				var partial = Math.Round(o.Size * rng.NextDouble() * 0.5, 2);
-
-				if (partial > 0)
-				{
-					builder.PartialFill(o, partial, o.Size - partial);
-					builder.DelayMs(rng.NextDouble() * 50);
-				}
-
-				builder.Cancelled(o);
-			}
-
-			return builder.Build();
-		}
-
-		private static List<SequenceEntry> NewPartialMatchSequence(string betId, double fillAmount)
+		private static List<SequenceEntry> BuildPartialMatchSequence(string betId, double fillAmount, double? matchPrice = null)
 		{
 			if (!_orders.TryGetValue(betId, out var o))
 				return new List<SequenceEntry>();
@@ -201,7 +118,18 @@ namespace StreamSimulator
 			var builder = new SequenceBuilder(o.marketId, o.selectionId);
 
 			var newMatched = Math.Min(o.Size, o.Matched + fillAmount);
+			var actualFill = newMatched - o.Matched;
 			var remaining = o.Size - newMatched;
+
+			// ✅ record execution BEFORE updating state
+			if (actualFill > 0)
+			{
+				var price = matchPrice ?? o.Price; // however you're sourcing it
+				o.Matches.Add((price, actualFill));
+			}
+
+			// update state
+			o.Matched = newMatched;
 
 			builder.PartialFill(o, newMatched, remaining);
 
@@ -215,9 +143,68 @@ namespace StreamSimulator
 			return builder.Build();
 		}
 
+		private static List<SequenceEntry> BuildRandomSequence(string marketId, long selectionId, int messageCount)
+		{
+			var rng = new Random();
+			var sequence = new List<SequenceEntry>();
+			var betIds = new List<string>();
+
+			// --- 1. Create bets ---
+			for (int i = 0; i < messageCount; i++)
+			{
+				var betId = rng.Next(100000, 999999).ToString();
+				var price = Math.Round(1.01 + rng.NextDouble() * 5, 2);
+				var stake = 25.0;
+				var side = rng.Next(2) == 0 ? Order.SideEnum.L : Order.SideEnum.B;
+
+				// register state (ONLY place this happens for new bets)
+				_orders[betId] = new SimOrder
+				{
+					BetId = betId,
+					marketId = marketId,
+					selectionId = selectionId,
+					Price = price,
+					Size = stake,
+					Matched = 0,
+					Side = side
+				};
+
+				var builder = new SequenceBuilder(marketId, selectionId);
+				builder.SubImage(betId, side, price, stake);
+
+				sequence.AddRange(builder.Build());
+				betIds.Add(betId);
+			}
+
+			// --- 2. Apply random lifecycle ---
+			foreach (var betId in betIds)
+			{
+				var roll = rng.NextDouble();
+
+				if (roll < 0.4)
+				{
+					sequence.AddRange(BuildPartialMatchSequence(betId, rng.NextDouble() * 2));
+				}
+				else if (roll < 0.7)
+				{
+					sequence.AddRange(BuildFullyMatchedSequence(betId));
+				}
+				else
+				{
+					sequence.AddRange(BuildCancelSequence(betId));
+				}
+			}
+
+			return sequence;
+		}
+
 		// ── Entry points ─────────────────────────────────────────────────────
 
-
+		public void Stop()
+		{
+			cts.Cancel();
+		}
+		
 		public void MapRealMarket(SpreadTrader.NodeViewModel nvm)
 		{
 			_marketSnapshot = new MarketSnapshot
@@ -235,42 +222,44 @@ namespace StreamSimulator
 
 		public Task SimulateNewBet(String marketId, long selectionId, double stake)
 		{
-			List<SequenceEntry> sequence = NewBetSequence(marketId, selectionId, stake);
+			List<SequenceEntry> sequence = BuildNewBetSequence(marketId, selectionId, stake);
 			return RunAsync(FromSynthetic(sequence), cts.Token);
 		}
 
 		public Task SimulateFull(String betId)
 		{
-			List<SequenceEntry> sequence = NewFullyMatchedSequence(betId);
+			List<SequenceEntry> sequence = BuildFullyMatchedSequence(betId);
 			return RunAsync(FromSynthetic(sequence), cts.Token);
 		}
 
 		public Task SimulatePartial(String betId, double fillAmount)
 		{
-			List<SequenceEntry> sequence = NewPartialMatchSequence(betId, fillAmount);
+			List<SequenceEntry> sequence = BuildPartialMatchSequence(betId, fillAmount);
 			return RunAsync(FromSynthetic(sequence), cts.Token);
 		}
 
 		public Task SimulateCancel(String betId)
 		{
-			List<SequenceEntry> sequence = NewCancelSequence(betId);
+			List<SequenceEntry> sequence = BuildCancelSequence(betId);
 			return RunAsync(FromSynthetic(sequence), cts.Token);
 		}
-		public Task SimulateSingleShot(String marketId)
+		
+		public Task SimulateRandomBurst(String marketId, long selectionId, Int32 messageCount)
 		{
-			List<SequenceEntry> sequence = NewSingleShotSequence(marketId, 59497577);
+			List<SequenceEntry> sequence = BuildRandomSequence(marketId, selectionId, messageCount);
 			return RunAsync(FromSynthetic(sequence), cts.Token);
 		}
 
-		public Task ReplaySyntheticAsync(string marketId, long selectionId, CancellationToken ct = default)
+		// ── Entry points ─────────────────────────────────────────────────────
+
+		private Task ReplaySyntheticAsync(string marketId, long selectionId, CancellationToken ct = default)
 		{
 			var sequence = new List<SequenceEntry>();
 
 			for (int i = 0; i < 10; i++)
 			{
-				var betId = Guid.NewGuid().ToString("N");
-
 				var rng = new Random();
+				var betId = rng.Next(100000, 999999).ToString();
 				var price = Math.Round(1.01 + rng.NextDouble() * 5, 2);
 				var size = Math.Round(1 + rng.NextDouble() * 10, 2);
 				var side = rng.Next(2) == 0 ? Order.SideEnum.L : Order.SideEnum.B;
@@ -295,17 +284,7 @@ namespace StreamSimulator
 
 			return RunAsync(FromSynthetic(sequence), ct);
 		}
-
-
-		//public Task ReplaySyntheticAsync(String marketId, long selectionId, CancellationToken ct = default(CancellationToken))
-		//{
-		//    List<SequenceEntry> sequence = SequenceBuilder.BuildRandom(marketId, selectionId, messageCount: 10);
-		//    return RunAsync(FromSynthetic(sequence), cts.Token);
-		//}
-		public void Stop()
-		{
-			cts.Cancel();
-		}
+		
 
 		private async Task RunAsync(List<ReplayEntry> entries, CancellationToken ct)
 		{
@@ -483,10 +462,14 @@ namespace StreamSimulator
 		public string marketId;
 		public long selectionId;
 		public string BetId;
+
 		public double Price;
 		public double Size;
 		public double Matched;
+
 		public Order.SideEnum Side;
+		
+		public List<(double price, double size)> Matches { get; } = new List<(double price, double size)>();
 	}
 
 }

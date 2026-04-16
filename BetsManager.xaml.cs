@@ -133,14 +133,14 @@ namespace SpreadTrader
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
-            if (messageName == "Simulate")
-            {
-                SimulatedFill();
-            }
-            if (messageName == "Stop Simulation")
-            {
-                _simulatedStream.Stop();
-            }
+			//if (messageName == "Simulate")
+			//{
+			//    await _simulatedStream.ReplaySyntheticAsync(MarketNode.MarketID, MarketNode.LiveRunners[0].SelectionId);
+			//}
+			//if (messageName == "Stop Simulation")
+			//{
+			//    _simulatedStream.Stop();
+			//}
 			if (messageName == "New")
 			{
 				_simulatedStream.SimulateNewBet(MarketNode.MarketID, MarketNode.LiveRunners[0].SelectionId, 25);
@@ -155,10 +155,9 @@ namespace SpreadTrader
                 if (SelectedRow != null)
 				    _simulatedStream.SimulatePartial(SelectedRow.BetID.ToString(), 5);
 			}
-
-			if (messageName == "Single Shot")
+			if (messageName == "Random Burst")
 			{
-				_simulatedStream.SimulateSingleShot(MarketNode.MarketID);
+				_simulatedStream.SimulateRandomBurst (MarketNode.MarketID, MarketNode.LiveRunners[0].SelectionId, 8);
 			}
 			if (messageName == "Clear")
 			{
@@ -258,7 +257,7 @@ namespace SpreadTrader
                 player.Play();
             }
 		}
-		private void ApplyPartialMatch(Order o)
+		private void ApplyPartialMatch(Order o, String runner_name)
 		{
 			UInt64 betid = Convert.ToUInt64(o.Id);
 			var actualRow = _allRows.FirstOrDefault(r => r.BetID == betid && !r.IsMatchedFragment);
@@ -271,6 +270,8 @@ namespace SpreadTrader
 			// clone row
 			var mrow = new BetsManagerRow(actualRow)
 			{
+                SelectionID = actualRow.SelectionID,
+                Runner = runner_name,
 				SizeMatched = o.Sm ?? 0.0,
 				Odds = o.P ?? 0.0,
 				Stake = o.Sm ?? 0.0,
@@ -291,10 +292,6 @@ namespace SpreadTrader
 			}
 			// update unmatched remainder
 			actualRow.Stake = o.Sr.Value;
-		}
-		private async void SimulatedFill()
-		{
-			await _simulatedStream.ReplaySyntheticAsync(MarketNode.MarketID, MarketNode.LiveRunners[0].SelectionId);
 		}
 		public void OnOrderChanged(OrderMarketChange change)
         {
@@ -409,7 +406,7 @@ namespace SpreadTrader
 									}
 									Dispatcher.Invoke(() =>
 									{
-										ApplyPartialMatch(o);
+										ApplyPartialMatch(o, runner_name);
 									});
 								}
 								else if (o.Sm > 0 && o.Sr == 0)                                                                     // fully matched
@@ -427,77 +424,6 @@ namespace SpreadTrader
 									ops.Add(() => row.SizeMatched = o.Sm.Value);
 									ops.Add(() => row.Hidden = false);
 								}
-
-
-
-								/*								if (o.Sm == 0 && o.Sr > 0)                                          // unmatched
-																{
-																	ops.Add(() => row.Stake = o.S.Value);
-																	ops.Add(() => row.SizeMatched = o.Sm.Value);
-																	ops.Add(() => row.Hidden = false);
-
-																	Debug.WriteLine(o.Id, "unmatched: ");
-																	Debug.WriteLine(MarketNode.MarketName);
-																}
-																if (o.Sm == 0 && o.Sl > 0)                                          // lapsed
-																{
-																	Debug.WriteLine(o.Id, "lapsed: ");
-																	ops.Add(() => { if (_byBetId.Remove(row.BetID)) _allRows.Remove(row); });
-																}
-																if (o.Sc == 0 && o.Sm > 0 && o.Sr == 0)                             // fully matched
-																{
-																	ops.Add(() => row.AvgPriceMatched = o.Avp.Value);
-																	ops.Add(() => row.SizeMatched = row.Stake);
-																	betMatched = true;
-																	Debug.WriteLine(o.Id, "fully matched: ");
-																}
-																if (o.Sm > 0 && o.Sr > 0)                                           // partially matched
-																{
-																	if (!_allRows.Any(r => r.BetID == row.BetID))
-																	{
-																		Debug.WriteLine($"INCONSISTENCY: row {row.BetID} not in _allRows");
-																		Debug.WriteLine($"_byBetId contains: {_byBetId.ContainsKey(betid)}");
-																		Debug.WriteLine($"_allRows contains: {_allRows.Any(r => r.BetID == betid)}");
-																	}
-
-																	Dispatcher.Invoke(() =>
-																	{
-																		ApplyPartialMatch(o);
-																	});
-																	betMatched = true;
-
-																	Debug.WriteLine(o.Id, "partial match: ");
-																}
-
-																if (o.Sc > 0 && o.Sr > 0)                                             // cancellation of unmatched portion
-																{
-																	ops.Add(() => row.Stake = o.Sr.Value);
-																	Debug.WriteLine(o.Id, "Cancellation of partially matched bet");
-																}
-																else if (o.Sc > 0 && o.Sr == 0 && o.Sm == 0)
-																{
-																	// fully cancelled (no match ever happened)
-																	_cancelledBets.Add(row.BetID);
-
-																	ops.Add(() =>
-																	{
-																		if (_byBetId.Remove(row.BetID))
-																			_allRows.Remove(row);
-																	});
-
-																	Debug.WriteLine(o.Id, "Bet fully cancelled");
-																}
-																else
-																{
-																	// THIS is your case:
-																	// Sr == 0 but Sm > 0 → matched + cancelled remainder
-
-																	Debug.WriteLine(o.Id, "Cancel after partial match");
-
-																	// do NOT remove row
-																	ops.Add(() => row.Stake = 0);
-																}
-																*/
 							}
 						}
 					}

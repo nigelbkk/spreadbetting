@@ -105,20 +105,14 @@ namespace SpreadTrader
 					case "New":
 					case "Full":
 					case "Simulate":
-					case "Single Shot":
 					case "Clear":
+					case "Random Burst":
+					case "Partial":
 					case "Stop":
+					case "Reconnect":
 						ControlMessenger.Send(b.Tag.ToString());
 						break;
 
-					case "Partial":
-						String betId = "0";
-						ControlMessenger.Send(b.Tag.ToString(), betId);
-						break;
-
-					case "Connect":
-						ControlMessenger.Send("Reconnect");
-						break;
 					case "Market Description":
 						new MarketDescription(this, b, TabContent.MarketNode).ShowDialog();
 						break;
