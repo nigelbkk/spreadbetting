@@ -112,6 +112,8 @@ namespace StreamSimulator
 
 			_orders[betId] = new SimOrder
 			{
+				marketId = marketId,
+				selectionId = selectionId,
 				BetId = betId,
 				Price = price,
 				Size = stake,
@@ -131,7 +133,6 @@ namespace StreamSimulator
 			var builder = new SequenceBuilder(o.marketId, o.selectionId);
 
 			builder.Cancelled(o);
-
 			_orders.Remove(betId);
 
 			return builder.Build();
@@ -415,16 +416,16 @@ namespace StreamSimulator
 
 		// ── Supporting types ─────────────────────────────────────────────────────
 
-		public class SimOrder
-		{
-			public string marketId;
-			public long selectionId;
-			public string BetId;
-			public double Price;
-			public double Size;
-			public double Matched;
-			public Order.SideEnum Side;
-		}
+		//public class SimOrder
+		//{
+		//	public string marketId;
+		//	public long selectionId;
+		//	public string BetId;
+		//	public double Price;
+		//	public double Size;
+		//	public double Matched;
+		//	public Order.SideEnum Side;
+		//}
 
 		public class ReplayEntry
 		{
@@ -475,6 +476,17 @@ namespace StreamSimulator
 				return $"{Name} : {SelectionId}";
 			}
 		}
+	}
+
+	public class SimOrder
+	{
+		public string marketId;
+		public long selectionId;
+		public string BetId;
+		public double Price;
+		public double Size;
+		public double Matched;
+		public Order.SideEnum Side;
 	}
 
 }

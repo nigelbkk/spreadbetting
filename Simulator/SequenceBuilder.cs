@@ -2,7 +2,7 @@ using Betfair.ESASwagger.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static StreamSimulator.SimulatedStream;
+//using StreamSimulator.SimOrder;
 
 namespace StreamSimulator.Synthetic
 {
@@ -159,29 +159,29 @@ namespace StreamSimulator.Synthetic
 		{
 			_pt++;
 
-			if (!_orders.ContainsKey(betId))
-			{
-				// new order
-				_orders[betId] = new SimOrder()
-				{ 
-					BetId = betId,
-					Price = price,
-					Size = size,
-					Matched = sm, 
-					Side = side
-				};
-			}
-			else
-			{
-				// update matched
-				var o = _orders[betId];
-				o.Matched = sm;
-				_orders[betId] = o;
+			//if (!_orders.ContainsKey(betId))
+			//{
+			//	// new order
+			//	_orders[betId] = new SimOrder()
+			//	{ 
+			//		BetId = betId,
+			//		Price = price,
+			//		Size = size,
+			//		Matched = sm, 
+			//		Side = side
+			//	};
+			//}
+			//else
+			//{
+			//	// update matched
+			//	var o = _orders[betId];
+			//	o.Matched = sm;
+			//	_orders[betId] = o;
 
-				// remove if complete
-				if (sr == 0 && (sm == size || sc > 0))
-					_orders.Remove(betId);
-			}
+			//	//// remove if complete
+			//	//if (sr == 0 && (sm == size || sc > 0))
+			//	//	_orders.Remove(betId);
+			//}
 
 			var order = new Order( Side: side, Pt: Order.PtEnum.L, Ot: Order.OtEnum.L, Status: Order.StatusEnum.E, Id: betId, P: price, S: size, Sm: sm, Sr: sr, Sc: sc, Sl: 0.0, Sv: 0.0, Pd: _pt, Rc: "REG_GGC", Rac: "" );
 			var orc = new OrderRunnerChange( Id: _selectionId, FullImage: fullImage, Uo: new List<Order> { order } );
