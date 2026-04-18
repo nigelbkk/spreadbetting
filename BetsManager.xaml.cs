@@ -338,9 +338,20 @@ namespace SpreadTrader
 									}
 									else if (o.Sr == 0 && o.Sm > 0)
 									{
-										Debug.WriteLine(o.Id, "Remainder cancelled after partial match");
-										// do NOT remove row
-										ops.Add(() => row.Stake = 0);
+										///Debug.WriteLine(o.Id, "Remainder cancelled after partial match");
+										// INCORRECT: ops.Add(() => row.Stake = 0);
+										_cancelledBets.Add(row.BetID);
+
+										ops.Add(() =>
+										{
+											if (_byBetId.Remove(row.BetID))
+												_allRows.Remove(row);
+										});
+
+
+										//Debug.WriteLine(o.Id, "Remainder cancelled after partial match");
+										//// do NOT remove row
+										//ops.Add(() => row.Stake = 0);
 									}
 								}
 
