@@ -1,6 +1,7 @@
 ﻿using Betfair.ESASwagger.Model;
 using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
+using SpreadTrader.Simulator;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace SpreadTrader
 {
@@ -82,6 +84,7 @@ namespace SpreadTrader
 				{
 					var sw = Stopwatch.StartNew();
 
+					Debug.WriteLine( $"[LOOP INJECT] T={Thread.CurrentThread.ManagedThreadId} " + $"UI={Application.Current.Dispatcher.CheckAccess()}");
 					manager.OnOrderChanged(change);
 
 					sw.Stop();
@@ -149,6 +152,9 @@ namespace SpreadTrader
 			});
 			hubProxy.On<string>("ordersChanged", (json1) =>
 			{
+				Interlocked.Increment(ref OcmDiagnostics.MessagesReceived);
+				Debug.WriteLine($"[HUB INJECT] T={Thread.CurrentThread.ManagedThreadId} " + $"UI={Application.Current.Dispatcher.CheckAccess()}");
+
 				_orderQueue.Add(json1);
 			});
 			Connect();
@@ -158,7 +164,11 @@ namespace SpreadTrader
 			if (_ordersHandlers.TryGetValue(change.Id, out var manager))
 			{
 				var sw = Stopwatch.StartNew();
-				manager.OnOrderChanged(change);
+				Debug.WriteLine(
+				  $"[SIM INJECT] T={Thread.CurrentThread.ManagedThreadId} " +
+				  $"UI={Application.Current.Dispatcher.CheckAccess()}"); 
+				  
+				  manager.OnOrderChanged(change);
 			}
 		}
 

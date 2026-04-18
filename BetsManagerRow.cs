@@ -55,6 +55,7 @@ namespace SpreadTrader
 
 		private double _SizeMatched;
 		public double SizeMatched { get => _SizeMatched; set { if (_SizeMatched != value) { _SizeMatched = value; RaiseDerived(); } } }
+		public long LastPt { get; set; } = -1;
 
 		private void RaiseDerived()
 		{

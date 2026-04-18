@@ -43,7 +43,7 @@ namespace StreamSimulator
 		public event EventHandler<MessageDispatchedEventArgs> MessageDispatched;
 		public event EventHandler<SimulationCompleteEventArgs> SimulationComplete;
 
-		public SimulatedStream(ReplayMode mode = ReplayMode.PtAccurate, int iterations = 1, double speedMultiplier = 1.0)
+		public SimulatedStream(ReplayMode mode = ReplayMode.PtAccurate, int iterations = 1, double speedMultiplier = 0.01)
 		{
 			_mode = mode;
 			_iterations = iterations;
@@ -252,40 +252,6 @@ namespace StreamSimulator
 
 		// ── Entry points ─────────────────────────────────────────────────────
 
-		private Task ReplaySyntheticAsync(string marketId, long selectionId, CancellationToken ct = default)
-		{
-			var sequence = new List<SequenceEntry>();
-
-			for (int i = 0; i < 10; i++)
-			{
-				var rng = new Random();
-				var betId = rng.Next(100000, 999999).ToString();
-				var price = Math.Round(1.01 + rng.NextDouble() * 5, 2);
-				var size = Math.Round(1 + rng.NextDouble() * 10, 2);
-				var side = rng.Next(2) == 0 ? Order.SideEnum.L : Order.SideEnum.B;
-
-				// register in your real state
-				_orders[betId] = new SimOrder
-				{
-					BetId = betId,
-					marketId = marketId,
-					selectionId = selectionId,
-					Price = price,
-					Size = size,
-					Matched = 0,
-					Side = side
-				};
-
-				var builder = new SequenceBuilder(marketId, selectionId);
-				builder.SubImage(betId, side, price, size);
-
-				sequence.AddRange(builder.Build());
-			}
-
-			return RunAsync(FromSynthetic(sequence), ct);
-		}
-		
-
 		private async Task RunAsync(List<ReplayEntry> entries, CancellationToken ct)
 		{
 			var sw = Stopwatch.StartNew();
@@ -303,13 +269,17 @@ namespace StreamSimulator
 					if (!first)
 						await DelayAsync(entry, lastPt, lastWallClockMs, ct);
 
-					lastPt = entry.Pt;
+					lastPt = entry.Pd;
 					lastWallClockMs = entry.WallClockMs;
 					first = false;
 
 					if (OnChange != null)
 					{
+						entry.CreatedAtTicks = Stopwatch.GetTimestamp();
 						OnChange(entry.Change);
+						var now = Stopwatch.GetTimestamp();
+						var latencyMs = (now - entry.CreatedAtTicks) * 1000.0 / Stopwatch.Frequency;
+				
 						MessagesDispatched++;
 
 						var handler = MessageDispatched;
@@ -333,15 +303,11 @@ namespace StreamSimulator
 
 			if (_mode == ReplayMode.PtAccurate)
 			{
-				rawDelayMs = entry.Pt > 0 && lastPt > 0
-					? (double)(entry.Pt - lastPt)
-					: 0;
+				rawDelayMs = entry.Pd > 0 && lastPt > 0 ? (double)(entry.Pd - lastPt): 0;
 			}
 			else if (_mode == ReplayMode.WallClockAccurate)
 			{
-				rawDelayMs = entry.WallClockMs > 0 && lastWallClockMs > 0
-					? (double)(entry.WallClockMs - lastWallClockMs)
-					: 0;
+				rawDelayMs = entry.WallClockMs > 0 && lastWallClockMs > 0 ? (double)(entry.WallClockMs - lastWallClockMs) : 0;
 			}
 			else
 			{
@@ -382,7 +348,7 @@ namespace StreamSimulator
 				entries.Add(new ReplayEntry
 				{
 					Change = s.Change,
-					Pt = s.Pt > 0 ? s.Pt : runningPt,
+					Pd = s.Pt > 0 ? s.Pt : runningPt,
 					WallClockMs = runningPt,
 					IsSynthetic = true,
 					DelayMsFromPrior = accumulatedDelayMs
@@ -409,8 +375,10 @@ namespace StreamSimulator
 		public class ReplayEntry
 		{
 			public OrderMarketChange Change { get; set; }
-			public long Pt { get; set; }
+			public long Pd { get; set; }
 			public long WallClockMs { get; set; }
+			public long CreatedAtTicks;
+
 			public bool IsSynthetic { get; set; }
 			public double DelayMsFromPrior { get; set; }
 		}

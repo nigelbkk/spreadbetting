@@ -140,6 +140,7 @@
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Simulator\OcmDiagnostics.cs" />
     <Compile Include="Simulator\SequenceBuilder.cs" />
     <Compile Include="Simulator\SimulatedStream.cs" />
     <Compile Include="SliderControl.xaml.cs">
