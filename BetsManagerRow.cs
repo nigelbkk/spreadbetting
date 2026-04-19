@@ -30,7 +30,11 @@ namespace SpreadTrader
 		private String _Side;
 		public String Side { get => _Side; set { if (_Side != value) { _Side = value; OnPropertyChanged(nameof(Side)); } } }
 		private double _Stake;
-		public double Stake { get => _Stake; set { if (_Stake != value) { _Stake = value; OnPropertyChanged(nameof(Stake)); } } }
+		public double Stake { get => _Stake; set { if (_Stake != value) { 
+			_Stake = value;
+					OnPropertyChanged(nameof(Stake));
+					OnPropertyChanged(nameof(Profit)); 
+		} } }
 
 		private double _Odds;
 		public double Odds { get => _Odds; set { if (_Odds != value) { _Odds = value; OnPropertyChanged(nameof(Odds)); RaiseDerived(); } } }

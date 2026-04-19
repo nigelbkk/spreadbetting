@@ -578,7 +578,8 @@ namespace SpreadTrader
                                 {
                                     if (!row.IsMatched && row.Stake >= 4)
                                     {
-                                        cancel_instructions.Add(new CancelInstruction(row.BetID) { sizeReduction = Math.Round((row.Stake / 2), 2) });
+										cancel_instructions.Add(new CancelInstruction(row.BetID) { sizeReduction = Math.Round((row.Stake), 2) });
+                                        row.Stake /= 2;
 										_simulatedStream?.SimulateCancel(row.BetID.ToString());
 									}
 								}
