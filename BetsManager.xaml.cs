@@ -367,6 +367,7 @@ namespace SpreadTrader
 										Debug.WriteLine($"_byBetId contains: {_byBetId.ContainsKey(betid)}");
 										Debug.WriteLine($"_allRows contains: {_allRows.Any(r => r.BetID == betid)}");
 									}
+									betMatched = true;
 									Dispatcher.Invoke(() =>
 									{
 										ApplyPartialMatch(o);
@@ -383,7 +384,6 @@ namespace SpreadTrader
 								{
 									// unmatched
 									Debug.WriteLine(o.Id, "unmatched");
-									//ops.Add(() => row.Stake = o.S.Value);
 									ops.Add(() => row.Stake = o.Sr.Value);
 									ops.Add(() => row.SizeMatched = o.Sm.Value);
 									ops.Add(() => row.Hidden = false);
