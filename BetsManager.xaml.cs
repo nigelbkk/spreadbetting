@@ -227,7 +227,7 @@ namespace SpreadTrader
 				SizeMatched = o.Sm ?? 0.0,
 				Odds = o.P ?? 0.0,
 				Stake = o.Sm ?? 0.0,
-				AvgPriceMatched = o.Avp ?? 0.0,
+				AvgPriceMatched = o.P ?? 0.0,
 				Hidden = UnmatchedOnly,
 				IsMatchedFragment = true
 			};
