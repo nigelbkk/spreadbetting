@@ -73,8 +73,8 @@ namespace SpreadTrader
 			{
 				Debug.WriteLine($"{DateTime.UtcNow:HH:mm:ss.fff} [T{Thread.CurrentThread.ManagedThreadId}] Dequeue. Queue={_orderQueue.Count}");
 
-				if (props.RecordOrders)
-					StreamRecorder.Record(json);
+				//if (props.RecordOrders)
+				//	StreamRecorder.Record(json);
 
 				var change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
 
