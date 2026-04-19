@@ -75,7 +75,6 @@ namespace SpreadTrader
                 Dispatcher.BeginInvoke(new Action(() => { PropertyChanged(this, new PropertyChangedEventArgs(info)); }));
             }
         }
-		private Mutex mutex = null;
         public static TabContent SelectedTab {get;set;}
 #endregion Properties
 

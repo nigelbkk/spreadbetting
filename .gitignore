@@ -10,6 +10,7 @@ SpreadTrader.csproj
 # User-specific files
 *.suo
 *.usernn
+*.user
 *.userosscache
 *.sln.docstates
 *.sublime-settings

@@ -44,7 +44,7 @@ namespace SpreadTrader
 			{
 				_ordersHandlers.Remove(marketId);
 			}
-		}
+		}		
 		public void Attach(string marketId, RunnersControl manager)
 		{
 			if (_marketHandlers.TryGetValue(marketId, out var existing))
@@ -86,6 +86,7 @@ namespace SpreadTrader
 					var sw = Stopwatch.StartNew();
 
 					manager.OnOrderChanged(change);
+					ControlMessenger.Send("");
 
 					sw.Stop();
 
@@ -93,10 +94,6 @@ namespace SpreadTrader
 					{
 						Debug.WriteLine($"SLOW OnOrderChanged {change.Id}: {sw.ElapsedMilliseconds} ms");
 					}
-
-					//Debug.WriteLine($"{DateTime.UtcNow:HH:mm:ss.fff} [T{Thread.CurrentThread.ManagedThreadId}] Before OnOrderChanged {change.Id}");
-					//manager.OnOrderChanged(change);
-					//Debug.WriteLine($"{DateTime.UtcNow:HH:mm:ss.fff} [T{Thread.CurrentThread.ManagedThreadId}] After OnOrderChanged {change.Id}");
 				}
 				else
 				{

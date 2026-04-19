@@ -12,20 +12,21 @@ namespace SpreadTrader
     {
         public CustomTabHeader customHeader = null;
         public NodeViewModel MarketNode = null;
-        //private System.Timers.Timer timer = new System.Timers.Timer();
 		private String marketID;
 
-		private String _MarketStatus = "";
-        public String MarketStatus
+		public String MarketStatus => Status.ToString();
+		private marketStatusEnum _Status;
+		public marketStatusEnum Status
 		{
-			get => _MarketStatus;
+			get => _Status;
 
 			set
 			{
-				if (_MarketStatus != value)
+				if (_Status != value)
 				{
 					Debug.WriteLine(value);
-					_MarketStatus = value;
+					_Status = value;
+					OnPropertyChanged(nameof(Status));
 					OnPropertyChanged(nameof(MarketStatus));
 					OnPropertyChanged(nameof(OverlayVisibility));
 				}
@@ -33,7 +34,7 @@ namespace SpreadTrader
 		}
 		public Visibility OverlayVisibility
 		{
-			get => (MarketStatus.ToUpper() == "OPEN" || MarketStatus == "INACTIVE") ? Visibility.Hidden : Visibility.Visible; 
+			get => (Status == marketStatusEnum.OPEN || Status == marketStatusEnum.INACTIVE) ? Visibility.Hidden : Visibility.Visible; 
 		}
 		public string MarketName { get { return MarketNode?.MarketName; } }
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -49,26 +50,17 @@ namespace SpreadTrader
 			ControlMessenger.MessageSent += OnMessageReceived;
 			marketHeader.TabContent = this;
 			oBettingGrid.sliderControl = SliderControl;
-        }
-        private async void UnsubscribeAsync(String marketId)
+		}
+		private async void UnsubscribeAsync(String marketId)
 		{
 			ControlMessenger.Send("Unsubscribe", new { MarketId = marketId });
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
-			if (messageName == "Market Changed")
+			if (messageName == "Market Status Changed")
 			{
-				//	dynamic d = data;
-				//	MarketChangeDto change = d.MarketChangeDto;
-				//	if (RunnersControl != null && RunnersControl.MarketNode != null)
-				//	{
-				//		String name = RunnersControl?.MarketNode.Market.marketName;
-
-				//		if (RunnersControl.MarketNode.MarketID == change.MarketId)
-				//		{
-				//			OnMarketChanged(change);
-				//		}
-				//	}
+				//dynamic d = data as NodeViewModel;
+				Status = MarketNode.Status;
 			}
 			if (messageName == "Telemetry Available")
 			{
@@ -78,6 +70,8 @@ namespace SpreadTrader
 
 				if (marketid == this.marketID)
 					marketHeader.TotalMatched = totalMatched;
+
+				Status = MarketNode.Status;
 			}
 		}
 		public void OnMarketSelected(NodeViewModel d2)
@@ -88,7 +82,8 @@ namespace SpreadTrader
 			customHeader.OnMarketSelected(d2);
 			BetsManager.OnMarketSelected(d2, RunnersControl);
 			RunnersControl.PopulateNewMarket(d2);
-			MarketStatus = marketStatusEnum.INACTIVE.ToString();
+			Status = marketStatusEnum.INACTIVE;
+//			MarketStatus = marketStatusEnum.INACTIVE.ToString();
 
 			OnPropertyChanged(nameof(MarketName));
 		}
@@ -102,22 +97,6 @@ namespace SpreadTrader
 			OnPropertyChanged(nameof(MarketStatus));
 
 			marketHeader?.OnTabSelected();
-		}
-		//public void OnOrdersChanged(String json)
-		//{
-		//	BetsManager.OnOrderChanged(json);
-		//}
-		void OnMarketChanged(MarketChangeDto change)
-		{
-			MarketStatus = change.Status.ToString();
-			marketHeader.TotalMatched = change.Tv ?? 0;
-			RunnersControl?.OnMarketChanged(change);
-
-			if (change.Status.ToString() != MarketStatus)
-			{
-				if (change.Status == MarketDefinition.StatusEnum.Closed)
-					UnsubscribeAsync(change.MarketId);
-			}
 		}
 	}
 }
