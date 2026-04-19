@@ -445,6 +445,7 @@ namespace SpreadTrader
 										Debug.WriteLine($"_byBetId contains: {_byBetId.ContainsKey(betid)}");
 										Debug.WriteLine($"_allRows contains: {_allRows.Any(r => r.BetID == betid)}");
 									}
+									betMatched = true;
 									Dispatcher.Invoke(() =>
 									{
 										ApplyPartialMatch(o, runner_name);
