@@ -42,12 +42,12 @@ namespace SpreadTrader
 		public bool IsBack { get => Side.ToUpper() == "BACK"; }
 
 		private bool _Hidden = false;
-		public bool Hidden { get => _Hidden; set { if (_Hidden != value) { _Hidden = value; OnPropertyChanged(nameof(Odds)); RaiseDerived(); } } }
+		public bool Hidden { get => _Hidden; set { if (_Hidden != value) { _Hidden = value; OnPropertyChanged(nameof(Hidden)); RaiseDerived(); } } }
 
 		private bool _Override;
 		public bool Override { get => _Override; set { _Override = value; OnPropertyChanged(nameof(Override)); RaiseDerived(); } }
 		private bool _NoCancel { get; set; }
-		public bool NoCancel { get => _NoCancel; set { _NoCancel = value; OnPropertyChanged(nameof(Hidden)); RaiseDerived(); } }
+		public bool NoCancel { get => _NoCancel; set { _NoCancel = value; OnPropertyChanged(nameof(NoCancel)); RaiseDerived(); } }
 		public String IsMatchedString { get => SizeMatched > 0 ? "F" : "U"; }
 		public double DisplayOdds { get => SizeMatched > 0 ? Math.Round(AvgPriceMatched, 2) : Odds; }
 		public bool IsMatched { get => SizeMatched > 0; }

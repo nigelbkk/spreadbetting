@@ -7,6 +7,7 @@ using StreamSimulator;
 using StreamSimulator.Synthetic;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -93,14 +94,27 @@ namespace SpreadTrader
 			InitializeComponent();
 			ControlMessenger.MessageSent += OnMessageReceived;
 
-            /////////// SIMULATOR STUFF
+			Loaded += (s, e) =>
+			{
+				if (Rows != null)
+				{
+					Rows.CollectionChanged += OnRowsCollectionChanged;
+				}
+			};
 
-            InitSimulator();
+			/////////// SIMULATOR STUFF
+
+			InitSimulator();
 
             ///////////////////////////
 		}
 
-        void InitSimulator()
+		private void OnRowsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			Debug.WriteLine($"[UI EVENT] Action={e.Action} Count={Rows.Count}");
+		}
+
+		void InitSimulator()
         {
             OcmDiagnostics.Clear();
 			_simulatedStream = new SimulatedStream(ReplayMode.WallClockAccurate, 1, 1.0);
@@ -116,7 +130,10 @@ namespace SpreadTrader
                 foreach (var row in _allRows)
                 {
                     if (!UnmatchedOnly || !row.IsMatched)
-                        Rows.Add(row);
+                    {
+						Debug.WriteLine( $"[FILTER] BetId={row.BetID} " + $"IsMatched={row.IsMatched} " + $"UnmatchedOnly={UnmatchedOnly}");
+						Rows.Add(row);
+                    }
                 }
 				Interlocked.Increment(ref OcmDiagnostics.MessagesProcessed);
 			}
@@ -398,7 +415,7 @@ namespace SpreadTrader
 
 								if (o.Sl > 0)
 								{
-									///Debug.WriteLine(o.Id, "lapsed");
+									Debug.WriteLine(o.Id, "lapsed");
 									ops.Add(() => { if (_byBetId.Remove(row.BetID)) _allRows.Remove(row); });
 								}
 
@@ -406,12 +423,12 @@ namespace SpreadTrader
 								{
 									if (o.Sr > 0)
 									{
-										///Debug.WriteLine(o.Id, "Partial cancellation (unmatched remainder reduced)");
+										Debug.WriteLine(o.Id, "Partial cancellation (unmatched remainder reduced)");
 										ops.Add(() => row.Stake = o.Sr.Value);
 									}
 									else if (o.Sr == 0 && o.Sm == 0)
 									{
-										///Debug.WriteLine(o.Id, "Fully cancelled (never matched)");
+										Debug.WriteLine(o.Id, "Fully cancelled (never matched)");
 										_cancelledBets.Add(row.BetID);
 
 										ops.Add(() =>
@@ -422,7 +439,7 @@ namespace SpreadTrader
 									}
 									else if (o.Sr == 0 && o.Sm > 0)
 									{
-										///Debug.WriteLine(o.Id, "Remainder cancelled after partial match");
+										Debug.WriteLine(o.Id, "Remainder cancelled after partial match");
 										// INCORRECT: ops.Add(() => row.Stake = 0);
 										_cancelledBets.Add(row.BetID);
 
@@ -438,21 +455,46 @@ namespace SpreadTrader
 
 								if (o.Sm > 0 && o.Sr > 0)
 								{
-									///Debug.WriteLine(o.Id, "partial match"); 									            // partially matched
+									Debug.WriteLine($"partial match {o.Id} : {o.Sm}"); 									            // partially matched
 									if (!_allRows.Any(r => r.BetID == row.BetID))
 									{
 										Debug.WriteLine($"INCONSISTENCY: row {row.BetID} not in _allRows");
 										Debug.WriteLine($"_byBetId contains: {_byBetId.ContainsKey(betid)}");
 										Debug.WriteLine($"_allRows contains: {_allRows.Any(r => r.BetID == betid)}");
 									}
+									betMatched = true;
+
 									Dispatcher.Invoke(() =>
 									{
+										var exists = _allRows.Any(r => r.BetID == betid);
+										var rowObj = _allRows.FirstOrDefault(r => r.BetID == betid);
+
+										Debug.WriteLine(
+											$"[CHECK ROW] BetId={betid} " +
+											$"Exists={exists} " +
+											$"Count={_allRows.Count} " +
+											//$"Suspend={_allRows.SuspendCountDebug()} " +
+											$"Thread={Thread.CurrentThread.ManagedThreadId}");
+
+										if (rowObj != null)
+										{
+											Debug.WriteLine(
+												$"[ROW STATE] Hidden={rowObj.Hidden} " +
+												$"Stake={rowObj.Stake} " +
+												$"Matched={rowObj.SizeMatched}");
+										}
+
 										ApplyPartialMatch(o, runner_name);
 									});
+
+									//Dispatcher.Invoke(() =>
+									//{
+									//	ApplyPartialMatch(o, runner_name);
+									//});
 								}
 								else if (o.Sm > 0 && o.Sr == 0)                                                                     // fully matched
 								{
-									///Debug.WriteLine(o.Id, "fully matched");
+									Debug.WriteLine(o.Id, "fully matched");
 									ops.Add(() => row.AvgPriceMatched = o.Avp ?? 0);
 									ops.Add(() => row.SizeMatched = row.Stake);
 									betMatched = true;
@@ -460,7 +502,7 @@ namespace SpreadTrader
 								else if (o.Sm == 0 && o.Sr > 0)
 								{
 									// unmatched
-									///Debug.WriteLine(o.Id, "unmatched");
+									Debug.WriteLine(o.Id, "unmatched");
 									ops.Add(() => row.Stake = o.S.Value);
 									ops.Add(() => row.SizeMatched = o.Sm.Value);
 									ops.Add(() => row.Hidden = false);
@@ -481,6 +523,9 @@ namespace SpreadTrader
                             ApplyFilter();
 						}
 					}));
+
+					var view = System.Windows.Data.CollectionViewSource.GetDefaultView(Rows);
+					view?.Refresh();
 
 					if (betMatched)
 						NotifyBetMatchedAsync();
