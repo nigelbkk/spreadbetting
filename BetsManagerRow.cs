@@ -33,6 +33,7 @@ namespace SpreadTrader
 		public double Stake { get => _Stake; set { if (_Stake != value) { 
 			_Stake = value;
 					OnPropertyChanged(nameof(Stake));
+					OnPropertyChanged(nameof(DisplayStake));
 					OnPropertyChanged(nameof(Profit)); 
 		} } }
 
