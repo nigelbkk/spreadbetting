@@ -90,7 +90,7 @@ namespace SpreadTrader
         public String StreamingButtonText { get { return "Streaming Connected"; } }
 		#endregion Properties
 
-		private SimulatedStream _simulatedStream;
+		private SimulatedStream _simulatedStream = null;
 
 		public static void TraceThread(string tag)
 		{
@@ -126,8 +126,8 @@ namespace SpreadTrader
 		void InitSimulator()
         {
             OcmDiagnostics.Clear();
-			_simulatedStream = new SimulatedStream(ReplayMode.WallClockAccurate, 1, 1.0);
-			_simulatedStream.OnChange = (change) => WebSocketsHub.Instance.Simulate(change);
+			//_simulatedStream = new SimulatedStream(ReplayMode.WallClockAccurate, 1, 1.0);
+			//_simulatedStream.OnChange = (change) => WebSocketsHub.Instance.Simulate(change);
 		}
 
 		private void ApplyFilter(BetsManagerRow[] snapshot)

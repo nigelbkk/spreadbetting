@@ -59,7 +59,6 @@ namespace SpreadTrader
 		{
 			if (messageName == "Market Status Changed")
 			{
-				//dynamic d = data as NodeViewModel;
 				Status = MarketNode.Status;
 			}
 			if (messageName == "Telemetry Available")
@@ -71,7 +70,8 @@ namespace SpreadTrader
 				if (marketid == this.marketID)
 					marketHeader.TotalMatched = totalMatched;
 
-				Status = MarketNode.Status;
+				if (MarketNode != null)
+					Status = MarketNode.Status;
 			}
 		}
 		public void OnMarketSelected(NodeViewModel d2)
@@ -83,7 +83,6 @@ namespace SpreadTrader
 			BetsManager.OnMarketSelected(d2, RunnersControl);
 			RunnersControl.PopulateNewMarket(d2);
 			Status = marketStatusEnum.INACTIVE;
-//			MarketStatus = marketStatusEnum.INACTIVE.ToString();
 
 			OnPropertyChanged(nameof(MarketName));
 		}
