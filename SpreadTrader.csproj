@@ -43,7 +43,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>latest</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
@@ -54,7 +54,7 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>latest</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
@@ -107,7 +107,6 @@
     <Compile Include="BettingGrid.xaml.cs">
       <DependentUpon>BettingGrid.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BulkObservableCollection.cs" />
     <Compile Include="CustomTabHeader.xaml.cs">
       <DependentUpon>CustomTabHeader.xaml</DependentUpon>
     </Compile>
@@ -140,10 +139,12 @@
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Simulator\OcmDiagnostics.cs" />
+    <Compile Include="Simulator\SequenceBuilder.cs" />
+    <Compile Include="Simulator\SimulatedStream.cs" />
     <Compile Include="SliderControl.xaml.cs">
       <DependentUpon>SliderControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="StreamRecorder.cs" />
     <Compile Include="TabContent.xaml.cs">
       <DependentUpon>TabContent.xaml</DependentUpon>
     </Compile>

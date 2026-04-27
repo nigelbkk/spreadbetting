@@ -102,9 +102,17 @@ namespace SpreadTrader
 			{
 				switch (b.Tag)
 				{
-					case "Connect":
-						ControlMessenger.Send("Reconnect", new { MarketId = MarketNode?.MarketID});
+					case "New":
+					case "Full":
+					case "Simulate":
+					case "Clear":
+					case "Random Burst":
+					case "Partial":
+					case "Stop":
+					case "Reconnect":
+						ControlMessenger.Send(b.Tag.ToString());
 						break;
+
 					case "Market Description":
 						new MarketDescription(this, b, TabContent.MarketNode).ShowDialog();
 						break;

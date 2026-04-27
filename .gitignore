@@ -16,6 +16,9 @@ SpreadTrader.csproj
 *.sublime-settings
 *.zip
 *.sln
+*.json
+*.jsonl
+*.user
 
 BetfairPnlTest/
 pnl_look/

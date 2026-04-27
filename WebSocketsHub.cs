@@ -1,6 +1,7 @@
 ﻿using Betfair.ESASwagger.Model;
 using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
+using SpreadTrader.Simulator;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace SpreadTrader
 {
@@ -67,15 +69,12 @@ namespace SpreadTrader
 				UnsubscribeAsync(marketId);
 			}
 		}
+
 		private void OrderProcessingLoop()
 		{
 			foreach (var json in _orderQueue.GetConsumingEnumerable())
 			{
 				Debug.WriteLine($"{DateTime.UtcNow:HH:mm:ss.fff} [T{Thread.CurrentThread.ManagedThreadId}] Dequeue. Queue={_orderQueue.Count}");
-
-				//if (props.RecordOrders)
-				//	StreamRecorder.Record(json);
-
 				var change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
 
 				if (change?.Id == null)
@@ -85,6 +84,7 @@ namespace SpreadTrader
 				{
 					var sw = Stopwatch.StartNew();
 
+					Debug.WriteLine( $"[LOOP INJECT] T={Thread.CurrentThread.ManagedThreadId} " + $"UI={Application.Current.Dispatcher.CheckAccess()}");
 					manager.OnOrderChanged(change);
 					ControlMessenger.Send("");
 
@@ -101,24 +101,6 @@ namespace SpreadTrader
 				}
 			}
 		}
-		//private void OrderProcessingLoop()
-		//{
-		//	foreach (var json in _orderQueue.GetConsumingEnumerable())
-		//	{
-		//		if (props.RecordOrders)
-		//			StreamRecorder.Record(json);
-
-		//		var change = JsonConvert.DeserializeObject<OrderMarketChange>(json);
-
-		//		if (change?.Id == null)
-		//			continue;
-
-		//		if (_ordersHandlers.TryGetValue(change.Id, out var manager))
-		//		{
-		//			manager.OnOrderChanged(change); // better: pass object, not json
-		//		}
-		//	}
-		//}
 		private void MarketChangeProcessingLoop()
 		{
 			foreach (var change in _marketChangeQueue?.GetConsumingEnumerable())
@@ -165,12 +147,28 @@ namespace SpreadTrader
 			{
 				_marketChangeQueue.Add(change);
 			});
-			hubProxy.On<string, string>("ordersChanged", (json1, json3) =>
+			hubProxy.On<string>("ordersChanged", (json1) =>
 			{
+				Interlocked.Increment(ref OcmDiagnostics.MessagesReceived);
+				Debug.WriteLine($"[HUB INJECT] T={Thread.CurrentThread.ManagedThreadId} " + $"UI={Application.Current.Dispatcher.CheckAccess()}");
+
 				_orderQueue.Add(json1);
 			});
 			Connect();
 		}
+		public void Simulate(OrderMarketChange change)
+		{
+			if (_ordersHandlers.TryGetValue(change.Id, out var manager))
+			{
+				var sw = Stopwatch.StartNew();
+				Debug.WriteLine(
+				  $"[SIM INJECT] T={Thread.CurrentThread.ManagedThreadId} " +
+				  $"UI={Application.Current.Dispatcher.CheckAccess()}"); 
+				  
+				  manager.OnOrderChanged(change);
+			}
+		}
+
 		private void OnMessageReceived(string messageName, object data)
 		{
 			if (messageName == "Reconnect")
