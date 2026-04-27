@@ -15,30 +15,8 @@ namespace SpreadTrader
 		public event PropertyChangedEventHandler PropertyChanged;
 		public void OnPropertyChanged(String name)
 		{
-			//if (_suspend > 0)
-			//{
-			//	_dirty = true;
-			//	return;
-			//}
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 		}
-
-		//private int _suspend;
-		//private bool _dirty;
-
-		//public void BeginUpdate()
-		//{
-		//	_suspend++;
-		//}
-
-		//public void EndUpdate()
-		//{
-		//	if (--_suspend == 0 && _dirty)
-		//	{
-		//		_dirty = false;
-		//		OnPropertyChanged("");
-		//	}
-		//}
 		private DateTime _Time;
 		public DateTime Time { get => _Time.AddHours(props.TimeOffset); set { _Time = value; } }
 		public long? UTCTime;
@@ -52,23 +30,24 @@ namespace SpreadTrader
 		private String _Side;
 		public String Side { get => _Side; set { if (_Side != value) { _Side = value; OnPropertyChanged(nameof(Side)); } } }
 		private double _Stake;
-		public double Stake { get => _Stake; set { if (_Stake != value) { _Stake = value;
+		public double Stake { get => _Stake; set { if (_Stake != value) { 
+			_Stake = value;
 					OnPropertyChanged(nameof(Stake));
 					OnPropertyChanged(nameof(DisplayStake));
 					OnPropertyChanged(nameof(Profit)); 
-			} } }
+		} } }
 
 		private double _Odds;
 		public double Odds { get => _Odds; set { if (_Odds != value) { _Odds = value; OnPropertyChanged(nameof(Odds)); RaiseDerived(); } } }
 		public bool IsBack { get => Side.ToUpper() == "BACK"; }
 
 		private bool _Hidden = false;
-		public bool Hidden { get => _Hidden; set { if (_Hidden != value) { _Hidden = value; OnPropertyChanged(nameof(Odds)); RaiseDerived(); } } }
+		public bool Hidden { get => _Hidden; set { if (_Hidden != value) { _Hidden = value; OnPropertyChanged(nameof(Hidden)); RaiseDerived(); } } }
 
 		private bool _Override;
 		public bool Override { get => _Override; set { _Override = value; OnPropertyChanged(nameof(Override)); RaiseDerived(); } }
 		private bool _NoCancel { get; set; }
-		public bool NoCancel { get => _NoCancel; set { _NoCancel = value; OnPropertyChanged(nameof(Hidden)); RaiseDerived(); } }
+		public bool NoCancel { get => _NoCancel; set { _NoCancel = value; OnPropertyChanged(nameof(NoCancel)); RaiseDerived(); } }
 		public String IsMatchedString { get => SizeMatched > 0 ? "F" : "U"; }
 		public double DisplayOdds { get => SizeMatched > 0 ? Math.Round(AvgPriceMatched, 2) : Odds; }
 		public bool IsMatched { get => SizeMatched > 0; }
@@ -81,6 +60,7 @@ namespace SpreadTrader
 
 		private double _SizeMatched;
 		public double SizeMatched { get => _SizeMatched; set { if (_SizeMatched != value) { _SizeMatched = value; RaiseDerived(); } } }
+		public long LastPt { get; set; } = -1;
 
 		private void RaiseDerived()
 		{
