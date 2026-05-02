@@ -634,7 +634,7 @@ namespace SpreadTrader
                 }
 				_simulatedStream?.SimulateCancel(row.BetID.ToString());
 
-                if (_simulatedStream != null)
+                if (_simulatedStream == null)
                     Betfair.cancelOrder(MarketNode.MarketID, row.BetID);
 			}
 		}
