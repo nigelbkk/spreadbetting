@@ -290,7 +290,41 @@ namespace SpreadTrader
                 player.Play();
             }
 		}
-		private void ApplyPartialMatch(Order o, String runner_name)
+		private void ApplyPartialMatch(BetsManagerRow row, Order o, string runner_name)
+		{
+			// clone from source of truth
+			var mrow = new BetsManagerRow(row)
+			{
+				SelectionID = row.SelectionID,
+				Runner = runner_name,
+				SizeMatched = o.Sm ?? 0.0,
+				Odds = o.P ?? 0.0,
+				Stake = o.Sm ?? 0.0,
+				AvgPriceMatched = o.P ?? 0.0,
+				Hidden = UnmatchedOnly,
+				IsMatchedFragment = true
+			};
+
+			if (_allRows.Any(r => r.BetID == row.BetID && r.IsMatchedFragment))
+			{
+				Debug.WriteLine($"POTENTIAL DUPLICATE BetID {row.BetID}");
+				// optional: update existing fragment instead of inserting
+			}
+			int idx = _allRows.IndexOf(row);
+
+			if (idx >= 0)
+			{
+				_allRows.Insert(idx + 1, mrow);
+			}
+			else
+			{
+				Debug.WriteLine($"Index failure for BetID {row.BetID}");
+			}
+
+			// update unmatched remainder
+			row.Stake = o.Sr ?? 0.0;
+		}
+		private void OldApplyPartialMatch(BetsManagerRow row, Order o, String runner_name)
 		{
 			UInt64 betid = Convert.ToUInt64(o.Id);
 			var actualRow = _allRows.FirstOrDefault(r => r.BetID == betid && !r.IsMatchedFragment);
@@ -329,6 +363,24 @@ namespace SpreadTrader
 			actualRow.Stake = o.Sr.Value;
 		}
 
+		void CheckConsistency()         // Call it every N messages or on demand.
+		{
+			var missing = _byBetId.Keys .Where(id => !_allRows.Any(r => r.BetID == id)) .ToList();
+
+			if (missing.Any())
+			{
+				Debug.WriteLine($"🔥 MISSING IN UI: {string.Join(",", missing)}");
+			}
+		}
+
+		void AssertUIThread()
+		{
+			if (!Dispatcher.CheckAccess())
+			{
+				Debug.WriteLine("🔥 UI THREAD VIOLATION");
+			}
+		}
+
 		private static int _inFlight = 0;
 		private static long _lastPd = -1;
 
@@ -340,110 +392,112 @@ namespace SpreadTrader
             if (MarketNode.MarketID.ToString() != change.Id)
                 return;
 
+			if (Interlocked.Increment(ref _inFlight) > 1)
+			{
+				Debug.WriteLine($"🔥 CONCURRENCY VIOLATION InFlight={_inFlight}");
+			}
 			var inFlight = Interlocked.Increment(ref _inFlight);
 
 			_LastUpdated = DateTime.UtcNow;
-            try
-            {
-                long utc = 0;
-                if (change.Closed == true)
-                {
-                    Debug.WriteLine("market closed");
-                    ControlMessenger.Send("Market Status Changed", new { String = "Closed" });
-                    Dispatcher.BeginInvoke(new Action(() => {
-						TraceThread("Dispatcher ENTER 2"); 
-						Rows.Clear(); }));
-                    return;
-                }
+			try
+			{
+				long utc = 0;
+				if (change.Closed == true)
+				{
+					Debug.WriteLine("market closed");
+					ControlMessenger.Send("Market Status Changed", new { String = "Closed" });
+					Dispatcher.BeginInvoke(new Action(() =>
+					{
+						TraceThread("Dispatcher ENTER 2");
+						Rows.Clear();
+					}));
+					return;
+				}
 
-                if (change.Orc.Count > 0)
-                {
+				if (change.Orc.Count > 0)
+				{
 					var ops = new List<Action>();
-                    bool betMatched = false;
+					bool betMatched = false;
 
 					TraceThread("OnOrderChanged ENTER");
 
 					foreach (OrderRunnerChange orc in change.Orc)
-                    {
-                        if (orc.Uo == null)
-                            continue;
+					{
+						if (orc.Uo == null)
+							continue;
 
-                        if (orc.Uo.Count > 0)
-                        {
+						if (orc.Uo.Count > 0)
+						{
 							foreach (Order o in orc.Uo)
-                            {
+							{
 								if (inFlight > 1)
 								{
-									Debug.WriteLine(
-										$"[CONCURRENT] Pd={o.Pd} InFlight={inFlight}");
+									Debug.WriteLine($"[CONCURRENT] Pd={o.Pd} InFlight={inFlight}");
 								}
 
 								if (_lastPd != -1 && o.Pd < _lastPd)
 								{
-									Debug.WriteLine(
-										$"[OCM OUT OF ORDER] Pd={o.Pd} LastPd={_lastPd}");
+									Debug.WriteLine($"🔥 OUT OF ORDER Pd={o.Pd} LastPd={_lastPd}");
+									return;     ///NH - REJECT OUT OF ORDER OCM
 								}
 
 								_lastPd = o.Pd.Value;
 
-                                ////////////////////////////////  
-								Debug.WriteLine( $"[ENTER] Pd={o.Pd} " + $"Thread={Thread.CurrentThread.ManagedThreadId} " + $"UI={Application.Current.Dispatcher.CheckAccess()}");
+								////////////////////////////////  
+								Debug.WriteLine($"[ENTER] Pd={o.Pd} " + $"Thread={Thread.CurrentThread.ManagedThreadId} " + $"UI={Application.Current.Dispatcher.CheckAccess()}");
 								////////////////////////////////  
 								OcmDiagnostics.ApplyOcmUpdate(o.Id, o.Pd.Value, Thread.CurrentThread.ManagedThreadId);
 								////////////////////////////////  
 
 								utc = o.Pd.Value;
 								UInt64 betid = Convert.ToUInt64(o.Id);
-                                Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
+								Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
 
-                                _byBetId.TryGetValue(betid, out BetsManagerRow row);
+								_byBetId.TryGetValue(betid, out BetsManagerRow row);
 
 								if (row == null)
 								{
-                                    if (_cancelledBets.Contains(betid))
-                                    {
-                                        Debug.WriteLine($"_cancelledBets.Contains({betid})");
-                                        continue;
-                                    }
-
-									////////////////////////////////  
-									Debug.WriteLine( $"[DISPATCH BEFORE] Pd={o.Pd} " + $"Thread={Thread.CurrentThread.ManagedThreadId}");
-
-									Dispatcher.Invoke(() =>
+									if (_cancelledBets.Contains(betid))
 									{
-										TraceThread("Dispatcher ENTER 3");
-										////////////////////////////////  
-										Debug.WriteLine( $"[DISPATCH INSIDE] Pd={o.Pd} " + $"Thread={Thread.CurrentThread.ManagedThreadId}");
+										Debug.WriteLine($"_cancelledBets.Contains({betid})");
+										continue;
+									}
 
-										var newRow = new BetsManagerRow(o)
-										{
-											IsMatchedFragment = false,
-											MarketID = change.Id,
-											SelectionID = orc.Id.Value
-										};
+									var newRow = new BetsManagerRow(o)
+									{
+										IsMatchedFragment = false,
+										MarketID = change.Id,
+										SelectionID = orc.Id.Value
+									};
 
-										TraceThread("Before _allRows.Insert");
+									ops.Add(() =>
+									{
+										AssertUIThread();
 										_allRows.Insert(0, newRow);
-										TraceThread("Before _byBetId update"); 
 										_byBetId[betid] = newRow;
-                                        row = newRow;
 									});
 
-									////////////////////////////////  
-									Debug.WriteLine( $"[DISPATCH AFTER] Pd={o.Pd} " + $"Thread={Thread.CurrentThread.ManagedThreadId}");
+									row = newRow; // safe: just local reference
 									Debug.WriteLine($"CREATED base row {betid}");
 								}
-                                								
+
 								String runner_name = MarketNode.GetRunnerName(row.SelectionID);
-								ops.Add(() => row.Runner = runner_name);
+								ops.Add(() =>
+								{
+									AssertUIThread();
+									row.Runner = runner_name;
+								});
 
 								// --- 1. LIFECYCLE / TERMINAL EVENTS FIRST ---
 
 								if (o.Sl > 0)
 								{
 									Debug.WriteLine(o.Id, "lapsed");
-									TraceThread("Before _byBetId remove"); 
-									ops.Add(() => { if (_byBetId.Remove(row.BetID)) _allRows.Remove(row); });
+									TraceThread("Before _byBetId remove");
+									ops.Add(() => {
+										AssertUIThread(); 
+										if (_byBetId.Remove(row.BetID)) _allRows.Remove(row); 
+									});
 								}
 
 								if (o.Sc > 0)
@@ -451,7 +505,10 @@ namespace SpreadTrader
 									if (o.Sr > 0)
 									{
 										Debug.WriteLine(o.Id, "Partial cancellation (unmatched remainder reduced)");
-										ops.Add(() => row.Stake = o.Sr.Value);
+										ops.Add(() => {
+											AssertUIThread();
+											row.Stake = o.Sr.Value;
+										});
 									}
 									else if (o.Sr == 0 && o.Sm == 0)
 									{
@@ -460,7 +517,8 @@ namespace SpreadTrader
 
 										ops.Add(() =>
 										{
-											TraceThread("Before _byBetId remove"); 
+											AssertUIThread();
+											TraceThread("Before _byBetId remove");
 											if (_byBetId.Remove(row.BetID))
 												_allRows.Remove(row);
 										});
@@ -474,6 +532,7 @@ namespace SpreadTrader
 										ops.Add(() =>
 										{
 											TraceThread("Before _byBetId remove");
+											AssertUIThread();
 											if (_byBetId.Remove(row.BetID))
 											{
 												TraceThread("Before _allRows remove");
@@ -487,7 +546,7 @@ namespace SpreadTrader
 
 								if (o.Sm > 0 && o.Sr > 0)
 								{
-									Debug.WriteLine($"partial match {o.Id} : {o.Sm}"); 									            // partially matched
+									Debug.WriteLine($"partial match {o.Id} : {o.Sm}");                                              // partially matched
 									if (!_allRows.Any(r => r.BetID == row.BetID))
 									{
 										Debug.WriteLine($"INCONSISTENCY: row {row.BetID} not in _allRows");
@@ -495,51 +554,49 @@ namespace SpreadTrader
 										Debug.WriteLine($"_allRows contains: {_allRows.Any(r => r.BetID == betid)}");
 									}
 									betMatched = true;
-									Dispatcher.Invoke(() =>
+
+									if (_byBetId.TryGetValue(betid, out var _row))
 									{
-										TraceThread("Dispatcher ENTER 4");
-										var exists = _allRows.Any(r => r.BetID == betid);
-										var rowObj = _allRows.FirstOrDefault(r => r.BetID == betid);
-
-										Debug.WriteLine(
-											$"[CHECK ROW] BetId={betid} " +
-											$"Exists={exists} " +
-											$"Count={_allRows.Count} " +
-											//$"Suspend={_allRows.SuspendCountDebug()} " +
-											$"Thread={Thread.CurrentThread.ManagedThreadId}");
-
-										if (rowObj != null)
+										ops.Add(() =>
 										{
-											Debug.WriteLine(
-												$"[ROW STATE] Hidden={rowObj.Hidden} " +
-												$"Stake={rowObj.Stake} " +
-												$"Matched={rowObj.SizeMatched}");
-										}
-
-										ApplyPartialMatch(o, runner_name);
-									});
-
-									//Dispatcher.Invoke(() =>
-									//{
-									//	ApplyPartialMatch(o, runner_name);
-									//});
+											AssertUIThread();
+											ApplyPartialMatch(_row, o, runner_name);
+										});
+									}
+									else
+									{
+										Debug.WriteLine($"Row not found for BetID {betid}");
+									}
 								}
 								else if (o.Sm > 0 && o.Sr == 0)                                                                     // fully matched
 								{
 									Debug.WriteLine(o.Id, "fully matched");
-									ops.Add(() => row.AvgPriceMatched = o.Avp ?? 0);
-									ops.Add(() => row.SizeMatched = row.Stake);
+									ops.Add(() =>
+									{
+										AssertUIThread();
+										row.AvgPriceMatched = o.Avp ?? 0;
+										row.SizeMatched = row.Stake;
+									});
+
+									//ops.Add(() => row.AvgPriceMatched = o.Avp ?? 0);
+									//ops.Add(() => row.SizeMatched = row.Stake);
 									betMatched = true;
 								}
 								else if (o.Sm == 0 && o.Sr > 0)
 								{
 									// unmatched
 									Debug.WriteLine(o.Id, "unmatched");
-									ops.Add(() => row.Stake = o.Sr.Value);
-									ops.Add(() => row.SizeMatched = o.Sm.Value);
-									ops.Add(() => row.Hidden = false);
+									ops.Add(() =>
+									{
+										AssertUIThread();
+										row.SizeMatched = o.Sm.Value;
+										row.Hidden = false;
+										row.Stake = o.Sr.Value;
+									});
+									//ops.Add(() => row.SizeMatched = o.Sm.Value);
+									//ops.Add(() => row.Hidden = false);
 								}
-								Debug.WriteLine( $"[EXIT] Pd={o.Pd} " + $"Thread={Thread.CurrentThread.ManagedThreadId}");
+								Debug.WriteLine($"[EXIT] Pd={o.Pd} " + $"Thread={Thread.CurrentThread.ManagedThreadId}");
 							}
 						}
 					}
@@ -551,7 +608,7 @@ namespace SpreadTrader
 
 						//using (Rows.SuspendNotifications())
 						{
-                            ApplyFilter(_allRows.ToArray());
+							ApplyFilter(_allRows.ToArray());
 							var view2 = CollectionViewSource.GetDefaultView(Rows);
 							view2?.Refresh();
 
@@ -567,13 +624,16 @@ namespace SpreadTrader
 
 					SendOrdersLatency(utc);
 				}
-            }
-            catch (Exception xe)
-            {
-                Status = xe.Message;
-                Debug.WriteLine(xe.Message);
-            }
-			Interlocked.Decrement(ref _inFlight);
+			}
+			catch (Exception xe)
+			{
+				Status = xe.Message;
+				Debug.WriteLine(xe.Message);
+			}
+			finally
+			{
+				Interlocked.Decrement(ref _inFlight);
+			}
 		}
 		private void PopulateDataGrid()
         {
