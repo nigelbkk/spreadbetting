@@ -19,6 +19,9 @@ SpreadTrader.csproj
 *.json
 *.jsonl
 *.user
+*.wav
+*.txt
+*.log
 
 BetfairPnlTest/
 pnl_look/
@@ -32,6 +35,7 @@ pnl_look/
 [Rr]elease/
 [Rr]eleases/
 Connected Services/
+images/
 bin/
 obj/
 x64/
