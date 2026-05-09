@@ -398,8 +398,8 @@ namespace SpreadTrader
 
 								if (_lastPd != -1 && o.Pd < _lastPd)
 								{
-									Debug.WriteLine($"🔥 OUT OF ORDER Pd={o.Pd} LastPd={_lastPd}");
-									return;     ///NH - REJECT OUT OF ORDER OCM
+									Debug.WriteLine($"Older Pd observed Pd={o.Pd} LastPd={_lastPd}");
+									//return;     ///NH - REJECT OUT OF ORDER OCM
 								}
 
 								_lastPd = o.Pd.Value;
