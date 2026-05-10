@@ -50,7 +50,12 @@ namespace SpreadTrader
 		}
 
 		private bool _UnmatchedOnly;
-		public bool UnmatchedOnly { get => _UnmatchedOnly; set { if (_UnmatchedOnly != value)
+		public bool UnmatchedOnly 
+		{ 
+			get => _UnmatchedOnly; 
+			set 
+			{ 
+				if (_UnmatchedOnly != value)
                 { 
                     _UnmatchedOnly = value;
 					OnPropertyChanged();
@@ -529,18 +534,24 @@ namespace SpreadTrader
 									}
 									betMatched = true;
 
-									if (_byBetId.TryGetValue(betid, out var _row))
+									ops.Add(() =>
 									{
-										ops.Add(() =>
-										{
-											AssertUIThread();
-											ApplyPartialMatch(_row, o, runner_name);
-										});
-									}
-									else
-									{
-										Debug.WriteLine($"Row not found for BetID {betid}");
-									}
+										AssertUIThread();
+										ApplyPartialMatch(row, o, runner_name);
+									});
+
+									//if (_byBetId.TryGetValue(betid, out var _row))
+									//{
+									//	ops.Add(() =>
+									//	{
+									//		AssertUIThread();
+									//		ApplyPartialMatch(_row, o, runner_name);
+									//	});
+									//}
+									//else
+									//{
+									//	Debug.WriteLine($"Row not found for BetID {betid}");
+									//}
 								}
 								else if (o.Sm > 0 && o.Sr == 0)                                                                     // fully matched
 								{
@@ -618,7 +629,7 @@ namespace SpreadTrader
 
 						CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); 
 
-                        _allRows.Clear();
+                        //_allRows.Clear();
                         if (report.currentOrders.Count > 0)
                         {
                             foreach (CurrentOrderSummaryReport.CurrentOrderSummary o in report.currentOrders)
@@ -637,7 +648,8 @@ namespace SpreadTrader
 								Debug.WriteLine(o.betId, "insert new bet into _allRows: ");
 							}
                         }
-                        ApplyFilter(_allRows.ToArray());
+						Debug.WriteLine("PopulateDataGrid merged rows only");
+						//ApplyFilter(_allRows.ToArray());
 					}
 					catch (Exception xe)
                     {
