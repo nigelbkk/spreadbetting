@@ -396,6 +396,19 @@ namespace SpreadTrader
 									Debug.WriteLine($"[CONCURRENT] Pd={o.Pd} InFlight={inFlight}");
 								}
 
+
+								UInt64 betid = Convert.ToUInt64(o.Id);
+								bool alreadyApplied = _allRows.Any(r => r.BetID == betid && r.IsMatchedFragment && r.SizeMatched == (o.Sm ?? 0));
+
+								if (alreadyApplied)
+								{
+									Debug.WriteLine($"Duplicate partial ignored {betid}");
+									return;
+								}
+
+
+
+
 								if (_lastPd != -1 && o.Pd < _lastPd)
 								{
 									Debug.WriteLine($"Older Pd observed Pd={o.Pd} LastPd={_lastPd}");
@@ -411,7 +424,7 @@ namespace SpreadTrader
 								////////////////////////////////  
 
 								utc = o.Pd.Value;
-								UInt64 betid = Convert.ToUInt64(o.Id);
+								//UInt64 betid = Convert.ToUInt64(o.Id);
 								Debug.Assert(o.Status == Order.StatusEnum.E || o.Status == Order.StatusEnum.Ec);
 
 								_byBetId.TryGetValue(betid, out BetsManagerRow row);
