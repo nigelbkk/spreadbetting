@@ -536,19 +536,6 @@ namespace SpreadTrader
 										AssertUIThread();
 										ApplyPartialMatch(row, o, runner_name);
 									});
-
-									//if (_byBetId.TryGetValue(betid, out var _row))
-									//{
-									//	ops.Add(() =>
-									//	{
-									//		AssertUIThread();
-									//		ApplyPartialMatch(_row, o, runner_name);
-									//	});
-									//}
-									//else
-									//{
-									//	Debug.WriteLine($"Row not found for BetID {betid}");
-									//}
 								}
 								else if (o.Sm > 0 && o.Sr == 0)                                                                     // fully matched
 								{
@@ -685,37 +672,33 @@ namespace SpreadTrader
                 switch (b.Tag)
                 {
                     case "HalveUnmatched":
-                        if (MarketNode != null)
-                        {
-                            await Task.Run(() =>
-                            {
-                                List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
-								
-								TraceThread("Before Rows access");
+					{
+						List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
 
-								if (!Dispatcher.CheckAccess())
-								{
-									Debug.WriteLine("WARNING: Rows accessed off UI thread");
-								}
+						TraceThread("Before Rows access");
+						AssertUIThread();
 
-								foreach (BetsManagerRow row in Rows)
-                                {
-                                    if (!row.IsMatched && row.Stake >= 4)
-                                    {
-                                        cancel_instructions.Add(new CancelInstruction(row.BetID) { sizeReduction = Math.Round((row.Stake/2), 2) });
-									}
-                                }
-                                if (cancel_instructions.Count == 0)
-                                {
-                                    Notification = "Nothing to do";
-                                }
-                                else
-                                {
-									Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-								}
+						foreach (BetsManagerRow row in Rows)
+						{
+							if (!row.IsMatched && row.Stake >= 4)
+							{
+								cancel_instructions.Add( new CancelInstruction(row.BetID) { sizeReduction = Math.Round(row.Stake / 2, 2) });
+							}
+						}
+
+						if (cancel_instructions.Count == 0)
+						{
+							Notification = "Nothing to do";
+						}
+						else
+						{
+							await Task.Run(() =>
+							{
+								Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
 							});
-                        }
-                        break;
+						}
+					}
+					break;
 
                     case "CancelAll":
                         Status = "CancelAll";
@@ -756,7 +739,11 @@ namespace SpreadTrader
 								else
 								{
 									Notification = $"Cancelling {cancel_instructions.Count} bets";
-									Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+									//Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+									await Task.Run(() =>
+									{
+										Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+									});
 								}
 								Status = "Cancellation Task completed";
 							}
@@ -770,39 +757,40 @@ namespace SpreadTrader
 
                     case "AbsoluteCancelAll":
 
-                        if (MarketNode != null)
-                        {
-                            await Task.Run(() =>
-                            {
-                                List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
+						if (MarketNode != null)
+						{
+							List<CancelInstruction> cancel_instructions = new List<CancelInstruction>();
 
-								TraceThread("Before Rows access");
-								if (!Dispatcher.CheckAccess())
+							TraceThread("Before Rows access");
+							if (!Dispatcher.CheckAccess())
+							{
+								Debug.WriteLine("WARNING: Rows accessed off UI thread");
+							}
+							foreach (BetsManagerRow row in Rows)
+							{
+								if (!row.IsMatched && row.Stake > 0)
 								{
-									Debug.WriteLine("WARNING: Rows accessed off UI thread");
+									cancel_instructions.Add(new CancelInstruction(row.BetID)
+									{
+										sizeReduction = null
+									});
+									_simulatedStream?.SimulateCancel(row.BetID.ToString());
 								}
-								foreach (BetsManagerRow row in Rows)
-                                {
-                                    if (!row.IsMatched && row.Stake > 0)
-                                    {
-                                        cancel_instructions.Add(new CancelInstruction(row.BetID)
-                                        {
-                                            sizeReduction = null
-                                        });
-										_simulatedStream?.SimulateCancel(row.BetID.ToString());
-									}
-								}
-                                if (cancel_instructions.Count == 0)
-                                {
-                                    Status = "Nothing to do";
-                                }
-                                else
-                                {
-									Notification = $"Cancelling {cancel_instructions.Count} bets";
+							}
+							if (cancel_instructions.Count == 0)
+							{
+								Status = "Nothing to do";
+							}
+							else
+							{
+								Notification = $"Cancelling {cancel_instructions.Count} bets";
+								//Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
+								await Task.Run(() =>
+								{
 									Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-                                }
-                            });
-                        }
+								});
+							});
+						}
                         break;
                 }
             }
