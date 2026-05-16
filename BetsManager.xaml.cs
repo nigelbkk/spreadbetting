@@ -408,11 +408,8 @@ namespace SpreadTrader
 								if (alreadyApplied)
 								{
 									Debug.WriteLine($"Duplicate partial ignored {betid}");
-									return;
+									//return;     ///NH - REJECT OUT OF ORDER OCM
 								}
-
-
-
 
 								if (_lastPd != -1 && o.Pd < _lastPd)
 								{
