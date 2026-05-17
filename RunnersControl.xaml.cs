@@ -47,7 +47,7 @@ namespace SpreadTrader
 		}
 		private Properties.Settings props = Properties.Settings.Default;
 		#endregion
-		public void PopulateNewMarket(NodeViewModel node)
+		public async void PopulateNewMarket(NodeViewModel node)
         {
             String _marketId = "";
             if (MarketNode != null)
@@ -65,7 +65,7 @@ namespace SpreadTrader
             WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
 			WebSocketsHub.Instance.Detach(_marketId, this);
 
-			_marketStateEngine.Stop();
+			await _marketStateEngine.Stop();
 			_marketStateEngine = new MarketStateEngine();
             
             if (props.PNLFrequency >= 400)

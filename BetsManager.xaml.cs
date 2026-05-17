@@ -739,7 +739,6 @@ namespace SpreadTrader
 								else
 								{
 									Notification = $"Cancelling {cancel_instructions.Count} bets";
-									//Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
 									await Task.Run(() =>
 									{
 										Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
@@ -784,12 +783,11 @@ namespace SpreadTrader
 							else
 							{
 								Notification = $"Cancelling {cancel_instructions.Count} bets";
-								//Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
 								await Task.Run(() =>
 								{
 									Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
 								});
-							});
+							}
 						}
                         break;
                 }

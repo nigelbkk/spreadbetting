@@ -24,8 +24,19 @@ namespace SpreadTrader
 		public event Action<MarketTelemetry> TelemetryAvailable;
 		private BetfairAPI.BetfairAPI _bf = MainWindow.Betfair;
 		private CancellationTokenSource _cts = new CancellationTokenSource();
+		private int _pnlLoopRunning;
+		private int _bookLoopRunning;
+		private readonly Guid _engineId = Guid.NewGuid();
+		private Task _pnlTask;
+		private Task _bookTask;
 		private async Task PNLProcessingLoop(Market _market, CancellationToken token)
 		{
+			Debug.WriteLine($"PNL LOOP START {_market.marketId} : {_engineId}");
+			if (Interlocked.Exchange(ref _pnlLoopRunning, 1) == 1)
+			{
+				Debug.WriteLine($"PNL LOOP ALREADY RUNNING {_market?.marketId}");
+				return;
+			}
 			while (!token.IsCancellationRequested)
 			{
 				try
@@ -40,16 +51,30 @@ namespace SpreadTrader
 						TelemetryAvailable?.Invoke(telemetry);
 					}
 				}
+				catch (OperationCanceledException)
+				{
+					Debug.WriteLine($"PNL LOOP CANCELLED {_engineId}");
+				}
 				catch (Exception ex)
 				{
-					Debug.WriteLine(ex.Message);
+					Debug.WriteLine($"[PNL LOOP ERROR] {ex}");
 				}
-
+				finally
+				{
+					_pnlLoopRunning = 0;
+				}
 				await Task.Delay(Props.props.PNLFrequency, token);
 			}
+			Debug.WriteLine($"PNL LOOP ENDS {_market.marketId} : {_engineId}");
 		}
 		private async Task OrderBookProcessingLoop(Market _market, CancellationToken token)
 		{
+			Debug.WriteLine($"BOOK LOOP START {_market.marketId} : {_engineId}");
+			if (Interlocked.Exchange(ref _pnlLoopRunning, 1) == 1)
+			{
+				Debug.WriteLine($"BOOK LOOP ALREADY RUNNING {_market?.marketId}");
+				return;
+			} 
 			while (!token.IsCancellationRequested)
 			{
 				try
@@ -66,26 +91,49 @@ namespace SpreadTrader
 							TotalMatched = book.totalMatched,
 							ProfitAndLosses = null
 						};
-						TelemetryAvailable?.Invoke(telemetry);
+						//TelemetryAvailable?.Invoke(telemetry);
+						var handler = TelemetryAvailable;				// Decouple downstream code from task loop
+
+						if (handler != null)
+						{
+							try
+							{
+								handler(telemetry);
+							}
+							catch (Exception ex)
+							{
+								Debug.WriteLine($"Telemetry handler error: {ex}");
+							}
+						}
 					}
+				}
+				catch (OperationCanceledException)
+				{
+					Debug.WriteLine($"BOOK LOOP CANCELLED {_engineId}");
 				}
 				catch (Exception ex)
 				{
-					Debug.WriteLine(ex.Message);
+					Debug.WriteLine($"[BOOK LOOP ERROR] {ex}");
 				}
-
+				finally
+				{
+					_pnlLoopRunning = 0;
+				}
 				await Task.Delay(Props.props.TotalMatchedFrequency*1000, token);
 			}
+			Debug.WriteLine($"BOOK LOOP ENDS {_market.marketId} : {_engineId}");
 		}
 		public void Start(Market market)
 		{
-			_ = Task.Run(() => OrderBookProcessingLoop(market, _cts.Token));
-			_ = Task.Run(() => PNLProcessingLoop(market, _cts.Token));
+			_pnlTask = Task.Run(() => OrderBookProcessingLoop(market, _cts.Token));
+			_bookTask = Task.Run(() => PNLProcessingLoop(market, _cts.Token));
 		}
-		public void Stop()
+		public async Task Stop()
 		{
 			_cts.Cancel();
 			TelemetryAvailable = null;
+			await Task.WhenAll( _pnlTask ?? Task.CompletedTask, _bookTask ?? Task.CompletedTask);
+			_cts.Dispose();
 		}
 	}
 }
