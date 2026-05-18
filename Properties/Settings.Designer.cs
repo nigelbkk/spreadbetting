@@ -494,12 +494,12 @@ namespace SpreadTrader.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int TotalMatchedFrequency {
+        public int BookFrequency {
             get {
-                return ((int)(this["TotalMatchedFrequency"]));
+                return ((int)(this["BookFrequency"]));
             }
             set {
-                this["TotalMatchedFrequency"] = value;
+                this["BookFrequency"] = value;
             }
         }
     }

@@ -119,7 +119,7 @@ namespace SpreadTrader
 				{
 					_pnlLoopRunning = 0;
 				}
-				await Task.Delay(Props.props.TotalMatchedFrequency*1000, token);
+				await Task.Delay(Props.props.BookFrequency*1000, token);
 			}
 			Debug.WriteLine($"BOOK LOOP ENDS {_market.marketId} : {_engineId}");
 		}
