@@ -70,7 +70,7 @@ namespace SpreadTrader
 		private async Task OrderBookProcessingLoop(Market _market, CancellationToken token)
 		{
 			Debug.WriteLine($"BOOK LOOP START {_market.marketId} : {_engineId}");
-			if (Interlocked.Exchange(ref _pnlLoopRunning, 1) == 1)
+			if (Interlocked.Exchange(ref _bookLoopRunning, 1) == 1)
 			{
 				Debug.WriteLine($"BOOK LOOP ALREADY RUNNING {_market?.marketId}");
 				return;
@@ -91,7 +91,6 @@ namespace SpreadTrader
 							TotalMatched = book.totalMatched,
 							ProfitAndLosses = null
 						};
-						//TelemetryAvailable?.Invoke(telemetry);
 						var handler = TelemetryAvailable;				// Decouple downstream code from task loop
 
 						if (handler != null)
@@ -117,7 +116,7 @@ namespace SpreadTrader
 				}
 				finally
 				{
-					_pnlLoopRunning = 0;
+					_bookLoopRunning = 0;
 				}
 				await Task.Delay(Props.props.BookFrequency*1000, token);
 			}
@@ -125,8 +124,8 @@ namespace SpreadTrader
 		}
 		public void Start(Market market)
 		{
-			_pnlTask = Task.Run(() => OrderBookProcessingLoop(market, _cts.Token));
-			_bookTask = Task.Run(() => PNLProcessingLoop(market, _cts.Token));
+			_bookTask = Task.Run(() => OrderBookProcessingLoop(market, _cts.Token));
+			_pnlTask = Task.Run(() => PNLProcessingLoop(market, _cts.Token));
 		}
 		public async Task Stop()
 		{
