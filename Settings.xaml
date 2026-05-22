@@ -84,7 +84,7 @@
 
 					<!--<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=TimeOffset, Mode=TwoWay}" />-->
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=PNLFrequency, Mode=TwoWay}" />
-					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=TotalMatchedFrequency, Mode=TwoWay}" />
+					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=BookFrequency, Mode=TwoWay}" />
 
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=LegacyProxyUrl, Mode=TwoWay}" />
 					<TextBox  Text="{Binding Source={x:Static p:Settings.Default}, Path=WebSocketsUrl, Mode=TwoWay}" />
