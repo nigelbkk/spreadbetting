@@ -50,6 +50,7 @@ namespace SpreadTrader
 						};
 						TelemetryAvailable?.Invoke(telemetry);
 					}
+					await Task.Delay(Props.props.PNLFrequency, token);
 				}
 				catch (OperationCanceledException)
 				{
@@ -63,7 +64,7 @@ namespace SpreadTrader
 				{
 					_pnlLoopRunning = 0;
 				}
-				await Task.Delay(Props.props.PNLFrequency, token);
+//				await Task.Delay(Props.props.PNLFrequency, token);
 			}
 			Debug.WriteLine($"PNL LOOP ENDS {_market.marketId} : {_engineId}");
 		}
@@ -105,6 +106,7 @@ namespace SpreadTrader
 							}
 						}
 					}
+					await Task.Delay(Props.props.BookFrequency * 1000, token);
 				}
 				catch (OperationCanceledException)
 				{
@@ -118,7 +120,7 @@ namespace SpreadTrader
 				{
 					_bookLoopRunning = 0;
 				}
-				await Task.Delay(Props.props.BookFrequency*1000, token);
+//				await Task.Delay(Props.props.BookFrequency*1000, token);
 			}
 			Debug.WriteLine($"BOOK LOOP ENDS {_market.marketId} : {_engineId}");
 		}
