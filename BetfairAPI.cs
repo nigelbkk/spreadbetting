@@ -334,7 +334,10 @@ namespace BetfairAPI
                 priceData = GetHashSet<priceDataEnum>((uint)(priceDataEnum.EX_BEST_OFFERS)),
             };
             List<MarketBook> books = RPCRequest<List<MarketBook>>("listMarketBook", p) as List<MarketBook>;
-            MarketBook book = books.First();
+			MarketBook book = books?.FirstOrDefault();
+
+			if (book == null)
+				throw new Exception($"No market book returned for {m.marketId}");
 
             if (m.runners == null)
             {

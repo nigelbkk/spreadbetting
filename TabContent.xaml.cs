@@ -59,11 +59,17 @@ namespace SpreadTrader
 		{
 			if (messageName == "Market Status Changed")
 			{
+				if (MarketNode == null)
+					return;
+
 				Status = MarketNode.Status;
 			}
 			if (messageName == "Telemetry Available")
 			{
 				dynamic d = data as MarketTelemetry;
+				if (d == null)
+					return;
+
 				String marketid = d.MarketId;
 				double totalMatched = d?.TotalMatched;
 

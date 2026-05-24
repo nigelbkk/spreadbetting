@@ -142,20 +142,19 @@ namespace SpreadTrader
 			if (!Dispatcher.CheckAccess())
 			{
 				Debug.WriteLine("WARNING: Rows accessed off UI thread");
+				Dispatcher.BeginInvoke(new Action(() => ApplyFilter(snapshot)));
+				return;
 			}
 
-			var newRows = new ObservableCollection<BetsManagerRow>();
+			Rows.Clear();
 
 			foreach (var row in snapshot)
 			{
 				if (!UnmatchedOnly || !row.IsMatched)
 				{
-					newRows.Add(row);
+					Rows.Add(row);
 				}
 			}
-
-			Rows = newRows;
-			OnPropertyChanged(nameof(Rows));
 		}
 		public void OnMarketSelected(NodeViewModel d2, RunnersControl rc)
 		{
@@ -170,7 +169,8 @@ namespace SpreadTrader
 			_simulatedStream?.MapRealMarket(d2);
 
 			WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
-			WebSocketsHub.Instance.Detach(_marketId, this);
+			if (_marketId != MarketNode.MarketID)
+				WebSocketsHub.Instance.Detach(_marketId, this);
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
@@ -631,9 +631,9 @@ namespace SpreadTrader
 								_byBetId[o.betId] = newrow;
 								Debug.WriteLine(o.betId, "insert new bet into _allRows: ");
 							}
-                        }
+						}
 						Debug.WriteLine("PopulateDataGrid merged rows only");
-						//ApplyFilter(_allRows.ToArray());
+						ApplyFilter(_allRows.ToArray());
 					}
 					catch (Exception xe)
                     {

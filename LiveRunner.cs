@@ -137,19 +137,27 @@ namespace SpreadTrader
 			int i = 0;
 			if (r.ex != null)
 			{
-                if (r.ex.availableToBack.Count > 0)
+                if (r.ex.availableToBack != null && r.ex.availableToBack.Count > 0)
                 {
                     foreach (var ps in r.ex.availableToBack)
                     {
-                        UiThread.Run(() => BackValues[i++].Update(ps.price, ps.size));
+						if (i >= BackValues.Count)
+							break;
+
+						int index = i++;
+                        UiThread.Run(() => BackValues[index].Update(ps.price, ps.size));
                     }
                 }
 				i = 0;
-				if (r.ex.availableToLay.Count > 0)
+				if (r.ex.availableToLay != null && r.ex.availableToLay.Count > 0)
                 {
                     foreach (var ps in r.ex.availableToLay)
                     {
-                        UiThread.Run(() => LayValues[i++].Update(ps.price, ps.size));
+						if (i >= LayValues.Count)
+							break;
+
+						int index = i++;
+                        UiThread.Run(() => LayValues[index].Update(ps.price, ps.size));
                     }
                 }
 			}

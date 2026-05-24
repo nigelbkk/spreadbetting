@@ -49,59 +49,81 @@ namespace SpreadTrader
 		#endregion
 		public async void PopulateNewMarket(NodeViewModel node)
         {
-            String _marketId = "";
-            if (MarketNode != null)
-				_marketId = MarketNode.MarketID;
-
-			_MarketNode = node;
-			MarketNode.GetLiveRunners();
-			LiveRunners = MarketNode.LiveRunners;
-            foreach (var runner in LiveRunners)
-            {
-                RunnerBySelectionId[runner.SelectionId] = runner;
-            }
-			OnPropertyChanged("");
-
-            WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
-			WebSocketsHub.Instance.Detach(_marketId, this);
-
-			await _marketStateEngine.Stop();
-			_marketStateEngine = new MarketStateEngine();
-            
-            if (props.PNLFrequency >= 400)
-                _marketStateEngine.Start(_MarketNode.Market);
-            else
-                Debug.WriteLine("P&L IS DISABLED");
-
-			_marketStateEngine.TelemetryAvailable += telemetry =>
+			try
 			{
-				Dispatcher.Invoke(() =>
-				{
-                    if (telemetry.ProfitAndLosses != null)
-                    {
-                        var pnlSnapshot = telemetry.ProfitAndLosses?.ToList() ?? new List<RunnerProfitAndLoss>();
+				String _marketId = "";
+				if (MarketNode != null)
+					_marketId = MarketNode.MarketID;
 
-                        foreach (var pnl in pnlSnapshot)
-                        {
-                            if (RunnerBySelectionId.ContainsKey(pnl.selectionId)) // ✅ Also add this check
-                            {
-                                RunnerBySelectionId[pnl.selectionId].ifWin = pnl.ifWin;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        BackBook = telemetry.BackBook;
-                        LayBook = telemetry.LayBook;
-						ControlMessenger.Send("Telemetry Available", telemetry);
-					}
-				});
-			};
+				_MarketNode = node;
+				RunnerBySelectionId.Clear();
+				MarketNode.GetLiveRunners();
+				LiveRunners = MarketNode.LiveRunners ?? new List<LiveRunner>();
+				foreach (var runner in LiveRunners)
+				{
+					RunnerBySelectionId[runner.SelectionId] = runner;
+				}
+				OnPropertyChanged("");
+
+				WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
+				if (_marketId != MarketNode.MarketID)
+					WebSocketsHub.Instance.Detach(_marketId, this);
+
+				await _marketStateEngine.Stop();
+				_marketStateEngine = new MarketStateEngine();
+
+				if (props.PNLFrequency >= 400)
+					_marketStateEngine.Start(_MarketNode.Market);
+				else
+					Debug.WriteLine("P&L IS DISABLED");
+
+				_marketStateEngine.TelemetryAvailable += telemetry =>
+				{
+					Dispatcher.Invoke(() =>
+					{
+						if (telemetry.ProfitAndLosses != null)
+						{
+							var pnlSnapshot = telemetry.ProfitAndLosses?.ToList() ?? new List<RunnerProfitAndLoss>();
+
+							foreach (var pnl in pnlSnapshot)
+							{
+								if (RunnerBySelectionId.ContainsKey(pnl.selectionId))
+								{
+									RunnerBySelectionId[pnl.selectionId].ifWin = pnl.ifWin;
+								}
+							}
+						}
+						else
+						{
+							BackBook = telemetry.BackBook;
+							LayBook = telemetry.LayBook;
+							ControlMessenger.Send("Telemetry Available", telemetry);
+						}
+					});
+				};
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine($"PopulateNewMarket failed: {ex}");
+				Extensions.MainWindow.Status = ex.Message;
+			}
 		}
 		public void OnMarketClosed()
         {
             //Debug.WriteLine($"Market closed ");
-			_marketStateEngine.Stop();
+			_ = StopMarketStateEngineAsync();
+		}
+
+		private async Task StopMarketStateEngineAsync()
+		{
+			try
+			{
+				await _marketStateEngine.Stop();
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine($"MarketStateEngine stop failed: {ex}");
+			}
 		}
 
 		public void OnMarketChanged(MarketChangeDto change)

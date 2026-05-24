@@ -31,7 +31,7 @@ namespace SpreadTrader
 		private Task _bookTask;
 		private async Task PNLProcessingLoop(Market _market, CancellationToken token)
 		{
-			Debug.WriteLine($"PNL LOOP START {_market.marketId} : {_engineId}");
+			Debug.WriteLine($"PNL LOOP START {_market?.marketId} : {_engineId}");
 			if (Interlocked.Exchange(ref _pnlLoopRunning, 1) == 1)
 			{
 				Debug.WriteLine($"PNL LOOP ALREADY RUNNING {_market?.marketId}");
@@ -54,7 +54,6 @@ namespace SpreadTrader
 				}
 				catch (OperationCanceledException)
 				{
-					Debug.WriteLine($"PNL LOOP CANCELLED {_engineId}");
 				}
 				catch (Exception ex)
 				{
@@ -66,11 +65,11 @@ namespace SpreadTrader
 				}
 //				await Task.Delay(Props.props.PNLFrequency, token);
 			}
-			Debug.WriteLine($"PNL LOOP ENDS {_market.marketId} : {_engineId}");
+			Debug.WriteLine($"PNL LOOP ENDS {_market?.marketId} : {_engineId}");
 		}
 		private async Task OrderBookProcessingLoop(Market _market, CancellationToken token)
 		{
-			Debug.WriteLine($"BOOK LOOP START {_market.marketId} : {_engineId}");
+			Debug.WriteLine($"BOOK LOOP START {_market?.marketId} : {_engineId}");
 			if (Interlocked.Exchange(ref _bookLoopRunning, 1) == 1)
 			{
 				Debug.WriteLine($"BOOK LOOP ALREADY RUNNING {_market?.marketId}");
@@ -110,7 +109,6 @@ namespace SpreadTrader
 				}
 				catch (OperationCanceledException)
 				{
-					Debug.WriteLine($"BOOK LOOP CANCELLED {_engineId}");
 				}
 				catch (Exception ex)
 				{
@@ -122,19 +120,35 @@ namespace SpreadTrader
 				}
 //				await Task.Delay(Props.props.BookFrequency*1000, token);
 			}
-			Debug.WriteLine($"BOOK LOOP ENDS {_market.marketId} : {_engineId}");
+			Debug.WriteLine($"BOOK LOOP ENDS {_market?.marketId} : {_engineId}");
 		}
 		public void Start(Market market)
 		{
+			if (market == null)
+			{
+				Debug.WriteLine($"MarketStateEngine start skipped: market is null {_engineId}");
+				return;
+			}
+
 			_bookTask = Task.Run(() => OrderBookProcessingLoop(market, _cts.Token));
 			_pnlTask = Task.Run(() => PNLProcessingLoop(market, _cts.Token));
 		}
 		public async Task Stop()
 		{
-			_cts.Cancel();
-			TelemetryAvailable = null;
-			await Task.WhenAll( _pnlTask ?? Task.CompletedTask, _bookTask ?? Task.CompletedTask);
-			_cts.Dispose();
+			try
+			{
+				_cts.Cancel();
+				TelemetryAvailable = null;
+				await Task.WhenAll( _pnlTask ?? Task.CompletedTask, _bookTask ?? Task.CompletedTask);
+			}
+			catch (ObjectDisposedException ex)
+			{
+				Debug.WriteLine($"MarketStateEngine already disposed {_engineId}: {ex.Message}");
+			}
+			finally
+			{
+				_cts.Dispose();
+			}
 		}
 	}
 }

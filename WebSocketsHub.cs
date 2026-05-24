@@ -24,49 +24,102 @@ namespace SpreadTrader
 		private Task _orderProcessor;
 		private Task _marketChangeProcessor;
 		private Properties.Settings props = Properties.Settings.Default;
-		private readonly Dictionary<string, BetsManager> _ordersHandlers = new Dictionary<string, BetsManager>();
-		private readonly Dictionary<string, RunnersControl> _marketHandlers = new Dictionary<string, RunnersControl>();
+		private readonly object _handlersLock = new object();
+		private readonly Dictionary<string, List<BetsManager>> _ordersHandlers = new Dictionary<string, List<BetsManager>>();
+		private readonly Dictionary<string, List<RunnersControl>> _marketHandlers = new Dictionary<string, List<RunnersControl>>();
 
 		public void Attach(string marketId, BetsManager manager)
 		{
-			if (_ordersHandlers.TryGetValue(marketId, out var existing))
-			{
-				if (!ReferenceEquals(existing, manager))
-				{
-					Debug.WriteLine($"Handler already registered for market {marketId}. " + $"Existing: {existing.GetHashCode()}, New: {manager.GetHashCode()}");
-				}
-				// already registered, no-op
+			if (string.IsNullOrEmpty(marketId) || manager == null)
 				return;
+
+			lock (_handlersLock)
+			{
+				if (!_ordersHandlers.TryGetValue(marketId, out var handlers))
+				{
+					handlers = new List<BetsManager>();
+					_ordersHandlers[marketId] = handlers;
+				}
+
+				if (!handlers.Contains(manager))
+					handlers.Add(manager);
 			}
-			_ordersHandlers[marketId] = manager;
 		}
 		public void Detach(string marketId, BetsManager manager)
 		{
-			if (_ordersHandlers.TryGetValue(marketId, out var existing) && existing == manager)
+			if (string.IsNullOrEmpty(marketId) || manager == null)
+				return;
+
+			lock (_handlersLock)
 			{
-				_ordersHandlers.Remove(marketId);
+				if (_ordersHandlers.TryGetValue(marketId, out var handlers))
+				{
+					handlers.Remove(manager);
+					if (handlers.Count == 0)
+						_ordersHandlers.Remove(marketId);
+				}
 			}
 		}		
 		public void Attach(string marketId, RunnersControl manager)
 		{
-			if (_marketHandlers.TryGetValue(marketId, out var existing))
-			{
-				if (!ReferenceEquals(existing, manager))
-				{
-					Debug.WriteLine( $"Handler already registered for market {marketId}. " + $"Existing: {existing.GetHashCode()}, New: {manager.GetHashCode()}");
-				}
-				// already registered, no-op
+			if (string.IsNullOrEmpty(marketId) || manager == null)
 				return;
+
+			bool shouldSubscribe = false;
+
+			lock (_handlersLock)
+			{
+				if (!_marketHandlers.TryGetValue(marketId, out var handlers))
+				{
+					handlers = new List<RunnersControl>();
+					_marketHandlers[marketId] = handlers;
+					shouldSubscribe = true;
+				}
+
+				if (!handlers.Contains(manager))
+					handlers.Add(manager);
 			}
-			_marketHandlers[marketId] = manager;
-			SubscribeAsync(marketId);
+
+			if (shouldSubscribe)
+				_ = SubscribeAsync(marketId);
 		}
 		public void Detach(string marketId, RunnersControl manager)
 		{
-			if (_marketHandlers.TryGetValue(marketId, out var existing) && existing == manager)
+			if (string.IsNullOrEmpty(marketId) || manager == null)
+				return;
+
+			bool shouldUnsubscribe = false;
+
+			lock (_handlersLock)
 			{
-				_marketHandlers.Remove(marketId);
-				UnsubscribeAsync(marketId);
+				if (_marketHandlers.TryGetValue(marketId, out var handlers))
+				{
+					handlers.Remove(manager);
+					if (handlers.Count == 0)
+					{
+						_marketHandlers.Remove(marketId);
+						shouldUnsubscribe = true;
+					}
+				}
+			}
+
+			if (shouldUnsubscribe)
+				_ = UnsubscribeAsync(marketId);
+		}
+
+		private List<BetsManager> GetOrderHandlers(string marketId)
+		{
+			lock (_handlersLock)
+			{
+				return _ordersHandlers.TryGetValue(marketId, out var handlers) ? new List<BetsManager>(handlers) : new List<BetsManager>();
+			}
+		}
+
+		private List<RunnersControl> GetMarketHandlers(string marketId)
+		{
+			lock (_handlersLock)
+			{
+				return _marketHandlers.TryGetValue(marketId, out var handlers) ? new List<RunnersControl>(handlers) : new List<RunnersControl>();
 			}
 		}
 
@@ -80,19 +133,23 @@ namespace SpreadTrader
 				if (change?.Id == null)
 					continue;
 
-				if (_ordersHandlers.TryGetValue(change.Id, out var manager))
+				var managers = GetOrderHandlers(change.Id);
+				if (managers.Count > 0)
 				{
-					var sw = Stopwatch.StartNew();
-
-					Debug.WriteLine( $"[LOOP INJECT] T={Thread.CurrentThread.ManagedThreadId} " + $"UI={Application.Current.Dispatcher.CheckAccess()}");
-					manager.OnOrderChanged(change);
-					ControlMessenger.Send("");
-
-					sw.Stop();
-
-					if (sw.ElapsedMilliseconds > 50)
+					foreach (var manager in managers)
 					{
-						Debug.WriteLine($"SLOW OnOrderChanged {change.Id}: {sw.ElapsedMilliseconds} ms");
+						var sw = Stopwatch.StartNew();
+
+						Debug.WriteLine( $"[LOOP INJECT] T={Thread.CurrentThread.ManagedThreadId} " + $"UI={Application.Current.Dispatcher.CheckAccess()}");
+						manager.OnOrderChanged(change);
+						ControlMessenger.Send("");
+
+						sw.Stop();
+
+						if (sw.ElapsedMilliseconds > 50)
+						{
+							Debug.WriteLine($"SLOW OnOrderChanged {change.Id}: {sw.ElapsedMilliseconds} ms");
+						}
 					}
 				}
 				else
@@ -113,7 +170,7 @@ namespace SpreadTrader
 					latest = next;
 				}
 
-				if (_marketHandlers.TryGetValue(latest.MarketId, out var manager))
+				foreach (var manager in GetMarketHandlers(latest.MarketId))
 				{
 					manager.OnMarketChanged(latest);
 				}
@@ -158,7 +215,7 @@ namespace SpreadTrader
 		}
 		public void Simulate(OrderMarketChange change)
 		{
-			if (_ordersHandlers.TryGetValue(change.Id, out var manager))
+			foreach (var manager in GetOrderHandlers(change.Id))
 			{
 				var sw = Stopwatch.StartNew();
 				Debug.WriteLine(
@@ -176,32 +233,50 @@ namespace SpreadTrader
 				dynamic d = data;
 				String marketId = d.MarketId;
 				Connect();
-				SubscribeAsync(marketId);
+				_ = SubscribeAsync(marketId);
 			}
 		}
-		private async void UnsubscribeAsync(String marketId)
+		private async Task UnsubscribeAsync(String marketId)
 		{
-			var http = new HttpClient();
-			var url = $"http://{props.WebSocketsUrl}/api/market/unsubscribe";
-			var payload = new { MarketId = marketId, };
-			string json = JsonConvert.SerializeObject(payload);
-			var content = new StringContent(json, Encoding.UTF8, "application/json");
+			try
+			{
+				using (var http = new HttpClient())
+				{
+					var url = $"http://{props.WebSocketsUrl}/api/market/unsubscribe";
+					var payload = new { MarketId = marketId, };
+					string json = JsonConvert.SerializeObject(payload);
+					var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-			HttpResponseMessage response = await http.PostAsync(url, content);
-			string responseString = await response.Content.ReadAsStringAsync();
-			Console.WriteLine(responseString);
+					HttpResponseMessage response = await http.PostAsync(url, content);
+					string responseString = await response.Content.ReadAsStringAsync();
+					Console.WriteLine(responseString);
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine($"Unsubscribe failed for {marketId}: {ex}");
+			}
 		}
-		private async void SubscribeAsync(String marketid)
+		private async Task SubscribeAsync(String marketid)
 		{
-			var http = new HttpClient();
-			var url = $"http://{props.WebSocketsUrl}/api/market/subscribe";
-			var payload = new { MarketId = marketid, };
-			string json = JsonConvert.SerializeObject(payload);
-			var content = new StringContent(json, Encoding.UTF8, "application/json");
+			try
+			{
+				using (var http = new HttpClient())
+				{
+					var url = $"http://{props.WebSocketsUrl}/api/market/subscribe";
+					var payload = new { MarketId = marketid, };
+					string json = JsonConvert.SerializeObject(payload);
+					var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-			HttpResponseMessage response = await http.PostAsync(url, content);
-			string responseString = await response.Content.ReadAsStringAsync();
-			Console.WriteLine(responseString);
+					HttpResponseMessage response = await http.PostAsync(url, content);
+					string responseString = await response.Content.ReadAsStringAsync();
+					Console.WriteLine(responseString);
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine($"Subscribe failed for {marketid}: {ex}");
+			}
 		}
 
 		private void Connect()
