@@ -146,6 +146,12 @@ namespace SpreadTrader
 				return;
 			}
 
+			var view = CollectionViewSource.GetDefaultView(Rows);
+			var sortDescriptions = view?.SortDescriptions.ToList() ?? new List<SortDescription>();
+			var columnSortDirections = dataGrid?.Columns
+				.Select(c => new { Column = c, Direction = c.SortDirection })
+				.ToList();
+
 			Rows.Clear();
 
 			foreach (var row in snapshot)
@@ -154,6 +160,22 @@ namespace SpreadTrader
 				{
 					Rows.Add(row);
 				}
+			}
+
+			if (view != null && sortDescriptions.Count > 0)
+			{
+				using (view.DeferRefresh())
+				{
+					view.SortDescriptions.Clear();
+					foreach (var sortDescription in sortDescriptions)
+						view.SortDescriptions.Add(sortDescription);
+				}
+			}
+
+			if (columnSortDirections != null)
+			{
+				foreach (var columnSortDirection in columnSortDirections)
+					columnSortDirection.Column.SortDirection = columnSortDirection.Direction;
 			}
 		}
 		public void OnMarketSelected(NodeViewModel d2, RunnersControl rc)
