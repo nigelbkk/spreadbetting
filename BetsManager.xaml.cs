@@ -319,6 +319,20 @@ namespace SpreadTrader
 		}
 		private void ApplyPartialMatch(BetsManagerRow row, Order o, string runner_name)
 		{
+			var existing = _allRows.FirstOrDefault(r => r.BetID == row.BetID && r.IsMatchedFragment);
+			if (existing != null)
+			{
+				existing.SelectionID = row.SelectionID;
+				existing.Runner = runner_name;
+				existing.SizeMatched = o.Sm ?? 0.0;
+				existing.Odds = o.P ?? existing.Odds;
+				existing.Stake = o.Sm ?? 0.0;
+				existing.AvgPriceMatched = o.Avp ?? o.P ?? existing.AvgPriceMatched;
+				existing.Hidden = UnmatchedOnly;
+				row.Stake = o.Sr ?? 0.0;
+				return;
+			}
+
 			// clone from source of truth
 			var mrow = new BetsManagerRow(row)
 			{
@@ -327,16 +341,11 @@ namespace SpreadTrader
 				SizeMatched = o.Sm ?? 0.0,
 				Odds = o.P ?? 0.0,
 				Stake = o.Sm ?? 0.0,
-				AvgPriceMatched = o.P ?? 0.0,
+				AvgPriceMatched = o.Avp ?? o.P ?? 0.0,
 				Hidden = UnmatchedOnly,
 				IsMatchedFragment = true
 			};
 
-			if (_allRows.Any(r => r.BetID == row.BetID && r.IsMatchedFragment))
-			{
-				Debug.WriteLine($"POTENTIAL DUPLICATE BetID {row.BetID}");
-				// optional: update existing fragment instead of inserting
-			}
 			int idx = _allRows.IndexOf(row);
 
 			if (idx >= 0)
@@ -429,7 +438,7 @@ namespace SpreadTrader
 
 								if (alreadyApplied)
 								{
-									Debug.WriteLine($"Duplicate partial ignored {betid}");
+									Debug.WriteLine($"Existing partial fragment observed {betid}");
 									//return;     ///NH - REJECT OUT OF ORDER OCM
 								}
 
@@ -487,6 +496,7 @@ namespace SpreadTrader
 								});
 
 								// --- 1. LIFECYCLE / TERMINAL EVENTS FIRST ---
+								bool remainderCancelledAfterPartial = false;
 
 								if (o.Sl > 0)
 								{
@@ -526,11 +536,13 @@ namespace SpreadTrader
 										Debug.WriteLine(o.Id, "Remainder cancelled after partial match");
 										// INCORRECT: ops.Add(() => row.Stake = 0);
 										_cancelledBets.Add(row.BetID);
+										remainderCancelledAfterPartial = true;
 
 										ops.Add(() =>
 										{
 											TraceThread("Before _byBetId remove");
 											AssertUIThread();
+											ApplyPartialMatch(row, o, runner_name);
 											if (_byBetId.Remove(row.BetID))
 											{
 												TraceThread("Before _allRows remove");
@@ -542,7 +554,11 @@ namespace SpreadTrader
 
 								// --- 2. MATCH STATE (independent of cancellation) ---
 
-								if (o.Sm > 0 && o.Sr > 0)
+								if (remainderCancelledAfterPartial)
+								{
+									betMatched = true;
+								}
+								else if (o.Sm > 0 && o.Sr > 0)
 								{
 									Debug.WriteLine($"partial match {o.Id} : {o.Sm}");                                              // partially matched
 									if (!_allRows.Any(r => r.BetID == row.BetID))
