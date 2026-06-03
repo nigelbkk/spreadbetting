@@ -1,11 +1,13 @@
 param(
-    [string]$LogPath = "C:\Development\SXTrader\logs\transactions.csv",
+    [string]$LogPath = "C:\Users\Administrator\Documents\spreadtrader.log",
     [string]$StatePath = "C:\SpreadTraderAudit\audit-state.json",
     [string]$AuditLogPath = "C:\SpreadTraderAudit\audit.log",
-    [int]$ContextLines = 3
+    [int]$ContextLines = 3,
+    [switch]$Quiet
 )
 
 $ErrorActionPreference = "Stop"
+$ScriptVersion = "2026-06-03.6"
 
 function Write-AuditLog {
     param([string]$Message)
@@ -24,18 +26,32 @@ function Send-Telegram {
     $token = $env:TELEGRAM_BOT_TOKEN
     $chatId = $env:TELEGRAM_CHAT_ID
 
+    Write-AuditLog "Telegram config visible. TokenSet=$(-not [string]::IsNullOrWhiteSpace($token)) ChatIdSet=$(-not [string]::IsNullOrWhiteSpace($chatId))"
+
     if ([string]::IsNullOrWhiteSpace($token) -or [string]::IsNullOrWhiteSpace($chatId)) {
         Write-AuditLog "Telegram not configured. TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is missing."
         return
     }
 
-    Invoke-RestMethod `
-        -Uri "https://api.telegram.org/bot$token/sendMessage" `
-        -Method Post `
-        -Body @{
-            chat_id = $chatId
-            text = $Text
-        } | Out-Null
+    try {
+        $response = Invoke-RestMethod `
+            -Uri "https://api.telegram.org/bot$token/sendMessage" `
+            -Method Post `
+            -Body @{
+                chat_id = $chatId
+                text = $Text
+            }
+
+        if ($response.ok) {
+            Write-AuditLog "Telegram send succeeded. MessageId=$($response.result.message_id)"
+        }
+        else {
+            Write-AuditLog "Telegram send returned non-ok response: $($response | ConvertTo-Json -Compress)"
+        }
+    }
+    catch {
+        Write-AuditLog "Telegram send failed: $($_.Exception.Message)"
+    }
 }
 
 function Get-State {
@@ -77,6 +93,12 @@ function Get-NewLogText {
     if ($null -ne $State.LastLength) {
         $previousLength = [long]$State.LastLength
     }
+
+    if ($State.LogPath -and $State.LogPath -ne $LogPath) {
+        Write-AuditLog "Log path changed from '$($State.LogPath)' to '$LogPath'. Starting from beginning of new log."
+        $previousLength = 0
+    }
+
     $currentLength = $File.Length
 
     if ($currentLength -lt $previousLength) {
@@ -105,7 +127,7 @@ function Get-NewLogText {
 function Find-Problems {
     param([string[]]$Lines)
 
-    $patterns = @(
+    $alertPatterns = @(
         "DispatcherUnhandledException",
         "UnhandledException",
         "UnobservedTaskException",
@@ -116,32 +138,48 @@ function Find-Problems {
         "INCONSISTENCY",
         "MISSING IN UI",
         "Exception",
-        "failed",
+        "failed"
+    )
+
+    $diagnosticPatterns = @(
         "Duplicate partial",
         "Existing partial fragment observed",
         "Remainder cancelled after partial match",
         "Older Pd observed"
     )
 
-    $matches = New-Object System.Collections.Generic.List[string]
+    $problemMatches = New-Object System.Collections.Generic.List[string]
+    $diagnosticCount = 0
 
     for ($i = 0; $i -lt $Lines.Count; $i++) {
         $line = $Lines[$i]
-        foreach ($pattern in $patterns) {
+        foreach ($pattern in $alertPatterns) {
             if ($line -match $pattern) {
                 $start = [Math]::Max(0, $i - $ContextLines)
                 $end = [Math]::Min($Lines.Count - 1, $i + $ContextLines)
                 $context = ($Lines[$start..$end] -join "`n")
-                $matches.Add("Pattern: $pattern`n$context")
+                $problemMatches.Add("Pattern: $pattern`n$context")
+                break
+            }
+        }
+
+        foreach ($pattern in $diagnosticPatterns) {
+            if ($line -match $pattern) {
+                $diagnosticCount++
                 break
             }
         }
     }
 
-    return $matches
+    return [pscustomobject]@{
+        Alerts = $problemMatches
+        DiagnosticCount = $diagnosticCount
+    }
 }
 
 try {
+    Write-AuditLog "Audit starting. Version=$ScriptVersion LogPath=$LogPath StatePath=$StatePath Quiet=$Quiet"
+
     if (!(Test-Path $LogPath)) {
         Write-AuditLog "Log file not found: $LogPath"
         Send-Telegram "SpreadTrader audit: log file not found: $LogPath"
@@ -150,20 +188,29 @@ try {
 
     $file = Get-Item $LogPath
     $state = Get-State
+    Write-AuditLog "Log file length=$($file.Length) lastWriteUtc=$($file.LastWriteTimeUtc.ToString("o")) previousLength=$($state.LastLength)"
     $newText = Get-NewLogText -State $state -File $file
 
-    Save-State -Length $file.Length -LastWriteUtc $file.LastWriteTimeUtc
-
     if ([string]::IsNullOrWhiteSpace($newText)) {
+        Save-State -Length $file.Length -LastWriteUtc $file.LastWriteTimeUtc
         Write-AuditLog "No new log content."
+        if (!$Quiet) {
+            Send-Telegram "SpreadTrader audit completed. No new log content. LogPath=$LogPath"
+        }
         exit 0
     }
 
     $lines = $newText -split "`r?`n" | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
-    $problems = Find-Problems -Lines $lines
+    $scanResult = Find-Problems -Lines $lines
+    $problems = $scanResult.Alerts
+    $diagnosticCount = $scanResult.DiagnosticCount
 
     if ($problems.Count -eq 0) {
-        Write-AuditLog "Scanned $($lines.Count) new lines. No problems found."
+        Save-State -Length $file.Length -LastWriteUtc $file.LastWriteTimeUtc
+        Write-AuditLog "Scanned $($lines.Count) new lines. No alert problems found. Diagnostic matches=$diagnosticCount."
+        if (!$Quiet) {
+            Send-Telegram "SpreadTrader audit completed. Scanned $($lines.Count) new lines. No alert problems found. Diagnostic matches=$diagnosticCount."
+        }
         exit 0
     }
 
@@ -176,8 +223,9 @@ try {
         $message = $message.Substring(0, 3900) + "`n...(truncated)"
     }
 
-    Write-AuditLog "Scanned $($lines.Count) new lines. Found $($problems.Count) suspicious matches."
+    Write-AuditLog "Scanned $($lines.Count) new lines. Found $($problems.Count) alert matches. Diagnostic matches=$diagnosticCount."
     Send-Telegram $message
+    Save-State -Length $file.Length -LastWriteUtc $file.LastWriteTimeUtc
 }
 catch {
     $err = "SpreadTrader audit failed: $($_.Exception.Message)"
