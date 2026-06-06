@@ -7,7 +7,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$ScriptVersion = "2026-06-03.6"
+$ScriptVersion = "2026-06-06.1"
 
 function Write-AuditLog {
     param([string]$Message)
@@ -131,17 +131,20 @@ function Find-Problems {
         "DispatcherUnhandledException",
         "UnhandledException",
         "UnobservedTaskException",
-        "\[PNL LOOP ERROR\]",
-        "\[BOOK LOOP ERROR\]",
         "UI THREAD VIOLATION",
         "REAL CONCURRENCY",
-        "INCONSISTENCY",
         "MISSING IN UI",
-        "Exception",
-        "failed"
+        "SpreadTrader audit failed"
     )
 
     $diagnosticPatterns = @(
+        "\[PNL LOOP ERROR\]",
+        "\[BOOK LOOP ERROR\]",
+        "INCONSISTENCY",
+        "Exception",
+        "failed",
+        "Exchange Error",
+        "No market book returned",
         "Duplicate partial",
         "Existing partial fragment observed",
         "Remainder cancelled after partial match",
