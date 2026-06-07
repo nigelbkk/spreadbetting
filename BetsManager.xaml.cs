@@ -178,12 +178,24 @@ namespace SpreadTrader
 					columnSortDirection.Column.SortDirection = columnSortDirection.Direction;
 			}
 		}
+		private void ResetRowsForNewMarket()
+		{
+			_allRows.Clear();
+			_byBetId.Clear();
+			_cancelledBets.Clear();
+			SelectedRow = null;
+			Rows.Clear();
+		}
 		public void OnMarketSelected(NodeViewModel d2, RunnersControl rc)
 		{
 			String _marketId = "";
 			if (MarketNode != null)
 				_marketId = MarketNode.MarketID; 
-                
+
+			bool marketChanged = _marketId != d2.MarketID;
+			if (marketChanged)
+				ResetRowsForNewMarket();
+
 			MarketNode = d2;
             RunnersControl = rc;
             PopulateDataGrid();
@@ -191,7 +203,7 @@ namespace SpreadTrader
 			_simulatedStream?.MapRealMarket(d2);
 
 			WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
-			if (_marketId != MarketNode.MarketID)
+			if (marketChanged)
 				WebSocketsHub.Instance.Detach(_marketId, this);
 		}
 		private void OnMessageReceived(string messageName, object data)
@@ -354,7 +366,8 @@ namespace SpreadTrader
 			}
 			else
 			{
-				Debug.WriteLine($"Index failure for BetID {row.BetID}");
+				Debug.WriteLine($"Index failure for BetID {row.BetID}; inserting matched fragment at top");
+				_allRows.Insert(0, mrow);
 			}
 
 			// update unmatched remainder
