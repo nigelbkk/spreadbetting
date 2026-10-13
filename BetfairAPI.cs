@@ -20,7 +20,9 @@ namespace BetfairAPI
 {
     public class BetfairAPI
     {
-        private static readonly string API_KEY = Environment.GetEnvironmentVariable("BF_API_KEY") ?? throw new Exception("BF_API_KEY environment variable not set");
+        // SpreadTrader now uses the canonical RPC relay; it owns the Betfair
+        // session and does not require a client-side Betfair API key.
+        private static readonly string API_KEY = Environment.GetEnvironmentVariable("BF_API_KEY") ?? string.Empty;
 
         static private String AppKey { get; set; }
         static private String Token { get; set; }
