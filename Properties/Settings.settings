@@ -105,7 +105,7 @@
       <Value Profile="(Default)">2,5,10</Value>
     </Setting>
     <Setting Name="LegacyProxyUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)">127.0.0.1:5055</Value>
+      <Value Profile="(Default)">100.76.118.17:15055</Value>
     </Setting>
     <Setting Name="FlashYellow" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>

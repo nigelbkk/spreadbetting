@@ -433,7 +433,7 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1:5055")]
+        [global::System.Configuration.DefaultSettingValueAttribute("100.76.118.17:15055")]
         public string LegacyProxyUrl {
             get {
                 return ((string)(this["LegacyProxyUrl"]));
