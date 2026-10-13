@@ -217,7 +217,7 @@ namespace SpreadTrader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1:8088")]
+        [global::System.Configuration.DefaultSettingValueAttribute("100.76.118.17:18088")]
         public string WebSocketsUrl {
             get {
                 return ((string)(this["WebSocketsUrl"]));

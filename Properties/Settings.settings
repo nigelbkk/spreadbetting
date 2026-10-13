@@ -51,7 +51,7 @@
       <Value Profile="(Default)">log.csv</Value>
     </Setting>
     <Setting Name="WebSocketsUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)">127.0.0.1:8088</Value>
+    <Value Profile="(Default)">100.76.118.17:18088</Value>
     </Setting>
     <Setting Name="SafeBets" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
