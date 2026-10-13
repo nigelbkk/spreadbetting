@@ -30,6 +30,7 @@ namespace SpreadTrader
         private ClientWebSocket _socket;
         private CancellationTokenSource _socketCts;
         private int _invocationId;
+        private int _connectLoopStarted;
         private Properties.Settings props = Properties.Settings.Default;
 
         public void Attach(string marketId, BetsManager manager) { if (string.IsNullOrEmpty(marketId) || manager == null) return; lock (_handlersLock) { if (!_ordersHandlers.TryGetValue(marketId, out var h)) _ordersHandlers[marketId] = h = new List<BetsManager>(); if (!h.Contains(manager)) h.Add(manager); } }
@@ -82,6 +83,17 @@ namespace SpreadTrader
         private async Task SendRawAsync(ClientWebSocket socket, string value, CancellationToken token) { byte[] bytes = Encoding.UTF8.GetBytes(value); await _sendGate.WaitAsync(token); try { await socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, token); } finally { _sendGate.Release(); } }
         private async Task SubscribeAsync(string marketId) { lock (_handlersLock) _subscribedMarkets.Add(marketId); await InvokeAsync("SubscribeMarket", marketId); }
         private async Task UnsubscribeAsync(string marketId) { lock (_handlersLock) _subscribedMarkets.Remove(marketId); await InvokeAsync("UnsubscribeMarket", marketId); }
-        private void Connect() { _ = ConnectAsync(); }
+        private void Connect()
+        {
+            if (Interlocked.Exchange(ref _connectLoopStarted, 1) != 0) return;
+            _ = Task.Run(async () =>
+            {
+                while (true)
+                {
+                    await ConnectAsync();
+                    await Task.Delay(TimeSpan.FromSeconds(5));
+                }
+            });
+        }
     }
 }
