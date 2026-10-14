@@ -69,7 +69,7 @@ public sealed class PriceSize : INotifyPropertyChanged
 				_tradedVolume = value;
 				OnPropertyChanged();
 				if (props.FlashYellow)
-					Flash();
+					_ = FlashAsync();
 			}
 		}
 	}
@@ -128,16 +128,38 @@ public sealed class PriceSize : INotifyPropertyChanged
 
 	private int _flashGeneration;
 
-	private async void Flash()
+	private async Task FlashAsync()
 	{
-		var gen = ++_flashGeneration;
+		var gen = Interlocked.Increment(ref _flashGeneration);
+		SetCellBackground(Brushes.Yellow);
 
-		CellBackgroundColor = Brushes.Yellow;
+		try
+		{
+			await Task.Delay(FLASH_DURATION_MS).ConfigureAwait(false);
+			if (gen == Volatile.Read(ref _flashGeneration))
+				SetCellBackground(CellDefaultColor);
+		}
+		catch (Exception ex)
+		{
+			System.Diagnostics.Debug.WriteLine($"Price flash failed: {ex.Message}");
+		}
+	}
 
-		await Task.Delay(FLASH_DURATION_MS);
-
-		if (gen == _flashGeneration)
-			CellBackgroundColor = CellDefaultColor;
+	private void SetCellBackground(SolidColorBrush value)
+	{
+		var dispatcher = Application.Current?.Dispatcher;
+		if (dispatcher == null || dispatcher.HasShutdownStarted || dispatcher.HasShutdownFinished)
+			return;
+		if (dispatcher.CheckAccess())
+		{
+			CellBackgroundColor = value;
+			return;
+		}
+		dispatcher.BeginInvoke(new Action(() =>
+		{
+			if (!dispatcher.HasShutdownStarted && !dispatcher.HasShutdownFinished)
+				CellBackgroundColor = value;
+		}));
 	}
 	private const int FLASH_DURATION_MS = 200;
 	public SolidColorBrush CellDefaultColor { get; set; }
