@@ -39,8 +39,8 @@ namespace SpreadTrader
         public void Detach(string marketId, RunnersControl manager) { if (string.IsNullOrEmpty(marketId) || manager == null) return; bool unsubscribe = false; lock (_handlersLock) { if (_marketHandlers.TryGetValue(marketId, out var h)) { h.Remove(manager); if (h.Count == 0) { _marketHandlers.Remove(marketId); unsubscribe = true; } } } if (unsubscribe) _ = UnsubscribeAsync(marketId); }
         private List<BetsManager> OrderHandlers(string id) { lock (_handlersLock) return _ordersHandlers.TryGetValue(id, out var h) ? new List<BetsManager>(h) : new List<BetsManager>(); }
         private List<RunnersControl> MarketHandlers(string id) { lock (_handlersLock) return _marketHandlers.TryGetValue(id, out var h) ? new List<RunnersControl>(h) : new List<RunnersControl>(); }
-        public void Start() { _ = Task.Run(OrderLoop); _ = Task.Run(MarketLoop); }
-        private WebSocketsHub() { ControlMessenger.MessageSent += OnMessageReceived; Start(); Connect(); }
+        public void Start() { _ = Task.Run(OrderLoop); _ = Task.Run(MarketLoop); Connect(); }
+        private WebSocketsHub() { ControlMessenger.MessageSent += OnMessageReceived; Start(); }
         public void Simulate(OrderMarketChange change) { foreach (var manager in OrderHandlers(change.Id)) manager.OnOrderChanged(change); }
         private void OnMessageReceived(string name, object data) { if (name != "Reconnect") return; dynamic d = data; Connect(); _ = SubscribeAsync((string)d.MarketId); }
         private Uri HubUri { get { return new Uri("ws://" + props.WebSocketsUrl.TrimEnd('/') + "/marketHub"); } }
@@ -50,14 +50,15 @@ namespace SpreadTrader
         {
             try
             {
+                Trace.WriteLine("Canonical SignalR stream connection attempt: " + HubUri);
                 var socket = new ClientWebSocket(); socket.Options.KeepAliveInterval = TimeSpan.FromSeconds(15); var cts = new CancellationTokenSource();
                 await socket.ConnectAsync(HubUri, cts.Token); await SendRawAsync(socket, "{\"protocol\":\"json\",\"version\":1}\u001e", cts.Token);
                 lock (_socketLock) { if (_socketCts != null) _socketCts.Cancel(); _socket = socket; _socketCts = cts; }
-                Debug.WriteLine("Canonical SignalR stream connected: " + HubUri);
+                Trace.WriteLine("Canonical SignalR stream connected: " + HubUri);
                 string[] markets; lock (_handlersLock) markets = new List<string>(_subscribedMarkets).ToArray(); foreach (string market in markets) await InvokeAsync("SubscribeMarket", market);
                 await ReceiveLoopAsync(socket, cts.Token);
             }
-            catch (Exception ex) { Debug.WriteLine("Canonical SignalR stream error: " + ex.Message); }
+            catch (Exception ex) { Trace.WriteLine("Canonical SignalR stream error: " + ex); }
         }
         private async Task ReceiveLoopAsync(ClientWebSocket socket, CancellationToken token)
         {
@@ -81,7 +82,7 @@ namespace SpreadTrader
             if (socket == null || socket.State != WebSocketState.Open) return; string json = JsonConvert.SerializeObject(new { type = 1, invocationId = Interlocked.Increment(ref _invocationId).ToString(), target = target, arguments = new[] { marketId } }) + "\u001e"; await SendRawAsync(socket, json, token);
         }
         private async Task SendRawAsync(ClientWebSocket socket, string value, CancellationToken token) { byte[] bytes = Encoding.UTF8.GetBytes(value); await _sendGate.WaitAsync(token); try { await socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, token); } finally { _sendGate.Release(); } }
-        private async Task SubscribeAsync(string marketId) { lock (_handlersLock) _subscribedMarkets.Add(marketId); await InvokeAsync("SubscribeMarket", marketId); }
+        private async Task SubscribeAsync(string marketId) { lock (_handlersLock) _subscribedMarkets.Add(marketId); Trace.WriteLine("Canonical SignalR subscribe queued: " + marketId); await InvokeAsync("SubscribeMarket", marketId); }
         private async Task UnsubscribeAsync(string marketId) { lock (_handlersLock) _subscribedMarkets.Remove(marketId); await InvokeAsync("UnsubscribeMarket", marketId); }
         private void Connect()
         {
