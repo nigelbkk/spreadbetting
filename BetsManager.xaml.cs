@@ -663,6 +663,12 @@ namespace SpreadTrader
 						Debug.WriteLine(MarketNode.MarketID, "PopulateDataGrid: ");
 
 						CurrentOrderSummaryReport report = Betfair.listCurrentOrders(MarketNode.MarketID); 
+						if (report == null || report.currentOrders == null)
+						{
+							Status = "Current orders unavailable";
+							Debug.WriteLine("Current orders refresh returned no response");
+							return;
+						}
 
                         //_allRows.Clear();
                         if (report.currentOrders.Count > 0)
