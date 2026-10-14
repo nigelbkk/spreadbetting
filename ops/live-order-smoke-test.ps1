@@ -1,11 +1,12 @@
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $false)]
     [string]$MarketId,
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $false)]
     [long]$SelectionId,
     [string]$RpcUrl = 'http://100.76.118.17:15055',
-    [switch]$ConfirmLiveOrder
+    [switch]$ConfirmLiveOrder,
+    [int]$HorseMarketWindowMinutes = 30
 )
 
 $ErrorActionPreference = 'Stop'
@@ -34,6 +35,39 @@ function Invoke-BetfairRpc([string]$Method, $Params) {
 function Get-CurrentOrder([string]$Id, [string]$BetId) {
     $report = Invoke-BetfairRpc 'listCurrentOrders' @{ marketIds = @($Id); betIds = @($BetId) }
     return @($report.currentOrders) | Where-Object { [string]$_.betId -eq $BetId } | Select-Object -First 1
+}
+
+if (!$MarketId -or !$SelectionId) {
+    $from = [DateTime]::UtcNow.AddMinutes(-2).ToString('o')
+    $to = [DateTime]::UtcNow.AddMinutes($HorseMarketWindowMinutes).ToString('o')
+    $catalogue = @(Invoke-BetfairRpc 'listMarketCatalogue' @{
+        filter = @{
+            eventTypeIds = @('7')
+            marketTypeCodes = @('WIN')
+            marketStartTime = @{ from = $from; to = $to }
+        }
+        marketProjection = @('MARKET_START_TIME', 'RUNNER_DESCRIPTION', 'EVENT', 'MARKET_NAME')
+        sort = 'FIRST_TO_START'
+        maxResults = 50
+    })
+    $candidateIds = @($catalogue | Where-Object { $_.marketId } | ForEach-Object { [string]$_.marketId })
+    if ($candidateIds.Count -eq 0) { throw "No horse WIN markets start within $HorseMarketWindowMinutes minutes." }
+
+    $books = @(Invoke-BetfairRpc 'listMarketBook' @{ marketIds = $candidateIds })
+    $open = @($books | Where-Object { [string]$_.status -eq 'OPEN' -and @($_.runners).Count -gt 0 } |
+        Sort-Object @{ Expression = { [DateTime]($_.marketStartTime) }; Ascending = $true }) | Select-Object -First 1
+    if (!$open) {
+        # Market-book responses do not always repeat marketStartTime; use the
+        # catalogue ordering as the deterministic near-market ordering.
+        foreach ($candidate in $catalogue) {
+            $book = $books | Where-Object { [string]$_.marketId -eq [string]$candidate.marketId -and [string]$_.status -eq 'OPEN' } | Select-Object -First 1
+            if ($book -and @($book.runners).Count -gt 0) { $open = $book; break }
+        }
+    }
+    if (!$open) { throw 'No currently OPEN horse WIN market was found in the near-market window.' }
+    $MarketId = [string]$open.marketId
+    $SelectionId = [long](@($open.runners) | Select-Object -First 1).selectionId
+    Write-Output "SELECTED marketId=$MarketId selectionId=$SelectionId"
 }
 
 $book = @(Invoke-BetfairRpc 'listMarketBook' @{ marketIds = @($MarketId) }) | Select-Object -First 1
