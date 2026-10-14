@@ -38,8 +38,10 @@ function Get-CurrentOrder([string]$Id, [string]$BetId) {
 }
 
 if (!$MarketId -or !$SelectionId) {
-    $from = [DateTime]::UtcNow.AddMinutes(-2).ToString('o')
-    $to = [DateTime]::UtcNow.AddMinutes($HorseMarketWindowMinutes).ToString('o')
+    # Betfair rejects PowerShell's round-trip offset/fraction format here;
+    # send strict UTC timestamps as required by the API.
+    $from = [DateTime]::UtcNow.AddMinutes(-2).ToString('yyyy-MM-ddTHH:mm:ssZ')
+    $to = [DateTime]::UtcNow.AddMinutes($HorseMarketWindowMinutes).ToString('yyyy-MM-ddTHH:mm:ssZ')
     $catalogue = @(Invoke-BetfairRpc 'listMarketCatalogue' @{
         filter = @{
             eventTypeIds = @('7')
