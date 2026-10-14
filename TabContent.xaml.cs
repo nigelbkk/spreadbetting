@@ -51,7 +51,7 @@ namespace SpreadTrader
 			marketHeader.TabContent = this;
 			oBettingGrid.sliderControl = SliderControl;
 		}
-		private async void UnsubscribeAsync(String marketId)
+		private void UnsubscribeAsync(String marketId)
 		{
 			ControlMessenger.Send("Unsubscribe", new { MarketId = marketId });
 		}

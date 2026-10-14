@@ -325,7 +325,7 @@ namespace SpreadTrader
 				UiThread.Run(PopulateDataGrid);
             });
         }
-        private async void NotifyBetMatchedAsync()
+        private void NotifyBetMatchedAsync()
         {
             String path = props.MatchedBetAlert;
             if (!string.IsNullOrEmpty(path))
