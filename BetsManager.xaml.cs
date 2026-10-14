@@ -317,7 +317,11 @@ namespace SpreadTrader
 			await Task.Run(() =>
 			{
 				PlaceExecutionReport report = Betfair.placeOrders(MarketNode.MarketID, place_instructions);
-				Status = report.status;
+				Status = report?.status ?? "Order placement returned no report";
+				// The canonical hub carries market updates, not account-order
+				// notifications. Refresh the authoritative order list after a
+				// successful placement so the grid reflects the new bet.
+				UiThread.Run(PopulateDataGrid);
             });
         }
         private async void NotifyBetMatchedAsync()
