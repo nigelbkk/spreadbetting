@@ -63,11 +63,10 @@ namespace BetfairAPI
                 }
             }
         }
-		public async void SendRequestAsync(object joe, string url)
+		public async Task SendRequestAsync(object joe, string url)
 		{
-			_ = Task.Run(async () =>
+			using (var client = new HttpClient())
 			{
-				var client = new HttpClient();
 
 				client.DefaultRequestHeaders.Add("X-API-Key", API_KEY);
 				client.DefaultRequestHeaders.Add("X-Application", AppKey);
@@ -75,17 +74,20 @@ namespace BetfairAPI
 				client.DefaultRequestHeaders.AcceptCharset.ParseAdd("ISO-8859-1, utf-8");
 
                 var json = JsonConvert.SerializeObject(joe);
-				var content = new StringContent(json, Encoding.UTF8, "application/json");
+				using (var content = new StringContent(json, Encoding.UTF8, "application/json"))
+				{
 
-				try
-				{
-					await client.PostAsync(url, content); // Response intentionally ignored
+					try
+					{
+						await client.PostAsync(url, content); // Response body intentionally ignored
+					}
+					catch (Exception ex)
+					{
+						Debug.WriteLine(ex.Message);
+						throw;
+					}
 				}
-				catch (Exception ex)
-				{
-					Debug.WriteLine(ex.Message);
-				}
-			});
+			}
 		}
 		public async Task RPCRequestAsync(String Method, Dictionary<String, Object> Params)
 		{
@@ -107,7 +109,7 @@ namespace BetfairAPI
 			//			url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
 			//	}
 			//}
-			SendRequestAsync(joe, url);
+			await SendRequestAsync(joe, url);
 		}
 		public Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
@@ -482,7 +484,7 @@ namespace BetfairAPI
 			}
 		}
 
-		public async void cancelOrders(String marketId, List<CancelInstruction> instructions)
+		public async Task cancelOrders(String marketId, List<CancelInstruction> instructions)
 		{
 			var tasks = instructions.Select(ci => CancelSingleAsync(marketId, ci)) .ToList();
 
