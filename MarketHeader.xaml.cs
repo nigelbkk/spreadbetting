@@ -84,6 +84,12 @@ namespace SpreadTrader
 			timer.Enabled = true;
 			timer.Start();
 		}
+		public void OnTabRemoved()
+		{
+			timer.Stop();
+			timer.Dispose();
+			ControlMessenger.MessageSent -= OnMessageReceived;
+		}
 		public void OnMarketSelected(NodeViewModel d2)
 		{
 			MarketNode = d2;

@@ -159,6 +159,8 @@ namespace SpreadTrader
            //Debug.WriteLine("Down");
             Button b = sender as Button;
             String Tag = b.Tag as String;
+            timer?.Stop();
+            timer?.Dispose();
             timer = new System.Timers.Timer(75);
 
             timer.Enabled = true;
@@ -186,5 +188,15 @@ namespace SpreadTrader
             timer.Enabled = false;
             timer.Stop();
         }
+		public void OnTabRemoved()
+		{
+			if (timer != null)
+			{
+				timer.Stop();
+				timer.Dispose();
+				timer = null;
+			}
+			ControlMessenger.MessageSent -= OnMessageReceived;
+		}
     }
 }

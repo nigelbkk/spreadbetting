@@ -94,7 +94,12 @@ namespace SpreadTrader
 		}
 		public void OnTabRemoved()
 		{
-			RunnersControl?.OnMarketClosed();
+			BetsManager?.OnTabRemoved();
+			RunnersControl?.OnTabRemoved();
+			marketHeader?.OnTabRemoved();
+			SliderControl?.OnTabRemoved();
+			oBettingGrid?.OnTabRemoved();
+			ControlMessenger.MessageSent -= OnMessageReceived;
 		}
 		public void OnTabSelected()
 		{

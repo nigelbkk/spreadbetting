@@ -21,7 +21,13 @@ namespace SpreadTrader
 
         public static void Send(string messageName, object data = null)
         {
-            MessageSent?.Invoke(messageName, data);
+            var handlers = MessageSent?.GetInvocationList();
+            if (handlers == null) return;
+            foreach (Action<string, object> handler in handlers)
+            {
+                try { handler(messageName, data); }
+                catch (Exception ex) { Debug.WriteLine($"ControlMessenger handler failed for {messageName}: {ex}"); }
+            }
         }
     }
     public partial class MainWindow : Window, INotifyPropertyChanged

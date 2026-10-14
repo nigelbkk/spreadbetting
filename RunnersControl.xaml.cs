@@ -46,6 +46,7 @@ namespace SpreadTrader
             }
 		}
 		private Properties.Settings props = Properties.Settings.Default;
+		private bool _tabRemoved;
 		#endregion
 		public async void PopulateNewMarket(NodeViewModel node)
         {
@@ -73,7 +74,9 @@ namespace SpreadTrader
 				_marketStateEngine = new MarketStateEngine();
 				_marketStateEngine.TelemetryAvailable += telemetry =>
 				{
-					Dispatcher.Invoke(() =>
+					if (Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished)
+						return;
+					Dispatcher.BeginInvoke(new Action(() =>
 					{
 						if (telemetry.ProfitAndLosses != null)
 						{
@@ -105,6 +108,17 @@ namespace SpreadTrader
 		public void OnMarketClosed()
         {
             //Debug.WriteLine($"Market closed ");
+			_ = StopMarketStateEngineAsync();
+			if (MarketNode != null)
+				WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
+		}
+
+		public void OnTabRemoved()
+		{
+			if (_tabRemoved) return;
+			_tabRemoved = true;
+			if (MarketNode != null)
+				WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
 			_ = StopMarketStateEngineAsync();
 		}
 
@@ -341,13 +355,7 @@ namespace SpreadTrader
 
 		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
 		{
-   //         Debug.WriteLine("RunnersControl Unloaded");
-			////WebSocketsHub.Instance.UnregisterRunnersControl(MarketNode?.MarketID, this);
-			//if (MarketNode != null)
-			//{
-			//	WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
-			//	MarketNode = null;
-			//}
+			OnTabRemoved();
 		}
 	}
 }

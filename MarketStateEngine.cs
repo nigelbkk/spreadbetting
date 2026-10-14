@@ -49,7 +49,12 @@ namespace SpreadTrader
 							MarketId = _market.marketId,
 							ProfitAndLosses = pnl?.FirstOrDefault()?.profitAndLosses?.ToList() ?? new List<RunnerProfitAndLoss>()
 						};
-						TelemetryAvailable?.Invoke(telemetry);
+						var handler = TelemetryAvailable;
+						if (handler != null)
+						{
+							try { handler(telemetry); }
+							catch (Exception handlerError) { Debug.WriteLine($"PNL telemetry handler error: {handlerError}"); }
+						}
 					}
 					await Task.Delay(Props.props.PNLFrequency, token);
 				}
@@ -60,7 +65,8 @@ namespace SpreadTrader
 				{
 					Debug.WriteLine($"[PNL LOOP ERROR] {ex}");
 					// Yield before retrying a failed relay/API call; do not spin.
-					await Task.Delay(Math.Max(1000, Props.props.PNLFrequency), token);
+					try { await Task.Delay(Math.Max(1000, Props.props.PNLFrequency), token); }
+					catch (OperationCanceledException) { break; }
 				}
 				finally
 				{

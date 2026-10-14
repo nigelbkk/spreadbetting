@@ -81,5 +81,9 @@ namespace SpreadTrader
 
             BackActive = LayActive = true;
         }
+		public void OnTabRemoved()
+		{
+			ControlMessenger.MessageSent -= OnMessageReceived;
+		}
     }
 }

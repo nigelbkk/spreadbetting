@@ -96,6 +96,7 @@ namespace SpreadTrader
 		#endregion Properties
 
 		private SimulatedStream _simulatedStream = null;
+		private bool _tabRemoved;
 
 		public static void TraceThread(string tag)
 		{
@@ -916,13 +917,18 @@ namespace SpreadTrader
 
 		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
 		{
-			//Debug.WriteLine("BetsManager Unloaded");
-			
-   //         if (MarketNode != null)
-			//{
-			//	WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
-			//	MarketNode = null;
-			//}
+			OnTabRemoved();
+		}
+
+		public void OnTabRemoved()
+		{
+			if (_tabRemoved) return;
+			_tabRemoved = true;
+			if (MarketNode != null)
+				WebSocketsHub.Instance.Detach(MarketNode.MarketID, this);
+			ControlMessenger.MessageSent -= OnMessageReceived;
+			if (Rows != null)
+				Rows.CollectionChanged -= OnRowsCollectionChanged;
 		}
 	}
 }
