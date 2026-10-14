@@ -87,6 +87,8 @@ namespace SpreadTrader
 			marketHeader.OnMarketSelected(d2);
 			customHeader.OnMarketSelected(d2);
 			BetsManager.OnMarketSelected(d2, RunnersControl);
+			oBettingGrid.OnMarketSelected(d2);
+			SliderControl.OnMarketSelected(d2.MarketID);
 			_ = RunnersControl.PopulateNewMarket(d2);
 			Status = marketStatusEnum.INACTIVE;
 

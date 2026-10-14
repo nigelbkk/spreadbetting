@@ -21,6 +21,7 @@ namespace SpreadTrader
             }
         }
         public LiveRunner Favorite { get; set; }
+        private string _marketId;
         public bool FavoriteSelected { get { return Favorite != null; } }
         public double CutStakes { get; set; }
         public double MoveBack { get; set; }
@@ -41,17 +42,20 @@ namespace SpreadTrader
             if (messageName == "Favorite Changed")
             {
                 dynamic d = data;
+				if (_marketId == null || (string)d.MarketId != _marketId)
+					return;
                 Debug.WriteLine($"BetsManager: {messageName} : {d.Name}");
                 Favorite = d.Favorite;
                 BasePrice = Favorite.LastPriceTraded;
                 SyncPrices();
                 NotifyPropertyChanged("");
             }
-			if (messageName == "Market Selected")
-			{
-				Favorite = null;
-				NotifyPropertyChanged("");
-			}
+		}
+		public void OnMarketSelected(string marketId)
+		{
+			_marketId = marketId;
+			Favorite = null;
+			NotifyPropertyChanged("");
 		}
 		public SliderControl()
         {
@@ -112,7 +116,7 @@ namespace SpreadTrader
                     case "Execute":
                         if (Favorite != null)
                         {
-                            ControlMessenger.Send("Execute Bets", new { Favorite = Favorite, LayValues = LayValues.ToList(), BackValues = BackValues.ToList() });
+                            ControlMessenger.Send("Execute Bets", new { MarketId = _marketId, Favorite = Favorite, LayValues = LayValues.ToList(), BackValues = BackValues.ToList() });
                         }
 
                         //if (OnSubmitBets != null)

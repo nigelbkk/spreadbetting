@@ -276,7 +276,7 @@ namespace SpreadTrader
             if (LiveRunner.Favorite != null) LiveRunner.Favorite.IsFavorite = false;
             LiveRunner.Favorite = cp.Content as LiveRunner;
             LiveRunner.Favorite.IsFavorite = true;
-            ControlMessenger.Send("Favorite Changed", new { Favorite = LiveRunner.Favorite, Name = LiveRunner.Favorite.Name });
+            ControlMessenger.Send("Favorite Changed", new { MarketId = MarketNode?.MarketID, Favorite = LiveRunner.Favorite, Name = LiveRunner.Favorite.Name });
 
         }
         private void LevelProfitMouseDown(object sender, MouseButtonEventArgs e)

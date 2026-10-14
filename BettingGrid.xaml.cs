@@ -42,16 +42,6 @@ namespace SpreadTrader
         }
         private void OnMessageReceived(string messageName, object data)
         {
-            if (messageName == "Market Selected")
-            {
-                dynamic d = data;
-				NodeViewModel d2 = d.NodeViewModel;
-                MarketNode = d2;
-
-				BackValues = sliderControl.BackValues;
-				LayValues = sliderControl.LayValues;
-				NotifyPropertyChanged("");
-			}
             if (messageName == "Execute Bets")
             {
                 dynamic d = data;
@@ -84,6 +74,14 @@ namespace SpreadTrader
 		public void OnTabRemoved()
 		{
 			ControlMessenger.MessageSent -= OnMessageReceived;
+		}
+		public void OnMarketSelected(NodeViewModel node)
+		{
+			if (node == null) return;
+			MarketNode = node;
+			BackValues = sliderControl.BackValues;
+			LayValues = sliderControl.LayValues;
+			NotifyPropertyChanged("");
 		}
     }
 }

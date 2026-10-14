@@ -256,6 +256,8 @@ namespace SpreadTrader
             if (messageName == "Execute Bets")
 			{
 				dynamic d = data;
+				if (MarketNode == null || (string)d.MarketId != MarketNode.MarketID)
+					return;
 				Debug.WriteLine($"BetsManager: {messageName} : {d.Favorite.Name}");
 				ExecuteBets(d.Favorite, d.LayValues, d.BackValues);
 			}
