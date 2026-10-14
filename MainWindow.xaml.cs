@@ -85,6 +85,7 @@ namespace SpreadTrader
 		public MainWindow()
         {
 			Directory.CreateDirectory(@"C:\Temp");
+			HealthDiagnostics.Write(null);
 			var listener = new TextWriterTraceListener(@"C:\Temp\trace.log");
 
 			Trace.Listeners.Add(listener);

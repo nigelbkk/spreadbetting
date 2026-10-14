@@ -153,7 +153,7 @@ namespace SpreadTrader
                 {
                     GeneratedUtc = DateTime.UtcNow,
                     ProcessId = Process.GetCurrentProcess().Id,
-                    Stream = stream,
+                    Stream = stream ?? new StreamHealthSnapshot { GeneratedUtc = DateTime.UtcNow },
                     MarketEngines = Snapshot()
                 };
                 File.WriteAllText(@"C:\Temp\spreadtrader-health.json", JsonConvert.SerializeObject(document, Formatting.Indented));
