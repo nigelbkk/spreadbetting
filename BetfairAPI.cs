@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -23,6 +23,7 @@ namespace BetfairAPI
         // SpreadTrader now uses the canonical RPC relay; it owns the Betfair
         // session and does not require a client-side Betfair API key.
         private static readonly string API_KEY = Environment.GetEnvironmentVariable("BF_API_KEY") ?? string.Empty;
+        private static readonly bool OFFLINE = Environment.GetEnvironmentVariable("SPREADTRADER_OFFLINE") == "1";
 
         static private String AppKey { get; set; }
         static private String Token { get; set; }
@@ -73,7 +74,7 @@ namespace BetfairAPI
 				client.DefaultRequestHeaders.Add("X-Authentication", Token);
 				client.DefaultRequestHeaders.AcceptCharset.ParseAdd("ISO-8859-1, utf-8");
 
-				var json = "[" + JsonConvert.SerializeObject(joe) + "]";
+                var json = JsonConvert.SerializeObject(joe);
 				var content = new StringContent(json, Encoding.UTF8, "application/json");
 
 				try
@@ -88,6 +89,7 @@ namespace BetfairAPI
 		}
 		public async Task RPCRequestAsync(String Method, Dictionary<String, Object> Params)
 		{
+            if (OFFLINE) return;
 			String[] AccountCalls = new String[] { "getAccountFunds" };
 			Dictionary<String, Object> joe = new Dictionary<string, object>();
 			joe["jsonrpc"] = "2.0";
@@ -109,6 +111,8 @@ namespace BetfairAPI
 		}
 		public Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
+            Debug.WriteLine("RPC BEGIN " + Method);
+            if (OFFLINE) return null;
             try
             {
                 String[] AccountCalls = new String[] { "getAccountFunds" };
@@ -123,8 +127,8 @@ namespace BetfairAPI
                 {
                     joe["method"] = "AccountAPING/v1.0/" + Method;
                 }
-                String postData = "[" + JsonConvert.SerializeObject(joe) + "]";
-                var bytes = Encoding.GetEncoding("UTF-8").GetBytes(postData);
+                String postData = JsonConvert.SerializeObject(joe);
+                var bytes = Encoding.UTF8.GetBytes(postData);
                 HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
                 wr.Method = WebRequestMethods.Http.Post;
                 wr.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
@@ -143,20 +147,34 @@ namespace BetfairAPI
                 using (Stream stream = response.GetResponseStream())
                 using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
                 {
+
+                    // The canonical relay returns one JSON-RPC response object.
+                    // Keep accepting the legacy one-element array envelope so an
+                    // older relay cannot break the client during a transition.
                     var jsonResponse = reader.ReadToEnd();
-                    var err = JArray.Parse(jsonResponse)[0].SelectToken("error");
+                    var envelope = JToken.Parse(jsonResponse);
+                    var responseObject = envelope is JArray legacyArray
+                        ? legacyArray.FirstOrDefault()
+                        : envelope;
+                    if (responseObject == null || responseObject.Type != JTokenType.Object)
+                        throw new Exception("RPC response was not a JSON-RPC object");
+
+                    var err = responseObject.SelectToken("error");
 					if (err != null)
 					{
 						ErrorResponse oo = JsonConvert.DeserializeObject<ErrorResponse>(err.ToString());
 						throw new Exception(ErrorCodes.FaultCode(oo.message), new Exception(oo.message));
 					}
-					String res = JArray.Parse(jsonResponse)[0].SelectToken("result").ToString();
+					var result = responseObject.SelectToken("result");
+					if (result == null || result.Type == JTokenType.Null)
+						return default(T);
+					String res = result.ToString(Formatting.None);
 					return JsonConvert.DeserializeObject<T>(res);
                 }
             }
             catch (Exception xe)
             {
-                Debug.WriteLine(xe.Message);
+                Debug.WriteLine("RPC FAIL " + Method + " " + xe.Message);
                 return null;
             }
         }
@@ -456,7 +474,7 @@ namespace BetfairAPI
 			}
 			catch
 			{
-				// swallow — per your requirement
+				// swallow ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â per your requirement
 			}
 			finally
 			{
@@ -590,3 +608,7 @@ namespace BetfairAPI
     }
 
 }
+
+
+
+
