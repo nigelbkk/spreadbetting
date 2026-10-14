@@ -1,6 +1,7 @@
 ﻿using BetfairAPI;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -50,6 +51,8 @@ namespace SpreadTrader
         }
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
+			try
+			{
             Odds = UpDownOdds.NumericValue;
             Stake = UpDownStake.Value.Value;
 
@@ -82,6 +85,12 @@ namespace SpreadTrader
                 });
             }
             Extensions.MainWindow.Status = result;
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine($"Update bet failed: {ex}");
+				Extensions.MainWindow.Status = $"Update bet failed: {ex.Message}";
+			}
         }
         private void Window_Closing(object sender, CancelEventArgs e)
         {

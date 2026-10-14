@@ -260,6 +260,8 @@ namespace SpreadTrader
 		}
 		private async void ExecuteBets(LiveRunner runner, List<PriceSize> lay, List<PriceSize> back)
         {
+			try
+			{
             String MarketID = MarketNode.MarketID;
             long Selection = runner.SelectionId;
 
@@ -324,6 +326,12 @@ namespace SpreadTrader
 				// successful placement so the grid reflects the new bet.
 				UiThread.Run(PopulateDataGrid);
             });
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine($"Execute bets failed: {ex}");
+				Status = $"Order placement failed: {ex.Message}";
+			}
         }
         private void NotifyBetMatchedAsync()
         {
