@@ -404,8 +404,11 @@ namespace SpreadTrader
 			}
 		}
 
-		private static int _inFlight = 0;
-		private static long _lastPd = -1;
+		// These diagnostics describe this market panel's order stream.  Keeping
+		// them per instance avoids one tab making another tab look concurrent or
+		// out-of-order while leaving order/strategy behaviour unchanged.
+		private int _inFlight = 0;
+		private long _lastPd = -1;
 
 		public void OnOrderChanged(OrderMarketChange change)
         {
