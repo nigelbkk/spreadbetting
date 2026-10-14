@@ -119,6 +119,12 @@ namespace SpreadTrader
 		public void UpdateAccountInformation()
         {
             AccountFundsResponse response = Betfair.getAccountFunds(1);
+            if (response == null)
+            {
+                Status = "Account funds unavailable";
+                Debug.WriteLine("Account funds refresh returned no response");
+                return;
+            }
             Balance = response.availableToBetBalance;
             Exposure = response.exposure;
             Commission = response.retainedCommission - response.discountRate;

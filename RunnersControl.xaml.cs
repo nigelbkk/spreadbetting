@@ -71,12 +71,6 @@ namespace SpreadTrader
 
 				await _marketStateEngine.Stop();
 				_marketStateEngine = new MarketStateEngine();
-
-				if (props.PNLFrequency >= 400)
-					_marketStateEngine.Start(_MarketNode.Market);
-				else
-					Debug.WriteLine("P&L IS DISABLED");
-
 				_marketStateEngine.TelemetryAvailable += telemetry =>
 				{
 					Dispatcher.Invoke(() =>
@@ -84,14 +78,9 @@ namespace SpreadTrader
 						if (telemetry.ProfitAndLosses != null)
 						{
 							var pnlSnapshot = telemetry.ProfitAndLosses?.ToList() ?? new List<RunnerProfitAndLoss>();
-
 							foreach (var pnl in pnlSnapshot)
-							{
 								if (RunnerBySelectionId.ContainsKey(pnl.selectionId))
-								{
 									RunnerBySelectionId[pnl.selectionId].ifWin = pnl.ifWin;
-								}
-							}
 						}
 						else
 						{
@@ -101,6 +90,11 @@ namespace SpreadTrader
 						}
 					});
 				};
+
+				if (props.PNLFrequency >= 400)
+					_marketStateEngine.Start(_MarketNode.Market);
+				else
+					Debug.WriteLine("P&L IS DISABLED");
 			}
 			catch (Exception ex)
 			{

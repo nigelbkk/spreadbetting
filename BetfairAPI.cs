@@ -563,9 +563,10 @@ namespace BetfairAPI
         public AccountFundsResponse getAccountFunds(Int32 ExchangeId)
         {
             Dictionary<String, Object> p = new Dictionary<string, object>();
-            Dictionary<String, Object> filter = new Dictionary<string, object>();
-
-            filter["exchangeIds"] = new Int32[] { ExchangeId };
+            // The account API expects exchangeIds directly in the request
+            // parameters. The previous code populated a separate filter
+            // dictionary and then sent the empty p dictionary.
+            p["exchangeIds"] = new Int32[] { ExchangeId };
             return RPCRequest<AccountFundsResponse>("getAccountFunds", p) as AccountFundsResponse;
         }
         public List<MarketProfitAndLoss> listMarketProfitAndLoss(String marketId)
