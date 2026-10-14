@@ -266,7 +266,7 @@ namespace SpreadTrader
         {
 			long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 			String cs = $"{now - utc_time}ms";
-			ControlMessenger.Send("Update Orders Latency", new { OrdersLatency = cs });
+			ControlMessenger.Send("Update Orders Latency", new { MarketId = MarketNode?.MarketID, OrdersLatency = cs });
 		}
 		private async void ExecuteBets(LiveRunner runner, List<PriceSize> lay, List<PriceSize> back)
         {

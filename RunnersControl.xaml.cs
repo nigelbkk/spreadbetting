@@ -145,7 +145,7 @@ namespace SpreadTrader
 			var epoch = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             long diff = DateTime.UtcNow.Ticks - change.Time.Ticks;
 			String cs = $"{1000 * diff / TimeSpan.TicksPerSecond}ms";
-			ControlMessenger.Send("Update Market Latency", new { MarketLatency = cs, Status = "" });
+			ControlMessenger.Send("Update Market Latency", new { MarketId = MarketNode?.MarketID, MarketLatency = cs, Status = "" });
 
 			if (change.Status != (MarketDefinition.StatusEnum) MarketNode.Status)
 			{

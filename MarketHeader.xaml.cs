@@ -59,11 +59,15 @@ namespace SpreadTrader
 			if (messageName == "Update Market Latency")
 			{
 				dynamic d = data;
+				if (MarketNode == null || (string)d.MarketId != MarketNode.MarketID)
+					return;
 				MarketLatency = d?.MarketLatency;
 			}
             if (messageName == "Update Orders Latency")
             {
                 dynamic d = data;
+				if (MarketNode == null || (string)d.MarketId != MarketNode.MarketID)
+					return;
                 OrdersLatency = d.OrdersLatency;
             }
         }
