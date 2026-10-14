@@ -20,7 +20,7 @@ namespace SpreadTrader
     {
         public static WebSocketsHub Instance { get; } = new WebSocketsHub();
         private readonly BlockingCollection<string> _orderQueue = new BlockingCollection<string>(10000);
-        private readonly BlockingCollection<MarketChangeDto> _marketChangeQueue = new BlockingCollection<MarketChangeDto>();
+        private readonly BlockingCollection<MarketChangeDto> _marketChangeQueue = new BlockingCollection<MarketChangeDto>(5000);
         private readonly object _handlersLock = new object();
         private readonly object _socketLock = new object();
         private readonly SemaphoreSlim _sendGate = new SemaphoreSlim(1, 1);
@@ -31,6 +31,8 @@ namespace SpreadTrader
         private CancellationTokenSource _socketCts;
         private int _invocationId;
         private int _connectLoopStarted;
+        private int _droppedOrderMessages;
+        private int _droppedMarketMessages;
         private volatile bool _stopped;
         private Properties.Settings props = Properties.Settings.Default;
 
@@ -75,9 +77,30 @@ namespace SpreadTrader
         private void HandleMessage(string payload)
         {
             if (string.IsNullOrWhiteSpace(payload) || payload == "{}") return;
-            try { var message = JObject.Parse(payload); if ((int?)message["type"] != 1) return; string target = (string)message["target"]; if (target == "marketChanged") { var change = message["arguments"]?[0]?.ToObject<MarketChangeDto>(); if (change != null && !_stopped) _marketChangeQueue.Add(change); } else if (target == "ordersChanged" && !_stopped) _orderQueue.Add((string)message["arguments"]?[0]); }
+            try
+            {
+                var message = JObject.Parse(payload); if ((int?)message["type"] != 1) return; string target = (string)message["target"];
+                if (target == "marketChanged")
+                {
+                    var change = message["arguments"]?[0]?.ToObject<MarketChangeDto>();
+                    if (change != null && !_stopped && !_marketChangeQueue.TryAdd(change))
+                        RecordDroppedMessage("market", ref _droppedMarketMessages);
+                }
+                else if (target == "ordersChanged" && !_stopped)
+                {
+                    var orderJson = (string)message["arguments"]?[0];
+                    if (orderJson != null && !_orderQueue.TryAdd(orderJson))
+                        RecordDroppedMessage("order", ref _droppedOrderMessages);
+                }
+            }
             catch (InvalidOperationException) when (_stopped) { }
             catch (Exception ex) { Debug.WriteLine("Canonical SignalR message ignored: " + ex.Message); }
+        }
+        private void RecordDroppedMessage(string kind, ref int counter)
+        {
+            int dropped = Interlocked.Increment(ref counter);
+            if (dropped == 1 || dropped % 100 == 0)
+                Trace.WriteLine($"Canonical SignalR {kind} queue full; dropped {dropped} message(s)");
         }
         private async Task InvokeAsync(string target, string marketId)
         {
