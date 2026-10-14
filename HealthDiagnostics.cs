@@ -70,6 +70,8 @@ namespace SpreadTrader
             internal long BookLoopStarts;
             internal long PnlSuccesses;
             internal long BookSuccesses;
+            internal long PnlErrors;
+            internal long BookErrors;
             internal long LastPnlTicks;
             internal long LastBookTicks;
             internal long LastErrorTicks;
