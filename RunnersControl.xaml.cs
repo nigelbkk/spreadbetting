@@ -164,13 +164,13 @@ namespace SpreadTrader
                         {
                             for (int i = 0; i < 3; i++)
                             {
-								if (lr.BackValues[i].price == ti[0])
-								    lr.BackValues[i].TradedVolume = ti[1].Value;
+								if (lr.BackValues[i].price == ti.Price)
+								    lr.BackValues[i].TradedVolume = ti.Size;
                             }
                             for (int i = 0; i < 3; i++)
                             {
-								if (lr.LayValues[i].price == ti[0])
-								    lr.LayValues[i].TradedVolume = ti[1].Value;
+								if (lr.LayValues[i].price == ti.Price)
+								    lr.LayValues[i].TradedVolume = ti.Size;
                             }
                         }
                     }
