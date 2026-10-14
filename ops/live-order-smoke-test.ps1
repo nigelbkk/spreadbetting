@@ -59,15 +59,12 @@ if (!$MarketId -or !$SelectionId) {
     if ($candidateIds.Count -eq 0) { throw "No horse WIN markets start within $HorseMarketWindowMinutes minutes." }
 
     $books = @(Invoke-BetfairRpc 'listMarketBook' @{ marketIds = $candidateIds })
-    $open = @($books | Where-Object { [string]$_.status -eq 'OPEN' -and @($_.runners).Count -gt 0 } |
-        Sort-Object @{ Expression = { [DateTime]($_.marketStartTime) }; Ascending = $true }) | Select-Object -First 1
-    if (!$open) {
-        # Market-book responses do not always repeat marketStartTime; use the
-        # catalogue ordering as the deterministic near-market ordering.
-        foreach ($candidate in $catalogue) {
-            $book = $books | Where-Object { [string]$_.marketId -eq [string]$candidate.marketId -and [string]$_.status -eq 'OPEN' } | Select-Object -First 1
-            if ($book -and @($book.runners).Count -gt 0) { $open = $book; break }
-        }
+    # Market-book responses do not repeat marketStartTime.  Walk the
+    # catalogue's FIRST_TO_START order and choose the first matching OPEN book.
+    $open = $null
+    foreach ($candidate in $catalogue) {
+        $book = $books | Where-Object { [string]$_.marketId -eq [string]$candidate.marketId -and [string]$_.status -eq 'OPEN' } | Select-Object -First 1
+        if ($book -and @($book.runners).Count -gt 0) { $open = $book; break }
     }
     if (!$open) { throw 'No currently OPEN horse WIN market was found in the near-market window.' }
     $MarketId = [string]$open.marketId
