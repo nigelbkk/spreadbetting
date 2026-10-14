@@ -323,35 +323,58 @@ namespace SpreadTrader
                         size = Math.Abs(live_runner2.LevelStake),
                     }
                 });
-                System.Threading.Thread t = new System.Threading.Thread(() =>
-                {
-                    PlaceExecutionReport report = betfair.placeOrders(MarketNode.MarketID, orders);
-                    Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
-                });
-                t.Start();
+				_ = Task.Run(() =>
+				{
+					try
+					{
+						PlaceExecutionReport report = betfair.placeOrders(MarketNode.MarketID, orders);
+						ReportPlacementStatus(report);
+					}
+					catch (Exception ex) { ReportPlacementFailure(ex); }
+				});
             }
             else if (LiveRunners.Count == 2)
             {
                 if (live_runner.LevelSide == sideEnum.LAY)
                 {
-                    System.Threading.Thread t = new System.Threading.Thread(() =>
-                    {
-                        PlaceExecutionReport report = betfair.placeOrder(MarketNode.MarketID, live_runner.SelectionId, sideEnum.LAY, Math.Abs(live_runner.LevelStake), live_runner.LayValues[0].price);
-                        Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
-                    });
-                    t.Start();
+					_ = Task.Run(() =>
+					{
+						try
+						{
+							PlaceExecutionReport report = betfair.placeOrder(MarketNode.MarketID, live_runner.SelectionId, sideEnum.LAY, Math.Abs(live_runner.LevelStake), live_runner.LayValues[0].price);
+							ReportPlacementStatus(report);
+						}
+						catch (Exception ex) { ReportPlacementFailure(ex); }
+					});
                 }
                 if (live_runner.LevelSide == sideEnum.BACK)
                 {
-                    System.Threading.Thread t = new System.Threading.Thread(() =>
-                    {
-                        PlaceExecutionReport report = betfair.placeOrder(MarketNode.MarketID, live_runner.SelectionId, sideEnum.BACK, Math.Abs(live_runner.LevelStake), live_runner.BackValues[0].price);
-                        Dispatcher.BeginInvoke(new Action(() => { Extensions.MainWindow.Status = report.errorCode != null ? report.instructionReports[0].errorCode : report.status; }));
-                    });
-                    t.Start();
+					_ = Task.Run(() =>
+					{
+						try
+						{
+							PlaceExecutionReport report = betfair.placeOrder(MarketNode.MarketID, live_runner.SelectionId, sideEnum.BACK, Math.Abs(live_runner.LevelStake), live_runner.BackValues[0].price);
+							ReportPlacementStatus(report);
+						}
+						catch (Exception ex) { ReportPlacementFailure(ex); }
+					});
                 }
             }
         }
+
+		private void ReportPlacementStatus(PlaceExecutionReport report)
+		{
+			string status = report == null ? "Order placement returned no report" : report.errorCode != null ? report.instructionReports?[0].errorCode : report.status;
+			if (Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
+			Dispatcher.BeginInvoke(new Action(() => Extensions.MainWindow.Status = status));
+		}
+
+		private void ReportPlacementFailure(Exception ex)
+		{
+			Debug.WriteLine($"Level placement failed: {ex}");
+			if (Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
+			Dispatcher.BeginInvoke(new Action(() => Extensions.MainWindow.Status = $"Order placement failed: {ex.Message}"));
+		}
 
 		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
 		{
