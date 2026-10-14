@@ -91,7 +91,7 @@ namespace SpreadTrader
 							LayBook = telemetry.LayBook;
 							ControlMessenger.Send("Telemetry Available", telemetry);
 						}
-					});
+					}));
 				};
 
 				if (props.PNLFrequency >= 400)
