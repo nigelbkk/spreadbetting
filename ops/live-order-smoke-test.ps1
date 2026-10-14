@@ -48,7 +48,10 @@ if (!$MarketId -or !$SelectionId) {
             marketTypeCodes = @('WIN')
             marketStartTime = @{ from = $from; to = $to }
         }
-        marketProjection = @('MARKET_START_TIME', 'RUNNER_DESCRIPTION', 'EVENT', 'MARKET_NAME')
+        # The relay accepts the stable projections below; marketName is
+        # returned by default.  EVENT/MARKET_NAME trigger DSC-0018 on this
+        # Betfair endpoint.
+        marketProjection = @('MARKET_START_TIME', 'RUNNER_DESCRIPTION')
         sort = 'FIRST_TO_START'
         maxResults = 50
     })
