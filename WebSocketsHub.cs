@@ -31,6 +31,7 @@ namespace SpreadTrader
         private CancellationTokenSource _socketCts;
         private int _invocationId;
         private int _connectLoopStarted;
+        private int _started;
         private int _droppedOrderMessages;
         private int _droppedMarketMessages;
         private long _connectAttempts;
@@ -55,7 +56,7 @@ namespace SpreadTrader
         public void Detach(string marketId, RunnersControl manager) { if (string.IsNullOrEmpty(marketId) || manager == null) return; bool unsubscribe = false; lock (_handlersLock) { if (_marketHandlers.TryGetValue(marketId, out var h)) { h.Remove(manager); if (h.Count == 0) { _marketHandlers.Remove(marketId); unsubscribe = true; } } } if (unsubscribe) _ = UnsubscribeAsync(marketId); }
         private List<BetsManager> OrderHandlers(string id) { lock (_handlersLock) return _ordersHandlers.TryGetValue(id, out var h) ? new List<BetsManager>(h) : new List<BetsManager>(); }
         private List<RunnersControl> MarketHandlers(string id) { lock (_handlersLock) return _marketHandlers.TryGetValue(id, out var h) ? new List<RunnersControl>(h) : new List<RunnersControl>(); }
-        public void Start() { if (_stopped) return; _healthTimer = new Timer(_ => WriteHealthSnapshot(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10)); _ = Task.Run(OrderLoop); _ = Task.Run(MarketLoop); Connect(); }
+        public void Start() { if (_stopped || Interlocked.Exchange(ref _started, 1) != 0) return; _healthTimer = new Timer(_ => WriteHealthSnapshot(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10)); _ = Task.Run(OrderLoop); _ = Task.Run(MarketLoop); Connect(); }
         private WebSocketsHub() { ControlMessenger.MessageSent += OnMessageReceived; Start(); }
         public void Simulate(OrderMarketChange change) { foreach (var manager in OrderHandlers(change.Id)) manager.OnOrderChanged(change); }
         private void OnMessageReceived(string name, object data) { if (_stopped || name != "Reconnect") return; dynamic d = data; Connect(); _ = SubscribeAsync((string)d.MarketId); }
