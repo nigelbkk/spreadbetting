@@ -123,3 +123,21 @@ catch {
     Write-Error $_
     throw
 }
+finally {
+    # Never leave a successful smoke-test order working if verification fails.
+    if ($betId) {
+        try {
+            $remaining = Get-CurrentOrder $MarketId $betId
+            if ($remaining -and [string]$remaining.status -eq 'EXECUTABLE') {
+                Invoke-BetfairRpc 'cancelOrders' @{
+                    marketId = $MarketId
+                    instructions = @(@{ betId = [UInt64]$betId })
+                } | Out-Null
+                Write-Output "CLEANUP_CANCEL_REQUESTED betId=$betId"
+            }
+        }
+        catch {
+            Write-Error "CLEANUP_FAILED betId=$betId $($_.Exception.Message)"
+        }
+    }
+}
