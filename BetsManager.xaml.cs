@@ -754,10 +754,7 @@ namespace SpreadTrader
 						}
 						else
 						{
-							await Task.Run(() =>
-							{
-								Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-							});
+							await Task.Run(() => Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions));
 						}
 					}
 					break;
@@ -801,10 +798,7 @@ namespace SpreadTrader
 								else
 								{
 									Notification = $"Cancelling {cancel_instructions.Count} bets";
-									await Task.Run(() =>
-									{
-										Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-									});
+									await Task.Run(() => Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions));
 								}
 								Status = "Cancellation Task completed";
 							}
@@ -845,10 +839,7 @@ namespace SpreadTrader
 							else
 							{
 								Notification = $"Cancelling {cancel_instructions.Count} bets";
-								await Task.Run(() =>
-								{
-									Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions);
-								});
+								await Task.Run(() => Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions));
 							}
 						}
                         break;
