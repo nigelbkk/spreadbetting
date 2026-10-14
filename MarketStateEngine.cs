@@ -29,6 +29,7 @@ namespace SpreadTrader
 		private readonly Guid _engineId = Guid.NewGuid();
 		private Task _pnlTask;
 		private Task _bookTask;
+		private int _startStarted;
 		private int _stopStarted;
 		private async Task PNLProcessingLoop(Market _market, CancellationToken token)
 		{
@@ -144,6 +145,11 @@ namespace SpreadTrader
 			if (market == null)
 			{
 				Debug.WriteLine($"MarketStateEngine start skipped: market is null {_engineId}");
+				return;
+			}
+			if (Interlocked.Exchange(ref _startStarted, 1) != 0)
+			{
+				Debug.WriteLine($"MarketStateEngine start skipped: already running {_engineId}");
 				return;
 			}
 
