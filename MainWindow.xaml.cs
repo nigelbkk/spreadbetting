@@ -211,6 +211,7 @@ namespace SpreadTrader
         }
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            WebSocketsHub.Instance.Stop();
             props.Save();
         }
         private void OnUpdateAccount(object sender, MouseButtonEventArgs e)
