@@ -150,7 +150,7 @@ namespace SpreadTrader
 			if (change.Status != (MarketDefinition.StatusEnum) MarketNode.Status)
 			{
                 MarketNode.Status = (BetfairAPI.marketStatusEnum) change.Status;
-                ControlMessenger.Send("Market Status Changed");
+                ControlMessenger.Send("Market Status Changed", new { MarketId = MarketNode?.MarketID });
 			}
 			if (change.Status == Betfair.ESASwagger.Model.MarketDefinition.StatusEnum.Closed)
 			{

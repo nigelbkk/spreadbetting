@@ -441,7 +441,7 @@ namespace SpreadTrader
 				if (change.Closed == true)
 				{
 					Debug.WriteLine("market closed");
-					ControlMessenger.Send("Market Status Changed", new { String = "Closed" });
+					ControlMessenger.Send("Market Status Changed", new { MarketId = MarketNode?.MarketID, String = "Closed" });
 					Dispatcher.BeginInvoke(new Action(() =>
 					{
 						TraceThread("Dispatcher ENTER 2");

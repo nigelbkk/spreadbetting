@@ -61,6 +61,9 @@ namespace SpreadTrader
 			{
 				if (MarketNode == null)
 					return;
+				dynamic d = data;
+				if (d != null && d.MarketId != null && (string)d.MarketId != marketID)
+					return;
 
 				Status = MarketNode.Status;
 			}
