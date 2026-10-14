@@ -56,6 +56,12 @@ namespace SpreadTrader
         public int ProcessId { get; set; }
         public StreamHealthSnapshot Stream { get; set; }
         public List<MarketEngineHealthSnapshot> MarketEngines { get; set; }
+        public long RpcCalls { get; set; }
+        public long RpcFailures { get; set; }
+        public DateTime? LastRpcUtc { get; set; }
+        public DateTime? LastRpcFailureUtc { get; set; }
+        public string LastRpcMethod { get; set; }
+        public string LastRpcError { get; set; }
     }
 
     internal static class HealthDiagnostics
@@ -81,6 +87,29 @@ namespace SpreadTrader
         }
 
         private static readonly ConcurrentDictionary<string, EngineState> Engines = new ConcurrentDictionary<string, EngineState>();
+        private static long RpcCalls;
+        private static long RpcFailures;
+        private static long LastRpcTicks;
+        private static long LastRpcFailureTicks;
+        private static string LastRpcMethod;
+        private static string LastRpcError;
+
+        internal static void MarkRpcStart(string method)
+        {
+            Interlocked.Increment(ref RpcCalls);
+            Interlocked.Exchange(ref LastRpcTicks, DateTime.UtcNow.Ticks);
+            LastRpcMethod = method;
+        }
+
+        internal static void MarkRpcSuccess() { }
+
+        internal static void MarkRpcFailure(string method, Exception ex)
+        {
+            Interlocked.Increment(ref RpcFailures);
+            Interlocked.Exchange(ref LastRpcFailureTicks, DateTime.UtcNow.Ticks);
+            LastRpcMethod = method;
+            LastRpcError = ex?.Message;
+        }
 
         internal static void Register(Guid engineId, string marketId)
         {
@@ -154,7 +183,13 @@ namespace SpreadTrader
                     GeneratedUtc = DateTime.UtcNow,
                     ProcessId = Process.GetCurrentProcess().Id,
                     Stream = stream ?? new StreamHealthSnapshot { GeneratedUtc = DateTime.UtcNow },
-                    MarketEngines = Snapshot()
+                    MarketEngines = Snapshot(),
+                    RpcCalls = Volatile.Read(ref RpcCalls),
+                    RpcFailures = Volatile.Read(ref RpcFailures),
+                    LastRpcUtc = ToUtc(Volatile.Read(ref LastRpcTicks)),
+                    LastRpcFailureUtc = ToUtc(Volatile.Read(ref LastRpcFailureTicks)),
+                    LastRpcMethod = LastRpcMethod,
+                    LastRpcError = LastRpcError
                 };
                 File.WriteAllText(@"C:\Temp\spreadtrader-health.json", JsonConvert.SerializeObject(document, Formatting.Indented));
             }

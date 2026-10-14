@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Windows.Foundation;
+using SpreadTrader;
 
 namespace BetfairAPI
 {
@@ -92,6 +93,7 @@ namespace BetfairAPI
 		public async Task RPCRequestAsync(String Method, Dictionary<String, Object> Params)
 		{
             if (OFFLINE) return;
+			HealthDiagnostics.MarkRpcStart(Method);
 			String[] AccountCalls = new String[] { "getAccountFunds" };
 			Dictionary<String, Object> joe = new Dictionary<string, object>();
 			joe["jsonrpc"] = "2.0";
@@ -109,12 +111,22 @@ namespace BetfairAPI
 			//			url = "https://api.betfair.com/exchange/account/json-rpc/v1/";
 			//	}
 			//}
-			await SendRequestAsync(joe, url);
+			try
+			{
+				await SendRequestAsync(joe, url);
+				HealthDiagnostics.MarkRpcSuccess();
+			}
+			catch (Exception ex)
+			{
+				HealthDiagnostics.MarkRpcFailure(Method, ex);
+				throw;
+			}
 		}
 		public Object RPCRequest<T>(String Method, Dictionary<String, Object> Params)
         {
             Debug.WriteLine("RPC BEGIN " + Method);
             if (OFFLINE) return null;
+            HealthDiagnostics.MarkRpcStart(Method);
             try
             {
                 String[] AccountCalls = new String[] { "getAccountFunds" };
@@ -171,12 +183,15 @@ namespace BetfairAPI
 					if (result == null || result.Type == JTokenType.Null)
 						return default(T);
 					String res = result.ToString(Formatting.None);
-					return JsonConvert.DeserializeObject<T>(res);
+					var resultValue = JsonConvert.DeserializeObject<T>(res);
+					HealthDiagnostics.MarkRpcSuccess();
+					return resultValue;
                 }
             }
             catch (Exception xe)
             {
                 Debug.WriteLine("RPC FAIL " + Method + " " + xe.Message);
+                HealthDiagnostics.MarkRpcFailure(Method, xe);
                 return null;
             }
         }

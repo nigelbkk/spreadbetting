@@ -78,11 +78,12 @@ namespace SpreadTrader
                     Interlocked.Exchange(ref _lastConnectedTicks, DateTime.UtcNow.Ticks);
                 }
                 Trace.WriteLine("Canonical SignalR stream connected: " + HubUri);
+                ControlMessenger.Send("Stream Health Changed", GetHealthSnapshot());
                 string[] markets; lock (_handlersLock) markets = new List<string>(_subscribedMarkets).ToArray(); foreach (string market in markets) await InvokeAsync("SubscribeMarket", market);
                 await ReceiveLoopAsync(socket, cts.Token);
             }
             catch (OperationCanceledException) when (_stopped) { }
-            catch (Exception ex) { Interlocked.Exchange(ref _connected, 0); Interlocked.Exchange(ref _lastErrorTicks, DateTime.UtcNow.Ticks); _lastError = ex.Message; Trace.WriteLine("Canonical SignalR stream error: " + ex); }
+            catch (Exception ex) { Interlocked.Exchange(ref _connected, 0); Interlocked.Exchange(ref _lastErrorTicks, DateTime.UtcNow.Ticks); _lastError = ex.Message; Trace.WriteLine("Canonical SignalR stream error: " + ex); ControlMessenger.Send("Stream Health Changed", GetHealthSnapshot()); }
         }
         private async Task ReceiveLoopAsync(ClientWebSocket socket, CancellationToken token)
         {
@@ -94,7 +95,10 @@ namespace SpreadTrader
             }
             lock (_socketLock) { if (ReferenceEquals(_socket, socket)) { _socket = null; _socketCts = null; } }
             if (Interlocked.Exchange(ref _connected, 0) != 0)
+            {
                 Interlocked.Exchange(ref _lastDisconnectedTicks, DateTime.UtcNow.Ticks);
+                ControlMessenger.Send("Stream Health Changed", GetHealthSnapshot());
+            }
         }
         private void HandleMessage(string payload)
         {

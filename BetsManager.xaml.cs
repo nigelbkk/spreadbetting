@@ -92,7 +92,7 @@ namespace SpreadTrader
             }
         }
         public SolidColorBrush StreamingColor { get { return StreamActive ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.LightGray; } }
-        public String StreamingButtonText { get { return "Streaming Connected"; } }
+        public String StreamingButtonText { get { return StreamActive ? "Streaming Connected" : "Streaming Disconnected"; } }
 		#endregion Properties
 
 		private SimulatedStream _simulatedStream = null;
@@ -108,6 +108,7 @@ namespace SpreadTrader
 			Rows = new ObservableCollection<BetsManagerRow>();
 			InitializeComponent();
 			ControlMessenger.MessageSent += OnMessageReceived;
+			StreamActive = WebSocketsHub.Instance.GetHealthSnapshot().Connected;
 
 			Loaded += (s, e) =>
 			{
@@ -209,6 +210,13 @@ namespace SpreadTrader
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
+			if (messageName == "Stream Health Changed")
+			{
+				var health = data as StreamHealthSnapshot;
+				Action update = () => StreamActive = health != null && health.Connected;
+				if (Dispatcher.CheckAccess()) update(); else Dispatcher.BeginInvoke(update);
+				return;
+			}
 			if (messageName == "New")
 			{
 				_simulatedStream?.SimulateNewBet(MarketNode.MarketID, MarketNode.LiveRunners[0].SelectionId, 25);
