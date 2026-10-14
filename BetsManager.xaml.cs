@@ -360,12 +360,17 @@ namespace SpreadTrader
 		{
 			_ = Task.Run(async () =>
 			{
-				await Task.Delay(500).ConfigureAwait(false);
-				UiThread.Run(() =>
+				// Allow the relay to renew an expired session after a transient
+				// 403; do not make the UI depend on one immediate read-after-write.
+				foreach (int delayMs in new[] { 500, 1500, 3000 })
 				{
-					if (MarketNode?.MarketID == marketId)
-						PopulateDataGrid();
-				});
+					await Task.Delay(delayMs).ConfigureAwait(false);
+					UiThread.Run(() =>
+					{
+						if (MarketNode?.MarketID == marketId)
+							PopulateDataGrid();
+					});
+				}
 			});
 		}
 		private void ApplyPartialMatch(BetsManagerRow row, Order o, string runner_name)
