@@ -48,7 +48,7 @@ namespace SpreadTrader
 		private Properties.Settings props = Properties.Settings.Default;
 		private bool _tabRemoved;
 		#endregion
-		public async void PopulateNewMarket(NodeViewModel node)
+		public async Task PopulateNewMarket(NodeViewModel node)
         {
 			try
 			{
