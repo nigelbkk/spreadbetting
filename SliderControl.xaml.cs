@@ -167,19 +167,25 @@ namespace SpreadTrader
             timer.AutoReset = false;
             timer.Elapsed += (o, _e) =>
             {
-
-                switch (Tag)
-                {
-                    case "-":
-                        BasePrice = betfairPrices.Previous(BasePrice);
-                        break;
-                    case "+": BasePrice = betfairPrices.Next(BasePrice); break;
-                }
-                timer.Stop();
-                timer.Enabled = false;
-                Debug.WriteLine(BasePrice);
-                SyncPrices();
-                timer.Start();
+				if (Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished)
+					return;
+				Dispatcher.BeginInvoke(new Action(() =>
+				{
+					if (timer == null || Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished)
+						return;
+					switch (Tag)
+					{
+						case "-":
+							BasePrice = betfairPrices.Previous(BasePrice);
+							break;
+						case "+": BasePrice = betfairPrices.Next(BasePrice); break;
+					}
+					timer.Stop();
+					timer.Enabled = false;
+					Debug.WriteLine(BasePrice);
+					SyncPrices();
+					timer.Start();
+				}));
             };
         }
         private void Button_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)

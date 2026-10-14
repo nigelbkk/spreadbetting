@@ -77,8 +77,15 @@ namespace SpreadTrader
 			ConnectButtonText = "Reconnect";
 			timer.Elapsed += (o, e) =>
 			{
-				OnPropertyChanged(nameof(TimeToGo));
-				OnPropertyChanged(nameof(TotalMatched));
+				if (Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished)
+					return;
+				Dispatcher.BeginInvoke(new Action(() =>
+				{
+					if (Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished)
+						return;
+					OnPropertyChanged(nameof(TimeToGo));
+					OnPropertyChanged(nameof(TotalMatched));
+				}));
 			};
 			timer.Interval = 1000;
 			timer.Enabled = true;
