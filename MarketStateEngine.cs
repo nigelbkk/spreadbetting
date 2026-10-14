@@ -29,6 +29,7 @@ namespace SpreadTrader
 		private readonly Guid _engineId = Guid.NewGuid();
 		private Task _pnlTask;
 		private Task _bookTask;
+		private int _stopStarted;
 		private async Task PNLProcessingLoop(Market _market, CancellationToken token)
 		{
 			Debug.WriteLine($"PNL LOOP START {_market?.marketId} : {_engineId}");
@@ -60,6 +61,7 @@ namespace SpreadTrader
 				}
 				catch (OperationCanceledException)
 				{
+					break;
 				}
 				catch (Exception ex)
 				{
@@ -118,6 +120,7 @@ namespace SpreadTrader
 				}
 				catch (OperationCanceledException)
 				{
+					break;
 				}
 				catch (Exception ex)
 				{
@@ -133,6 +136,11 @@ namespace SpreadTrader
 		}
 		public void Start(Market market)
 		{
+			if (Volatile.Read(ref _stopStarted) != 0)
+			{
+				Debug.WriteLine($"MarketStateEngine start skipped after stop {_engineId}");
+				return;
+			}
 			if (market == null)
 			{
 				Debug.WriteLine($"MarketStateEngine start skipped: market is null {_engineId}");
@@ -144,6 +152,8 @@ namespace SpreadTrader
 		}
 		public async Task Stop()
 		{
+			if (Interlocked.Exchange(ref _stopStarted, 1) != 0)
+				return;
 			try
 			{
 				_cts.Cancel();
@@ -153,6 +163,10 @@ namespace SpreadTrader
 			catch (ObjectDisposedException ex)
 			{
 				Debug.WriteLine($"MarketStateEngine already disposed {_engineId}: {ex.Message}");
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine($"MarketStateEngine stop failed {_engineId}: {ex}");
 			}
 			finally
 			{
