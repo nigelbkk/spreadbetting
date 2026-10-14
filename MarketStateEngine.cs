@@ -132,6 +132,10 @@ namespace SpreadTrader
 				{
 					HealthDiagnostics.MarkBookError(_engineId, ex);
 					Debug.WriteLine($"[BOOK LOOP ERROR] {ex}");
+					// Bound repeated relay/API failures so a degraded market cannot
+					// turn into a tight request/CPU loop.
+					try { await Task.Delay(Math.Max(1000, Props.props.BookFrequency * 1000), token); }
+					catch (OperationCanceledException) { break; }
 				}
 				finally
 				{

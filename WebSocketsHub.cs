@@ -59,7 +59,7 @@ namespace SpreadTrader
         public void Start() { if (_stopped || Interlocked.Exchange(ref _started, 1) != 0) return; _healthTimer = new Timer(_ => WriteHealthSnapshot(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10)); _ = Task.Run(OrderLoop); _ = Task.Run(MarketLoop); Connect(); }
         private WebSocketsHub() { ControlMessenger.MessageSent += OnMessageReceived; Start(); }
         public void Simulate(OrderMarketChange change) { foreach (var manager in OrderHandlers(change.Id)) manager.OnOrderChanged(change); }
-        private void OnMessageReceived(string name, object data) { if (_stopped || name != "Reconnect") return; dynamic d = data; Connect(); _ = SubscribeAsync((string)d.MarketId); }
+        private void OnMessageReceived(string name, object data) { if (_stopped || name != "Reconnect") return; Connect(); }
         private Uri HubUri { get { return new Uri("ws://" + props.WebSocketsUrl.TrimEnd('/') + "/marketHub"); } }
         private void OrderLoop() { foreach (var json in _orderQueue.GetConsumingEnumerable()) { var change = JsonConvert.DeserializeObject<OrderMarketChange>(json); if (change == null || change.Id == null) continue; foreach (var manager in OrderHandlers(change.Id)) { manager.OnOrderChanged(change); ControlMessenger.Send(""); } } }
         private void MarketLoop() { foreach (var change in _marketChangeQueue.GetConsumingEnumerable()) { var latest = change; while (_marketChangeQueue.TryTake(out var next)) latest = next; foreach (var manager in MarketHandlers(latest.MarketId)) manager.OnMarketChanged(latest); } }
