@@ -33,6 +33,19 @@ namespace SpreadTrader
         private int _connectLoopStarted;
         private int _droppedOrderMessages;
         private int _droppedMarketMessages;
+        private long _connectAttempts;
+        private long _reconnects;
+        private long _messagesReceived;
+        private long _marketMessages;
+        private long _orderMessages;
+        private long _invalidMessages;
+        private long _lastConnectedTicks;
+        private long _lastDisconnectedTicks;
+        private long _lastMessageTicks;
+        private long _lastErrorTicks;
+        private string _lastError;
+        private Timer _healthTimer;
+        private int _connected;
         private volatile bool _stopped;
         private Properties.Settings props = Properties.Settings.Default;
 
@@ -42,7 +55,7 @@ namespace SpreadTrader
         public void Detach(string marketId, RunnersControl manager) { if (string.IsNullOrEmpty(marketId) || manager == null) return; bool unsubscribe = false; lock (_handlersLock) { if (_marketHandlers.TryGetValue(marketId, out var h)) { h.Remove(manager); if (h.Count == 0) { _marketHandlers.Remove(marketId); unsubscribe = true; } } } if (unsubscribe) _ = UnsubscribeAsync(marketId); }
         private List<BetsManager> OrderHandlers(string id) { lock (_handlersLock) return _ordersHandlers.TryGetValue(id, out var h) ? new List<BetsManager>(h) : new List<BetsManager>(); }
         private List<RunnersControl> MarketHandlers(string id) { lock (_handlersLock) return _marketHandlers.TryGetValue(id, out var h) ? new List<RunnersControl>(h) : new List<RunnersControl>(); }
-        public void Start() { if (_stopped) return; _ = Task.Run(OrderLoop); _ = Task.Run(MarketLoop); Connect(); }
+        public void Start() { if (_stopped) return; _healthTimer = new Timer(_ => WriteHealthSnapshot(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10)); _ = Task.Run(OrderLoop); _ = Task.Run(MarketLoop); Connect(); }
         private WebSocketsHub() { ControlMessenger.MessageSent += OnMessageReceived; Start(); }
         public void Simulate(OrderMarketChange change) { foreach (var manager in OrderHandlers(change.Id)) manager.OnOrderChanged(change); }
         private void OnMessageReceived(string name, object data) { if (_stopped || name != "Reconnect") return; dynamic d = data; Connect(); _ = SubscribeAsync((string)d.MarketId); }
@@ -53,16 +66,23 @@ namespace SpreadTrader
         {
             try
             {
+                Interlocked.Increment(ref _connectAttempts);
                 Trace.WriteLine("Canonical SignalR stream connection attempt: " + HubUri);
                 var socket = new ClientWebSocket(); socket.Options.KeepAliveInterval = TimeSpan.FromSeconds(15); var cts = new CancellationTokenSource();
                 await socket.ConnectAsync(HubUri, cts.Token); await SendRawAsync(socket, "{\"protocol\":\"json\",\"version\":1}\u001e", cts.Token);
                 lock (_socketLock) { if (_socketCts != null) _socketCts.Cancel(); _socket = socket; _socketCts = cts; }
+                var wasConnected = Interlocked.Exchange(ref _connected, 1);
+                if (wasConnected == 0)
+                {
+                    Interlocked.Increment(ref _reconnects);
+                    Interlocked.Exchange(ref _lastConnectedTicks, DateTime.UtcNow.Ticks);
+                }
                 Trace.WriteLine("Canonical SignalR stream connected: " + HubUri);
                 string[] markets; lock (_handlersLock) markets = new List<string>(_subscribedMarkets).ToArray(); foreach (string market in markets) await InvokeAsync("SubscribeMarket", market);
                 await ReceiveLoopAsync(socket, cts.Token);
             }
             catch (OperationCanceledException) when (_stopped) { }
-            catch (Exception ex) { Trace.WriteLine("Canonical SignalR stream error: " + ex); }
+            catch (Exception ex) { Interlocked.Exchange(ref _connected, 0); Interlocked.Exchange(ref _lastErrorTicks, DateTime.UtcNow.Ticks); _lastError = ex.Message; Trace.WriteLine("Canonical SignalR stream error: " + ex); }
         }
         private async Task ReceiveLoopAsync(ClientWebSocket socket, CancellationToken token)
         {
@@ -73,28 +93,34 @@ namespace SpreadTrader
                 while ((end = all.IndexOf('\u001e')) >= 0) { HandleMessage(all.Substring(0, end)); all = all.Substring(end + 1); } text.Clear(); text.Append(all);
             }
             lock (_socketLock) { if (ReferenceEquals(_socket, socket)) { _socket = null; _socketCts = null; } }
+            if (Interlocked.Exchange(ref _connected, 0) != 0)
+                Interlocked.Exchange(ref _lastDisconnectedTicks, DateTime.UtcNow.Ticks);
         }
         private void HandleMessage(string payload)
         {
             if (string.IsNullOrWhiteSpace(payload) || payload == "{}") return;
             try
             {
-                var message = JObject.Parse(payload); if ((int?)message["type"] != 1) return; string target = (string)message["target"];
+                Interlocked.Increment(ref _messagesReceived);
+                Interlocked.Exchange(ref _lastMessageTicks, DateTime.UtcNow.Ticks);
+                var message = JObject.Parse(payload); if ((int?)message["type"] != 1) { Interlocked.Increment(ref _invalidMessages); return; } string target = (string)message["target"];
                 if (target == "marketChanged")
                 {
+                    Interlocked.Increment(ref _marketMessages);
                     var change = message["arguments"]?[0]?.ToObject<MarketChangeDto>();
                     if (change != null && !_stopped && !_marketChangeQueue.TryAdd(change))
                         RecordDroppedMessage("market", ref _droppedMarketMessages);
                 }
                 else if (target == "ordersChanged" && !_stopped)
                 {
+                    Interlocked.Increment(ref _orderMessages);
                     var orderJson = (string)message["arguments"]?[0];
                     if (orderJson != null && !_orderQueue.TryAdd(orderJson))
                         RecordDroppedMessage("order", ref _droppedOrderMessages);
                 }
             }
             catch (InvalidOperationException) when (_stopped) { }
-            catch (Exception ex) { Debug.WriteLine("Canonical SignalR message ignored: " + ex.Message); }
+            catch (Exception ex) { Interlocked.Increment(ref _invalidMessages); Debug.WriteLine("Canonical SignalR message ignored: " + ex.Message); }
         }
         private void RecordDroppedMessage(string kind, ref int counter)
         {
@@ -130,6 +156,7 @@ namespace SpreadTrader
             ControlMessenger.MessageSent -= OnMessageReceived;
             _orderQueue.CompleteAdding();
             _marketChangeQueue.CompleteAdding();
+            _healthTimer?.Dispose();
             lock (_socketLock)
             {
                 _socketCts?.Cancel();
@@ -138,6 +165,40 @@ namespace SpreadTrader
                 _socket = null;
                 _socketCts = null;
             }
+            WriteHealthSnapshot();
         }
+
+        private void WriteHealthSnapshot() => HealthDiagnostics.Write(GetHealthSnapshot());
+
+        internal StreamHealthSnapshot GetHealthSnapshot()
+        {
+            lock (_handlersLock)
+            {
+                return new StreamHealthSnapshot
+                {
+                    GeneratedUtc = DateTime.UtcNow,
+                    Connected = Volatile.Read(ref _connected) != 0,
+                    HubUri = HubUri.ToString(),
+                    LastConnectedUtc = ToUtc(Volatile.Read(ref _lastConnectedTicks)),
+                    LastDisconnectedUtc = ToUtc(Volatile.Read(ref _lastDisconnectedTicks)),
+                    LastMessageUtc = ToUtc(Volatile.Read(ref _lastMessageTicks)),
+                    LastErrorUtc = ToUtc(Volatile.Read(ref _lastErrorTicks)),
+                    LastError = _lastError,
+                    ConnectAttempts = Volatile.Read(ref _connectAttempts),
+                    Reconnects = Volatile.Read(ref _reconnects),
+                    MessagesReceived = Volatile.Read(ref _messagesReceived),
+                    MarketMessages = Volatile.Read(ref _marketMessages),
+                    OrderMessages = Volatile.Read(ref _orderMessages),
+                    InvalidMessages = Volatile.Read(ref _invalidMessages),
+                    DroppedMarketMessages = Volatile.Read(ref _droppedMarketMessages),
+                    DroppedOrderMessages = Volatile.Read(ref _droppedOrderMessages),
+                    ActiveSubscriptions = _subscribedMarkets.Count,
+                    MarketQueueCount = _marketChangeQueue.Count,
+                    OrderQueueCount = _orderQueue.Count
+                };
+            }
+        }
+
+        private static DateTime? ToUtc(long ticks) => ticks == 0 ? (DateTime?)null : new DateTime(ticks, DateTimeKind.Utc);
     }
 }

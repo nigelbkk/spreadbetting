@@ -33,6 +33,7 @@ namespace SpreadTrader
 		private int _stopStarted;
 		private async Task PNLProcessingLoop(Market _market, CancellationToken token)
 		{
+			HealthDiagnostics.MarkPnlLoopStart(_engineId);
 			Debug.WriteLine($"PNL LOOP START {_market?.marketId} : {_engineId}");
 			if (Interlocked.Exchange(ref _pnlLoopRunning, 1) == 1)
 			{
@@ -57,6 +58,7 @@ namespace SpreadTrader
 							try { handler(telemetry); }
 							catch (Exception handlerError) { Debug.WriteLine($"PNL telemetry handler error: {handlerError}"); }
 						}
+						HealthDiagnostics.MarkPnlSuccess(_engineId);
 					}
 					await Task.Delay(Props.props.PNLFrequency, token);
 				}
@@ -66,6 +68,7 @@ namespace SpreadTrader
 				}
 				catch (Exception ex)
 				{
+					HealthDiagnostics.MarkPnlError(_engineId, ex);
 					Debug.WriteLine($"[PNL LOOP ERROR] {ex}");
 					// Yield before retrying a failed relay/API call; do not spin.
 					try { await Task.Delay(Math.Max(1000, Props.props.PNLFrequency), token); }
@@ -81,6 +84,7 @@ namespace SpreadTrader
 		}
 		private async Task OrderBookProcessingLoop(Market _market, CancellationToken token)
 		{
+			HealthDiagnostics.MarkBookLoopStart(_engineId);
 			Debug.WriteLine($"BOOK LOOP START {_market?.marketId} : {_engineId}");
 			if (Interlocked.Exchange(ref _bookLoopRunning, 1) == 1)
 			{
@@ -116,6 +120,7 @@ namespace SpreadTrader
 								Debug.WriteLine($"Telemetry handler error: {ex}");
 							}
 						}
+						HealthDiagnostics.MarkBookSuccess(_engineId);
 					}
 					await Task.Delay(Props.props.BookFrequency * 1000, token);
 				}
@@ -125,6 +130,7 @@ namespace SpreadTrader
 				}
 				catch (Exception ex)
 				{
+					HealthDiagnostics.MarkBookError(_engineId, ex);
 					Debug.WriteLine($"[BOOK LOOP ERROR] {ex}");
 				}
 				finally
@@ -152,6 +158,7 @@ namespace SpreadTrader
 				Debug.WriteLine($"MarketStateEngine start skipped: already running {_engineId}");
 				return;
 			}
+			HealthDiagnostics.MarkStarted(_engineId, market.marketId);
 
 			_bookTask = Task.Run(() => OrderBookProcessingLoop(market, _cts.Token));
 			_pnlTask = Task.Run(() => PNLProcessingLoop(market, _cts.Token));
@@ -176,6 +183,7 @@ namespace SpreadTrader
 			}
 			finally
 			{
+				HealthDiagnostics.MarkStopped(_engineId);
 				_cts.Dispose();
 			}
 		}
