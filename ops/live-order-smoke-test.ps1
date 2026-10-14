@@ -6,6 +6,7 @@ param(
     [long]$SelectionId,
     [string]$RpcUrl = 'http://100.76.118.17:15055',
     [switch]$ConfirmLiveOrder,
+    [switch]$CheckCancelAll,
     [int]$HorseMarketWindowMinutes = 30
 )
 
@@ -15,6 +16,9 @@ $price = 1.01
 
 if (!$ConfirmLiveOrder) {
     throw 'Refusing live order smoke test. Re-run with -ConfirmLiveOrder.'
+}
+if ($CheckCancelAll -and !$ConfirmLiveOrder) {
+    throw 'Refusing cancel-all verification without -ConfirmLiveOrder.'
 }
 
 function Invoke-BetfairRpc([string]$Method, $Params) {
@@ -35,6 +39,11 @@ function Invoke-BetfairRpc([string]$Method, $Params) {
 function Get-CurrentOrder([string]$Id, [string]$BetId) {
     $report = Invoke-BetfairRpc 'listCurrentOrders' @{ marketIds = @($Id); betIds = @($BetId) }
     return @($report.currentOrders) | Where-Object { [string]$_.betId -eq $BetId } | Select-Object -First 1
+}
+
+function Get-CurrentOrders([string]$Id) {
+    $report = Invoke-BetfairRpc 'listCurrentOrders' @{ marketIds = @($Id); orderProjection = 'ALL' }
+    return @($report.currentOrders)
 }
 
 if (!$MarketId -or !$SelectionId) {
@@ -104,11 +113,32 @@ try {
     if (!$visible) { throw "Placed bet $betId was not returned by listCurrentOrders." }
     Write-Output "DISPLAYED betId=$betId status=$($visible.status) sizeRemaining=$($visible.sizeRemaining)"
 
-    $cancel = Invoke-BetfairRpc 'cancelOrders' @{
-        marketId = $MarketId
-        instructions = @(@{ betId = [UInt64]$betId })
+    $cancelInstructions = @(@{ betId = [UInt64]$betId })
+    $cancelMethod = 'cancelOrders'
+    if ($CheckCancelAll) {
+        # The gate never cancels pre-existing orders implicitly.  It batches
+        # the bet created by this run, exercising the same cancel-all RPC
+        # contract without touching an operator's unrelated exposure.
+        $testOrders = @(Get-CurrentOrders $MarketId | Where-Object {
+            [string]$_.status -eq 'EXECUTABLE' -and [string]$_.betId -eq $betId
+        })
+        if ($testOrders.Count -ne 1) {
+            throw "Cancel-all precondition failed: expected exactly one executable smoke-test order, found $($testOrders.Count)."
+        }
+        Write-Output "CANCEL_ALL_SCOPE betIds=$betId"
     }
-    Write-Output "CANCEL_REQUESTED betId=$betId status=$($cancel.status)"
+    $cancel = Invoke-BetfairRpc $cancelMethod @{
+        marketId = $MarketId
+        instructions = $cancelInstructions
+    }
+    if ([string]$cancel.status -ne 'SUCCESS') {
+        throw "Cancellation request failed: $($cancel | ConvertTo-Json -Depth 12 -Compress)"
+    }
+    if ($CheckCancelAll) {
+        Write-Output "CANCEL_ALL_REQUESTED betIds=$betId status=$($cancel.status)"
+    } else {
+        Write-Output "CANCEL_REQUESTED betId=$betId status=$($cancel.status)"
+    }
 
     $stillExecutable = $null
     for ($attempt = 1; $attempt -le 10; $attempt++) {
@@ -119,7 +149,11 @@ try {
     if ($stillExecutable -and [string]$stillExecutable.status -eq 'EXECUTABLE') {
         throw "Bet $betId remains EXECUTABLE after cancellation."
     }
-    Write-Output "CANCEL_VERIFIED betId=$betId"
+    if ($CheckCancelAll) {
+        Write-Output "CANCEL_ALL_VERIFIED betIds=$betId"
+    } else {
+        Write-Output "CANCEL_VERIFIED betId=$betId"
+    }
 }
 catch {
     Write-Error $_

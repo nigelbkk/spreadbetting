@@ -335,6 +335,10 @@ namespace SpreadTrader
 				// notifications. Refresh the authoritative order list after a
 				// successful placement so the grid reflects the new bet.
 				UiThread.Run(PopulateDataGrid);
+				// Betfair can briefly lag between placeOrders and listCurrentOrders.
+				// A second, market-scoped refresh prevents a valid bet from being
+				// reported as missing without touching another selected tab.
+				ScheduleOrderRefresh(MarketID);
             });
 			}
 			catch (Exception ex)
@@ -351,6 +355,18 @@ namespace SpreadTrader
                 var player = new SoundPlayer(path);
                 player.Play();
             }
+		}
+		private void ScheduleOrderRefresh(string marketId)
+		{
+			_ = Task.Run(async () =>
+			{
+				await Task.Delay(500).ConfigureAwait(false);
+				UiThread.Run(() =>
+				{
+					if (MarketNode?.MarketID == marketId)
+						PopulateDataGrid();
+				});
+			});
 		}
 		private void ApplyPartialMatch(BetsManagerRow row, Order o, string runner_name)
 		{
@@ -692,9 +708,11 @@ namespace SpreadTrader
 						if (report == null || report.currentOrders == null)
 						{
 							Status = "Current orders unavailable";
+							Trace.WriteLine($"BetsManager current-orders refresh failed market={MarketNode.MarketID}");
 							Debug.WriteLine("Current orders refresh returned no response");
 							return;
 						}
+						Trace.WriteLine($"BetsManager current-orders refresh market={MarketNode.MarketID} count={report.currentOrders.Count}");
 
                         //_allRows.Clear();
                         if (report.currentOrders.Count > 0)
@@ -820,6 +838,8 @@ namespace SpreadTrader
 								{
 									Notification = $"Cancelling {cancel_instructions.Count} bets";
 									await Task.Run(() => Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions));
+									UiThread.Run(PopulateDataGrid);
+									ScheduleOrderRefresh(MarketNode.MarketID);
 								}
 								Status = "Cancellation Task completed";
 							}
@@ -861,6 +881,8 @@ namespace SpreadTrader
 							{
 								Notification = $"Cancelling {cancel_instructions.Count} bets";
 								await Task.Run(() => Betfair.cancelOrders(MarketNode.MarketID, cancel_instructions));
+								UiThread.Run(PopulateDataGrid);
+								ScheduleOrderRefresh(MarketNode.MarketID);
 							}
 						}
                         break;

@@ -191,6 +191,22 @@ namespace BetfairAPI
             catch (Exception xe)
             {
                 Debug.WriteLine("RPC FAIL " + Method + " " + xe.Message);
+                if (xe is WebException web && web.Response != null)
+                {
+                    try
+                    {
+                        using (var response = web.Response)
+                        using (var stream = response.GetResponseStream())
+                        using (var reader = new StreamReader(stream))
+                        {
+                            Debug.WriteLine("RPC FAIL BODY " + Method + " " + reader.ReadToEnd());
+                        }
+                    }
+                    catch (Exception bodyError)
+                    {
+                        Debug.WriteLine("RPC FAIL BODY READ " + Method + " " + bodyError.Message);
+                    }
+                }
                 HealthDiagnostics.MarkRpcFailure(Method, xe);
                 return null;
             }
