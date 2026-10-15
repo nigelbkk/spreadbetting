@@ -229,6 +229,17 @@ namespace SpreadTrader
 			WebSocketsHub.Instance.Attach(MarketNode.MarketID, this);
 			if (marketChanged)
 				WebSocketsHub.Instance.Detach(_marketId, this);
+
+			if (Environment.GetEnvironmentVariable("SPREADTRADER_SIM_SMOKE") == "1")
+			{
+				_ = RunSimulatorSmokeAsync().ContinueWith(t =>
+				{
+					if (t.IsFaulted)
+						Debug.WriteLine("Simulator smoke failed: " + t.Exception?.GetBaseException().Message);
+					else
+						Debug.WriteLine("Simulator smoke passed: placement, display and cancellation");
+				}, TaskScheduler.FromCurrentSynchronizationContext());
+			}
 		}
 		private void OnMessageReceived(string messageName, object data)
 		{
