@@ -131,8 +131,32 @@ namespace SpreadTrader
 		void InitSimulator()
         {
             OcmDiagnostics.Clear();
-			//_simulatedStream = new SimulatedStream(ReplayMode.WallClockAccurate, 1, 1.0);
-			//_simulatedStream.OnChange = (change) => WebSocketsHub.Instance.Simulate(change);
+			_simulatedStream = new SimulatedStream(ReplayMode.Burst, 1, 1.0);
+			_simulatedStream.OnChange = change => WebSocketsHub.Instance.Simulate(change);
+		}
+
+		/// <summary>
+		/// Runs the order display lifecycle without calling Betfair. This is intentionally
+		/// callable only by developer/test tooling; normal order buttons never use it.
+		/// </summary>
+		public async Task RunSimulatorSmokeAsync()
+		{
+			if (MarketNode == null || MarketNode.LiveRunners == null || MarketNode.LiveRunners.Count == 0)
+				throw new InvalidOperationException("Select a market with at least one runner first.");
+
+			InitSimulator();
+			await _simulatedStream.SimulateNewBet(MarketNode.MarketID, MarketNode.LiveRunners[0].SelectionId, 2.0);
+			string betId = SimulatedStream._orders.Keys.LastOrDefault();
+			if (string.IsNullOrEmpty(betId))
+				throw new InvalidOperationException("Simulator did not create an order.");
+
+			await _simulatedStream.SimulatePartial(betId, 1.0);
+			if (!_byBetId.ContainsKey(Convert.ToUInt64(betId)))
+				throw new InvalidOperationException("Simulator order was not displayed.");
+
+			await _simulatedStream.SimulateCancel(betId);
+			if (_byBetId.ContainsKey(Convert.ToUInt64(betId)))
+				throw new InvalidOperationException("Simulator cancellation was not reflected in the order display.");
 		}
 
 		private void ApplyFilter(BetsManagerRow[] snapshot)
