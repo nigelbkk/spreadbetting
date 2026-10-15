@@ -15,6 +15,7 @@ New-Item -ItemType Directory -Force -Path $logDirectory | Out-Null
 
 $processes = @(Get-CimInstance Win32_Process -Filter "Name='$ProcessName.exe'" -ErrorAction SilentlyContinue)
 $process = $processes | Select-Object -First 1
+$uiProcess = @(Get-Process -Name $ProcessName -ErrorAction SilentlyContinue) | Select-Object -First 1
 $proxy = [ordered]@{ reachable = $false; health = $null; error = $null }
 $heartbeat = [ordered]@{ installed = $false; fresh = $null; ageSeconds = $null; state = $null; error = $null }
 
@@ -56,11 +57,12 @@ $record = [ordered]@{
         name = $ProcessName
         running = $null -ne $process
         pid = if ($process) { [int]$process.ProcessId } else { $null }
+        responding = if ($uiProcess) { [bool]$uiProcess.Responding } else { $null }
         startUtc = $null
     }
     proxy = $proxy
     heartbeat = $heartbeat
-    healthy = (($null -ne $process) -and $proxy.reachable -and (($heartbeat.installed -eq $false) -or $heartbeat.fresh))
+    healthy = (($null -ne $process) -and (($null -eq $uiProcess) -or $uiProcess.Responding) -and $proxy.reachable -and (($heartbeat.installed -eq $false) -or $heartbeat.fresh))
 }
 
 if ($process -and $process.CreationDate) {
