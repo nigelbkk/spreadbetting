@@ -14,6 +14,9 @@ namespace SpreadTrader
     /// </summary>
     public partial class App : Application
     {
+        private DispatcherTimer _heartbeatTimer;
+        private const string HeartbeatPath = @"C:\Temp\SpreadTrader\heartbeat.json";
+
         private void ApplicationStartup(object sender, StartupEventArgs e)
         {
             Directory.CreateDirectory(@"C:\Temp");
@@ -24,6 +27,34 @@ namespace SpreadTrader
             FrameworkElement.LanguageProperty.OverrideMetadata(
                 typeof(FrameworkElement),
                 new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
+
+            StartHeartbeat();
+            Exit += (_, __) => WriteHeartbeat("stopped");
+        }
+
+        private void StartHeartbeat()
+        {
+            _heartbeatTimer = new DispatcherTimer(DispatcherPriority.Background)
+            {
+                Interval = TimeSpan.FromSeconds(15)
+            };
+            _heartbeatTimer.Tick += (_, __) => WriteHeartbeat("running");
+            _heartbeatTimer.Start();
+            WriteHeartbeat("running");
+        }
+
+        private static void WriteHeartbeat(string state)
+        {
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(HeartbeatPath));
+                string json = $"{{\"utc\":\"{DateTime.UtcNow:O}\",\"pid\":{Process.GetCurrentProcess().Id},\"state\":\"{state}\"}}";
+                File.WriteAllText(HeartbeatPath, json + Environment.NewLine);
+            }
+            catch
+            {
+                // Diagnostics must never interfere with the trading UI.
+            }
         }
 
         private static void LogFatal(string source, Exception ex)

@@ -3,7 +3,9 @@ param(
     [string]$ProcessName = 'SpreadTraderV2',
     [string]$ProxyHost = '100.76.118.17',
     [int]$ProxyPort = 18088,
-    [string]$LogPath = 'C:\Temp\SpreadTrader\health.jsonl'
+    [string]$LogPath = 'C:\Temp\SpreadTrader\health.jsonl',
+    [string]$HeartbeatPath = 'C:\Temp\SpreadTrader\heartbeat.json',
+    [int]$HeartbeatMaxAgeSeconds = 45
 )
 
 $ErrorActionPreference = 'Stop'
@@ -14,6 +16,21 @@ New-Item -ItemType Directory -Force -Path $logDirectory | Out-Null
 $processes = @(Get-CimInstance Win32_Process -Filter "Name='$ProcessName.exe'" -ErrorAction SilentlyContinue)
 $process = $processes | Select-Object -First 1
 $proxy = [ordered]@{ reachable = $false; health = $null; error = $null }
+$heartbeat = [ordered]@{ installed = $false; fresh = $null; ageSeconds = $null; state = $null; error = $null }
+
+if (Test-Path -LiteralPath $HeartbeatPath) {
+    $heartbeat.installed = $true
+    try {
+        $heartbeatData = Get-Content -LiteralPath $HeartbeatPath -Raw | ConvertFrom-Json
+        $heartbeat.state = $heartbeatData.state
+        $heartbeat.ageSeconds = [Math]::Max(0, ($now - [DateTime]::Parse($heartbeatData.utc).ToUniversalTime()).TotalSeconds)
+        $heartbeat.fresh = ($heartbeat.state -eq 'running' -and $heartbeat.ageSeconds -le $HeartbeatMaxAgeSeconds)
+    }
+    catch {
+        $heartbeat.error = $_.Exception.Message
+        $heartbeat.fresh = $false
+    }
+}
 
 try {
     $tcp = [Net.Sockets.TcpClient]::new()
@@ -42,7 +59,8 @@ $record = [ordered]@{
         startUtc = $null
     }
     proxy = $proxy
-    healthy = (($null -ne $process) -and $proxy.reachable)
+    heartbeat = $heartbeat
+    healthy = (($null -ne $process) -and $proxy.reachable -and (($heartbeat.installed -eq $false) -or $heartbeat.fresh))
 }
 
 if ($process -and $process.CreationDate) {
