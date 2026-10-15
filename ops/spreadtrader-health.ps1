@@ -39,10 +39,20 @@ $record = [ordered]@{
         name = $ProcessName
         running = $null -ne $process
         pid = if ($process) { [int]$process.ProcessId } else { $null }
-        startUtc = if ($process -and $process.CreationDate) { ([Management.ManagementDateTimeConverter]::ToDateTime($process.CreationDate)).ToUniversalTime().ToString('o') } else { $null }
+        startUtc = $null
     }
     proxy = $proxy
     healthy = (($null -ne $process) -and $proxy.reachable)
+}
+
+if ($process -and $process.CreationDate) {
+    try {
+        $record.process.startUtc = ([Management.ManagementDateTimeConverter]::ToDateTime($process.CreationDate)).ToUniversalTime().ToString('o')
+    }
+    catch {
+        # Some process providers expose a non-DMTF or incomplete timestamp.
+        # Liveness remains valid; retain the process/PID result and omit only startUtc.
+    }
 }
 
 $record | ConvertTo-Json -Compress -Depth 8 | Add-Content -LiteralPath $LogPath -Encoding UTF8
